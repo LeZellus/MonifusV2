@@ -40,6 +40,53 @@
             </div>
         </div>
 
+        <!-- Filtres -->
+        <div class="bg-gray-800 rounded-lg p-4 mb-6">
+            <form method="GET" class="grid grid-cols-1 md:grid-cols-4 gap-4 items-end">
+                <div>
+                    <label class="block text-white font-medium mb-2">Serveur</label>
+                    <select name="server" class="w-full px-3 py-2 border border-gray-600 bg-gray-700 text-white rounded-md">
+                        <option value="">Tous les serveurs</option>
+                        {% for character in characters %}
+                            <option value="{{ character.server.id }}" {{ current_filters.server == character.server.id ? 'selected' : '' }}>
+                                {{ character.server.name }}
+                            </option>
+                        {% endfor %}
+                    </select>
+                </div>
+
+                <div>
+                    <label class="block text-white font-medium mb-2">Période</label>
+                    <select name="period" class="w-full px-3 py-2 border border-gray-600 bg-gray-700 text-white rounded-md">
+                        <option value="7" {{ current_filters.period == '7' ? 'selected' : '' }}>7 derniers jours</option>
+                        <option value="30" {{ current_filters.period == '30' ? 'selected' : '' }}>30 derniers jours</option>
+                        <option value="90" {{ current_filters.period == '90' ? 'selected' : '' }}>3 derniers mois</option>
+                        <option value="365" {{ current_filters.period == '365' ? 'selected' : '' }}>Dernière année</option>
+                        <option value="all" {{ current_filters.period == 'all' ? 'selected' : '' }}>Toute la période</option>
+                    </select>
+                </div>
+
+                <div class="flex space-x-2">
+                    <button type="submit" class="bg-blue-600 hover:bg-blue-700 text-white px-4 py-2 rounded-md transition-colors">
+                        Filtrer
+                    </button>
+                    <a href="{{ path('app_sales_history_index') }}" class="bg-gray-600 hover:bg-gray-700 text-white px-4 py-2 rounded-md transition-colors">
+                        Reset
+                    </a>
+                </div>
+            </form>
+        </div>
+
+        <div class="flex justify-between items-center mb-6">
+            <h2 class="text-white text-2xl font-bold">Historique des Ventes</h2>
+            {% if sales|length > 0 %}
+                <a href="{{ path('app_sales_history_export', app.request.query.all) }}" 
+                class="bg-green-600 hover:bg-green-700 text-white px-4 py-2 rounded-lg transition-colors">
+                    📊 Exporter CSV
+                </a>
+            {% endif %}
+        </div>
+
         {% if sales|length > 0 %}
             <div class="bg-gray-800 rounded-lg overflow-hidden">
                 <table class="w-full">
