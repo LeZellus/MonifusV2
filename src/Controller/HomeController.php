@@ -2,17 +2,26 @@
 
 namespace App\Controller;
 
+use App\Entity\User;
+use App\Repository\UserRepository;
+use App\Repository\ClasseRepository;
+use App\Repository\ServerRepository;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\Routing\Attribute\Route;
 
-final class HomeController extends AbstractController
+class HomeController extends AbstractController
 {
     #[Route('/', name: 'app_home')]
-    public function index(): Response
-    {
+    public function index(
+        UserRepository $userRepository,
+        ClasseRepository $classeRepository,
+        ServerRepository $serverRepository
+    ): Response {
         return $this->render('home/index.html.twig', [
-            'controller_name' => 'HomeController',
+            'users_count' => $userRepository->count([]),
+            'classes_count' => $classeRepository->count([]),
+            'servers_count' => $serverRepository->count([]),
         ]);
     }
 }

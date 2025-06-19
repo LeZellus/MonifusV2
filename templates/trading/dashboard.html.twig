@@ -1,0 +1,56 @@
+{% extends 'base.html.twig' %}
+
+{% block title %}Dashboard Trading{% endblock %}
+
+{% block body %}
+<div class="bg-gray-900 min-h-screen">
+    <nav class="bg-gray-800 border-b border-gray-700">
+        <div class="container mx-auto px-4">
+            <div class="flex justify-between items-center py-4">
+                <h1 class="text-white text-xl font-bold">Trading Dashboard</h1>
+                <div class="flex space-x-4">
+                    <span class="text-gray-300">{{ user.pseudonymeWebsite ?? user.email }}</span>
+                    <a href="{{ path('app_logout') }}" class="text-red-400 hover:text-red-300">Déconnexion</a>
+                </div>
+            </div>
+        </div>
+    </nav>
+
+    <div class="container mx-auto px-4 py-8">
+        <div class="grid grid-cols-1 md:grid-cols-3 gap-6 mb-8">
+            <div class="bg-gray-800 rounded-lg p-6">
+                <h3 class="text-white text-lg font-semibold mb-2">Profils de Trading</h3>
+                <p class="text-blue-400 text-2xl font-bold">{{ trading_profiles_count }}</p>
+            </div>
+            <div class="bg-gray-800 rounded-lg p-6">
+                <h3 class="text-white text-lg font-semibold mb-2">Personnages</h3>
+                <p class="text-green-400 text-2xl font-bold">{{ characters_count }}</p>
+            </div>
+            <div class="bg-gray-800 rounded-lg p-6">
+                <h3 class="text-white text-lg font-semibold mb-2">Groupes de Lots</h3>
+                <p class="text-purple-400 text-2xl font-bold">{{ lot_groups_count }}</p>
+            </div>
+        </div>
+
+        <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+            <a href="{{ path('app_trading_lots') }}" 
+               class="bg-blue-600 hover:bg-blue-700 text-white p-6 rounded-lg text-center transition-colors block">
+                <h3 class="text-xl font-bold mb-2">Mon Trading</h3>
+                <p class="text-blue-100">Gérer mes lots et ventes</p>
+            </a>
+            <a href="{{ path('app_trading_surveillance') }}" 
+               class="bg-green-600 hover:bg-green-700 text-white p-6 rounded-lg text-center transition-colors block">
+                <h3 class="text-xl font-bold mb-2">Surveillance</h3>
+                <p class="text-green-100">Surveiller les prix du marché</p>
+            </a>
+        </div>
+
+        <div class="mb-8 mx-auto mt-6">
+            <a href="{{ path('app_profile_index') }}" 
+            class="bg-gray-600 hover:bg-gray-700 text-white px-4 py-2 rounded-lg transition-colors">
+                Gérer mes profils
+            </a>
+        </div>
+    </div>
+</div>
+{% endblock %}

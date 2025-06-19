@@ -1,20 +1,36 @@
 {% extends 'base.html.twig' %}
 
-{% block title %}Hello HomeController!{% endblock %}
+{% block title %}Dofus Trading V2{% endblock %}
 
 {% block body %}
-<style>
-    .example-wrapper { margin: 1em auto; max-width: 800px; width: 95%; font: 18px/1.5 sans-serif; }
-    .example-wrapper code { background: #F5F5F5; padding: 2px 6px; }
-</style>
+<div class="bg-gray-900 min-h-screen">
+    <div class="container mx-auto px-4 py-8">
+        <div class="text-center mb-12">
+            <h1 class="text-4xl font-bold text-white mb-4">Dofus Trading V2</h1>
+            <p class="text-gray-300 text-lg">Application moderne de trading Dofus</p>
+        </div>
 
-<div class="example-wrapper">
-    <h1>Hello {{ controller_name }}! ✅</h1>
+        <div class="grid grid-cols-1 md:grid-cols-3 gap-6 mb-8">
+            <div class="bg-gray-800 rounded-lg p-6 text-center">
+                <h3 class="text-white text-xl font-semibold mb-2">Utilisateurs</h3>
+                <p class="text-blue-400 text-3xl font-bold">{{ users_count }}</p>
+            </div>
+            <div class="bg-gray-800 rounded-lg p-6 text-center">
+                <h3 class="text-white text-xl font-semibold mb-2">Classes</h3>
+                <p class="text-green-400 text-3xl font-bold">{{ classes_count }}</p>
+            </div>
+            <div class="bg-gray-800 rounded-lg p-6 text-center">
+                <h3 class="text-white text-xl font-semibold mb-2">Serveurs</h3>
+                <p class="text-purple-400 text-3xl font-bold">{{ servers_count }}</p>
+            </div>
+        </div>
 
-    This friendly message is coming from:
-    <ul>
-        <li>Your controller at <code>C:/Users/mathe/Documents/Dev/MonifusV2/src/Controller/HomeController.php</code></li>
-        <li>Your template at <code>C:/Users/mathe/Documents/Dev/MonifusV2/templates/home/index.html.twig</code></li>
-    </ul>
+        <div class="text-center">
+            <a href="{{ path('app_trading_dashboard') }}" 
+               class="bg-blue-600 hover:bg-blue-700 text-white font-bold py-3 px-6 rounded-lg transition-colors">
+                Accéder au Trading
+            </a>
+        </div>
+    </div>
 </div>
 {% endblock %}

@@ -1,0 +1,46 @@
+{% extends 'base.html.twig' %}
+
+{% block title %}Nouveau Personnage{% endblock %}
+
+{% block body %}
+<div class="bg-gray-900 min-h-screen">
+    <nav class="bg-gray-800 border-b border-gray-700">
+        <div class="container mx-auto px-4">
+            <div class="flex justify-between items-center py-4">
+                <h1 class="text-white text-xl font-bold">Nouveau Personnage - {{ profile.name }}</h1>
+                <a href="{{ path('app_profile_index') }}" class="text-blue-400 hover:text-blue-300">← Retour</a>
+            </div>
+        </div>
+    </nav>
+
+    <div class="container mx-auto px-4 py-8">
+        <div class="max-w-md mx-auto bg-gray-800 rounded-lg p-6">
+            {{ form_start(form) }}
+            
+            <div class="mb-4">
+                {{ form_label(form.name, null, {'label_attr': {'class': 'block text-white font-medium mb-2'}}) }}
+                {{ form_widget(form.name) }}
+                {{ form_errors(form.name) }}
+            </div>
+
+            <div class="mb-4">
+                {{ form_label(form.server, null, {'label_attr': {'class': 'block text-white font-medium mb-2'}}) }}
+                {{ form_widget(form.server) }}
+                {{ form_errors(form.server) }}
+            </div>
+
+            <div class="mb-6">
+                {{ form_label(form.classe, null, {'label_attr': {'class': 'block text-white font-medium mb-2'}}) }}
+                {{ form_widget(form.classe) }}
+                {{ form_errors(form.classe) }}
+            </div>
+
+            <button type="submit" class="w-full bg-green-600 hover:bg-green-700 text-white font-bold py-2 px-4 rounded transition-colors">
+                Créer le personnage
+            </button>
+
+            {{ form_end(form) }}
+        </div>
+    </div>
+</div>
+{% endblock %}

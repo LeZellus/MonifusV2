@@ -5,8 +5,11 @@ namespace App\Entity;
 use App\Repository\TradingProfileRepository;
 use Doctrine\DBAL\Types\Types;
 use Doctrine\ORM\Mapping as ORM;
+use Doctrine\Common\Collections\ArrayCollection;
+use Doctrine\Common\Collections\Collection;
 
 #[ORM\Entity(repositoryClass: TradingProfileRepository::class)]
+#[ORM\HasLifecycleCallbacks]
 class TradingProfile
 {
     #[ORM\Id]
@@ -41,6 +44,17 @@ class TradingProfile
     public function setUpdatedAtValue(): void
     {
         $this->updatedAt = new \DateTimeImmutable();
+    }
+
+    /**
+     * @var Collection<int, DofusCharacter>
+     */
+    #[ORM\OneToMany(targetEntity: DofusCharacter::class, mappedBy: 'tradingProfile')]
+    private Collection $dofusCharacters;
+
+    public function __construct()
+    {
+        $this->dofusCharacters = new ArrayCollection();
     }
 
     public function getId(): ?int
@@ -93,5 +107,35 @@ class TradingProfile
     public function getUpdatedAt(): ?\DateTimeImmutable
     {
         return $this->updatedAt;
+    }
+
+    /**
+     * @return Collection<int, DofusCharacter>
+     */
+    public function getDofusCharacters(): Collection
+    {
+        return $this->dofusCharacters;
+    }
+
+    public function addDofusCharacter(DofusCharacter $dofusCharacter): static
+    {
+        if (!$this->dofusCharacters->contains($dofusCharacter)) {
+            $this->dofusCharacters->add($dofusCharacter);
+            $dofusCharacter->setTradingProfile($this);
+        }
+
+        return $this;
+    }
+
+    public function removeDofusCharacter(DofusCharacter $dofusCharacter): static
+    {
+        if ($this->dofusCharacters->removeElement($dofusCharacter)) {
+            // set the owning side to null (unless already changed)
+            if ($dofusCharacter->getTradingProfile() === $this) {
+                $dofusCharacter->setTradingProfile(null);
+            }
+        }
+
+        return $this;
     }
 }
