@@ -11,6 +11,7 @@ use Symfony\Component\Routing\Attribute\Route;
 use Symfony\Component\Security\Http\Attribute\IsGranted;
 use App\Service\TradingCalculatorService;
 use App\Service\NotificationService;
+use App\Service\WidgetService;
 
 #[Route('/trading')]
 #[IsGranted('ROLE_USER')]
@@ -20,17 +21,20 @@ class TradingController extends AbstractController
     public function dashboard(
         TradingProfileRepository $tradingProfileRepository,
         TradingCalculatorService $calculator,
-        NotificationService $notificationService
+        NotificationService $notificationService,
+        WidgetService $widgetService 
     ): Response {
         $user = $this->getUser();
         $stats = $calculator->getUserTradingStats($user);
         $notifications = $notificationService->getUserNotifications($user);
+        $quickStats = $widgetService->getQuickStats($user);
         
         return $this->render('trading/dashboard.html.twig', [
             'user' => $user,
             'trading_profiles_count' => $tradingProfileRepository->count(['user' => $user]),
             'stats' => $stats,
             'notifications' => $notifications,
+            'quick_stats' => $quickStats,
         ]);
     }
 

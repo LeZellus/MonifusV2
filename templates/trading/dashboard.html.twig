@@ -122,6 +122,29 @@
             </div>
         </div>
 
+        <!-- Performance de la semaine -->
+        {% if quick_stats.weekSalesCount > 0 %}
+            <div class="mb-8">
+                <h3 class="text-white text-xl font-semibold mb-4">🏆 Performance de la semaine</h3>
+                <div class="bg-gradient-to-r from-blue-600 to-purple-600 rounded-lg p-6 mb-8">
+                    <div class="grid grid-cols-1 md:grid-cols-3 gap-4 text-white">
+                        <div class="text-center">
+                            <div class="text-2xl font-bold">{{ quick_stats.weekSalesCount }}</div>
+                            <div class="text-blue-100 text-sm">ventes réalisées</div>
+                        </div>
+                        <div class="text-center">
+                            <div class="text-2xl font-bold">{{ (quick_stats.weekProfit / 1000000)|number_format(1) }}M</div>
+                            <div class="text-blue-100 text-sm">profit total</div>
+                        </div>
+                        <div class="text-center">
+                            <div class="text-lg font-medium">{{ quick_stats.bestItem }}</div>
+                            <div class="text-blue-100 text-sm">meilleur item (+{{ (quick_stats.bestItemProfit / 1000)|number_format(0, ',', ' ') }}k)</div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        {% endif %}
+
         <div class="mb-8 mx-auto mt-6">
             <a href="{{ path('app_profile_index') }}" 
             class="bg-gray-600 hover:bg-gray-700 text-white px-4 py-2 rounded-lg transition-colors">
