@@ -3,6 +3,8 @@
 namespace App\Entity;
 
 use App\Repository\LotGroupRepository;
+use Doctrine\Common\Collections\ArrayCollection;
+use Doctrine\Common\Collections\Collection;
 use Doctrine\ORM\Mapping as ORM;
 
 #[ORM\Entity(repositoryClass: LotGroupRepository::class)]
@@ -32,6 +34,17 @@ class LotGroup
     #[ORM\ManyToOne(inversedBy: 'lotGroups')]
     #[ORM\JoinColumn(nullable: false)]
     private ?Item $item = null;
+
+    /**
+     * @var Collection<int, LotUnit>
+     */
+    #[ORM\OneToMany(targetEntity: LotUnit::class, mappedBy: 'lotGroup')]
+    private Collection $lotUnits;
+
+    public function __construct()
+    {
+        $this->lotUnits = new ArrayCollection();
+    }
 
     public function getId(): ?int
     {
@@ -106,6 +119,36 @@ class LotGroup
     public function setItem(?Item $item): static
     {
         $this->item = $item;
+
+        return $this;
+    }
+
+    /**
+     * @return Collection<int, LotUnit>
+     */
+    public function getLotUnits(): Collection
+    {
+        return $this->lotUnits;
+    }
+
+    public function addLotUnit(LotUnit $lotUnit): static
+    {
+        if (!$this->lotUnits->contains($lotUnit)) {
+            $this->lotUnits->add($lotUnit);
+            $lotUnit->setLotGroup($this);
+        }
+
+        return $this;
+    }
+
+    public function removeLotUnit(LotUnit $lotUnit): static
+    {
+        if ($this->lotUnits->removeElement($lotUnit)) {
+            // set the owning side to null (unless already changed)
+            if ($lotUnit->getLotGroup() === $this) {
+                $lotUnit->setLotGroup(null);
+            }
+        }
 
         return $this;
     }

@@ -39,9 +39,16 @@ class Item
     #[ORM\OneToMany(targetEntity: LotGroup::class, mappedBy: 'item')]
     private Collection $lotGroups;
 
+    /**
+     * @var Collection<int, ItemCustomField>
+     */
+    #[ORM\OneToMany(targetEntity: ItemCustomField::class, mappedBy: 'item')]
+    private Collection $itemCustomFields;
+
     public function __construct()
     {
         $this->lotGroups = new ArrayCollection();
+        $this->itemCustomFields = new ArrayCollection();
     }
 
     public function getId(): ?int
@@ -145,6 +152,36 @@ class Item
             // set the owning side to null (unless already changed)
             if ($lotGroup->getItem() === $this) {
                 $lotGroup->setItem(null);
+            }
+        }
+
+        return $this;
+    }
+
+    /**
+     * @return Collection<int, ItemCustomField>
+     */
+    public function getItemCustomFields(): Collection
+    {
+        return $this->itemCustomFields;
+    }
+
+    public function addItemCustomField(ItemCustomField $itemCustomField): static
+    {
+        if (!$this->itemCustomFields->contains($itemCustomField)) {
+            $this->itemCustomFields->add($itemCustomField);
+            $itemCustomField->setItem($this);
+        }
+
+        return $this;
+    }
+
+    public function removeItemCustomField(ItemCustomField $itemCustomField): static
+    {
+        if ($this->itemCustomFields->removeElement($itemCustomField)) {
+            // set the owning side to null (unless already changed)
+            if ($itemCustomField->getItem() === $this) {
+                $itemCustomField->setItem(null);
             }
         }
 

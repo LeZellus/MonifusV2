@@ -36,9 +36,16 @@ class DofusCharacter
     #[ORM\OneToMany(targetEntity: LotGroup::class, mappedBy: 'dofusCharacter')]
     private Collection $lotGroups;
 
+    /**
+     * @var Collection<int, MarketWatch>
+     */
+    #[ORM\OneToMany(targetEntity: MarketWatch::class, mappedBy: 'dofusCharacter')]
+    private Collection $marketWatches;
+
     public function __construct()
     {
         $this->lotGroups = new ArrayCollection();
+        $this->marketWatches = new ArrayCollection();
     }
 
     public function getId(): ?int
@@ -118,6 +125,36 @@ class DofusCharacter
             // set the owning side to null (unless already changed)
             if ($lotGroup->getDofusCharacter() === $this) {
                 $lotGroup->setDofusCharacter(null);
+            }
+        }
+
+        return $this;
+    }
+
+    /**
+     * @return Collection<int, MarketWatch>
+     */
+    public function getMarketWatches(): Collection
+    {
+        return $this->marketWatches;
+    }
+
+    public function addMarketWatch(MarketWatch $marketWatch): static
+    {
+        if (!$this->marketWatches->contains($marketWatch)) {
+            $this->marketWatches->add($marketWatch);
+            $marketWatch->setDofusCharacter($this);
+        }
+
+        return $this;
+    }
+
+    public function removeMarketWatch(MarketWatch $marketWatch): static
+    {
+        if ($this->marketWatches->removeElement($marketWatch)) {
+            // set the owning side to null (unless already changed)
+            if ($marketWatch->getDofusCharacter() === $this) {
+                $marketWatch->setDofusCharacter(null);
             }
         }
 
