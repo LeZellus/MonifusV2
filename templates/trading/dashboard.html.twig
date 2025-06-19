@@ -9,6 +9,8 @@
             <div class="flex justify-between items-center py-4">
                 <h1 class="text-white text-xl font-bold">Trading Dashboard</h1>
                 <div class="flex space-x-4">
+                    <a href="{{ path('app_backup_index') }}" class="text-gray-300 hover:text-white">💾 Sauvegarde</a>
+                    <a href="{{ path('app_settings_index') }}" class="text-gray-300 hover:text-white">⚙️ Paramètres</a>
                     <span class="text-gray-300">{{ user.pseudonymeWebsite ?? user.email }}</span>
                     <a href="{{ path('app_logout') }}" class="text-red-400 hover:text-red-300">Déconnexion</a>
                 </div>

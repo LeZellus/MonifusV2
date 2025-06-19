@@ -1,0 +1,155 @@
+{% extends 'base.html.twig' %}
+
+{% block title %}Paramètres du Compte{% endblock %}
+
+{% block body %}
+<div class="bg-gray-900 min-h-screen">
+    <nav class="bg-gray-800 border-b border-gray-700">
+        <div class="container mx-auto px-4">
+            <div class="flex justify-between items-center py-4">
+                <h1 class="text-white text-xl font-bold">Paramètres du Compte</h1>
+                <a href="{{ path('app_trading_dashboard') }}" class="text-blue-400 hover:text-blue-300">← Dashboard</a>
+            </div>
+        </div>
+    </nav>
+
+    <div class="container mx-auto px-4 py-8">
+        <div class="max-w-2xl mx-auto">
+            <!-- Informations générales -->
+            <div class="bg-gray-800 rounded-lg p-6 mb-6">
+                <h2 class="text-white text-xl font-semibold mb-6">👤 Informations personnelles</h2>
+                
+                {{ form_start(form) }}
+                
+                <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+                    <div>
+                        {{ form_label(form.email, null, {'label_attr': {'class': 'block text-white font-medium mb-2'}}) }}
+                        {{ form_widget(form.email) }}
+                        {{ form_errors(form.email) }}
+                    </div>
+
+                    <div>
+                        {{ form_label(form.pseudonymeWebsite, null, {'label_attr': {'class': 'block text-white font-medium mb-2'}}) }}
+                        {{ form_widget(form.pseudonymeWebsite) }}
+                        {{ form_errors(form.pseudonymeWebsite) }}
+                    </div>
+
+                    <div>
+                        {{ form_label(form.pseudonymeDofus, null, {'label_attr': {'class': 'block text-white font-medium mb-2'}}) }}
+                        {{ form_widget(form.pseudonymeDofus) }}
+                        {{ form_errors(form.pseudonymeDofus) }}
+                    </div>
+
+                    <div>
+                        {{ form_label(form.discordId, null, {'label_attr': {'class': 'block text-white font-medium mb-2'}}) }}
+                        {{ form_widget(form.discordId) }}
+                        {{ form_errors(form.discordId) }}
+                        <div class="text-gray-400 text-sm mt-1">Votre nom d'utilisateur Discord</div>
+                    </div>
+                </div>
+
+                <div class="mt-6">
+                    {{ form_label(form.description, null, {'label_attr': {'class': 'block text-white font-medium mb-2'}}) }}
+                    {{ form_widget(form.description) }}
+                    {{ form_errors(form.description) }}
+                    <div class="text-gray-400 text-sm mt-1">Une courte description de votre profil</div>
+                </div>
+            </div>
+
+            <!-- Réseaux sociaux -->
+            <div class="bg-gray-800 rounded-lg p-6 mb-6">
+                <h2 class="text-white text-xl font-semibold mb-6">🌐 Réseaux sociaux</h2>
+                
+                <div class="space-y-4">
+                    <div>
+                        {{ form_label(form.youtubeUrl, null, {'label_attr': {'class': 'block text-white font-medium mb-2'}}) }}
+                        {{ form_widget(form.youtubeUrl) }}
+                        {{ form_errors(form.youtubeUrl) }}
+                        <div class="text-gray-400 text-sm mt-1">https://youtube.com/@votre-chaine</div>
+                    </div>
+
+                    <div>
+                        {{ form_label(form.twitchUrl, null, {'label_attr': {'class': 'block text-white font-medium mb-2'}}) }}
+                        {{ form_widget(form.twitchUrl) }}
+                        {{ form_errors(form.twitchUrl) }}
+                        <div class="text-gray-400 text-sm mt-1">https://twitch.tv/votre-chaine</div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Sécurité -->
+            <div class="bg-gray-800 rounded-lg p-6 mb-6">
+                <h2 class="text-white text-xl font-semibold mb-6">🔒 Sécurité</h2>
+                
+                <div>
+                    {{ form_label(form.plainPassword, null, {'label_attr': {'class': 'block text-white font-medium mb-2'}}) }}
+                    {{ form_widget(form.plainPassword) }}
+                    {{ form_errors(form.plainPassword) }}
+                    <div class="text-gray-400 text-sm mt-1">
+                        Laissez vide si vous ne souhaitez pas changer votre mot de passe
+                    </div>
+                </div>
+            </div>
+
+            <!-- Actions -->
+            <div class="flex space-x-4">
+                <button type="submit" class="flex-1 bg-blue-600 hover:bg-blue-700 text-white font-bold py-3 px-6 rounded-lg transition-colors">
+                    💾 Sauvegarder les modifications
+                </button>
+                <a href="{{ path('app_trading_dashboard') }}" 
+                   class="flex-1 bg-gray-600 hover:bg-gray-700 text-white font-bold py-3 px-6 rounded-lg transition-colors text-center">
+                    Annuler
+                </a>
+            </div>
+
+            {{ form_end(form) }}
+
+            <!-- Informations du compte -->
+            <div class="bg-gray-800 rounded-lg p-6 mt-8">
+                <h3 class="text-white text-lg font-semibold mb-4">ℹ️ Informations du compte</h3>
+                <div class="grid grid-cols-1 md:grid-cols-2 gap-4 text-sm">
+                    <div>
+                        <span class="text-gray-400">Compte créé le :</span>
+                        <span class="text-white">{{ app.user.createdAt|date('d/m/Y à H:i') }}</span>
+                    </div>
+                    <div>
+                        <span class="text-gray-400">Dernière modification :</span>
+                        <span class="text-white">{{ app.user.updatedAt|date('d/m/Y à H:i') }}</span>
+                    </div>
+                    <div>
+                        <span class="text-gray-400">Statut :</span>
+                        <span class="text-{{ app.user.isVerified ? 'green' : 'yellow' }}-400">
+                            {{ app.user.isVerified ? '✅ Vérifié' : '⏳ En attente' }}
+                        </span>
+                    </div>
+                    <div>
+                        <span class="text-gray-400">Tutoriel :</span>
+                        <span class="text-{{ app.user.isTutorial ? 'blue' : 'green' }}-400">
+                            {{ app.user.isTutorial ? '📚 À faire' : '✅ Terminé' }}
+                        </span>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Actions avancées -->
+            <div class="bg-gray-800 rounded-lg p-6 mt-6">
+                <h3 class="text-white text-lg font-semibold mb-4">🔧 Actions avancées</h3>
+                <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+                    <a href="{{ path('app_backup_index') }}" 
+                       class="bg-blue-600 hover:bg-blue-700 text-white p-4 rounded-lg text-center transition-colors block">
+                        <div class="text-lg mb-1">💾</div>
+                        <div class="font-medium">Sauvegarder mes données</div>
+                        <div class="text-blue-100 text-sm">Export complet JSON</div>
+                    </a>
+                    <a href="{{ path('app_profile_index') }}" 
+                       class="bg-green-600 hover:bg-green-700 text-white p-4 rounded-lg text-center transition-colors block">
+                        <div class="text-lg mb-1">👥</div>
+                        <div class="font-medium">Gérer mes profils</div>
+                        <div class="text-green-100 text-sm">Profils et personnages</div>
+                    </a>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}

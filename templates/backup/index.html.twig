@@ -1,0 +1,99 @@
+{% extends 'base.html.twig' %}
+
+{% block title %}Sauvegarde des Données{% endblock %}
+
+{% block body %}
+<div class="bg-gray-900 min-h-screen">
+    <nav class="bg-gray-800 border-b border-gray-700">
+        <div class="container mx-auto px-4">
+            <div class="flex justify-between items-center py-4">
+                <h1 class="text-white text-xl font-bold">Sauvegarde & Données</h1>
+                <a href="{{ path('app_trading_dashboard') }}" class="text-blue-400 hover:text-blue-300">← Dashboard</a>
+            </div>
+        </div>
+    </nav>
+
+    <div class="container mx-auto px-4 py-8">
+        <div class="max-w-4xl mx-auto">
+            <!-- Résumé des données -->
+            <div class="bg-gray-800 rounded-lg p-6 mb-8">
+                <h2 class="text-white text-xl font-semibold mb-4">📊 Résumé de vos données</h2>
+                <div class="grid grid-cols-2 md:grid-cols-5 gap-4">
+                    <div class="text-center">
+                        <div class="text-2xl font-bold text-blue-400">{{ summary.profiles_count }}</div>
+                        <div class="text-gray-400 text-sm">Profils</div>
+                    </div>
+                    <div class="text-center">
+                        <div class="text-2xl font-bold text-green-400">{{ summary.characters_count }}</div>
+                        <div class="text-gray-400 text-sm">Personnages</div>
+                    </div>
+                    <div class="text-center">
+                        <div class="text-2xl font-bold text-purple-400">{{ summary.lots_count }}</div>
+                        <div class="text-gray-400 text-sm">Lots</div>
+                    </div>
+                    <div class="text-center">
+                        <div class="text-2xl font-bold text-yellow-400">{{ summary.sales_count }}</div>
+                        <div class="text-gray-400 text-sm">Ventes</div>
+                    </div>
+                    <div class="text-center">
+                        <div class="text-2xl font-bold text-orange-400">{{ summary.watches_count }}</div>
+                        <div class="text-gray-400 text-sm">Surveillances</div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Actions de sauvegarde -->
+            <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+                <!-- Export des données -->
+                <div class="bg-gray-800 rounded-lg p-6">
+                    <div class="flex items-center mb-4">
+                        <span class="text-2xl mr-3">💾</span>
+                        <h3 class="text-white text-lg font-semibold">Exporter mes données</h3>
+                    </div>
+                    <p class="text-gray-300 mb-4">
+                        Téléchargez toutes vos données de trading au format JSON. 
+                        Ce fichier contient vos profils, personnages, lots, ventes et surveillances.
+                    </p>
+                    <a href="{{ path('app_backup_export') }}" 
+                       class="bg-blue-600 hover:bg-blue-700 text-white px-6 py-3 rounded-lg transition-colors inline-block">
+                        📥 Télécharger la sauvegarde
+                    </a>
+                </div>
+
+                <!-- Info RGPD -->
+                <div class="bg-gray-800 rounded-lg p-6">
+                    <div class="flex items-center mb-4">
+                        <span class="text-2xl mr-3">🔒</span>
+                        <h3 class="text-white text-lg font-semibold">Vos données</h3>
+                    </div>
+                    <div class="text-gray-300 space-y-2 text-sm">
+                        <p><strong>Données stockées :</strong></p>
+                        <ul class="list-disc list-inside space-y-1 text-gray-400">
+                            <li>Informations de profil et personnages</li>
+                            <li>Historique de trading et prix</li>
+                            <li>Préférences et paramètres</li>
+                        </ul>
+                        <p class="mt-4"><strong>Sécurité :</strong></p>
+                        <ul class="list-disc list-inside space-y-1 text-gray-400">
+                            <li>Données chiffrées en base</li>
+                            <li>Accès sécurisé par authentification</li>
+                            <li>Sauvegarde régulière</li>
+                        </ul>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Conseils de sauvegarde -->
+            <div class="bg-gradient-to-r from-green-600 to-blue-600 rounded-lg p-6 mt-8">
+                <h3 class="text-white text-lg font-semibold mb-3">💡 Conseils de sauvegarde</h3>
+                <div class="text-white space-y-2 text-sm">
+                    <p>• Exportez vos données régulièrement (1 fois par mois)</p>
+                    <p>• Conservez les fichiers de sauvegarde en lieu sûr</p>
+                    <p>• Vérifiez que l'export contient bien toutes vos données</p>
+                    <p>• En cas de problème, contactez le support avec votre sauvegarde</p>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}
