@@ -1,0 +1,105 @@
+<!-- templates/components/character_selector.html.twig -->
+<div class="bg-gray-800 rounded-lg p-4 mb-6" id="character-selector">
+    {% if characters|length > 0 %}
+        <div class="flex flex-col md:flex-row items-start md:items-center justify-between space-y-3 md:space-y-0">
+            <div class="flex items-center space-x-3">
+                <span class="text-gray-300 text-sm font-medium">👤 Personnage actuel :</span>
+                {% if selectedCharacter %}
+                    <div class="flex items-center space-x-2 bg-blue-600 text-white px-3 py-1 rounded-lg">
+                        <span class="font-medium">{{ selectedCharacter.name }}</span>
+                        <span class="text-blue-200 text-xs">{{ selectedCharacter.server.name }}</span>
+                    </div>
+                {% else %}
+                    <span class="text-gray-400 italic">Aucun personnage sélectionné</span>
+                {% endif %}
+            </div>
+
+            {% if characters|length > 1 %}
+                <div class="flex items-center space-x-2">
+                    <label for="character-select" class="text-gray-300 text-sm">Changer :</label>
+                    <select 
+                        id="character-select" 
+                        class="px-3 py-1 bg-gray-700 text-white rounded border border-gray-600 focus:border-blue-500 text-sm"
+                        onchange="changeCharacter(this.value)"
+                    >
+                        {% for character in characters %}
+                            <option 
+                                value="{{ character.id }}" 
+                                {{ selectedCharacter and character.id == selectedCharacter.id ? 'selected' : '' }}
+                            >
+                                {{ character.name }} ({{ character.server.name }})
+                            </option>
+                        {% endfor %}
+                    </select>
+                </div>
+            {% endif %}
+
+            <a href="{{ path('app_profile_character_new', {id: characters[0].tradingProfile.id}) }}" 
+               class="bg-green-600 hover:bg-green-700 text-white px-3 py-1 rounded text-sm transition-colors">
+                + Nouveau personnage
+            </a>
+        </div>
+
+        {% if selectedCharacter %}
+            <div class="mt-3 grid grid-cols-2 md:grid-cols-4 gap-2 text-xs">
+                <div>
+                    <span class="text-gray-400">Classe :</span>
+                    <span class="text-white">{{ selectedCharacter.classe.name }}</span>
+                </div>
+                <div>
+                    <span class="text-gray-400">Serveur :</span>
+                    <span class="text-white">{{ selectedCharacter.server.name }}</span>
+                </div>
+                <div>
+                    <span class="text-gray-400">Profil :</span>
+                    <span class="text-white">{{ selectedCharacter.tradingProfile.name }}</span>
+                </div>
+                <div>
+                    <span class="text-gray-400">Créé le :</span>
+                    <span class="text-white">{{ selectedCharacter.createdAt|date('d/m/Y') }}</span>
+                </div>
+            </div>
+        {% endif %}
+    {% else %}
+        <div class="text-center py-4">
+            <p class="text-gray-400 mb-3">Aucun personnage créé</p>
+            <a href="{{ path('app_profile_index') }}" 
+               class="bg-blue-600 hover:bg-blue-700 text-white px-4 py-2 rounded-lg transition-colors">
+                Créer un personnage
+            </a>
+        </div>
+    {% endif %}
+</div>
+
+<script>
+async function changeCharacter(characterId) {
+    try {
+        const response = await fetch(`/character/select/${characterId}`, {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json',
+                'X-Requested-With': 'XMLHttpRequest'
+            }
+        });
+
+        if (response.ok) {
+            // Recharger la page pour refléter le changement
+            window.location.reload();
+        } else {
+            console.error('Erreur lors du changement de personnage');
+        }
+    } catch (error) {
+        console.error('Erreur réseau:', error);
+    }
+}
+
+// Auto-sélection si un seul personnage et aucun sélectionné
+document.addEventListener('DOMContentLoaded', function() {
+    const characters = {{ characters|json_encode|raw }};
+    const selectedCharacter = {{ selectedCharacter ? selectedCharacter.id : 'null' }};
+    
+    if (characters.length === 1 && !selectedCharacter) {
+        changeCharacter(characters[0].id);
+    }
+});
+</script>

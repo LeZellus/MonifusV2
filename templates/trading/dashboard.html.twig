@@ -19,6 +19,43 @@
     </nav>
 
     <div class="container mx-auto px-4 py-8">
+        <!-- Étape 1: Sélection du personnage -->
+        {% if stats.charactersCount == 0 %}
+            <div class="bg-gradient-to-r from-blue-600 to-purple-600 rounded-lg p-8 mb-8 text-center">
+                <h2 class="text-white text-2xl font-bold mb-4">🚀 Commencez votre aventure trading !</h2>
+                <p class="text-white mb-6">Créez votre premier profil et personnage pour débuter</p>
+                <a href="{{ path('app_profile_index') }}" 
+                   class="bg-white text-blue-600 font-bold px-8 py-3 rounded-lg hover:bg-gray-100 transition-colors">
+                    Créer mon profil
+                </a>
+            </div>
+        {% else %}
+            <!-- Personnage actif -->
+            <div class="bg-gray-800 rounded-lg p-6 mb-8">
+                <div class="flex items-center justify-between">
+                    <div>
+                        <h2 class="text-white text-lg font-semibold mb-1">👤 Trading avec</h2>
+                        {% if stats.charactersCount > 0 %}
+                            <div class="flex items-center space-x-3">
+                                <div class="w-10 h-10 bg-blue-500 rounded-full flex items-center justify-center">
+                                    <span class="text-white font-bold">?</span>
+                                </div>
+                                <div>
+                                    <div class="text-blue-400 font-medium">Personnage sélectionné</div>
+                                    <div class="text-gray-400 text-sm">Gérez la sélection dans les profils</div>
+                                </div>
+                            </div>
+                        {% endif %}
+                    </div>
+                    <a href="{{ path('app_profile_index') }}" 
+                       class="bg-blue-600 hover:bg-blue-700 text-white px-4 py-2 rounded-lg transition-colors">
+                        Gérer personnages
+                    </a>
+                </div>
+            </div>
+        {% endif %}
+
+        <!-- Statistiques globales -->
         <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6 mb-8">
             <div class="bg-gray-800 rounded-lg p-6">
                 <h3 class="text-white text-lg font-semibold mb-2">Profils</h3>
@@ -70,58 +107,28 @@
             </div>
         {% endif %}
 
+        <!-- Actions principales -->
         <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6 mb-8">
-            <a href="{{ path('app_trading_lots') }}" 
+            <a href="{{ path('app_profile_index') }}" 
             class="bg-blue-600 hover:bg-blue-700 text-white p-6 rounded-lg text-center transition-colors block">
-                <h3 class="text-xl font-bold mb-2">Mon Trading</h3>
-                <p class="text-blue-100">Gérer mes lots et ventes</p>
+                <h3 class="text-xl font-bold mb-2">👥 Profils</h3>
+                <p class="text-blue-100">Gérer personnages et sélection</p>
+            </a>
+            <a href="{{ path('app_trading_lots') }}" 
+            class="bg-green-600 hover:bg-green-700 text-white p-6 rounded-lg text-center transition-colors block">
+                <h3 class="text-xl font-bold mb-2">📦 Mon Trading</h3>
+                <p class="text-green-100">Gérer mes lots et ventes</p>
             </a>
             <a href="{{ path('app_trading_surveillance') }}" 
-            class="bg-green-600 hover:bg-green-700 text-white p-6 rounded-lg text-center transition-colors block">
-                <h3 class="text-xl font-bold mb-2">Surveillance</h3>
-                <p class="text-green-100">Surveiller les prix du marché</p>
+            class="bg-orange-600 hover:bg-orange-700 text-white p-6 rounded-lg text-center transition-colors block">
+                <h3 class="text-xl font-bold mb-2">👁️ Surveillance</h3>
+                <p class="text-orange-100">Surveiller les prix du marché</p>
             </a>
             <a href="{{ path('app_analytics_index') }}" 
             class="bg-purple-600 hover:bg-purple-700 text-white p-6 rounded-lg text-center transition-colors block">
-                <h3 class="text-xl font-bold mb-2">Analytics</h3>
+                <h3 class="text-xl font-bold mb-2">📊 Analytics</h3>
                 <p class="text-purple-100">Analyser mes performances</p>
             </a>
-            <a href="{{ path('app_sales_history_index') }}" 
-            class="bg-orange-600 hover:bg-orange-700 text-white p-6 rounded-lg text-center transition-colors block">
-                <h3 class="text-xl font-bold mb-2">Historique</h3>
-                <p class="text-orange-100">Ventes réalisées</p>
-            </a>
-        </div>
-
-        <!-- Actions rapides -->
-        <div class="mb-8">
-            <h3 class="text-white text-xl font-semibold mb-4">⚡ Actions Rapides</h3>
-            <div class="grid grid-cols-2 md:grid-cols-4 gap-4">
-                {% if stats.charactersCount > 0 %}
-                    <a href="{{ path('app_lot_new', {id: 1}) }}" 
-                    class="bg-gray-700 hover:bg-gray-600 text-white p-3 rounded-lg text-center transition-colors">
-                        <div class="text-lg mb-1">➕</div>
-                        <div class="text-sm">Ajouter Lot</div>
-                    </a>
-                    <a href="{{ path('app_market_watch_new', {id: 1}) }}" 
-                    class="bg-gray-700 hover:bg-gray-600 text-white p-3 rounded-lg text-center transition-colors">
-                        <div class="text-lg mb-1">👁️</div>
-                        <div class="text-sm">Surveiller Prix</div>
-                    </a>
-                {% endif %}
-                <a href="{{ path('app_profile_new') }}" 
-                class="bg-gray-700 hover:bg-gray-600 text-white p-3 rounded-lg text-center transition-colors">
-                    <div class="text-lg mb-1">👤</div>
-                    <div class="text-sm">Nouveau Profil</div>
-                </a>
-                {% if stats.global.availableLots > 0 %}
-                    <a href="{{ path('app_lot_index') }}" 
-                    class="bg-gray-700 hover:bg-gray-600 text-white p-3 rounded-lg text-center transition-colors">
-                        <div class="text-lg mb-1">💸</div>
-                        <div class="text-sm">Vendre Lots</div>
-                    </a>
-                {% endif %}
-            </div>
         </div>
 
         <!-- Performance de la semaine -->
@@ -146,13 +153,6 @@
                 </div>
             </div>
         {% endif %}
-
-        <div class="mb-8 mx-auto mt-6">
-            <a href="{{ path('app_profile_index') }}" 
-            class="bg-gray-600 hover:bg-gray-700 text-white px-4 py-2 rounded-lg transition-colors">
-                Gérer mes profils
-            </a>
-        </div>
     </div>
 </div>
 {% endblock %}

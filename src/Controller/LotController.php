@@ -3,10 +3,9 @@
 namespace App\Controller;
 
 use App\Entity\LotGroup;
-use App\Entity\DofusCharacter;
 use App\Form\LotGroupType;
 use App\Repository\LotGroupRepository;
-use App\Repository\DofusCharacterRepository;
+use App\Service\CharacterSelectionService;
 use Doctrine\ORM\EntityManagerInterface;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\HttpFoundation\Request;
@@ -21,24 +20,16 @@ class LotController extends AbstractController
     #[Route('/', name: 'app_lot_index')]
     public function index(
         LotGroupRepository $lotRepository,
-        DofusCharacterRepository $characterRepository
+        CharacterSelectionService $characterService
     ): Response {
-        // Récupérer tous les personnages de l'utilisateur
-        $characters = $characterRepository->createQueryBuilder('c')
-            ->join('c.tradingProfile', 'tp')
-            ->where('tp.user = :user')
-            ->setParameter('user', $this->getUser())
-            ->getQuery()
-            ->getResult();
+        $selectedCharacter = $characterService->getSelectedCharacter($this->getUser());
+        $characters = $characterService->getUserCharacters($this->getUser());
 
-        // Récupérer tous les lots des personnages de l'utilisateur
         $lots = [];
-        if (!empty($characters)) {
+        if ($selectedCharacter) {
             $lots = $lotRepository->createQueryBuilder('lg')
-                ->join('lg.dofusCharacter', 'c')
-                ->join('c.tradingProfile', 'tp')
-                ->where('tp.user = :user')
-                ->setParameter('user', $this->getUser())
+                ->where('lg.dofusCharacter = :character')
+                ->setParameter('character', $selectedCharacter)
                 ->orderBy('lg.createdAt', 'DESC')
                 ->getQuery()
                 ->getResult();
@@ -47,18 +38,21 @@ class LotController extends AbstractController
         return $this->render('lot/index.html.twig', [
             'lots' => $lots,
             'characters' => $characters,
+            'selectedCharacter' => $selectedCharacter,
         ]);
     }
 
-    #[Route('/character/{id}/new', name: 'app_lot_new')]
+    #[Route('/new', name: 'app_lot_new')]
     public function new(
-        DofusCharacter $character, 
         Request $request, 
-        EntityManagerInterface $em
+        EntityManagerInterface $em,
+        CharacterSelectionService $characterService
     ): Response {
-        // Vérifier que le personnage appartient à l'utilisateur
-        if ($character->getTradingProfile()->getUser() !== $this->getUser()) {
-            throw $this->createAccessDeniedException();
+        $selectedCharacter = $characterService->getSelectedCharacter($this->getUser());
+        
+        if (!$selectedCharacter) {
+            $this->addFlash('error', 'Aucun personnage sélectionné. Créez d\'abord un personnage.');
+            return $this->redirectToRoute('app_profile_index');
         }
 
         $lotGroup = new LotGroup();
@@ -66,7 +60,7 @@ class LotController extends AbstractController
 
         $form->handleRequest($request);
         if ($form->isSubmitted() && $form->isValid()) {
-            $lotGroup->setDofusCharacter($character);
+            $lotGroup->setDofusCharacter($selectedCharacter);
             $em->persist($lotGroup);
             $em->flush();
 
@@ -76,7 +70,7 @@ class LotController extends AbstractController
 
         return $this->render('lot/new.html.twig', [
             'form' => $form,
-            'character' => $character,
+            'character' => $selectedCharacter,
         ]);
     }
 
@@ -84,10 +78,13 @@ class LotController extends AbstractController
     public function edit(
         LotGroup $lotGroup, 
         Request $request, 
-        EntityManagerInterface $em
+        EntityManagerInterface $em,
+        CharacterSelectionService $characterService
     ): Response {
-        // Vérifier que le lot appartient à l'utilisateur
-        if ($lotGroup->getDofusCharacter()->getTradingProfile()->getUser() !== $this->getUser()) {
+        $selectedCharacter = $characterService->getSelectedCharacter($this->getUser());
+
+        // Vérifier que le lot appartient au personnage sélectionné
+        if ($lotGroup->getDofusCharacter() !== $selectedCharacter) {
             throw $this->createAccessDeniedException();
         }
 
@@ -110,10 +107,13 @@ class LotController extends AbstractController
     #[Route('/{id}/delete', name: 'app_lot_delete', methods: ['POST'])]
     public function delete(
         LotGroup $lotGroup, 
-        EntityManagerInterface $em
+        EntityManagerInterface $em,
+        CharacterSelectionService $characterService
     ): Response {
-        // Vérifier que le lot appartient à l'utilisateur
-        if ($lotGroup->getDofusCharacter()->getTradingProfile()->getUser() !== $this->getUser()) {
+        $selectedCharacter = $characterService->getSelectedCharacter($this->getUser());
+
+        // Vérifier que le lot appartient au personnage sélectionné
+        if ($lotGroup->getDofusCharacter() !== $selectedCharacter) {
             throw $this->createAccessDeniedException();
         }
 

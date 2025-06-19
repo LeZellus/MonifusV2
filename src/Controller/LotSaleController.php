@@ -6,6 +6,7 @@ use App\Entity\LotGroup;
 use App\Entity\LotUnit;
 use App\Form\LotUnitType;
 use App\Enum\LotStatus;
+use App\Service\CharacterSelectionService;
 use Doctrine\ORM\EntityManagerInterface;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\HttpFoundation\Request;
@@ -21,10 +22,13 @@ class LotSaleController extends AbstractController
     public function sell(
         LotGroup $lotGroup, 
         Request $request, 
-        EntityManagerInterface $em
+        EntityManagerInterface $em,
+        CharacterSelectionService $characterService
     ): Response {
-        // Vérifier que le lot appartient à l'utilisateur
-        if ($lotGroup->getDofusCharacter()->getTradingProfile()->getUser() !== $this->getUser()) {
+        $selectedCharacter = $characterService->getSelectedCharacter($this->getUser());
+
+        // Vérifier que le lot appartient au personnage sélectionné
+        if ($lotGroup->getDofusCharacter() !== $selectedCharacter) {
             throw $this->createAccessDeniedException();
         }
 

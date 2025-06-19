@@ -14,25 +14,18 @@
     </nav>
 
     <div class="container mx-auto px-4 py-8">
-        {% if characters|length == 0 %}
-            <div class="text-center py-12">
-                <p class="text-gray-400 text-lg mb-4">Aucun personnage créé</p>
-                <a href="{{ path('app_profile_index') }}" 
-                   class="bg-blue-600 hover:bg-blue-700 text-white px-6 py-3 rounded-lg transition-colors">
-                    Créer un personnage
-                </a>
-            </div>
-        {% else %}
+        <!-- Sélecteur de personnage -->
+        {% include 'components/character_selector.html.twig' %}
+
+        {% if selectedCharacter %}
             <div class="flex justify-between items-center mb-6">
-                <h2 class="text-white text-2xl font-bold">Surveillance des Prix</h2>
-                <div class="flex space-x-2">
-                    {% for character in characters %}
-                        <a href="{{ path('app_market_watch_new', {id: character.id}) }}" 
-                           class="bg-orange-600 hover:bg-orange-700 text-white px-4 py-2 rounded-lg transition-colors text-sm">
-                            + Surveillance ({{ character.name }})
-                        </a>
-                    {% endfor %}
-                </div>
+                <h2 class="text-white text-2xl font-bold">
+                    Surveillances de {{ selectedCharacter.name }}
+                </h2>
+                <a href="{{ path('app_market_watch_new') }}" 
+                   class="bg-orange-600 hover:bg-orange-700 text-white px-4 py-2 rounded-lg transition-colors">
+                    + Nouvelle surveillance
+                </a>
             </div>
 
             {% if watch_list|length > 0 %}
@@ -41,7 +34,6 @@
                         <thead class="bg-gray-700">
                             <tr>
                                 <th class="px-6 py-3 text-left text-xs font-medium text-gray-300 uppercase tracking-wider">Item</th>
-                                <th class="px-6 py-3 text-left text-xs font-medium text-gray-300 uppercase tracking-wider">Personnage</th>
                                 <th class="px-6 py-3 text-left text-xs font-medium text-gray-300 uppercase tracking-wider">Lot</th>
                                 <th class="px-6 py-3 text-left text-xs font-medium text-gray-300 uppercase tracking-wider">Prix Observé</th>
                                 <th class="px-6 py-3 text-left text-xs font-medium text-gray-300 uppercase tracking-wider">Type</th>
@@ -57,10 +49,6 @@
                                         <div class="text-white font-medium">{{ watch.item.name }}</div>
                                         <div class="text-gray-400 text-sm">Niv.{{ watch.item.level }}</div>
                                     </td>
-                                    <td class="px-6 py-4 whitespace-nowrap">
-                                        <div class="text-white">{{ watch.dofusCharacter.name }}</div>
-                                        <div class="text-gray-400 text-sm">{{ watch.dofusCharacter.server.name }}</div>
-                                    </td>
                                     <td class="px-6 py-4 whitespace-nowrap text-white">
                                         {{ watch.lotSize }}
                                     </td>
@@ -69,8 +57,8 @@
                                     </td>
                                     <td class="px-6 py-4 whitespace-nowrap">
                                         <span class="px-2 inline-flex text-xs leading-5 font-semibold rounded-full 
-                                                   {{ watch.priceType.value == 'buy' ? 'bg-red-100 text-red-800' : 'bg-green-100 text-green-800' }}">
-                                            {{ watch.priceType.value == 'buy' ? 'Achat' : 'Vente' }}
+                                                   {{ watch.priceType.value == 'Acheter' ? 'bg-red-100 text-red-800' : 'bg-green-100 text-green-800' }}">
+                                            {{ watch.priceType.value == 'Acheter' ? 'Achat' : 'Vente' }}
                                         </span>
                                     </td>
                                     <td class="px-6 py-4 text-gray-300 max-w-xs">
@@ -102,32 +90,35 @@
                 </div>
 
                 <div class="mt-6 bg-gray-800 rounded-lg p-4">
-                    <h3 class="text-white font-semibold mb-2">📊 Résumé</h3>
+                    <h3 class="text-white font-semibold mb-2">📊 Résumé pour {{ selectedCharacter.name }}</h3>
                     <div class="grid grid-cols-1 md:grid-cols-3 gap-4 text-sm">
                         <div class="text-gray-300">
                             <span class="font-medium">Total surveillances :</span> {{ watch_list|length }}
                         </div>
                         <div class="text-gray-300">
                             <span class="font-medium">Prix d'achat :</span> 
-                            {{ watch_list|filter(w => w.priceType.value == 'buy')|length }}
+                            {{ watch_list|filter(w => w.priceType.value == 'Acheter')|length }}
                         </div>
                         <div class="text-gray-300">
                             <span class="font-medium">Prix de vente :</span> 
-                            {{ watch_list|filter(w => w.priceType.value == 'sell')|length }}
+                            {{ watch_list|filter(w => w.priceType.value == 'Vendre')|length }}
                         </div>
                     </div>
                 </div>
             {% else %}
                 <div class="text-center py-12">
-                    <p class="text-gray-400 text-lg mb-4">Aucune surveillance de prix pour le moment</p>
-                    {% if characters|length > 0 %}
-                        <a href="{{ path('app_market_watch_new', {id: characters[0].id}) }}" 
-                           class="bg-orange-600 hover:bg-orange-700 text-white px-6 py-3 rounded-lg transition-colors">
-                            Créer ma première surveillance
-                        </a>
-                    {% endif %}
+                    <p class="text-gray-400 text-lg mb-4">Aucune surveillance pour {{ selectedCharacter.name }}</p>
+                    <a href="{{ path('app_market_watch_new') }}" 
+                       class="bg-orange-600 hover:bg-orange-700 text-white px-6 py-3 rounded-lg transition-colors">
+                        Créer la première surveillance
+                    </a>
                 </div>
             {% endif %}
+        {% else %}
+            <!-- Aucun personnage sélectionné -->
+            <div class="text-center py-12">
+                <p class="text-gray-400 text-lg mb-4">Sélectionnez un personnage pour voir ses surveillances</p>
+            </div>
         {% endif %}
     </div>
 </div>
