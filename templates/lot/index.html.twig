@@ -11,8 +11,6 @@
 {% endblock %}
 
 {% block body %}
-<div class="bg-gray-900 min-h-screen">
-
     <div class="wrapper-container">
         <!-- Sélecteur de personnage -->
         {% include 'components/character_selector.html.twig' %}
@@ -112,7 +110,7 @@
                     {% for lot in lots %}
                         {% set profit = lot.sellPricePerLot - lot.buyPricePerLot %}
                         {% set profitPercent = lot.buyPricePerLot > 0 ? (profit / lot.buyPricePerLot * 100) : 0 %}
-                        <div class="bg-gray-800 rounded-lg p-4">
+                        <div class="wrapper-background">
                             <div class="flex justify-between items-start mb-3">
                                 <div>
                                     <h3 class="text-white font-medium">{{ lot.item.name }}</h3>
@@ -182,5 +180,4 @@
             </div>
         {% endif %}
     </div>
-</div>
 {% endblock %}

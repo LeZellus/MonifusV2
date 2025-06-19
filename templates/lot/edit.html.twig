@@ -10,17 +10,7 @@
 {% endblock %}
 
 {% block body %}
-<div class="bg-gray-900 min-h-screen">
-    <nav class="bg-gray-800 border-b border-gray-700">
-        <div class="wrapper-containe">
-            <div class="flex justify-between items-center py-4">
-                <h1 class="text-white text-xl font-bold">Modifier le lot - {{ lot.item.name }}</h1>
-                <a href="{{ path('app_lot_index') }}" class="text-blue-400 hover:text-blue-300">← Retour</a>
-            </div>
-        </div>
-    </nav>
-
-    <div class="wrapper-containe">
+    <div class="wrapper-container">
         <div class="max-w-md mx-auto bg-gray-800 rounded-lg p-6">
             {{ form_start(form) }}
             

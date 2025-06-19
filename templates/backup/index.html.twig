@@ -11,11 +11,10 @@
 {% endblock %}
 
 {% block body %}
-<div class="bg-gray-900 min-h-screen">
     <div class="wrapper-container">
         <div class="max-w-4xl mx-auto grid gap-8">
             <!-- Résumé des données -->
-            <div class="bg-gray-800 rounded-lg p-4">
+            <div class="wrapper-background">
                 <h2 class="text-white text-xl font-semibold mb-4">📊 Résumé de vos données</h2>
                 <div class="grid grid-cols-2 md:grid-cols-5 gap-4">
                     <div class="text-center">
@@ -44,7 +43,7 @@
             <!-- Actions de sauvegarde -->
             <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
                 <!-- Export des données -->
-                <div class="bg-gray-800 rounded-lg p-4">
+                <div class="wrapper-background">
                     <div class="flex items-center mb-4">
                         <span class="text-2xl mr-3">💾</span>
                         <h3 class="text-white text-lg font-semibold">Exporter mes données</h3>
@@ -60,7 +59,7 @@
                 </div>
 
                 <!-- Info RGPD -->
-                <div class="bg-gray-800 rounded-lg p-4">
+                <div class="wrapper-background">
                     <div class="flex items-center mb-4">
                         <span class="text-2xl mr-3">🔒</span>
                         <h3 class="text-white text-lg font-semibold">Vos données</h3>
@@ -94,5 +93,4 @@
             </div>
         </div>
     </div>
-</div>
 {% endblock %}

@@ -11,32 +11,31 @@
 {% endblock %}
 
 {% block body %}
-<div class="bg-gray-900 min-h-screen">
-        <div class="wrapper-container">
+    <div class="wrapper-container">
         <!-- Statistiques globales -->
         <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">
-            <div class="bg-gray-800 rounded-lg p-4">
+            <div class="wrapper-background">
                 <h3 class="text-white text-lg font-semibold mb-2">💰 Investi</h3>
                 <p class="text-yellow-400 text-2xl font-bold">
                     {{ (stats.global.investedAmount / 1000000)|number_format(1) }}M
                 </p>
                 <p class="text-gray-400 text-sm">{{ stats.global.availableLots }} lots disponibles</p>
             </div>
-            <div class="bg-gray-800 rounded-lg p-4">
+            <div class="wrapper-background">
                 <h3 class="text-white text-lg font-semibold mb-2">✅ Profit Réalisé</h3>
                 <p class="text-green-400 text-2xl font-bold">
                     {{ (stats.global.realizedProfit / 1000000)|number_format(1) }}M
                 </p>
                 <p class="text-gray-400 text-sm">{{ stats.global.soldLots }} lots vendus</p>
             </div>
-            <div class="bg-gray-800 rounded-lg p-4">
+            <div class="wrapper-background">
                 <h3 class="text-white text-lg font-semibold mb-2">🎯 Profit Potentiel</h3>
                 <p class="text-blue-400 text-2xl font-bold">
                     {{ (stats.global.potentialProfit / 1000000)|number_format(1) }}M
                 </p>
                 <p class="text-gray-400 text-sm">Si tout vendu au prix cible</p>
             </div>
-            <div class="bg-gray-800 rounded-lg p-4">
+            <div class="wrapper-background">
                 <h3 class="text-white text-lg font-semibold mb-2">📊 Total Lots</h3>
                 <p class="text-purple-400 text-2xl font-bold">{{ stats.global.totalLots }}</p>
                 <p class="text-gray-400 text-sm">{{ stats.charactersCount }} personnages</p>
@@ -45,7 +44,7 @@
 
         <!-- Top items rentables -->
         <div class="grid grid-cols-1 lg:grid-cols-2 gap-4">
-            <div class="bg-gray-800 rounded-lg p-4">
+            <div class="wrapper-background">
                 <h3 class="text-white text-xl font-semibold mb-4">🏆 Top Items Rentables</h3>
                 {% if stats.topItems|length > 0 %}
                     <div class="space-y-3">
@@ -72,7 +71,7 @@
 
         <!-- Ratios et métriques -->
         {% if stats.global.totalLots > 0 %}
-            <div class="bg-gray-800 rounded-lg p-4">
+            <div class="wrapper-background">
                 <h3 class="text-white text-xl font-semibold mb-4">📊 Métriques Clés</h3>
                 <div class="grid grid-cols-1 md:grid-cols-3 gap-4">
                     <div class="text-center">
@@ -99,5 +98,4 @@
             </div>
         {% endif %}
     </div>
-</div>
 {% endblock %}

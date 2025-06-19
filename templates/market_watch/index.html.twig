@@ -11,8 +11,6 @@
 {% endblock %}
 
 {% block body %}
-<div class="bg-gray-900 min-h-screen">
-
     <div class="wrapper-container">
         <!-- Sélecteur de personnage -->
         {% include 'components/character_selector.html.twig' %}
@@ -89,7 +87,7 @@
                     </table>
                 </div>
 
-                <div class="mt-6 bg-gray-800 rounded-lg p-4">
+                <div class="mt-6 wrapper-background">
                     <h3 class="text-white font-semibold mb-2">📊 Résumé pour {{ selectedCharacter.name }}</h3>
                     <div class="grid grid-cols-1 md:grid-cols-3 gap-4 text-sm">
                         <div class="text-gray-300">
@@ -121,5 +119,4 @@
             </div>
         {% endif %}
     </div>
-</div>
 {% endblock %}

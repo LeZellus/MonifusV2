@@ -11,7 +11,6 @@
 {% endblock %}
 
 {% block body %}
-<div class="bg-gray-900 min-h-screen">
     <div class="wrapper-container">
         <!-- Sélection du personnage actif -->
         {% if characters|length > 0 %}
@@ -120,7 +119,7 @@
         {% if profiles|length > 0 %}
             <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
                 {% for profile in profiles %}
-                    <div class="bg-gray-800 rounded-lg p-4">
+                    <div class="wrapper-background">
                         <div class="flex justify-between items-start mb-4">
                             <h3 class="text-white text-xl font-semibold">{{ profile.name }}</h3>
                             {% if selectedCharacter and selectedCharacter.tradingProfile.id == profile.id %}
@@ -176,5 +175,4 @@
             </div>
         {% endif %}
     </div>
-</div>
 {% endblock %}

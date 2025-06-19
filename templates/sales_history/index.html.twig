@@ -11,8 +11,6 @@
 {% endblock %}
 
 {% block body %}
-<div class="bg-gray-900 min-h-screen">
-
     <div class="wrapper-container">
         <!-- Sélecteur de personnage -->
         {% include 'components/character_selector.html.twig' %}
@@ -44,7 +42,7 @@
         </div>
 
         <!-- Filtres -->
-        <div class="bg-gray-800 rounded-lg p-4">
+        <div class="wrapper-background">
             <form method="GET" class="grid grid-cols-1 md:grid-cols-3 gap-4 items-end">
                 <div>
                     <label class="block text-white font-medium mb-2">Période</label>
@@ -182,5 +180,4 @@
             </div>
         {% endif %}
     </div>
-</div>
 {% endblock %}
