@@ -3,6 +3,8 @@
 namespace App\Entity;
 
 use App\Repository\ItemRepository;
+use Doctrine\Common\Collections\ArrayCollection;
+use Doctrine\Common\Collections\Collection;
 use Doctrine\ORM\Mapping as ORM;
 
 #[ORM\Entity(repositoryClass: ItemRepository::class)]
@@ -30,6 +32,17 @@ class Item
 
     #[ORM\Column(nullable: true)]
     private ?float $xpPet = null;
+
+    /**
+     * @var Collection<int, LotGroup>
+     */
+    #[ORM\OneToMany(targetEntity: LotGroup::class, mappedBy: 'item')]
+    private Collection $lotGroups;
+
+    public function __construct()
+    {
+        $this->lotGroups = new ArrayCollection();
+    }
 
     public function getId(): ?int
     {
@@ -104,6 +117,36 @@ class Item
     public function setXpPet(?float $xpPet): static
     {
         $this->xpPet = $xpPet;
+
+        return $this;
+    }
+
+    /**
+     * @return Collection<int, LotGroup>
+     */
+    public function getLotGroups(): Collection
+    {
+        return $this->lotGroups;
+    }
+
+    public function addLotGroup(LotGroup $lotGroup): static
+    {
+        if (!$this->lotGroups->contains($lotGroup)) {
+            $this->lotGroups->add($lotGroup);
+            $lotGroup->setItem($this);
+        }
+
+        return $this;
+    }
+
+    public function removeLotGroup(LotGroup $lotGroup): static
+    {
+        if ($this->lotGroups->removeElement($lotGroup)) {
+            // set the owning side to null (unless already changed)
+            if ($lotGroup->getItem() === $this) {
+                $lotGroup->setItem(null);
+            }
+        }
 
         return $this;
     }

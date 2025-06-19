@@ -3,6 +3,8 @@
 namespace App\Entity;
 
 use App\Repository\UserRepository;
+use Doctrine\Common\Collections\ArrayCollection;
+use Doctrine\Common\Collections\Collection;
 use Doctrine\DBAL\Types\Types;
 use Doctrine\ORM\Mapping as ORM;
 use Symfony\Component\Security\Core\User\PasswordAuthenticatedUserInterface;
@@ -70,6 +72,17 @@ class User implements UserInterface, PasswordAuthenticatedUserInterface
 
     #[ORM\Column(length: 100, nullable: true)]
     private ?string $twitchUrl = null;
+
+    /**
+     * @var Collection<int, TradingProfile>
+     */
+    #[ORM\OneToMany(targetEntity: TradingProfile::class, mappedBy: 'user')]
+    private Collection $tradingProfiles;
+
+    public function __construct()
+    {
+        $this->tradingProfiles = new ArrayCollection();
+    }
 
     public function getId(): ?int
     {
@@ -296,6 +309,36 @@ class User implements UserInterface, PasswordAuthenticatedUserInterface
     public function setTwitchUrl(?string $twitchUrl): static
     {
         $this->twitchUrl = $twitchUrl;
+
+        return $this;
+    }
+
+    /**
+     * @return Collection<int, TradingProfile>
+     */
+    public function getTradingProfiles(): Collection
+    {
+        return $this->tradingProfiles;
+    }
+
+    public function addTradingProfile(TradingProfile $tradingProfile): static
+    {
+        if (!$this->tradingProfiles->contains($tradingProfile)) {
+            $this->tradingProfiles->add($tradingProfile);
+            $tradingProfile->setUser($this);
+        }
+
+        return $this;
+    }
+
+    public function removeTradingProfile(TradingProfile $tradingProfile): static
+    {
+        if ($this->tradingProfiles->removeElement($tradingProfile)) {
+            // set the owning side to null (unless already changed)
+            if ($tradingProfile->getUser() === $this) {
+                $tradingProfile->setUser(null);
+            }
+        }
 
         return $this;
     }
