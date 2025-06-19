@@ -42,7 +42,33 @@
             </div>
         </div>
 
-        <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
+        <!-- Notifications -->
+        {% if notifications|length > 0 %}
+            <div class="mb-8">
+                <h3 class="text-white text-xl font-semibold mb-4">🔔 Notifications</h3>
+                <div class="space-y-3">
+                    {% for notification in notifications %}
+                        <div class="bg-gray-800 border-l-4 border-{{ notification.type == 'success' ? 'green' : (notification.type == 'warning' ? 'yellow' : 'blue') }}-500 rounded-lg p-4">
+                            <div class="flex items-center justify-between">
+                                <div class="flex items-center space-x-3">
+                                    <span class="text-2xl">{{ notification.icon }}</span>
+                                    <div>
+                                        <h4 class="text-white font-medium">{{ notification.title }}</h4>
+                                        <p class="text-gray-300 text-sm">{{ notification.message }}</p>
+                                    </div>
+                                </div>
+                                <a href="{{ notification.link }}" 
+                                class="bg-{{ notification.type == 'success' ? 'green' : (notification.type == 'warning' ? 'yellow' : 'blue') }}-600 hover:bg-{{ notification.type == 'success' ? 'green' : (notification.type == 'warning' ? 'yellow' : 'blue') }}-700 text-white px-3 py-1 rounded text-sm transition-colors">
+                                    {{ notification.action }}
+                                </a>
+                            </div>
+                        </div>
+                    {% endfor %}
+                </div>
+            </div>
+        {% endif %}
+
+        <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6 mb-8">
             <a href="{{ path('app_trading_lots') }}" 
             class="bg-blue-600 hover:bg-blue-700 text-white p-6 rounded-lg text-center transition-colors block">
                 <h3 class="text-xl font-bold mb-2">Mon Trading</h3>
@@ -63,6 +89,37 @@
                 <h3 class="text-xl font-bold mb-2">Historique</h3>
                 <p class="text-orange-100">Ventes réalisées</p>
             </a>
+        </div>
+
+        <!-- Actions rapides -->
+        <div class="mb-8">
+            <h3 class="text-white text-xl font-semibold mb-4">⚡ Actions Rapides</h3>
+            <div class="grid grid-cols-2 md:grid-cols-4 gap-4">
+                {% if stats.charactersCount > 0 %}
+                    <a href="{{ path('app_lot_new', {id: 1}) }}" 
+                    class="bg-gray-700 hover:bg-gray-600 text-white p-3 rounded-lg text-center transition-colors">
+                        <div class="text-lg mb-1">➕</div>
+                        <div class="text-sm">Ajouter Lot</div>
+                    </a>
+                    <a href="{{ path('app_market_watch_new', {id: 1}) }}" 
+                    class="bg-gray-700 hover:bg-gray-600 text-white p-3 rounded-lg text-center transition-colors">
+                        <div class="text-lg mb-1">👁️</div>
+                        <div class="text-sm">Surveiller Prix</div>
+                    </a>
+                {% endif %}
+                <a href="{{ path('app_profile_new') }}" 
+                class="bg-gray-700 hover:bg-gray-600 text-white p-3 rounded-lg text-center transition-colors">
+                    <div class="text-lg mb-1">👤</div>
+                    <div class="text-sm">Nouveau Profil</div>
+                </a>
+                {% if stats.global.availableLots > 0 %}
+                    <a href="{{ path('app_lot_index') }}" 
+                    class="bg-gray-700 hover:bg-gray-600 text-white p-3 rounded-lg text-center transition-colors">
+                        <div class="text-lg mb-1">💸</div>
+                        <div class="text-sm">Vendre Lots</div>
+                    </a>
+                {% endif %}
+            </div>
         </div>
 
         <div class="mb-8 mx-auto mt-6">
