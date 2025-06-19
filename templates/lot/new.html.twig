@@ -11,50 +11,156 @@
 
 {% block body %}
     <div class="wrapper-container">
-        <div class="max-w-md mx-auto wrapper-background w-full">
-            {{ form_start(form) }}
-            
-            <div class="mb-4">
-                {{ form_label(form.item, null, {'label_attr': {'class': 'block text-white font-medium mb-2'}}) }}
-                {{ form_widget(form.item) }}
-                {{ form_errors(form.item) }}
+        <div class="max-w-2xl mx-auto">
+            <!-- En-tête avec info personnage -->
+            <div class="wrapper-background mb-6">
+                <div class="flex items-center space-x-4">
+                    <div class="w-12 h-12 bg-blue-500 rounded-full flex items-center justify-center">
+                        <span class="text-white font-bold text-lg">{{ character.name|first|upper }}</span>
+                    </div>
+                    <div>
+                        <h2 class="text-white text-xl font-semibold">{{ character.name }}</h2>
+                        <p class="text-gray-400">{{ character.classe.name }} • {{ character.server.name }}</p>
+                    </div>
+                    <div class="ml-auto text-right">
+                        <div class="text-green-400 font-semibold">📦 Nouveau Lot</div>
+                        <div class="text-gray-400 text-sm">Ajouter un item au trading</div>
+                    </div>
+                </div>
             </div>
 
-            <div class="mb-4">
-                {{ form_label(form.lotSize, null, {'label_attr': {'class': 'block text-white font-medium mb-2'}}) }}
-                {{ form_widget(form.lotSize) }}
-                {{ form_errors(form.lotSize) }}
+            <!-- Formulaire principal -->
+            <div class="wrapper-background">
+                <h3 class="text-white text-lg font-semibold mb-6 flex items-center">
+                    <span class="text-2xl mr-3">📝</span>
+                    Informations du lot
+                </h3>
+
+                {{ form_start(form) }}
+                
+                <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+                    <!-- Item -->
+                    <div class="md:col-span-2">
+                        {{ form_label(form.item, null, {'label_attr': {'class': 'block text-white font-medium mb-2'}}) }}
+                        {{ form_widget(form.item, {'attr': {'class': 'w-full px-4 py-3 border border-gray-600 bg-gray-700 text-white rounded-lg focus:outline-none focus:border-blue-500 focus:ring-2 focus:ring-blue-500 focus:ring-opacity-20'}}) }}
+                        {{ form_errors(form.item) }}
+                        <div class="text-gray-400 text-sm mt-1">🔍 Sélectionnez l'item que vous souhaitez trader</div>
+                    </div>
+
+                    <!-- Configuration du lot -->
+                    <div>
+                        {{ form_label(form.lotSize, null, {'label_attr': {'class': 'block text-white font-medium mb-2'}}) }}
+                        <div class="relative">
+                            {{ form_widget(form.lotSize, {'attr': {'class': 'w-full px-4 py-3 border border-gray-600 bg-gray-700 text-white rounded-lg focus:outline-none focus:border-blue-500 focus:ring-2 focus:ring-blue-500 focus:ring-opacity-20', 'placeholder': 'ex: 100'}}) }}
+                            <div class="absolute inset-y-0 right-0 pr-3 flex items-center">
+                                <span class="text-gray-400 text-sm">lots</span>
+                            </div>
+                        </div>
+                        {{ form_errors(form.lotSize) }}
+                        <div class="text-gray-400 text-sm mt-1">📊 Quantité totale à trader</div>
+                    </div>
+
+                    <div>
+                        {{ form_label(form.saleUnit, null, {'label_attr': {'class': 'block text-white font-medium mb-2'}}) }}
+                        {{ form_widget(form.saleUnit, {'attr': {'class': 'w-full px-4 py-3 border border-gray-600 bg-gray-700 text-white rounded-lg focus:outline-none focus:border-blue-500 focus:ring-2 focus:ring-blue-500 focus:ring-opacity-20'}}) }}
+                        {{ form_errors(form.saleUnit) }}
+                        <div class="text-gray-400 text-sm mt-1">🎯 Comment vous vendez sur Dofus</div>
+                    </div>
+
+                    <!-- Prix -->
+                    <div>
+                        {{ form_label(form.buyPricePerLot, null, {'label_attr': {'class': 'block text-white font-medium mb-2'}}) }}
+                        <div class="relative">
+                            {{ form_widget(form.buyPricePerLot, {'attr': {'class': 'w-full px-4 py-3 pr-12 border border-gray-600 bg-gray-700 text-white rounded-lg focus:outline-none focus:border-red-500 focus:ring-2 focus:ring-red-500 focus:ring-opacity-20', 'placeholder': '1000'}}) }}
+                            <div class="absolute inset-y-0 right-0 pr-3 flex items-center">
+                                <span class="text-gray-400 text-sm">kamas</span>
+                            </div>
+                        </div>
+                        {{ form_errors(form.buyPricePerLot) }}
+                        <div class="text-red-400 text-sm mt-1">💸 Prix payé pour acheter</div>
+                    </div>
+
+                    <div>
+                        {{ form_label(form.sellPricePerLot, null, {'label_attr': {'class': 'block text-white font-medium mb-2'}}) }}
+                        <div class="relative">
+                            {{ form_widget(form.sellPricePerLot, {'attr': {'class': 'w-full px-4 py-3 pr-12 border border-gray-600 bg-gray-700 text-white rounded-lg focus:outline-none focus:border-green-500 focus:ring-2 focus:ring-green-500 focus:ring-opacity-20', 'placeholder': '1200'}}) }}
+                            <div class="absolute inset-y-0 right-0 pr-3 flex items-center">
+                                <span class="text-gray-400 text-sm">kamas</span>
+                            </div>
+                        </div>
+                        {{ form_errors(form.sellPricePerLot) }}
+                        <div class="text-green-400 text-sm mt-1">💰 Prix de vente souhaité</div>
+                    </div>
+
+                    <!-- Statut -->
+                    <div class="md:col-span-2">
+                        {{ form_label(form.status, null, {'label_attr': {'class': 'block text-white font-medium mb-2'}}) }}
+                        {{ form_widget(form.status, {'attr': {'class': 'w-full px-4 py-3 border border-gray-600 bg-gray-700 text-white rounded-lg focus:outline-none focus:border-blue-500 focus:ring-2 focus:ring-blue-500 focus:ring-opacity-20'}}) }}
+                        {{ form_errors(form.status) }}
+                        <div class="text-gray-400 text-sm mt-1">📋 Statut initial du lot</div>
+                    </div>
+                </div>
+
+                <!-- Aperçu du profit -->
+                <div class="mt-6 bg-gradient-to-r from-blue-600 to-green-600 rounded-lg p-4">
+                    <h4 class="text-white font-semibold mb-2">💡 Aperçu du profit</h4>
+                    <div class="grid grid-cols-3 gap-4 text-center">
+                        <div>
+                            <div class="text-blue-200 text-sm">Investissement</div>
+                            <div id="investment" class="text-white font-bold">-</div>
+                        </div>
+                        <div>
+                            <div class="text-green-200 text-sm">Profit par lot</div>
+                            <div id="profit-per-lot" class="text-white font-bold">-</div>
+                        </div>
+                        <div>
+                            <div class="text-yellow-200 text-sm">Profit total</div>
+                            <div id="total-profit" class="text-white font-bold">-</div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Actions -->
+                <div class="flex space-x-4 mt-8">
+                    <button type="submit" class="flex-1 bg-green-600 hover:bg-green-700 text-white font-bold py-3 px-6 rounded-lg transition-colors flex items-center justify-center">
+                        <span class="mr-2">✅</span>
+                        Créer le lot
+                    </button>
+                    <a href="{{ path('app_lot_index') }}" 
+                       class="flex-1 bg-gray-600 hover:bg-gray-700 text-white font-bold py-3 px-6 rounded-lg transition-colors text-center flex items-center justify-center">
+                        <span class="mr-2">❌</span>
+                        Annuler
+                    </a>
+                </div>
+
+                {{ form_end(form) }}
             </div>
-
-            <div class="mb-4">
-                {{ form_label(form.buyPricePerLot, null, {'label_attr': {'class': 'block text-white font-medium mb-2'}}) }}
-                {{ form_widget(form.buyPricePerLot) }}
-                {{ form_errors(form.buyPricePerLot) }}
-            </div>
-
-            <div class="mb-4">
-                {{ form_label(form.sellPricePerLot, null, {'label_attr': {'class': 'block text-white font-medium mb-2'}}) }}
-                {{ form_widget(form.sellPricePerLot) }}
-                {{ form_errors(form.sellPricePerLot) }}
-            </div>
-
-            <div class="mb-4">
-                {{ form_label(form.saleUnit, null, {'label_attr': {'class': 'block text-white font-medium mb-2'}}) }}
-                {{ form_widget(form.saleUnit) }}
-                {{ form_errors(form.saleUnit) }}
-            </div>
-
-            <div class="mb-6">
-                {{ form_label(form.status, null, {'label_attr': {'class': 'block text-white font-medium mb-2'}}) }}
-                {{ form_widget(form.status) }}
-                {{ form_errors(form.status) }}
-            </div>
-
-            <button type="submit" class="w-full bg-green-600 hover:bg-green-700 text-white font-bold py-2 px-4 rounded transition-colors">
-                Créer le lot
-            </button>
-
-            {{ form_end(form) }}
         </div>
     </div>
+
+    <script>
+    document.addEventListener('DOMContentLoaded', function() {
+        const lotSizeInput = document.getElementById('lot_group_lotSize');
+        const buyPriceInput = document.getElementById('lot_group_buyPricePerLot');
+        const sellPriceInput = document.getElementById('lot_group_sellPricePerLot');
+        
+        function updateProfit() {
+            const lotSize = parseInt(lotSizeInput.value) || 0;
+            const buyPrice = parseInt(buyPriceInput.value) || 0;
+            const sellPrice = parseInt(sellPriceInput.value) || 0;
+            
+            const investment = lotSize * buyPrice;
+            const profitPerLot = sellPrice - buyPrice;
+            const totalProfit = lotSize * profitPerLot;
+            
+            document.getElementById('investment').textContent = investment > 0 ? (investment / 1000).toLocaleString() + 'k' : '-';
+            document.getElementById('profit-per-lot').textContent = profitPerLot !== 0 ? (profitPerLot / 1000).toLocaleString() + 'k' : '-';
+            document.getElementById('total-profit').textContent = totalProfit !== 0 ? (totalProfit / 1000).toLocaleString() + 'k' : '-';
+        }
+        
+        [lotSizeInput, buyPriceInput, sellPriceInput].forEach(input => {
+            if (input) input.addEventListener('input', updateProfit);
+        });
+    });
+    </script>
 {% endblock %}

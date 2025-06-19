@@ -11,26 +11,66 @@
 
 {% block body %}
     <div class="wrapper-container">
-        <div class="w-full max-w-md mx-auto bg-gray-800 rounded-lg p-6">
-            {{ form_start(form) }}
-            
-            <div class="mb-4">
-                {{ form_label(form.name, null, {'label_attr': {'class': 'block text-white font-medium mb-2'}}) }}
-                {{ form_widget(form.name) }}
-                {{ form_errors(form.name) }}
+        <div class="max-w-lg mx-auto">
+            <!-- En-tête explicatif -->
+            <div class="wrapper-background mb-6 text-center">
+                <div class="text-4xl mb-3">👥</div>
+                <h2 class="text-white text-xl font-bold mb-2">Créer un Profil de Trading</h2>
+                <p class="text-gray-400">
+                    Un profil regroupe plusieurs personnages Dofus et organise votre activité de trading.
+                </p>
             </div>
 
-            <div class="mb-6">
-                {{ form_label(form.description, null, {'label_attr': {'class': 'block text-white font-medium mb-2'}}) }}
-                {{ form_widget(form.description) }}
-                {{ form_errors(form.description) }}
+            <!-- Formulaire principal -->
+            <div class="wrapper-background">
+                <h3 class="text-white text-lg font-semibold mb-6 flex items-center">
+                    <span class="text-2xl mr-3">📝</span>
+                    Informations du profil
+                </h3>
+
+                {{ form_start(form) }}
+                
+                <div class="space-y-6">
+                    <div>
+                        {{ form_label(form.name, null, {'label_attr': {'class': 'block text-white font-medium mb-2'}}) }}
+                        {{ form_widget(form.name, {'attr': {'class': 'w-full px-4 py-3 border border-gray-600 bg-gray-700 text-white rounded-lg focus:outline-none focus:border-blue-500 focus:ring-2 focus:ring-blue-500 focus:ring-opacity-20', 'placeholder': 'ex: Trading Principal, Kamas Farm, etc.'}}) }}
+                        {{ form_errors(form.name) }}
+                        <div class="text-gray-400 text-sm mt-1">💡 Choisissez un nom qui décrit votre stratégie</div>
+                    </div>
+
+                    <div>
+                        {{ form_label(form.description, null, {'label_attr': {'class': 'block text-white font-medium mb-2'}}) }}
+                        {{ form_widget(form.description, {'attr': {'class': 'w-full px-4 py-3 border border-gray-600 bg-gray-700 text-white rounded-lg focus:outline-none focus:border-blue-500 focus:ring-2 focus:ring-blue-500 focus:ring-opacity-20', 'rows': 4, 'placeholder': 'Décrivez votre stratégie de trading, vos objectifs, les serveurs ciblés...'}}) }}
+                        {{ form_errors(form.description) }}
+                        <div class="text-gray-400 text-sm mt-1">📋 Description optionnelle de votre approche</div>
+                    </div>
+                </div>
+
+                <!-- Étapes suivantes -->
+                <div class="mt-6 bg-gradient-to-r from-blue-600 to-purple-600 rounded-lg p-4">
+                    <h4 class="text-white font-semibold mb-2">🚀 Prochaines étapes</h4>
+                    <div class="text-blue-100 text-sm space-y-1">
+                        <p>1. ✅ Créer le profil</p>
+                        <p>2. 👤 Ajouter vos personnages Dofus</p>
+                        <p>3. 📦 Commencer à tracker vos lots</p>
+                        <p>4. 📊 Analyser vos profits</p>
+                    </div>
+                </div>
+
+                <div class="flex space-x-4 mt-8">
+                    <button type="submit" class="flex-1 bg-blue-600 hover:bg-blue-700 text-white font-bold py-3 px-6 rounded-lg transition-colors flex items-center justify-center">
+                        <span class="mr-2">✨</span>
+                        Créer le profil
+                    </button>
+                    <a href="{{ path('app_profile_index') }}" 
+                       class="flex-1 bg-gray-600 hover:bg-gray-700 text-white font-bold py-3 px-6 rounded-lg transition-colors text-center flex items-center justify-center">
+                        <span class="mr-2">❌</span>
+                        Annuler
+                    </a>
+                </div>
+
+                {{ form_end(form) }}
             </div>
-
-            <button type="submit" class="w-full bg-blue-600 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded transition-colors">
-                Créer le profil
-            </button>
-
-            {{ form_end(form) }}
         </div>
     </div>
 {% endblock %}

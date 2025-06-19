@@ -11,32 +11,99 @@
 
 {% block body %}
     <div class="wrapper-container">
-        <div class="max-w-md mx-auto w-full bg-gray-800 rounded-lg p-6">
-            {{ form_start(form) }}
-            
-            <div class="mb-4">
-                {{ form_label(form.name, null, {'label_attr': {'class': 'block text-white font-medium mb-2'}}) }}
-                {{ form_widget(form.name) }}
-                {{ form_errors(form.name) }}
+        <div class="max-w-lg mx-auto">
+            <!-- En-tête avec profil parent -->
+            <div class="wrapper-background mb-6">
+                <div class="flex items-center space-x-4">
+                    <div class="w-12 h-12 bg-gradient-to-br from-blue-500 to-purple-600 rounded-lg flex items-center justify-center">
+                        <span class="text-white font-bold text-lg">{{ profile.name|first|upper }}</span>
+                    </div>
+                    <div>
+                        <h2 class="text-white text-xl font-semibold">{{ profile.name }}</h2>
+                        <p class="text-gray-400">Profil de trading</p>
+                    </div>
+                    <div class="ml-auto text-right">
+                        <div class="text-green-400 font-semibold">👤 Nouveau Personnage</div>
+                        <div class="text-gray-400 text-sm">Ajouter un trader</div>
+                    </div>
+                </div>
             </div>
 
-            <div class="mb-4">
-                {{ form_label(form.server, null, {'label_attr': {'class': 'block text-white font-medium mb-2'}}) }}
-                {{ form_widget(form.server) }}
-                {{ form_errors(form.server) }}
+            <!-- Information importante -->
+            <div class="bg-gradient-to-r from-green-600 to-blue-600 rounded-lg p-4 mb-6">
+                <h3 class="text-white font-bold mb-2 flex items-center">
+                    <span class="text-xl mr-2">ℹ️</span>
+                    Pourquoi ajouter un personnage ?
+                </h3>
+                <div class="text-green-100 text-sm space-y-1">
+                    <p>• 🎮 Chaque personnage peut avoir sa propre stratégie de trading</p>
+                    <p>• 🗂️ Organiser vos lots par serveur et spécialisation</p>
+                    <p>• 📊 Analyser les performances par personnage</p>
+                    <p>• 🔄 Basculer facilement entre vos différents traders</p>
+                </div>
             </div>
 
-            <div class="mb-6">
-                {{ form_label(form.classe, null, {'label_attr': {'class': 'block text-white font-medium mb-2'}}) }}
-                {{ form_widget(form.classe) }}
-                {{ form_errors(form.classe) }}
+            <!-- Formulaire principal -->
+            <div class="wrapper-background">
+                <h3 class="text-white text-lg font-semibold mb-6 flex items-center">
+                    <span class="text-2xl mr-3">📝</span>
+                    Informations du personnage
+                </h3>
+
+                {{ form_start(form) }}
+                
+                <div class="space-y-6">
+                    <div>
+                        {{ form_label(form.name, null, {'label_attr': {'class': 'block text-white font-medium mb-2'}}) }}
+                        {{ form_widget(form.name, {'attr': {'class': 'w-full px-4 py-3 border border-gray-600 bg-gray-700 text-white rounded-lg focus:outline-none focus:border-green-500 focus:ring-2 focus:ring-green-500 focus:ring-opacity-20', 'placeholder': 'ex: Kama-Hunter, Trading-Master...'}}) }}
+                        {{ form_errors(form.name) }}
+                        <div class="text-gray-400 text-sm mt-1">🎮 Nom exact de votre personnage Dofus</div>
+                    </div>
+
+                    <div>
+                        {{ form_label(form.server, null, {'label_attr': {'class': 'block text-white font-medium mb-2'}}) }}
+                        {{ form_widget(form.server, {'attr': {'class': 'w-full px-4 py-3 border border-gray-600 bg-gray-700 text-white rounded-lg focus:outline-none focus:border-green-500 focus:ring-2 focus:ring-green-500 focus:ring-opacity-20'}}) }}
+                        {{ form_errors(form.server) }}
+                        <div class="text-gray-400 text-sm mt-1">🌍 Serveur sur lequel joue ce personnage</div>
+                    </div>
+
+                    <div>
+                        {{ form_label(form.classe, null, {'label_attr': {'class': 'block text-white font-medium mb-2'}}) }}
+                        {{ form_widget(form.classe, {'attr': {'class': 'w-full px-4 py-3 border border-gray-600 bg-gray-700 text-white rounded-lg focus:outline-none focus:border-green-500 focus:ring-2 focus:ring-green-500 focus:ring-opacity-20'}}) }}
+                        {{ form_errors(form.classe) }}
+                        <div class="text-gray-400 text-sm mt-1">⚔️ Classe de votre personnage</div>
+                    </div>
+                </div>
+
+                <!-- Informations supplémentaires -->
+                <div class="mt-6 bg-gradient-to-r from-blue-600 to-purple-600 rounded-lg p-4">
+                    <h4 class="text-white font-semibold mb-2 flex items-center">
+                        <span class="mr-2">🚀</span>
+                        Après la création
+                    </h4>
+                    <div class="text-blue-100 text-sm space-y-1">
+                        <p>1. ✅ Le personnage sera ajouté au profil "{{ profile.name }}"</p>
+                        <p>2. 🎯 Il sera automatiquement sélectionné comme personnage actif</p>
+                        <p>3. 📦 Vous pourrez commencer à ajouter des lots de trading</p>
+                        <p>4. 👁️ Configurer des surveillances de marché</p>
+                    </div>
+                </div>
+
+                <!-- Actions -->
+                <div class="flex space-x-4 mt-8">
+                    <button type="submit" class="flex-1 bg-green-600 hover:bg-green-700 text-white font-bold py-3 px-6 rounded-lg transition-colors flex items-center justify-center">
+                        <span class="mr-2">👤</span>
+                        Créer le personnage
+                    </button>
+                    <a href="{{ path('app_profile_index') }}" 
+                       class="flex-1 bg-gray-600 hover:bg-gray-700 text-white font-bold py-3 px-6 rounded-lg transition-colors text-center flex items-center justify-center">
+                        <span class="mr-2">❌</span>
+                        Annuler
+                    </a>
+                </div>
+
+                {{ form_end(form) }}
             </div>
-
-            <button type="submit" class="w-full bg-green-600 hover:bg-green-700 text-white font-bold py-2 px-4 rounded transition-colors">
-                Créer le personnage
-            </button>
-
-            {{ form_end(form) }}
         </div>
     </div>
 {% endblock %}

@@ -11,44 +11,128 @@
 
 {% block body %}
     <div class="wrapper-container">
-        <div class="max-w-md mx-auto wrapper-background">
-            {{ form_start(form) }}
-            
-            <div class="mb-4">
-                {{ form_label(form.item, null, {'label_attr': {'class': 'block text-white font-medium mb-2'}}) }}
-                {{ form_widget(form.item) }}
-                {{ form_errors(form.item) }}
+        <div class="max-w-2xl mx-auto">
+            <!-- En-tête avec info personnage -->
+            <div class="wrapper-background mb-6">
+                <div class="flex items-center space-x-4">
+                    <div class="w-12 h-12 bg-orange-500 rounded-full flex items-center justify-center">
+                        <span class="text-white font-bold text-lg">{{ character.name|first|upper }}</span>
+                    </div>
+                    <div>
+                        <h2 class="text-white text-xl font-semibold">{{ character.name }}</h2>
+                        <p class="text-gray-400">{{ character.classe.name }} • {{ character.server.name }}</p>
+                    </div>
+                    <div class="ml-auto text-right">
+                        <div class="text-orange-400 font-semibold">👁️ Nouvelle Surveillance</div>
+                        <div class="text-gray-400 text-sm">Observer les prix du marché</div>
+                    </div>
+                </div>
             </div>
 
-            <div class="mb-4">
-                {{ form_label(form.lotSize, null, {'label_attr': {'class': 'block text-white font-medium mb-2'}}) }}
-                {{ form_widget(form.lotSize) }}
-                {{ form_errors(form.lotSize) }}
+            <!-- Explication de la surveillance -->
+            <div class="bg-gradient-to-r from-orange-600 to-red-600 rounded-lg p-4 mb-6">
+                <h3 class="text-white font-bold mb-2 flex items-center">
+                    <span class="text-xl mr-2">💡</span>
+                    À quoi sert la surveillance ?
+                </h3>
+                <div class="text-orange-100 text-sm space-y-1">
+                    <p>• 📊 Tracker l'évolution des prix sur votre serveur</p>
+                    <p>• 🎯 Identifier les meilleures opportunités d'achat/vente</p>
+                    <p>• 📈 Suivre la tendance des items qui vous intéressent</p>
+                    <p>• ⚡ Réagir rapidement aux changements du marché</p>
+                </div>
             </div>
 
-            <div class="mb-4">
-                {{ form_label(form.observedPrice, null, {'label_attr': {'class': 'block text-white font-medium mb-2'}}) }}
-                {{ form_widget(form.observedPrice) }}
-                {{ form_errors(form.observedPrice) }}
+            <!-- Formulaire principal -->
+            <div class="wrapper-background">
+                <h3 class="text-white text-lg font-semibold mb-6 flex items-center">
+                    <span class="text-2xl mr-3">📝</span>
+                    Configurer la surveillance
+                </h3>
+
+                {{ form_start(form) }}
+                
+                <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+                    <!-- Item -->
+                    <div class="md:col-span-2">
+                        {{ form_label(form.item, null, {'label_attr': {'class': 'block text-white font-medium mb-2'}}) }}
+                        {{ form_widget(form.item, {'attr': {'class': 'w-full px-4 py-3 border border-gray-600 bg-gray-700 text-white rounded-lg focus:outline-none focus:border-orange-500 focus:ring-2 focus:ring-orange-500 focus:ring-opacity-20'}}) }}
+                        {{ form_errors(form.item) }}
+                        <div class="text-gray-400 text-sm mt-1">🔍 Item que vous voulez surveiller</div>
+                    </div>
+
+                    <!-- Configuration -->
+                    <div>
+                        {{ form_label(form.lotSize, null, {'label_attr': {'class': 'block text-white font-medium mb-2'}}) }}
+                        <div class="relative">
+                            {{ form_widget(form.lotSize, {'attr': {'class': 'w-full px-4 py-3 border border-gray-600 bg-gray-700 text-white rounded-lg focus:outline-none focus:border-orange-500 focus:ring-2 focus:ring-orange-500 focus:ring-opacity-20', 'placeholder': 'ex: 1, 10, 100'}}) }}
+                            <div class="absolute inset-y-0 right-0 pr-3 flex items-center">
+                                <span class="text-gray-400 text-sm">lots</span>
+                            </div>
+                        </div>
+                        {{ form_errors(form.lotSize) }}
+                        <div class="text-gray-400 text-sm mt-1">📊 Taille du lot surveillé</div>
+                    </div>
+
+                    <div>
+                        {{ form_label(form.priceType, null, {'label_attr': {'class': 'block text-white font-medium mb-2'}}) }}
+                        {{ form_widget(form.priceType, {'attr': {'class': 'w-full px-4 py-3 border border-gray-600 bg-gray-700 text-white rounded-lg focus:outline-none focus:border-orange-500 focus:ring-2 focus:ring-orange-500 focus:ring-opacity-20'}}) }}
+                        {{ form_errors(form.priceType) }}
+                        <div class="text-gray-400 text-sm mt-1">
+                            <span class="text-red-400">🛒 Achat:</span> Prix pour acheter •
+                            <span class="text-green-400">💰 Vente:</span> Prix pour vendre
+                        </div>
+                    </div>
+
+                    <!-- Prix observé -->
+                    <div class="md:col-span-2">
+                        {{ form_label(form.observedPrice, null, {'label_attr': {'class': 'block text-white font-medium mb-2'}}) }}
+                        <div class="relative">
+                            {{ form_widget(form.observedPrice, {'attr': {'class': 'w-full px-4 py-3 pr-12 border border-gray-600 bg-gray-700 text-white rounded-lg focus:outline-none focus:border-orange-500 focus:ring-2 focus:ring-orange-500 focus:ring-opacity-20', 'placeholder': '1500'}}) }}
+                            <div class="absolute inset-y-0 right-0 pr-3 flex items-center">
+                                <span class="text-gray-400 text-sm">kamas</span>
+                            </div>
+                        </div>
+                        {{ form_errors(form.observedPrice) }}
+                        <div class="text-gray-400 text-sm mt-1">💱 Prix actuellement observé sur le marché</div>
+                    </div>
+
+                    <!-- Notes -->
+                    <div class="md:col-span-2">
+                        {{ form_label(form.notes, null, {'label_attr': {'class': 'block text-white font-medium mb-2'}}) }}
+                        {{ form_widget(form.notes, {'attr': {'class': 'w-full px-4 py-3 border border-gray-600 bg-gray-700 text-white rounded-lg focus:outline-none focus:border-orange-500 focus:ring-2 focus:ring-orange-500 focus:ring-opacity-20', 'rows': 3, 'placeholder': 'ex: Prix stable depuis 1 semaine, demande élevée le week-end...'}}) }}
+                        {{ form_errors(form.notes) }}
+                        <div class="text-gray-400 text-sm mt-1">📝 Observations, tendances, contexte du marché...</div>
+                    </div>
+                </div>
+
+                <!-- Conseil -->
+                <div class="mt-6 bg-gradient-to-r from-blue-600 to-indigo-600 rounded-lg p-4">
+                    <h4 class="text-white font-semibold mb-2 flex items-center">
+                        <span class="mr-2">💡</span>
+                        Conseil pro
+                    </h4>
+                    <div class="text-blue-100 text-sm">
+                        <p>Mettez à jour régulièrement vos surveillances pour garder des données précises. 
+                        Plus vous trackez, mieux vous comprendrez les cycles du marché !</p>
+                    </div>
+                </div>
+
+                <!-- Actions -->
+                <div class="flex space-x-4 mt-8">
+                    <button type="submit" class="flex-1 bg-orange-600 hover:bg-orange-700 text-white font-bold py-3 px-6 rounded-lg transition-colors flex items-center justify-center">
+                        <span class="mr-2">👁️</span>
+                        Créer la surveillance
+                    </button>
+                    <a href="{{ path('app_market_watch_index') }}" 
+                       class="flex-1 bg-gray-600 hover:bg-gray-700 text-white font-bold py-3 px-6 rounded-lg transition-colors text-center flex items-center justify-center">
+                        <span class="mr-2">❌</span>
+                        Annuler
+                    </a>
+                </div>
+
+                {{ form_end(form) }}
             </div>
-
-            <div class="mb-4">
-                {{ form_label(form.priceType, null, {'label_attr': {'class': 'block text-white font-medium mb-2'}}) }}
-                {{ form_widget(form.priceType) }}
-                {{ form_errors(form.priceType) }}
-            </div>
-
-            <div class="mb-6">
-                {{ form_label(form.notes, null, {'label_attr': {'class': 'block text-white font-medium mb-2'}}) }}
-                {{ form_widget(form.notes) }}
-                {{ form_errors(form.notes) }}
-            </div>
-
-            <button type="submit" class="w-full bg-orange-600 hover:bg-orange-700 text-white font-bold py-2 px-4 rounded transition-colors">
-                Créer la surveillance
-            </button>
-
-            {{ form_end(form) }}
         </div>
     </div>
 {% endblock %}
