@@ -79,6 +79,6 @@ class TradingController extends AbstractController
     #[Route('/surveillance', name: 'app_trading_surveillance')]
     public function surveillance(): Response
     {
-        return $this->render('trading/surveillance.html.twig');
+        return $this->redirectToRoute('app_market_watch_index');
     }
 }

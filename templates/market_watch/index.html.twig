@@ -1,0 +1,134 @@
+{% extends 'base.html.twig' %}
+
+{% block title %}Surveillance du Marché{% endblock %}
+
+{% block body %}
+<div class="bg-gray-900 min-h-screen">
+    <nav class="bg-gray-800 border-b border-gray-700">
+        <div class="container mx-auto px-4">
+            <div class="flex justify-between items-center py-4">
+                <h1 class="text-white text-xl font-bold">Surveillance du Marché</h1>
+                <a href="{{ path('app_trading_dashboard') }}" class="text-blue-400 hover:text-blue-300">← Dashboard</a>
+            </div>
+        </div>
+    </nav>
+
+    <div class="container mx-auto px-4 py-8">
+        {% if characters|length == 0 %}
+            <div class="text-center py-12">
+                <p class="text-gray-400 text-lg mb-4">Aucun personnage créé</p>
+                <a href="{{ path('app_profile_index') }}" 
+                   class="bg-blue-600 hover:bg-blue-700 text-white px-6 py-3 rounded-lg transition-colors">
+                    Créer un personnage
+                </a>
+            </div>
+        {% else %}
+            <div class="flex justify-between items-center mb-6">
+                <h2 class="text-white text-2xl font-bold">Surveillance des Prix</h2>
+                <div class="flex space-x-2">
+                    {% for character in characters %}
+                        <a href="{{ path('app_market_watch_new', {id: character.id}) }}" 
+                           class="bg-orange-600 hover:bg-orange-700 text-white px-4 py-2 rounded-lg transition-colors text-sm">
+                            + Surveillance ({{ character.name }})
+                        </a>
+                    {% endfor %}
+                </div>
+            </div>
+
+            {% if watch_list|length > 0 %}
+                <div class="bg-gray-800 rounded-lg overflow-hidden">
+                    <table class="w-full">
+                        <thead class="bg-gray-700">
+                            <tr>
+                                <th class="px-6 py-3 text-left text-xs font-medium text-gray-300 uppercase tracking-wider">Item</th>
+                                <th class="px-6 py-3 text-left text-xs font-medium text-gray-300 uppercase tracking-wider">Personnage</th>
+                                <th class="px-6 py-3 text-left text-xs font-medium text-gray-300 uppercase tracking-wider">Lot</th>
+                                <th class="px-6 py-3 text-left text-xs font-medium text-gray-300 uppercase tracking-wider">Prix Observé</th>
+                                <th class="px-6 py-3 text-left text-xs font-medium text-gray-300 uppercase tracking-wider">Type</th>
+                                <th class="px-6 py-3 text-left text-xs font-medium text-gray-300 uppercase tracking-wider">Notes</th>
+                                <th class="px-6 py-3 text-left text-xs font-medium text-gray-300 uppercase tracking-wider">Dernière MAJ</th>
+                                <th class="px-6 py-3 text-left text-xs font-medium text-gray-300 uppercase tracking-wider">Actions</th>
+                            </tr>
+                        </thead>
+                        <tbody class="divide-y divide-gray-700">
+                            {% for watch in watch_list %}
+                                <tr class="hover:bg-gray-700">
+                                    <td class="px-6 py-4 whitespace-nowrap">
+                                        <div class="text-white font-medium">{{ watch.item.name }}</div>
+                                        <div class="text-gray-400 text-sm">Niv.{{ watch.item.level }}</div>
+                                    </td>
+                                    <td class="px-6 py-4 whitespace-nowrap">
+                                        <div class="text-white">{{ watch.dofusCharacter.name }}</div>
+                                        <div class="text-gray-400 text-sm">{{ watch.dofusCharacter.server.name }}</div>
+                                    </td>
+                                    <td class="px-6 py-4 whitespace-nowrap text-white">
+                                        {{ watch.lotSize }}
+                                    </td>
+                                    <td class="px-6 py-4 whitespace-nowrap text-white">
+                                        {{ (watch.observedPrice / 1000)|number_format(0, ',', ' ') }}k
+                                    </td>
+                                    <td class="px-6 py-4 whitespace-nowrap">
+                                        <span class="px-2 inline-flex text-xs leading-5 font-semibold rounded-full 
+                                                   {{ watch.priceType.value == 'buy' ? 'bg-red-100 text-red-800' : 'bg-green-100 text-green-800' }}">
+                                            {{ watch.priceType.value == 'buy' ? 'Achat' : 'Vente' }}
+                                        </span>
+                                    </td>
+                                    <td class="px-6 py-4 text-gray-300 max-w-xs">
+                                        {% if watch.notes %}
+                                            <div class="truncate" title="{{ watch.notes }}">
+                                                {{ watch.notes|slice(0, 50) }}{{ watch.notes|length > 50 ? '...' : '' }}
+                                            </div>
+                                        {% else %}
+                                            <span class="text-gray-500">-</span>
+                                        {% endif %}
+                                    </td>
+                                    <td class="px-6 py-4 whitespace-nowrap text-gray-300 text-sm">
+                                        {{ watch.updatedAt|date('d/m/Y H:i') }}
+                                    </td>
+                                    <td class="px-6 py-4 whitespace-nowrap text-sm">
+                                        <div class="flex space-x-2">
+                                            <a href="{{ path('app_market_watch_edit', {id: watch.id}) }}" 
+                                               class="text-blue-400 hover:text-blue-300">Modifier</a>
+                                            <form action="{{ path('app_market_watch_delete', {id: watch.id}) }}" method="post" 
+                                                  onsubmit="return confirm('Êtes-vous sûr de vouloir supprimer cette surveillance ?')" class="inline">
+                                                <button type="submit" class="text-red-400 hover:text-red-300">Supprimer</button>
+                                            </form>
+                                        </div>
+                                    </td>
+                                </tr>
+                            {% endfor %}
+                        </tbody>
+                    </table>
+                </div>
+
+                <div class="mt-6 bg-gray-800 rounded-lg p-4">
+                    <h3 class="text-white font-semibold mb-2">📊 Résumé</h3>
+                    <div class="grid grid-cols-1 md:grid-cols-3 gap-4 text-sm">
+                        <div class="text-gray-300">
+                            <span class="font-medium">Total surveillances :</span> {{ watch_list|length }}
+                        </div>
+                        <div class="text-gray-300">
+                            <span class="font-medium">Prix d'achat :</span> 
+                            {{ watch_list|filter(w => w.priceType.value == 'buy')|length }}
+                        </div>
+                        <div class="text-gray-300">
+                            <span class="font-medium">Prix de vente :</span> 
+                            {{ watch_list|filter(w => w.priceType.value == 'sell')|length }}
+                        </div>
+                    </div>
+                </div>
+            {% else %}
+                <div class="text-center py-12">
+                    <p class="text-gray-400 text-lg mb-4">Aucune surveillance de prix pour le moment</p>
+                    {% if characters|length > 0 %}
+                        <a href="{{ path('app_market_watch_new', {id: characters[0].id}) }}" 
+                           class="bg-orange-600 hover:bg-orange-700 text-white px-6 py-3 rounded-lg transition-colors">
+                            Créer ma première surveillance
+                        </a>
+                    {% endif %}
+                </div>
+            {% endif %}
+        {% endif %}
+    </div>
+</div>
+{% endblock %}

@@ -36,6 +36,12 @@
             </div>
 
             <div class="mb-4">
+                {{ form_label(form.saleUnit, null, {'label_attr': {'class': 'block text-white font-medium mb-2'}}) }}
+                {{ form_widget(form.saleUnit) }}
+                {{ form_errors(form.saleUnit) }}
+            </div>
+
+            <div class="mb-4">
                 {{ form_label(form.sellPricePerLot, null, {'label_attr': {'class': 'block text-white font-medium mb-2'}}) }}
                 {{ form_widget(form.sellPricePerLot) }}
                 {{ form_errors(form.sellPricePerLot) }}

@@ -1,0 +1,58 @@
+{% extends 'base.html.twig' %}
+
+{% block title %}Nouvelle Surveillance - {{ character.name }}{% endblock %}
+
+{% block body %}
+<div class="bg-gray-900 min-h-screen">
+    <nav class="bg-gray-800 border-b border-gray-700">
+        <div class="container mx-auto px-4">
+            <div class="flex justify-between items-center py-4">
+                <h1 class="text-white text-xl font-bold">Nouvelle Surveillance - {{ character.name }}</h1>
+                <a href="{{ path('app_market_watch_index') }}" class="text-blue-400 hover:text-blue-300">← Retour</a>
+            </div>
+        </div>
+    </nav>
+
+    <div class="container mx-auto px-4 py-8">
+        <div class="max-w-md mx-auto bg-gray-800 rounded-lg p-6">
+            {{ form_start(form) }}
+            
+            <div class="mb-4">
+                {{ form_label(form.item, null, {'label_attr': {'class': 'block text-white font-medium mb-2'}}) }}
+                {{ form_widget(form.item) }}
+                {{ form_errors(form.item) }}
+            </div>
+
+            <div class="mb-4">
+                {{ form_label(form.lotSize, null, {'label_attr': {'class': 'block text-white font-medium mb-2'}}) }}
+                {{ form_widget(form.lotSize) }}
+                {{ form_errors(form.lotSize) }}
+            </div>
+
+            <div class="mb-4">
+                {{ form_label(form.observedPrice, null, {'label_attr': {'class': 'block text-white font-medium mb-2'}}) }}
+                {{ form_widget(form.observedPrice) }}
+                {{ form_errors(form.observedPrice) }}
+            </div>
+
+            <div class="mb-4">
+                {{ form_label(form.priceType, null, {'label_attr': {'class': 'block text-white font-medium mb-2'}}) }}
+                {{ form_widget(form.priceType) }}
+                {{ form_errors(form.priceType) }}
+            </div>
+
+            <div class="mb-6">
+                {{ form_label(form.notes, null, {'label_attr': {'class': 'block text-white font-medium mb-2'}}) }}
+                {{ form_widget(form.notes) }}
+                {{ form_errors(form.notes) }}
+            </div>
+
+            <button type="submit" class="w-full bg-orange-600 hover:bg-orange-700 text-white font-bold py-2 px-4 rounded transition-colors">
+                Créer la surveillance
+            </button>
+
+            {{ form_end(form) }}
+        </div>
+    </div>
+</div>
+{% endblock %}

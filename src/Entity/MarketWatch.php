@@ -8,6 +8,7 @@ use Doctrine\ORM\Mapping as ORM;
 use App\Enum\PriceType;
 
 #[ORM\Entity(repositoryClass: MarketWatchRepository::class)]
+#[ORM\HasLifecycleCallbacks]
 class MarketWatch
 {
     #[ORM\Id]

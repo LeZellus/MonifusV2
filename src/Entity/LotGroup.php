@@ -7,6 +7,7 @@ use Doctrine\Common\Collections\ArrayCollection;
 use Doctrine\Common\Collections\Collection;
 use Doctrine\ORM\Mapping as ORM;
 use App\Enum\LotStatus;
+use App\Enum\SaleUnit;
 
 #[ORM\Entity(repositoryClass: LotGroupRepository::class)]
 #[ORM\HasLifecycleCallbacks]
@@ -36,6 +37,9 @@ class LotGroup
     #[ORM\ManyToOne(inversedBy: 'lotGroups')]
     #[ORM\JoinColumn(nullable: false)]
     private ?Item $item = null;
+
+    #[ORM\Column(enumType: SaleUnit::class)]
+    private ?SaleUnit $saleUnit = null;
 
     #[ORM\Column]
     private ?\DateTimeImmutable $createdAt = null;
@@ -141,6 +145,17 @@ class LotGroup
     {
         $this->item = $item;
 
+        return $this;
+    }
+
+    public function getSaleUnit(): ?SaleUnit
+    {
+        return $this->saleUnit;
+    }
+
+    public function setSaleUnit(SaleUnit $saleUnit): static
+    {
+        $this->saleUnit = $saleUnit;
         return $this;
     }
 
