@@ -1,0 +1,25 @@
+<!-- Navigation mobile -->
+<div class="md:hidden fixed bottom-0 left-0 right-0 bg-gray-800 border-t border-gray-700 z-50">
+    <div class="grid grid-cols-4 h-16">
+        <a href="{{ path('app_trading_dashboard') }}" 
+           class="flex flex-col items-center justify-center text-gray-400 hover:text-white {{ app.request.get('_route') == 'app_trading_dashboard' ? 'text-blue-400' : '' }}">
+            <span class="text-lg">🏠</span>
+            <span class="text-xs">Dashboard</span>
+        </a>
+        <a href="{{ path('app_lot_index') }}" 
+           class="flex flex-col items-center justify-center text-gray-400 hover:text-white {{ app.request.get('_route') starts with 'app_lot' ? 'text-blue-400' : '' }}">
+            <span class="text-lg">📦</span>
+            <span class="text-xs">Lots</span>
+        </a>
+        <a href="{{ path('app_market_watch_index') }}" 
+           class="flex flex-col items-center justify-center text-gray-400 hover:text-white {{ app.request.get('_route') starts with 'app_market_watch' ? 'text-blue-400' : '' }}">
+            <span class="text-lg">👁️</span>
+            <span class="text-xs">Surveillance</span>
+        </a>
+        <a href="{{ path('app_analytics_index') }}" 
+           class="flex flex-col items-center justify-center text-gray-400 hover:text-white {{ app.request.get('_route') starts with 'app_analytics' ? 'text-blue-400' : '' }}">
+            <span class="text-lg">📊</span>
+            <span class="text-xs">Analytics</span>
+        </a>
+    </div>
+</div>

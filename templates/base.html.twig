@@ -14,5 +14,21 @@
     </head>
     <body>
         {% block body %}{% endblock %}
+
+        <!-- Navigation mobile -->
+        {% if app.user %}
+            {% include 'components/mobile_nav.html.twig' %}
+        {% endif %}
+
+        <!-- Messages flash globaux -->
+        {% for type, messages in app.flashes %}
+            <div class="fixed top-4 right-4 z-50">
+                {% for message in messages %}
+                    <div class="bg-{{ type == 'success' ? 'green' : (type == 'error' ? 'red' : 'blue') }}-600 text-white px-4 py-2 rounded-lg mb-2 shadow-lg">
+                        {{ message }}
+                    </div>
+                {% endfor %}
+            </div>
+        {% endfor %}
     </body>
 </html>
