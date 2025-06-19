@@ -1,26 +1,31 @@
-// assets/controllers/character_selector_controller.js
 import { Controller } from '@hotwired/stimulus';
 
 export default class extends Controller {
-    static values = {
-        characters: Array,
-        selectedId: Number
+    static targets = ["select"]
+    static values = { 
+        selectedId: Number 
     }
 
     connect() {
-        if (this.charactersValue.length === 1 && this.selectedIdValue === null) {
-            this.changeCharacter(this.charactersValue[0].id);
+        // Auto-sélection si un seul personnage et aucun sélectionné
+        const selectElement = this.selectTarget;
+        if (selectElement && selectElement.options.length === 2 && !this.selectedIdValue) { // 2 car il y a l'option par défaut
+            const firstCharacterId = selectElement.options[1]?.value;
+            if (firstCharacterId) {
+                this.changeCharacter(firstCharacterId);
+            }
         }
     }
 
-    change(event) {
+    async change(event) {
         const characterId = event.target.value;
-        this.changeCharacter(characterId);
+        if (characterId) {
+            await this.changeCharacter(characterId);
+        }
     }
 
     async changeCharacter(characterId) {
         try {
-            console.log("coucou")
             const response = await fetch(`/character/select/${characterId}`, {
                 method: 'POST',
                 headers: {
@@ -32,10 +37,24 @@ export default class extends Controller {
             if (response.ok) {
                 window.location.reload();
             } else {
-                console.error('Erreur lors du changement de personnage');
+                console.error('Erreur lors du changement de personnage:', response.status);
+                this.showError('Erreur lors du changement de personnage');
             }
         } catch (error) {
             console.error('Erreur réseau:', error);
+            this.showError('Erreur réseau lors du changement de personnage');
         }
+    }
+
+    showError(message) {
+        // Simple notification d'erreur - vous pouvez améliorer cela
+        const notification = document.createElement('div');
+        notification.className = 'bg-red-600 text-white px-4 py-2 rounded-lg fixed top-4 right-4 z-50';
+        notification.textContent = message;
+        document.body.appendChild(notification);
+        
+        setTimeout(() => {
+            notification.remove();
+        }, 3000);
     }
 }
