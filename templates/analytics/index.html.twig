@@ -5,7 +5,7 @@
 {% block body %}
 <div class="bg-gray-900 min-h-screen">
     <nav class="bg-gray-800 border-b border-gray-700">
-        <div class="container mx-auto px-4">
+        <div class="wrapper-container">
             <div class="flex justify-between items-center py-4">
                 <h1 class="text-white text-xl font-bold">Analytics Trading</h1>
                 <a href="{{ path('app_trading_dashboard') }}" class="text-blue-400 hover:text-blue-300">← Dashboard</a>
@@ -13,46 +13,46 @@
         </div>
     </nav>
 
-    <div class="container mx-auto px-4 py-8">
+    <div class="wrapper-container">
         <!-- Statistiques globales -->
-        <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6 mb-8">
-            <div class="bg-gray-800 rounded-lg p-6">
+        <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">
+            <div class="bg-gray-800 rounded-lg p-4">
                 <h3 class="text-white text-lg font-semibold mb-2">💰 Investi</h3>
                 <p class="text-yellow-400 text-2xl font-bold">
                     {{ (stats.global.investedAmount / 1000000)|number_format(1) }}M
                 </p>
                 <p class="text-gray-400 text-sm">{{ stats.global.availableLots }} lots disponibles</p>
             </div>
-            <div class="bg-gray-800 rounded-lg p-6">
+            <div class="bg-gray-800 rounded-lg p-4">
                 <h3 class="text-white text-lg font-semibold mb-2">✅ Profit Réalisé</h3>
                 <p class="text-green-400 text-2xl font-bold">
                     {{ (stats.global.realizedProfit / 1000000)|number_format(1) }}M
                 </p>
                 <p class="text-gray-400 text-sm">{{ stats.global.soldLots }} lots vendus</p>
             </div>
-            <div class="bg-gray-800 rounded-lg p-6">
+            <div class="bg-gray-800 rounded-lg p-4">
                 <h3 class="text-white text-lg font-semibold mb-2">🎯 Profit Potentiel</h3>
                 <p class="text-blue-400 text-2xl font-bold">
                     {{ (stats.global.potentialProfit / 1000000)|number_format(1) }}M
                 </p>
                 <p class="text-gray-400 text-sm">Si tout vendu au prix cible</p>
             </div>
-            <div class="bg-gray-800 rounded-lg p-6">
+            <div class="bg-gray-800 rounded-lg p-4">
                 <h3 class="text-white text-lg font-semibold mb-2">📊 Total Lots</h3>
                 <p class="text-purple-400 text-2xl font-bold">{{ stats.global.totalLots }}</p>
                 <p class="text-gray-400 text-sm">{{ stats.charactersCount }} personnages</p>
             </div>
         </div>
 
-        <div class="grid grid-cols-1 lg:grid-cols-2 gap-8">
-            <!-- Top items rentables -->
-            <div class="bg-gray-800 rounded-lg p-6">
+        <!-- Top items rentables -->
+        <div class="grid grid-cols-1 lg:grid-cols-2 gap-4">
+            <div class="bg-gray-800 rounded-lg p-4">
                 <h3 class="text-white text-xl font-semibold mb-4">🏆 Top Items Rentables</h3>
                 {% if stats.topItems|length > 0 %}
                     <div class="space-y-3">
                         {% for item in stats.topItems %}
                             {% set profit = item.totalProfit %}
-                            <div class="flex justify-between items-center p-3 bg-gray-700 rounded-lg">
+                            <div class="flex justify-between items-center p-4 bg-gray-700 rounded-lg">
                                 <div>
                                     <div class="text-white font-medium">{{ item.itemName }}</div>
                                     <div class="text-gray-400 text-sm">{{ item.lotsCount }} lots</div>
@@ -73,9 +73,9 @@
 
         <!-- Ratios et métriques -->
         {% if stats.global.totalLots > 0 %}
-            <div class="bg-gray-800 rounded-lg p-6 mt-8">
+            <div class="bg-gray-800 rounded-lg p-4">
                 <h3 class="text-white text-xl font-semibold mb-4">📊 Métriques Clés</h3>
-                <div class="grid grid-cols-1 md:grid-cols-3 gap-6">
+                <div class="grid grid-cols-1 md:grid-cols-3 gap-4">
                     <div class="text-center">
                         <div class="text-2xl font-bold text-blue-400">
                             {{ ((stats.global.soldLots / stats.global.totalLots) * 100)|number_format(1) }}%

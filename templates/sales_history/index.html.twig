@@ -5,7 +5,7 @@
 {% block body %}
 <div class="bg-gray-900 min-h-screen">
     <nav class="bg-gray-800 border-b border-gray-700">
-        <div class="container mx-auto px-4">
+        <div class="wrapper-container">
             <div class="flex justify-between items-center py-4">
                 <h1 class="text-white text-xl font-bold">Historique des Ventes</h1>
                 <a href="{{ path('app_trading_dashboard') }}" class="text-blue-400 hover:text-blue-300">← Dashboard</a>
@@ -13,12 +13,12 @@
         </div>
     </nav>
 
-    <div class="container mx-auto px-4 py-8">
+    <div class="wrapper-container">
         <!-- Sélecteur de personnage -->
         {% include 'components/character_selector.html.twig' %}
 
         <!-- Statistiques des ventes -->
-        <div class="grid grid-cols-1 md:grid-cols-4 gap-6 mb-8">
+        <div class="grid grid-cols-1 md:grid-cols-4 gap-4">
             <div class="bg-gray-800 rounded-lg p-6">
                 <h3 class="text-white text-lg font-semibold mb-2">💰 Profit Réalisé</h3>
                 <p class="text-green-400 text-2xl font-bold">
@@ -44,7 +44,7 @@
         </div>
 
         <!-- Filtres -->
-        <div class="bg-gray-800 rounded-lg p-4 mb-6">
+        <div class="bg-gray-800 rounded-lg p-4">
             <form method="GET" class="grid grid-cols-1 md:grid-cols-3 gap-4 items-end">
                 <div>
                     <label class="block text-white font-medium mb-2">Période</label>
@@ -68,7 +68,7 @@
             </form>
         </div>
 
-        <div class="flex justify-between items-center mb-6">
+        <div class="flex justify-between items-center">
             <h2 class="text-white text-2xl font-bold">
                 Historique des Ventes
                 {% if selectedCharacter %}

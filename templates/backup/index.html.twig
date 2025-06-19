@@ -5,7 +5,7 @@
 {% block body %}
 <div class="bg-gray-900 min-h-screen">
     <nav class="bg-gray-800 border-b border-gray-700">
-        <div class="container mx-auto px-4">
+        <div class="wrapper-container">
             <div class="flex justify-between items-center py-4">
                 <h1 class="text-white text-xl font-bold">Sauvegarde & Données</h1>
                 <a href="{{ path('app_trading_dashboard') }}" class="text-blue-400 hover:text-blue-300">← Dashboard</a>
@@ -13,10 +13,10 @@
         </div>
     </nav>
 
-    <div class="container mx-auto px-4 py-8">
-        <div class="max-w-4xl mx-auto">
+    <div class="wrapper-container">
+        <div class="max-w-4xl mx-auto grid gap-8">
             <!-- Résumé des données -->
-            <div class="bg-gray-800 rounded-lg p-6 mb-8">
+            <div class="bg-gray-800 rounded-lg p-4">
                 <h2 class="text-white text-xl font-semibold mb-4">📊 Résumé de vos données</h2>
                 <div class="grid grid-cols-2 md:grid-cols-5 gap-4">
                     <div class="text-center">
@@ -43,9 +43,9 @@
             </div>
 
             <!-- Actions de sauvegarde -->
-            <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+            <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
                 <!-- Export des données -->
-                <div class="bg-gray-800 rounded-lg p-6">
+                <div class="bg-gray-800 rounded-lg p-4">
                     <div class="flex items-center mb-4">
                         <span class="text-2xl mr-3">💾</span>
                         <h3 class="text-white text-lg font-semibold">Exporter mes données</h3>
@@ -61,7 +61,7 @@
                 </div>
 
                 <!-- Info RGPD -->
-                <div class="bg-gray-800 rounded-lg p-6">
+                <div class="bg-gray-800 rounded-lg p-4">
                     <div class="flex items-center mb-4">
                         <span class="text-2xl mr-3">🔒</span>
                         <h3 class="text-white text-lg font-semibold">Vos données</h3>
@@ -84,7 +84,7 @@
             </div>
 
             <!-- Conseils de sauvegarde -->
-            <div class="bg-gradient-to-r from-green-600 to-blue-600 rounded-lg p-6 mt-8">
+            <div class="bg-gradient-to-r from-green-600 to-blue-600 rounded-lg p-4">
                 <h3 class="text-white text-lg font-semibold mb-3">💡 Conseils de sauvegarde</h3>
                 <div class="text-white space-y-2 text-sm">
                     <p>• Exportez vos données régulièrement (1 fois par mois)</p>

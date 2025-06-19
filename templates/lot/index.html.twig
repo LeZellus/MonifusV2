@@ -5,7 +5,7 @@
 {% block body %}
 <div class="bg-gray-900 min-h-screen">
     <nav class="bg-gray-800 border-b border-gray-700">
-        <div class="container mx-auto px-4">
+        <div class="wrapper-container">
             <div class="flex justify-between items-center py-4">
                 <h1 class="text-white text-xl font-bold">Mes Lots de Trading</h1>
                 <a href="{{ path('app_trading_dashboard') }}" class="text-blue-400 hover:text-blue-300">← Dashboard</a>
@@ -13,12 +13,12 @@
         </div>
     </nav>
 
-    <div class="container mx-auto px-4 py-8">
+    <div class="wrapper-container">
         <!-- Sélecteur de personnage -->
         {% include 'components/character_selector.html.twig' %}
 
         {% if selectedCharacter %}
-            <div class="flex justify-between items-center mb-6">
+            <div class="flex justify-between items-center">
                 <h2 class="text-white text-2xl font-bold">
                     Lots de {{ selectedCharacter.name }}
                 </h2>

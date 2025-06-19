@@ -5,7 +5,7 @@
 {% block body %}
 <div class="bg-gray-900 min-h-screen">
     <nav class="bg-gray-800 border-b border-gray-700">
-        <div class="container mx-auto px-4">
+        <div class="wrapper-container">
             <div class="flex justify-between items-center py-4">
                 <h1 class="text-white text-xl font-bold">Vendre le lot - {{ lot_group.item.name }}</h1>
                 <a href="{{ path('app_lot_index') }}" class="text-blue-400 hover:text-blue-300">← Retour</a>
@@ -13,10 +13,10 @@
         </div>
     </nav>
 
-    <div class="container mx-auto px-4 py-8">
-        <div class="max-w-2xl mx-auto">
+    <div class="wrapper-container">
+        <div class="max-w-2xl mx-auto grid gap-4 w-full">
             <!-- Informations du lot -->
-            <div class="bg-gray-800 rounded-lg p-6 mb-6">
+            <div class="bg-gray-800 rounded-lg p-4">
                 <h2 class="text-white text-xl font-semibold mb-4">📦 Informations du lot</h2>
                 <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
                     <div>
@@ -43,7 +43,7 @@
             </div>
 
             <!-- Formulaire de vente -->
-            <div class="bg-gray-800 rounded-lg p-6">
+            <div class="bg-gray-800 rounded-lg p-4">
                 <h2 class="text-white text-xl font-semibold mb-4">💸 Enregistrer la vente</h2>
                 {{ form_start(form) }}
                 

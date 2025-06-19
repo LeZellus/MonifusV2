@@ -5,7 +5,7 @@
 {% block body %}
 <div class="bg-gray-900 min-h-screen">
     <nav class="bg-gray-800 border-b border-gray-700">
-        <div class="container mx-auto px-4">
+        <div class="wrapper-container">
             <div class="flex justify-between items-center py-4">
                 <h1 class="text-white text-xl font-bold">Nouveau Personnage - {{ profile.name }}</h1>
                 <a href="{{ path('app_profile_index') }}" class="text-blue-400 hover:text-blue-300">← Retour</a>
@@ -13,8 +13,8 @@
         </div>
     </nav>
 
-    <div class="container mx-auto px-4 py-8">
-        <div class="max-w-md mx-auto bg-gray-800 rounded-lg p-6">
+    <div class="wrapper-container">
+        <div class="max-w-md mx-auto w-full bg-gray-800 rounded-lg p-6">
             {{ form_start(form) }}
             
             <div class="mb-4">

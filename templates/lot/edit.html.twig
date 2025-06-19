@@ -5,7 +5,7 @@
 {% block body %}
 <div class="bg-gray-900 min-h-screen">
     <nav class="bg-gray-800 border-b border-gray-700">
-        <div class="container mx-auto px-4">
+        <div class="wrapper-containe">
             <div class="flex justify-between items-center py-4">
                 <h1 class="text-white text-xl font-bold">Modifier le lot - {{ lot.item.name }}</h1>
                 <a href="{{ path('app_lot_index') }}" class="text-blue-400 hover:text-blue-300">← Retour</a>
@@ -13,7 +13,7 @@
         </div>
     </nav>
 
-    <div class="container mx-auto px-4 py-8">
+    <div class="wrapper-containe">
         <div class="max-w-md mx-auto bg-gray-800 rounded-lg p-6">
             {{ form_start(form) }}
             
@@ -39,6 +39,12 @@
                 {{ form_label(form.sellPricePerLot, null, {'label_attr': {'class': 'block text-white font-medium mb-2'}}) }}
                 {{ form_widget(form.sellPricePerLot) }}
                 {{ form_errors(form.sellPricePerLot) }}
+            </div>
+
+            <div class="mb-4">
+                {{ form_label(form.saleUnit, null, {'label_attr': {'class': 'block text-white font-medium mb-2'}}) }}
+                {{ form_widget(form.saleUnit) }}
+                {{ form_errors(form.saleUnit) }}
             </div>
 
             <div class="mb-6">
