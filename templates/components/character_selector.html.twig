@@ -18,9 +18,9 @@
                 <div class="flex items-center space-x-2">
                     <label for="character-select" class="text-gray-300 text-sm">Changer :</label>
                     <select 
-                        id="character-select" 
+                        id="character-select"
                         class="px-3 py-1 bg-gray-700 text-white rounded border border-gray-600 focus:border-blue-500 text-sm"
-                        onchange="changeCharacter(this.value)"
+                        data-action="change->character-selector#change"
                     >
                         {% for character in characters %}
                             <option 

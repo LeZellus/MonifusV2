@@ -1,44 +1,338 @@
 {% extends 'base.html.twig' %}
 
-{% block title %}Dofus Trading V2{% endblock %}
+{% block title %}Dofus Trading V2 - Le tracker de trading moderne{% endblock %}
 
 {% block navbar %}
-    {% include 'components/navbar.html.twig' with {
-        'title': 'Dofus Trading V2',
-        'actions': [
-            {'url': path('app_trading_dashboard'), 'label': 'Accéder au Trading', 'class': 'bg-blue-600 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded-lg transition-colors'}
-        ]
-    } %}
+    <nav class="bg-gray-800 border-b border-gray-700">
+        <div class="container mx-auto px-4">
+            <div class="flex justify-between items-center py-4">
+                <div class="flex items-center space-x-3">
+                    <div class="w-10 h-10 bg-gradient-to-br from-blue-500 to-purple-600 rounded-lg flex items-center justify-center">
+                        <span class="text-white font-bold text-lg">DT</span>
+                    </div>
+                    <h1 class="text-white text-xl font-bold">Dofus Trading V2</h1>
+                </div>
+                
+                <div class="flex items-center space-x-4">
+                    <a href="{{ path('app_login') }}" class="text-gray-300 hover:text-white transition-colors">Connexion</a>
+                    <a href="{{ path('app_register') }}" 
+                       class="bg-gradient-to-r from-blue-600 to-purple-600 hover:from-blue-700 hover:to-purple-700 text-white font-bold py-2 px-4 rounded-lg transition-all duration-200 transform hover:scale-105">
+                        S'inscrire
+                    </a>
+                </div>
+            </div>
+        </div>
+    </nav>
 {% endblock %}
 
 {% block body %}
-
-    <div class="wrapper-container">
-        <div class="text-center mb-12">
-            <h1 class="text-4xl font-bold text-white mb-4">Dofus Trading V2</h1>
-            <p class="text-gray-300 text-lg">Application moderne de trading Dofus</p>
-        </div>
-
-        <div class="grid grid-cols-1 md:grid-cols-3 gap-6">
-            <div class="bg-gray-800 rounded-lg p-6 text-center">
-                <h3 class="text-white text-xl font-semibold mb-2">Utilisateurs</h3>
-                <p class="text-blue-400 text-3xl font-bold">{{ users_count }}</p>
+    <!-- Hero Section -->
+    <div class="bg-gradient-to-br from-gray-900 via-blue-900 to-purple-900 relative overflow-hidden">
+        <div class="absolute inset-0 bg-black bg-opacity-30"></div>
+        <div class="container mx-auto px-4 py-20 relative z-10">
+            <div class="text-center max-w-4xl mx-auto">
+                <div class="text-6xl mb-6">💰</div>
+                <h1 class="text-5xl md:text-6xl font-bold text-white mb-6 leading-tight">
+                    Le Trading Dofus
+                    <span class="bg-gradient-to-r from-blue-400 to-purple-400 bg-clip-text text-transparent">
+                        Nouvelle Génération
+                    </span>
+                </h1>
+                <p class="text-xl text-gray-300 mb-8 leading-relaxed">
+                    Transformez votre approche du trading avec l'outil le plus avancé de la communauté.
+                    Trackez, analysez et optimisez vos profits comme jamais auparavant.
+                </p>
+                
+                <div class="flex flex-col sm:flex-row gap-4 justify-center items-center">
+                    <a href="{{ path('app_register') }}" 
+                       class="bg-gradient-to-r from-green-600 to-blue-600 hover:from-green-700 hover:to-blue-700 text-white font-bold py-4 px-8 rounded-xl text-lg transition-all duration-200 transform hover:scale-105 shadow-xl flex items-center">
+                        <span class="text-2xl mr-3">🚀</span>
+                        Commencer gratuitement
+                    </a>
+                    <a href="#features" 
+                       class="bg-gray-800 bg-opacity-50 hover:bg-opacity-70 text-white font-medium py-4 px-8 rounded-xl text-lg transition-all duration-200 border border-gray-600 hover:border-gray-500">
+                        Découvrir les fonctionnalités
+                    </a>
+                </div>
+                
+                <div class="flex justify-center items-center space-x-8 mt-12 text-gray-400">
+                    <div class="text-center">
+                        <div class="text-2xl font-bold text-blue-400">{{ users_count }}</div>
+                        <div class="text-sm">Traders actifs</div>
+                    </div>
+                    <div class="text-center">
+                        <div class="text-2xl font-bold text-green-400">{{ servers_count }}</div>
+                        <div class="text-sm">Serveurs supportés</div>
+                    </div>
+                    <div class="text-center">
+                        <div class="text-2xl font-bold text-purple-400">100%</div>
+                        <div class="text-sm">Gratuit</div>
+                    </div>
+                </div>
             </div>
-            <div class="bg-gray-800 rounded-lg p-6 text-center">
-                <h3 class="text-white text-xl font-semibold mb-2">Classes</h3>
-                <p class="text-green-400 text-3xl font-bold">{{ classes_count }}</p>
-            </div>
-            <div class="bg-gray-800 rounded-lg p-6 text-center">
-                <h3 class="text-white text-xl font-semibold mb-2">Serveurs</h3>
-                <p class="text-purple-400 text-3xl font-bold">{{ servers_count }}</p>
-            </div>
-        </div>
-
-        <div class="text-center">
-            <a href="{{ path('app_trading_dashboard') }}" 
-               class="bg-blue-600 hover:bg-blue-700 text-white font-bold py-3 px-6 rounded-lg transition-colors">
-                Accéder au Trading
-            </a>
         </div>
     </div>
+
+    <!-- Features Section -->
+    <section id="features" class="py-20 bg-gray-900">
+        <div class="container mx-auto px-4">
+            <div class="text-center mb-16">
+                <h2 class="text-4xl font-bold text-white mb-4">Pourquoi choisir Dofus Trading V2 ?</h2>
+                <p class="text-xl text-gray-400">Les outils dont vous avez besoin pour dominer l'économie de Dofus</p>
+            </div>
+
+            <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
+                <!-- Feature 1 -->
+                <div class="bg-gray-800 rounded-xl p-6 hover:bg-gray-750 transition-all duration-200 border border-gray-700 hover:border-gray-600">
+                    <div class="text-4xl mb-4">📦</div>
+                    <h3 class="text-xl font-bold text-white mb-3">Gestion Intelligente des Lots</h3>
+                    <p class="text-gray-400 mb-4">
+                        Trackez vos achats, définissez vos prix cibles et suivez vos ventes en temps réel. 
+                        Ventes partielles supportées pour une flexibilité maximale.
+                    </p>
+                    <div class="bg-gradient-to-r from-green-600 to-blue-600 rounded-lg p-3">
+                        <div class="text-green-100 text-sm">
+                            ✓ Suivi profit/perte en temps réel<br>
+                            ✓ Calculs automatiques de rentabilité<br>
+                            ✓ Historique complet des transactions
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Feature 2 -->
+                <div class="bg-gray-800 rounded-xl p-6 hover:bg-gray-750 transition-all duration-200 border border-gray-700 hover:border-gray-600">
+                    <div class="text-4xl mb-4">👁️</div>
+                    <h3 class="text-xl font-bold text-white mb-3">Surveillance du Marché</h3>
+                    <p class="text-gray-400 mb-4">
+                        Observez l'évolution des prix sur vos serveurs. Identifiez les tendances et 
+                        les opportunités avant vos concurrents.
+                    </p>
+                    <div class="bg-gradient-to-r from-orange-600 to-red-600 rounded-lg p-3">
+                        <div class="text-orange-100 text-sm">
+                            ✓ Tracking prix achat/vente<br>
+                            ✓ Alertes sur les fluctuations<br>
+                            ✓ Analyse des tendances marché
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Feature 3 -->
+                <div class="bg-gray-800 rounded-xl p-6 hover:bg-gray-750 transition-all duration-200 border border-gray-700 hover:border-gray-600">
+                    <div class="text-4xl mb-4">📊</div>
+                    <h3 class="text-xl font-bold text-white mb-3">Analytics Avancées</h3>
+                    <p class="text-gray-400 mb-4">
+                        Dashboards détaillés, métriques de performance et rapports exportables 
+                        pour optimiser votre stratégie.
+                    </p>
+                    <div class="bg-gradient-to-r from-purple-600 to-pink-600 rounded-lg p-3">
+                        <div class="text-purple-100 text-sm">
+                            ✓ ROI et ratios de performance<br>
+                            ✓ Top items les plus rentables<br>
+                            ✓ Exports CSV détaillés
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Feature 4 -->
+                <div class="bg-gray-800 rounded-xl p-6 hover:bg-gray-750 transition-all duration-200 border border-gray-700 hover:border-gray-600">
+                    <div class="text-4xl mb-4">👥</div>
+                    <h3 class="text-xl font-bold text-white mb-3">Multi-Personnages</h3>
+                    <p class="text-gray-400 mb-4">
+                        Gérez plusieurs personnages et serveurs dans un seul outil. 
+                        Basculez instantanément entre vos différents traders.
+                    </p>
+                    <div class="bg-gradient-to-r from-blue-600 to-indigo-600 rounded-lg p-3">
+                        <div class="text-blue-100 text-sm">
+                            ✓ Profils de trading séparés<br>
+                            ✓ Sélection rapide de personnage<br>
+                            ✓ Stats individuelles par trader
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Feature 5 -->
+                <div class="bg-gray-800 rounded-xl p-6 hover:bg-gray-750 transition-all duration-200 border border-gray-700 hover:border-gray-600">
+                    <div class="text-4xl mb-4">💾</div>
+                    <h3 class="text-xl font-bold text-white mb-3">Sauvegarde Sécurisée</h3>
+                    <p class="text-gray-400 mb-4">
+                        Vos données sont en sécurité avec nos sauvegardes automatiques 
+                        et la possibilité d'export complet.
+                    </p>
+                    <div class="bg-gradient-to-r from-teal-600 to-green-600 rounded-lg p-3">
+                        <div class="text-teal-100 text-sm">
+                            ✓ Backup automatique quotidien<br>
+                            ✓ Export JSON de toutes vos données<br>
+                            ✓ Conformité RGPD
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Feature 6 -->
+                <div class="bg-gray-800 rounded-xl p-6 hover:bg-gray-750 transition-all duration-200 border border-gray-700 hover:border-gray-600">
+                    <div class="text-4xl mb-4">📱</div>
+                    <h3 class="text-xl font-bold text-white mb-3">Interface Moderne</h3>
+                    <p class="text-gray-400 mb-4">
+                        Design responsive et intuitif. Accédez à vos données depuis 
+                        n'importe quel appareil, desktop ou mobile.
+                    </p>
+                    <div class="bg-gradient-to-r from-yellow-600 to-orange-600 rounded-lg p-3">
+                        <div class="text-yellow-100 text-sm">
+                            ✓ Responsive design<br>
+                            ✓ Navigation mobile optimisée<br>
+                            ✓ Mode sombre par défaut
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Screenshot Section -->
+    <section class="py-20 bg-gray-800">
+        <div class="container mx-auto px-4">
+            <div class="text-center mb-16">
+                <h2 class="text-4xl font-bold text-white mb-4">Interface Moderne et Intuitive</h2>
+                <p class="text-xl text-gray-400">Découvrez l'expérience utilisateur nouvelle génération</p>
+            </div>
+
+            <div class="grid grid-cols-1 lg:grid-cols-2 gap-12 items-center">
+                <div>
+                    <div class="bg-gradient-to-br from-gray-700 to-gray-800 rounded-xl p-8 border border-gray-600">
+                        <div class="bg-gray-900 rounded-lg p-4 mb-4">
+                            <div class="flex items-center space-x-2 mb-3">
+                                <div class="w-3 h-3 bg-red-500 rounded-full"></div>
+                                <div class="w-3 h-3 bg-yellow-500 rounded-full"></div>
+                                <div class="w-3 h-3 bg-green-500 rounded-full"></div>
+                            </div>
+                            <div class="space-y-2">
+                                <div class="h-3 bg-gradient-to-r from-blue-600 to-purple-600 rounded w-3/4"></div>
+                                <div class="h-3 bg-gray-700 rounded w-1/2"></div>
+                                <div class="h-3 bg-gray-700 rounded w-2/3"></div>
+                            </div>
+                        </div>
+                        <div class="text-center text-gray-400 text-sm">Aperçu du dashboard</div>
+                    </div>
+                </div>
+
+                <div class="space-y-6">
+                    <div class="flex items-center space-x-4">
+                        <div class="w-12 h-12 bg-gradient-to-br from-green-500 to-blue-500 rounded-lg flex items-center justify-center">
+                            <span class="text-white text-2xl">⚡</span>
+                        </div>
+                        <div>
+                            <h3 class="text-white text-lg font-bold">Performance Ultra-Rapide</h3>
+                            <p class="text-gray-400">Interface réactive construite avec les dernières technologies</p>
+                        </div>
+                    </div>
+
+                    <div class="flex items-center space-x-4">
+                        <div class="w-12 h-12 bg-gradient-to-br from-purple-500 to-pink-500 rounded-lg flex items-center justify-center">
+                            <span class="text-white text-2xl">🎨</span>
+                        </div>
+                        <div>
+                            <h3 class="text-white text-lg font-bold">Design Soigné</h3>
+                            <p class="text-gray-400">Chaque détail pensé pour une expérience optimale</p>
+                        </div>
+                    </div>
+
+                    <div class="flex items-center space-x-4">
+                        <div class="w-12 h-12 bg-gradient-to-br from-orange-500 to-red-500 rounded-lg flex items-center justify-center">
+                            <span class="text-white text-2xl">📊</span>
+                        </div>
+                        <div>
+                            <h3 class="text-white text-lg font-bold">Visualisation Claire</h3>
+                            <p class="text-gray-400">Tableaux de bord et graphiques faciles à comprendre</p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Social Proof Section -->
+    <section class="py-20 bg-gradient-to-r from-blue-900 to-purple-900">
+        <div class="container mx-auto px-4">
+            <div class="text-center mb-16">
+                <h2 class="text-4xl font-bold text-white mb-4">Rejoint par la Communauté</h2>
+                <p class="text-xl text-blue-200">Des traders de tous niveaux nous font confiance</p>
+            </div>
+
+            <div class="grid grid-cols-1 md:grid-cols-3 gap-8">
+                <div class="bg-white bg-opacity-10 rounded-xl p-6 backdrop-blur">
+                    <div class="text-center mb-4">
+                        <div class="text-3xl mb-2">💰</div>
+                        <h3 class="text-white font-bold">Traders Débutants</h3>
+                    </div>
+                    <p class="text-blue-100 text-center italic">
+                        "Enfin un outil qui m'aide à comprendre mes profits réels. 
+                        L'interface est super intuitive !"
+                    </p>
+                </div>
+
+                <div class="bg-white bg-opacity-10 rounded-xl p-6 backdrop-blur">
+                    <div class="text-center mb-4">
+                        <div class="text-3xl mb-2">🏆</div>
+                        <h3 class="text-white font-bold">Traders Experts</h3>
+                    </div>
+                    <p class="text-blue-100 text-center italic">
+                        "Les analytics avancées et l'export CSV me font gagner des heures. 
+                        Un must-have !"
+                    </p>
+                </div>
+
+                <div class="bg-white bg-opacity-10 rounded-xl p-6 backdrop-blur">
+                    <div class="text-center mb-4">
+                        <div class="text-3xl mb-2">👥</div>
+                        <h3 class="text-white font-bold">Guildes</h3>
+                    </div>
+                    <p class="text-blue-100 text-center italic">
+                        "Parfait pour organiser le trading de guilde. 
+                        Chaque membre peut gérer ses personnages !"
+                    </p>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- CTA Final -->
+    <section class="py-20 bg-gray-900">
+        <div class="container mx-auto px-4 text-center">
+            <div class="max-w-3xl mx-auto">
+                <h2 class="text-4xl font-bold text-white mb-6">
+                    Prêt à Révolutionner Votre Trading ?
+                </h2>
+                <p class="text-xl text-gray-400 mb-8">
+                    Rejoignez {{ users_count }} traders qui optimisent déjà leurs profits avec Dofus Trading V2.
+                    Inscription gratuite, aucune carte bancaire requise.
+                </p>
+                
+                <div class="flex flex-col sm:flex-row gap-4 justify-center items-center mb-8">
+                    <a href="{{ path('app_register') }}" 
+                       class="bg-gradient-to-r from-green-600 to-blue-600 hover:from-green-700 hover:to-blue-700 text-white font-bold py-4 px-8 rounded-xl text-lg transition-all duration-200 transform hover:scale-105 shadow-xl flex items-center">
+                        <span class="text-2xl mr-3">🚀</span>
+                        Créer mon compte gratuit
+                    </a>
+                    <a href="{{ path('app_login') }}" 
+                       class="text-gray-300 hover:text-white transition-colors">
+                        Déjà inscrit ? Se connecter
+                    </a>
+                </div>
+
+                <div class="flex justify-center items-center space-x-6 text-gray-500 text-sm">
+                    <div class="flex items-center">
+                        <span class="text-green-400 mr-2">✓</span>
+                        Gratuit à vie
+                    </div>
+                    <div class="flex items-center">
+                        <span class="text-green-400 mr-2">✓</span>
+                        Aucune publicité
+                    </div>
+                    <div class="flex items-center">
+                        <span class="text-green-400 mr-2">✓</span>
+                        Support communautaire
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
 {% endblock %}

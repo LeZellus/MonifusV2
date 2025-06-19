@@ -18,6 +18,11 @@ class HomeController extends AbstractController
         ClasseRepository $classeRepository,
         ServerRepository $serverRepository
     ): Response {
+        // Redirection si utilisateur connecté
+        if ($this->getUser()) {
+            return $this->redirectToRoute('app_trading_dashboard');
+        }
+
         return $this->render('home/index.html.twig', [
             'users_count' => $userRepository->count([]),
             'classes_count' => $classeRepository->count([]),
