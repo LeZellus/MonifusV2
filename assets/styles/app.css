@@ -6,10 +6,325 @@ body {
     @apply bg-gray-900;
 }
 
+/* ============================================
+   LAYOUT CLASSES (existantes)
+   ============================================ */
 .wrapper-container {
     @apply container grid mx-auto p-4 gap-8 mt-4;
 }
 
 .wrapper-background {
     @apply bg-gray-800 rounded-lg p-4;
+}
+
+/* ============================================
+   BOUTONS - Classes de Base
+   ============================================ */
+.btn-base {
+    @apply font-bold py-3 px-6 rounded-lg transition-colors duration-200;
+}
+
+.btn-full {
+    @apply btn-base flex-1;
+}
+
+.btn-primary {
+    @apply btn-base bg-blue-600 hover:bg-blue-700 text-white;
+}
+
+.btn-success {
+    @apply btn-base bg-green-600 hover:bg-green-700 text-white;
+}
+
+.btn-warning {
+    @apply btn-base bg-orange-600 hover:bg-orange-700 text-white;
+}
+
+.btn-danger {
+    @apply btn-base bg-red-600 hover:bg-red-700 text-white;
+}
+
+.btn-secondary {
+    @apply btn-base bg-gray-600 hover:bg-gray-700 text-white;
+}
+
+.btn-purple {
+    @apply btn-base bg-purple-600 hover:bg-purple-700 text-white;
+}
+
+/* Variantes avec icônes */
+.btn-with-icon {
+    @apply flex items-center justify-center;
+}
+
+/* Boutons de taille alternative */
+.btn-sm {
+    @apply py-2 px-4 text-sm;
+}
+
+.btn-lg {
+    @apply py-4 px-8 text-lg;
+}
+
+/* ============================================
+   INPUTS - Formulaires
+   ============================================ */
+.form-input {
+    @apply w-full px-3 py-2 border border-gray-600 bg-gray-700 text-white rounded-md focus:outline-none focus:border-blue-500 transition-colors;
+}
+
+.form-input-lg {
+    @apply w-full px-4 py-3 border border-gray-600 bg-gray-700 text-white rounded-lg focus:outline-none focus:border-blue-500 focus:ring-2 focus:ring-blue-500 focus:ring-opacity-20 transition-all;
+}
+
+/* Variantes de couleur pour les inputs */
+.form-input-success {
+    @apply form-input focus:border-green-500 focus:ring-green-500;
+}
+
+.form-input-warning {
+    @apply form-input focus:border-orange-500 focus:ring-orange-500;
+}
+
+.form-input-danger {
+    @apply form-input focus:border-red-500 focus:ring-red-500;
+}
+
+/* Labels */
+.form-label {
+    @apply block text-white font-medium mb-2;
+}
+
+.form-help {
+    @apply text-gray-400 text-sm mt-1;
+}
+
+/* ============================================
+   CARDS - Statistiques
+   ============================================ */
+.stats-card {
+    @apply wrapper-background text-center;
+}
+
+.stats-title {
+    @apply text-white text-lg font-semibold mb-2;
+}
+
+.stats-value {
+    @apply text-2xl font-bold;
+}
+
+.stats-value-lg {
+    @apply text-3xl font-bold;
+}
+
+.stats-subtitle {
+    @apply text-gray-400 text-sm;
+}
+
+/* Variantes de couleur pour les valeurs */
+.stats-value-primary { @apply stats-value text-blue-400; }
+.stats-value-success { @apply stats-value text-green-400; }
+.stats-value-warning { @apply stats-value text-orange-400; }
+.stats-value-danger { @apply stats-value text-red-400; }
+.stats-value-purple { @apply stats-value text-purple-400; }
+.stats-value-yellow { @apply stats-value text-yellow-400; }
+
+/* ============================================
+   PRICE CARDS - Market Watch
+   ============================================ */
+.price-card {
+    @apply bg-gray-700 rounded-lg p-3 text-center;
+}
+
+.price-label {
+    @apply text-gray-400 text-sm mb-1;
+}
+
+.price-value {
+    @apply text-lg font-bold;
+}
+
+.price-value-unit { @apply price-value text-green-400; }
+.price-value-ten { @apply price-value text-blue-400; }
+.price-value-hundred { @apply price-value text-purple-400; }
+
+.price-empty {
+    @apply text-gray-500;
+}
+
+/* ============================================
+   NAVIGATION & HEADERS
+   ============================================ */
+.character-avatar {
+    @apply w-12 h-12 rounded-full overflow-hidden;
+}
+
+.character-avatar-sm {
+    @apply w-8 h-8 rounded-full overflow-hidden;
+}
+
+.character-avatar-lg {
+    @apply w-16 h-16 rounded-full overflow-hidden;
+}
+
+.page-title {
+    @apply text-white text-2xl font-bold;
+}
+
+.page-subtitle {
+    @apply text-gray-400;
+}
+
+/* ============================================
+   INFO BOXES - Conseils/Alertes
+   ============================================ */
+.info-box {
+    @apply rounded-lg p-4;
+}
+
+.info-box-gradient {
+    @apply info-box bg-gradient-to-r;
+}
+
+.info-box-primary {
+    @apply info-box-gradient from-blue-600 to-purple-600;
+}
+
+.info-box-success {
+    @apply info-box-gradient from-green-600 to-blue-600;
+}
+
+.info-box-warning {
+    @apply info-box-gradient from-orange-600 to-red-600;
+}
+
+.info-box-info {
+    @apply info-box-gradient from-blue-600 to-indigo-600;
+}
+
+.info-title {
+    @apply text-white font-bold mb-2 flex items-center;
+}
+
+.info-content {
+    @apply text-sm space-y-1;
+}
+
+.info-content-primary { @apply info-content text-blue-100; }
+.info-content-success { @apply info-content text-green-100; }
+.info-content-warning { @apply info-content text-orange-100; }
+.info-content-info { @apply info-content text-blue-100; }
+
+/* ============================================
+   TABLES
+   ============================================ */
+.table-header {
+    @apply px-6 py-3 text-left text-xs font-medium text-gray-300 uppercase tracking-wider;
+}
+
+.table-cell {
+    @apply px-6 py-4 whitespace-nowrap;
+}
+
+.table-row {
+    @apply hover:bg-gray-700 transition-colors;
+}
+
+/* ============================================
+   UTILITIES - Répétées
+   ============================================ */
+.icon-text {
+    @apply flex items-center;
+}
+
+.icon-text > *:first-child {
+    @apply mr-2;
+}
+
+.action-group {
+    @apply flex space-x-4;
+}
+
+.action-group-vertical {
+    @apply space-y-4;
+}
+
+/* Status badges */
+.status-badge {
+    @apply px-2 py-1 text-xs rounded-full font-medium;
+}
+
+.status-available {
+    @apply status-badge bg-green-600 text-green-100;
+}
+
+.status-sold {
+    @apply status-badge bg-gray-600 text-gray-100;
+}
+
+.status-active {
+    @apply status-badge bg-green-600 text-green-100;
+}
+
+/* Mobile responsive helpers */
+.mobile-only {
+    @apply md:hidden;
+}
+
+.desktop-only {
+    @apply hidden md:block;
+}
+
+/* ============================================
+   AUTOCOMPLETE
+   ============================================ */
+.autocomplete-container {
+    @apply relative;
+}
+
+.autocomplete-results {
+    @apply absolute z-10 w-full bg-gray-800 border border-gray-600 rounded-md shadow-lg hidden max-h-60 overflow-y-auto mt-1;
+}
+
+.autocomplete-item {
+    @apply p-3 hover:bg-gray-700 cursor-pointer border-b border-gray-600 last:border-b-0 transition-colors;
+}
+
+/* ============================================
+   GRID LAYOUTS - Répétés
+   ============================================ */
+.stats-grid {
+    @apply grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4;
+}
+
+.stats-grid-2 {
+    @apply grid grid-cols-1 md:grid-cols-2 gap-4;
+}
+
+.stats-grid-3 {
+    @apply grid grid-cols-1 md:grid-cols-3 gap-4;
+}
+
+.form-grid {
+    @apply grid grid-cols-1 md:grid-cols-2 gap-6;
+}
+
+.price-grid {
+    @apply grid grid-cols-3 gap-4;
+}
+
+/* ============================================
+   PROFIT INDICATORS
+   ============================================ */
+.profit-positive {
+    @apply text-green-400;
+}
+
+.profit-negative {
+    @apply text-red-400;
+}
+
+.profit-neutral {
+    @apply text-gray-400;
 }

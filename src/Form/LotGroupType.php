@@ -40,7 +40,7 @@ class LotGroupType extends AbstractType
                 'choice_label' => 'name',
                 'label' => 'Item',
                 'attr' => array_merge(
-                    ['class' => 'w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:border-blue-500'],
+                    ['class' => 'form-input'],
                     !$isEdit ? ['data-autocomplete-target' => 'hiddenId', 'style' => 'display: none;'] : []
                 )
             ])
@@ -48,19 +48,19 @@ class LotGroupType extends AbstractType
                 'class' => SaleUnit::class,
                 'choice_label' => fn(SaleUnit $choice) => $choice->getLabel(),
                 'label' => 'Unité de vente Dofus',
-                'attr' => ['class' => 'w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:border-blue-500']
+                'attr' => ['class' => 'form-input']
             ])
             ->add('lotSize', IntegerType::class, [
                 'label' => 'Taille du lot',
-                'attr' => ['class' => 'w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:border-blue-500']
+                'attr' => ['class' => 'form-input']
             ])
             ->add('buyPricePerLot', IntegerType::class, [
                 'label' => 'Prix d\'achat par lot (kamas)',
-                'attr' => ['class' => 'w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:border-blue-500']
+                'attr' => ['class' => 'form-input']
             ])
             ->add('sellPricePerLot', IntegerType::class, [
                 'label' => 'Prix de vente par lot (kamas)',
-                'attr' => ['class' => 'w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:border-blue-500']
+                'attr' => ['class' => 'form-input']
             ])
             ->add('status', EnumType::class, [
                 'class' => LotStatus::class,
@@ -72,7 +72,7 @@ class LotGroupType extends AbstractType
                 },
                 'label' => 'Statut',
                 'data' => LotStatus::AVAILABLE,
-                'attr' => ['class' => 'w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:border-blue-500']
+                'attr' => ['class' => 'form-input']
             ]);
     }
 

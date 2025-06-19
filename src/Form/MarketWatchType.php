@@ -41,7 +41,7 @@ class MarketWatchType extends AbstractType
                 'choice_label' => 'name',
                 'label' => $isEdit ? 'Ressource observée' : 'Ressource sélectionnée',
                 'attr' => array_merge(
-                    ['class' => 'w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:border-blue-500'],
+                    ['class' => 'form-input'],
                     !$isEdit ? ['data-autocomplete-target' => 'hiddenId', 'style' => 'display: none;'] : []
                 )
             ])
@@ -49,13 +49,13 @@ class MarketWatchType extends AbstractType
                 'widget' => 'single_text',
                 'label' => 'Date d\'observation',
                 'data' => new \DateTimeImmutable(),
-                'attr' => ['class' => 'w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:border-blue-500']
+                'attr' => ['class' => 'form-input']
             ])
             ->add('pricePerUnit', IntegerType::class, [
                 'label' => 'Prix à l\'unité (x1)',
                 'required' => false,
                 'attr' => [
-                    'class' => 'w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:border-blue-500',
+                    'class' => 'form-input',
                     'placeholder' => 'ex: 1500'
                 ]
             ])
@@ -63,7 +63,7 @@ class MarketWatchType extends AbstractType
                 'label' => 'Prix par 10 (x10)',
                 'required' => false,
                 'attr' => [
-                    'class' => 'w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:border-blue-500',
+                    'class' => 'form-input',
                     'placeholder' => 'ex: 14500'
                 ]
             ])
@@ -71,7 +71,7 @@ class MarketWatchType extends AbstractType
                 'label' => 'Prix par 100 (x100)',
                 'required' => false,
                 'attr' => [
-                    'class' => 'w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:border-blue-500',
+                    'class' => 'form-input',
                     'placeholder' => 'ex: 140000'
                 ]
             ])
@@ -79,7 +79,7 @@ class MarketWatchType extends AbstractType
                 'label' => 'Notes sur le marché',
                 'required' => false,
                 'attr' => [
-                    'class' => 'w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:border-blue-500',
+                    'class' => 'form-input',
                     'rows' => 3,
                     'placeholder' => 'ex: Prix en hausse, forte demande, peu d\'offres...'
                 ]

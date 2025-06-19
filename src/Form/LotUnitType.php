@@ -22,7 +22,7 @@ class LotUnitType extends AbstractType
             ->add('quantitySold', IntegerType::class, [
                 'label' => 'Quantité vendue',
                 'attr' => [
-                    'class' => 'w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:border-blue-500',
+                    'class' => 'form-input',
                     'min' => 1,
                     'max' => $maxQuantity,
                     'placeholder' => "Max: {$maxQuantity} lots"
@@ -39,13 +39,13 @@ class LotUnitType extends AbstractType
             ])
             ->add('actualSellPrice', IntegerType::class, [
                 'label' => 'Prix de vente réel (kamas)',
-                'attr' => ['class' => 'w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:border-blue-500']
+                'attr' => ['class' => 'form-input']
             ])
             ->add('notes', TextareaType::class, [
                 'label' => 'Notes sur la vente',
                 'required' => false,
                 'attr' => [
-                    'class' => 'w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:border-blue-500',
+                    'class' => 'form-input',
                     'rows' => 3
                 ]
             ]);

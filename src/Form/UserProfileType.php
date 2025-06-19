@@ -20,37 +20,37 @@ class UserProfileType extends AbstractType
         $builder
             ->add('email', EmailType::class, [
                 'label' => 'Email',
-                'attr' => ['class' => 'w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:border-blue-500']
+                'attr' => ['class' => 'form-input']
             ])
             ->add('pseudonymeWebsite', TextType::class, [
                 'label' => 'Pseudo sur le site',
                 'required' => false,
-                'attr' => ['class' => 'w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:border-blue-500']
+                'attr' => ['class' => 'form-input']
             ])
             ->add('pseudonymeDofus', TextType::class, [
                 'label' => 'Pseudo Dofus principal',
                 'required' => false,
-                'attr' => ['class' => 'w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:border-blue-500']
+                'attr' => ['class' => 'form-input']
             ])
             ->add('description', TextareaType::class, [
                 'label' => 'Description',
                 'required' => false,
-                'attr' => ['class' => 'w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:border-blue-500', 'rows' => 3]
+                'attr' => ['class' => 'form-input', 'rows' => 3]
             ])
             ->add('discordId', TextType::class, [
                 'label' => 'Discord ID',
                 'required' => false,
-                'attr' => ['class' => 'w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:border-blue-500']
+                'attr' => ['class' => 'form-input']
             ])
             ->add('youtubeUrl', UrlType::class, [
                 'label' => 'YouTube',
                 'required' => false,
-                'attr' => ['class' => 'w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:border-blue-500']
+                'attr' => ['class' => 'form-input']
             ])
             ->add('twitchUrl', UrlType::class, [
                 'label' => 'Twitch',
                 'required' => false,
-                'attr' => ['class' => 'w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:border-blue-500']
+                'attr' => ['class' => 'form-input']
             ])
             ->add('plainPassword', PasswordType::class, [
                 'label' => 'Nouveau mot de passe',
@@ -64,7 +64,7 @@ class UserProfileType extends AbstractType
                     ]),
                 ],
                 'attr' => [
-                    'class' => 'w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:border-blue-500',
+                    'class' => 'form-input',
                     'placeholder' => 'Laissez vide pour ne pas changer'
                 ]
             ]);

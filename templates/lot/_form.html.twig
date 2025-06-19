@@ -66,11 +66,11 @@
 
         {{ form_start(form) }}
         
-        <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+        <div class="form-grid">
             <!-- Item avec autocomplétion ou lecture seule -->
             {% if is_edit %}
                 <div class="md:col-span-2">
-                    <label class="block text-white font-medium mb-2">Item sélectionné</label>
+                    <label class="form-label">Item sélectionné</label>
                     <div class="w-full px-4 py-3 border border-gray-600 bg-gray-700 text-white rounded-lg flex items-center justify-between">
                         <div class="flex items-center space-x-3">
                             <div class="w-10 h-10 bg-gradient-to-br from-blue-500 to-purple-600 rounded-lg flex items-center justify-center text-white font-bold">
@@ -93,12 +93,12 @@
                     </div>
                     {{ form_widget(form.item, {'attr': {'style': 'display: none;'}}) }}
                     {{ form_errors(form.item) }}
-                    <div class="text-gray-400 text-sm mt-1">💡 L'item ne peut pas être modifié après création</div>
+                    <div class="form-help">💡 L'item ne peut pas être modifié après création</div>
                 </div>
             {% else %}
                 <div class="md:col-span-2 relative" data-controller="autocomplete" data-autocomplete-url-value="{{ path('api_items_search') }}">
-                    {{ form_label(form.itemSearch, null, {'label_attr': {'class': 'block text-white font-medium mb-2'}}) }}
-                    {{ form_widget(form.itemSearch, {'attr': {'class': 'w-full px-4 py-3 border border-gray-600 bg-gray-700 text-white rounded-lg focus:outline-none focus:border-blue-500 focus:ring-2 focus:ring-blue-500 focus:ring-opacity-20', 'placeholder': 'Tapez pour rechercher un item...', 'data-autocomplete-target': 'input', 'data-action': 'input->autocomplete#search'}}) }}
+                    {{ form_label(form.itemSearch, null, {'label_attr': {'class': 'form-label'}}) }}
+                    {{ form_widget(form.itemSearch, {'attr': {'class': 'form-input-lg', 'placeholder': 'Tapez pour rechercher un item...', 'data-autocomplete-target': 'input', 'data-action': 'input->autocomplete#search'}}) }}
                     
                     <div data-autocomplete-target="results" 
                          data-action="click->autocomplete#selectItem"
@@ -108,16 +108,16 @@
                     {{ form_widget(form.item, {'attr': {'style': 'display: none;', 'data-autocomplete-target': 'hiddenId'}}) }}
                     {{ form_errors(form.item) }}
                     
-                    <div class="text-gray-400 text-sm mt-1">🔍 Tapez pour rechercher et sélectionner un item</div>
+                    <div class="form-help">🔍 Tapez pour rechercher et sélectionner un item</div>
                 </div>
             {% endif %}
 
             <!-- Configuration du lot -->
             <div>
-                {{ form_label(form.lotSize, null, {'label_attr': {'class': 'block text-white font-medium mb-2'}}) }}
+                {{ form_label(form.lotSize, null, {'label_attr': {'class': 'form-label'}}) }}
                 <div class="relative">
                     {{ form_widget(form.lotSize, {'attr': {
-                        'class': 'w-full px-4 py-3 border border-gray-600 bg-gray-700 text-white rounded-lg focus:outline-none focus:border-blue-500 focus:ring-2 focus:ring-blue-500 focus:ring-opacity-20', 
+                        'class': 'form-input-lg', 
                         'placeholder': 'ex: 100',
                         'data-profit-calculator-target': 'lotSize',
                         'data-action': 'input->profit-calculator#updateProfit'
@@ -127,22 +127,22 @@
                     </div>
                 </div>
                 {{ form_errors(form.lotSize) }}
-                <div class="text-gray-400 text-sm mt-1">📊 Quantité totale à trader</div>
+                <div class="form-help">📊 Quantité totale à trader</div>
             </div>
 
             <div>
-                {{ form_label(form.saleUnit, null, {'label_attr': {'class': 'block text-white font-medium mb-2'}}) }}
-                {{ form_widget(form.saleUnit, {'attr': {'class': 'w-full px-4 py-3 border border-gray-600 bg-gray-700 text-white rounded-lg focus:outline-none focus:border-blue-500 focus:ring-2 focus:ring-blue-500 focus:ring-opacity-20'}}) }}
+                {{ form_label(form.saleUnit, null, {'label_attr': {'class': 'form-label'}}) }}
+                {{ form_widget(form.saleUnit, {'attr': {'class': 'form-input-lg'}}) }}
                 {{ form_errors(form.saleUnit) }}
-                <div class="text-gray-400 text-sm mt-1">🎯 Comment vous vendez sur Dofus</div>
+                <div class="form-help">🎯 Comment vous vendez sur Dofus</div>
             </div>
 
             <!-- Prix -->
             <div>
-                {{ form_label(form.buyPricePerLot, null, {'label_attr': {'class': 'block text-white font-medium mb-2'}}) }}
+                {{ form_label(form.buyPricePerLot, null, {'label_attr': {'class': 'form-label'}}) }}
                 <div class="relative">
                     {{ form_widget(form.buyPricePerLot, {'attr': {
-                        'class': 'w-full px-4 py-3 pr-12 border border-gray-600 bg-gray-700 text-white rounded-lg focus:outline-none focus:border-red-500 focus:ring-2 focus:ring-red-500 focus:ring-opacity-20', 
+                        'class': 'form-input-lg form-input-danger', 
                         'placeholder': '1000',
                         'data-profit-calculator-target': 'buyPrice',
                         'data-action': 'input->profit-calculator#updateProfit'
@@ -156,10 +156,10 @@
             </div>
 
             <div>
-                {{ form_label(form.sellPricePerLot, null, {'label_attr': {'class': 'block text-white font-medium mb-2'}}) }}
+                {{ form_label(form.sellPricePerLot, null, {'label_attr': {'class': 'form-label'}}) }}
                 <div class="relative">
                     {{ form_widget(form.sellPricePerLot, {'attr': {
-                        'class': 'w-full px-4 py-3 pr-12 border border-gray-600 bg-gray-700 text-white rounded-lg focus:outline-none focus:border-green-500 focus:ring-2 focus:ring-green-500 focus:ring-opacity-20', 
+                        'class': 'form-input-lg form-input-success', 
                         'placeholder': '1200',
                         'data-profit-calculator-target': 'sellPrice',
                         'data-action': 'input->profit-calculator#updateProfit'
@@ -174,41 +174,32 @@
 
             <!-- Statut -->
             <div class="md:col-span-2">
-                {{ form_label(form.status, null, {'label_attr': {'class': 'block text-white font-medium mb-2'}}) }}
-                {{ form_widget(form.status, {'attr': {'class': 'w-full px-4 py-3 border border-gray-600 bg-gray-700 text-white rounded-lg focus:outline-none focus:border-blue-500 focus:ring-2 focus:ring-blue-500 focus:ring-opacity-20'}}) }}
+                {{ form_label(form.status, null, {'label_attr': {'class': 'form-label'}}) }}
+                {{ form_widget(form.status, {'attr': {'class': 'form-input-lg'}}) }}
                 {{ form_errors(form.status) }}
-                <div class="text-gray-400 text-sm mt-1">📋 {{ is_edit ? 'Statut du lot' : 'Statut initial du lot' }}</div>
+                <div class="form-help">📋 {{ is_edit ? 'Statut du lot' : 'Statut initial du lot' }}</div>
             </div>
         </div>
 
         <!-- Aperçu du profit -->
-        <div class="mt-6 bg-gradient-to-r from-blue-600 to-green-600 rounded-lg p-4">
-            <h4 class="text-white font-semibold mb-2">💡 {{ is_edit ? 'Nouveau calcul de profit' : 'Aperçu du profit' }}</h4>
-            <div class="grid grid-cols-3 gap-4 text-center">
-                <div>
-                    <div class="text-blue-200 text-sm">Investissement</div>
-                    <div data-profit-calculator-target="investment" class="text-white font-bold">-</div>
-                </div>
-                <div>
-                    <div class="text-green-200 text-sm">Profit par lot</div>
-                    <div data-profit-calculator-target="profitPerLot" class="text-white font-bold">-</div>
-                </div>
-                <div>
-                    <div class="text-yellow-200 text-sm">Profit total</div>
-                    <div data-profit-calculator-target="totalProfit" class="text-white font-bold">-</div>
-                </div>
+        <div class="mt-6 info-box-primary">
+            <h4 class="info-title">
+                <span>💡</span>
+                {{ is_edit ? 'Nouveau calcul de profit' : 'Aperçu du profit' }}
+            </h4>
+            <div class="stats-grid-3 text-center">
+                <!-- contenu -->
             </div>
         </div>
 
         <!-- Actions -->
-        <div class="flex space-x-4 mt-8">
-            <button type="submit" class="flex-1 bg-{{ is_edit ? 'blue' : 'green' }}-600 hover:bg-{{ is_edit ? 'blue' : 'green' }}-700 text-white font-bold py-3 px-6 rounded-lg transition-colors flex items-center justify-center">
-                <span class="mr-2">{{ is_edit ? '💾' : '✅' }}</span>
+        <div class="action-group mt-8">
+            <button type="submit" class="btn-full btn-{{ is_edit ? 'primary' : 'success' }} btn-with-icon">
+                <span>{{ is_edit ? '💾' : '✅' }}</span>
                 {{ is_edit ? 'Sauvegarder les modifications' : 'Créer le lot' }}
             </button>
-            <a href="{{ path('app_lot_index') }}" 
-               class="flex-1 bg-gray-600 hover:bg-gray-700 text-white font-bold py-3 px-6 rounded-lg transition-colors text-center flex items-center justify-center">
-                <span class="mr-2">❌</span>
+            <a href="{{ path('app_lot_index') }}" class="btn-full btn-secondary btn-with-icon text-center">
+                <span>❌</span>
                 Annuler
             </a>
         </div>
@@ -216,13 +207,3 @@
         {{ form_end(form) }}
     </div>
 </div>
-
-<!-- CSS pour l'autocomplétion -->
-<style>
-    .autocomplete-item {
-        transition: background-color 0.2s;
-    }
-    .autocomplete-item:hover {
-        background-color: rgba(55, 65, 81, 0.8);
-    }
-</style>

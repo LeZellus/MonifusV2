@@ -73,7 +73,7 @@
                         {{ form_widget(form.item, {'attr': {'style': 'display: none;', 'data-autocomplete-target': 'hiddenId'}}) }}
                         {{ form_errors(form.item) }}
                         
-                        <div class="text-gray-400 text-sm mt-1">🔍 Recherche filtrée sur les ressources</div>
+                        <div class="form-help">🔍 Recherche filtrée sur les ressources</div>
                     </div>
 
                     <!-- Date d'observation -->
@@ -81,7 +81,7 @@
                         {{ form_label(form.observedAt, null, {'label_attr': {'class': 'block text-white font-medium mb-2'}}) }}
                         {{ form_widget(form.observedAt, {'attr': {'class': 'w-full px-3 py-2 border border-gray-600 bg-gray-700 text-white rounded-md focus:outline-none focus:border-orange-500'}}) }}
                         {{ form_errors(form.observedAt) }}
-                        <div class="text-gray-400 text-sm mt-1">📅 Quand avez-vous observé ces prix ?</div>
+                        <div class="form-help">📅 Quand avez-vous observé ces prix ?</div>
                     </div>
 
                     <!-- Prix observés -->
@@ -138,7 +138,7 @@
                         {{ form_label(form.notes, null, {'label_attr': {'class': 'block text-white font-medium mb-2'}}) }}
                         {{ form_widget(form.notes, {'attr': {'class': 'w-full px-3 py-2 border border-gray-600 bg-gray-700 text-white rounded-md focus:outline-none focus:border-orange-500', 'rows': 3}}) }}
                         {{ form_errors(form.notes) }}
-                        <div class="text-gray-400 text-sm mt-1">📝 Contexte du marché, tendances observées...</div>
+                        <div class="form-help">📝 Contexte du marché, tendances observées...</div>
                     </div>
                 </div>
 

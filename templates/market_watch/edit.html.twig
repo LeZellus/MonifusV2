@@ -80,7 +80,7 @@
                         {{ form_label(form.item, null, {'label_attr': {'class': 'block text-white font-medium mb-2'}}) }}
                         {{ form_widget(form.item, {'attr': {'class': 'w-full px-4 py-3 border border-gray-600 bg-gray-700 text-white rounded-lg focus:outline-none focus:border-orange-500', 'readonly': true}}) }}
                         {{ form_errors(form.item) }}
-                        <div class="text-gray-400 text-sm mt-1">🔒 Ressource observée (non modifiable)</div>
+                        <div class="form-help">🔒 Ressource observée (non modifiable)</div>
                     </div>
 
                     <!-- Date d'observation -->
@@ -88,7 +88,7 @@
                         {{ form_label(form.observedAt, null, {'label_attr': {'class': 'block text-white font-medium mb-2'}}) }}
                         {{ form_widget(form.observedAt, {'attr': {'class': 'w-full px-3 py-2 border border-gray-600 bg-gray-700 text-white rounded-md focus:outline-none focus:border-orange-500'}}) }}
                         {{ form_errors(form.observedAt) }}
-                        <div class="text-gray-400 text-sm mt-1">📅 Date de cette observation</div>
+                        <div class="form-help">📅 Date de cette observation</div>
                     </div>
 
                     <!-- Prix observés -->
@@ -145,18 +145,17 @@
                         {{ form_label(form.notes, null, {'label_attr': {'class': 'block text-white font-medium mb-2'}}) }}
                         {{ form_widget(form.notes, {'attr': {'class': 'w-full px-3 py-2 border border-gray-600 bg-gray-700 text-white rounded-md focus:outline-none focus:border-orange-500', 'rows': 3}}) }}
                         {{ form_errors(form.notes) }}
-                        <div class="text-gray-400 text-sm mt-1">📝 Contexte du marché, évolutions observées...</div>
+                        <div class="form-help">📝 Contexte du marché, évolutions observées...</div>
                     </div>
                 </div>
 
                 <!-- Actions -->
-                <div class="flex space-x-4 mt-8">
-                    <button type="submit" class="flex-1 bg-blue-600 hover:bg-blue-700 text-white font-bold py-3 px-6 rounded-lg transition-colors flex items-center justify-center">
+                <div class="action-group">
+                    <button type="submit" class="btn-full btn-primary btn-with-icon">
                         <span class="mr-2">💾</span>
                         Sauvegarder les modifications
                     </button>
-                    <a href="{{ path('app_market_watch_index') }}" 
-                       class="flex-1 bg-gray-600 hover:bg-gray-700 text-white font-bold py-3 px-6 rounded-lg transition-colors text-center flex items-center justify-center">
+                    <a href="{{ path('app_trading_dashboard') }}" class="btn-full btn-secondary btn-with-icon text-center">
                         <span class="mr-2">❌</span>
                         Annuler
                     </a>

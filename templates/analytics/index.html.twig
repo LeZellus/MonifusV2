@@ -13,37 +13,37 @@
 {% block body %}
     <div class="wrapper-container">
         <!-- Statistiques globales -->
-        <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">
-            <div class="wrapper-background">
-                <h3 class="text-white text-lg font-semibold mb-2">💰 Investi</h3>
-                <p class="text-yellow-400 text-2xl font-bold">
+        <div class="stats-grid">
+            <div class="stats-card">
+                <h3 class="stats-title">💰 Investi</h3>
+                <p class="stats-value-warning">
                     {{ (stats.global.investedAmount / 1000000)|number_format(1) }}M
                 </p>
-                <p class="text-gray-400 text-sm">{{ stats.global.availableLots }} lots disponibles</p>
+                <p class="stats-subtitle">{{ stats.global.availableLots }} lots disponibles</p>
             </div>
-            <div class="wrapper-background">
-                <h3 class="text-white text-lg font-semibold mb-2">✅ Profit Réalisé</h3>
-                <p class="text-green-400 text-2xl font-bold">
+            <div class="stats-card">
+                <h3 class="stats-title">✅ Profit Réalisé</h3>
+                <p class="stats-value-success">
                     {{ (stats.global.realizedProfit / 1000000)|number_format(1) }}M
                 </p>
-                <p class="text-gray-400 text-sm">{{ stats.global.soldLots }} lots vendus</p>
+                <p class="stats-subtitle">{{ stats.global.soldLots }} lots vendus</p>
             </div>
-            <div class="wrapper-background">
-                <h3 class="text-white text-lg font-semibold mb-2">🎯 Profit Potentiel</h3>
-                <p class="text-blue-400 text-2xl font-bold">
+            <div class="stats-card">
+                <h3 class="stats-title">🎯 Profit Potentiel</h3>
+                <p class="stats-value-primary">
                     {{ (stats.global.potentialProfit / 1000000)|number_format(1) }}M
                 </p>
-                <p class="text-gray-400 text-sm">Si tout vendu au prix cible</p>
+                <p class="stats-subtitle">Si tout vendu au prix cible</p>
             </div>
-            <div class="wrapper-background">
-                <h3 class="text-white text-lg font-semibold mb-2">📊 Total Lots</h3>
-                <p class="text-purple-400 text-2xl font-bold">{{ stats.global.totalLots }}</p>
-                <p class="text-gray-400 text-sm">{{ stats.charactersCount }} personnages</p>
+            <div class="stats-card">
+                <h3 class="stats-title">📊 Total Lots</h3>
+                <p class="stats-value-purple">{{ stats.global.totalLots }}</p>
+                <p class="stats-subtitle">{{ stats.charactersCount }} personnages</p>
             </div>
         </div>
 
         <!-- Top items rentables -->
-        <div class="grid grid-cols-1 lg:grid-cols-2 gap-4">
+        <div class="stats-grid-2">
             <div class="wrapper-background">
                 <h3 class="text-white text-xl font-semibold mb-4">🏆 Top Items Rentables</h3>
                 {% if stats.topItems|length > 0 %}
@@ -72,27 +72,27 @@
         <!-- Ratios et métriques -->
         {% if stats.global.totalLots > 0 %}
             <div class="wrapper-background">
-                <h3 class="text-white text-xl font-semibold mb-4">📊 Métriques Clés</h3>
-                <div class="grid grid-cols-1 md:grid-cols-3 gap-4">
+                <h3 class="page-title">📊 Métriques Clés</h3>
+                <div class="stats-grid-3">
                     <div class="text-center">
-                        <div class="text-2xl font-bold text-blue-400">
+                        <div class="stats-value-primary">
                             {{ ((stats.global.soldLots / stats.global.totalLots) * 100)|number_format(1) }}%
                         </div>
-                        <div class="text-gray-400">Taux de vente</div>
+                        <div class="stats-subtitle">Taux de vente</div>
                     </div>
                     <div class="text-center">
-                        <div class="text-2xl font-bold text-green-400">
+                        <div class="stats-value-success">
                             {% set totalProfit = stats.global.realizedProfit + stats.global.potentialProfit %}
                             {% set roi = stats.global.investedAmount > 0 ? (totalProfit / stats.global.investedAmount * 100) : 0 %}
                             {{ roi|number_format(1) }}%
                         </div>
-                        <div class="text-gray-400">ROI Total</div>
+                        <div class="stats-subtitle">ROI Total</div>
                     </div>
                     <div class="text-center">
-                        <div class="text-2xl font-bold text-yellow-400">
+                        <div class="stats-value-warning">
                             {{ (stats.global.totalLots / stats.charactersCount)|number_format(1) }}
                         </div>
-                        <div class="text-gray-400">Lots par personnage</div>
+                        <div class="stats-subtitle">Lots par personnage</div>
                     </div>
                 </div>
             </div>

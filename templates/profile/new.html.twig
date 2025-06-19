@@ -35,14 +35,14 @@
                         {{ form_label(form.name, null, {'label_attr': {'class': 'block text-white font-medium mb-2'}}) }}
                         {{ form_widget(form.name, {'attr': {'class': 'w-full px-4 py-3 border border-gray-600 bg-gray-700 text-white rounded-lg focus:outline-none focus:border-blue-500 focus:ring-2 focus:ring-blue-500 focus:ring-opacity-20', 'placeholder': 'ex: Trading Principal, Kamas Farm, etc.'}}) }}
                         {{ form_errors(form.name) }}
-                        <div class="text-gray-400 text-sm mt-1">💡 Choisissez un nom qui décrit votre stratégie</div>
+                        <div class="form-help">💡 Choisissez un nom qui décrit votre stratégie</div>
                     </div>
 
                     <div>
                         {{ form_label(form.description, null, {'label_attr': {'class': 'block text-white font-medium mb-2'}}) }}
                         {{ form_widget(form.description, {'attr': {'class': 'w-full px-4 py-3 border border-gray-600 bg-gray-700 text-white rounded-lg focus:outline-none focus:border-blue-500 focus:ring-2 focus:ring-blue-500 focus:ring-opacity-20', 'rows': 4, 'placeholder': 'Décrivez votre stratégie de trading, vos objectifs, les serveurs ciblés...'}}) }}
                         {{ form_errors(form.description) }}
-                        <div class="text-gray-400 text-sm mt-1">📋 Description optionnelle de votre approche</div>
+                        <div class="form-help">📋 Description optionnelle de votre approche</div>
                     </div>
                 </div>
 
@@ -57,13 +57,12 @@
                     </div>
                 </div>
 
-                <div class="flex space-x-4 mt-8">
-                    <button type="submit" class="flex-1 bg-blue-600 hover:bg-blue-700 text-white font-bold py-3 px-6 rounded-lg transition-colors flex items-center justify-center">
+                <div class="action-group">
+                    <button type="submit" class="btn-full btn-primary btn-with-icon">
                         <span class="mr-2">✨</span>
                         Créer le profil
                     </button>
-                    <a href="{{ path('app_profile_index') }}" 
-                       class="flex-1 bg-gray-600 hover:bg-gray-700 text-white font-bold py-3 px-6 rounded-lg transition-colors text-center flex items-center justify-center">
+                    <a href="{{ path('app_profile_index') }}" class="btn-full btn-secondary btn-with-icon text-center">
                         <span class="mr-2">❌</span>
                         Annuler
                     </a>

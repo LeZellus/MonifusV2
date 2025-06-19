@@ -15,7 +15,7 @@
             <!-- Informations du lot -->
             <div class="wrapper-background">
                 <h2 class="text-white text-xl font-semibold mb-4">📦 Informations du lot</h2>
-                <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+                <div class="stats-grid-2">
                     <div>
                         <div class="text-gray-400 text-sm">Item</div>
                         <div class="text-white font-medium">{{ lot_group.item.name }}</div>
@@ -49,7 +49,7 @@
                     {{ form_label(form.quantitySold, null, {'label_attr': {'class': 'block text-white font-medium mb-2'}}) }}
                     {{ form_widget(form.quantitySold) }}
                     {{ form_errors(form.quantitySold) }}
-                    <div class="text-gray-400 text-sm mt-1">
+                    <div class="form-help">
                         Stock disponible : {{ lot_group.lotSize }} lots
                     </div>
                 </div>
@@ -59,7 +59,7 @@
                     {{ form_label(form.actualSellPrice, null, {'label_attr': {'class': 'block text-white font-medium mb-2'}}) }}
                     {{ form_widget(form.actualSellPrice) }}
                     {{ form_errors(form.actualSellPrice) }}
-                    <div class="text-gray-400 text-sm mt-1">
+                    <div class="form-help">
                         Prix prévu : {{ (lot_group.sellPricePerLot / 1000)|number_format(0, ',', ' ') }}k
                     </div>
                 </div>
@@ -69,7 +69,7 @@
                     {{ form_label(form.notes, null, {'label_attr': {'class': 'block text-white font-medium mb-2'}}) }}
                     {{ form_widget(form.notes) }}
                     {{ form_errors(form.notes) }}
-                    <div class="text-gray-400 text-sm mt-1">
+                    <div class="form-help">
                         Ex: "Vendu rapidement", "Prix du marché plus bas", etc.
                     </div>
                 </div>

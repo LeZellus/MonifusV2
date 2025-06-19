@@ -42,7 +42,7 @@
                         {{ form_label(form.discordId, null, {'label_attr': {'class': 'block text-white font-medium mb-2'}}) }}
                         {{ form_widget(form.discordId) }}
                         {{ form_errors(form.discordId) }}
-                        <div class="text-gray-400 text-sm mt-1">Votre nom d'utilisateur Discord</div>
+                        <div class="form-help">Votre nom d'utilisateur Discord</div>
                     </div>
                 </div>
 
@@ -50,7 +50,7 @@
                     {{ form_label(form.description, null, {'label_attr': {'class': 'block text-white font-medium mb-2'}}) }}
                     {{ form_widget(form.description) }}
                     {{ form_errors(form.description) }}
-                    <div class="text-gray-400 text-sm mt-1">Une courte description de votre profil</div>
+                    <div class="form-help">Une courte description de votre profil</div>
                 </div>
             </div>
 
@@ -63,14 +63,14 @@
                         {{ form_label(form.youtubeUrl, null, {'label_attr': {'class': 'block text-white font-medium mb-2'}}) }}
                         {{ form_widget(form.youtubeUrl) }}
                         {{ form_errors(form.youtubeUrl) }}
-                        <div class="text-gray-400 text-sm mt-1">https://youtube.com/@votre-chaine</div>
+                        <div class="form-help">https://youtube.com/@votre-chaine</div>
                     </div>
 
                     <div>
                         {{ form_label(form.twitchUrl, null, {'label_attr': {'class': 'block text-white font-medium mb-2'}}) }}
                         {{ form_widget(form.twitchUrl) }}
                         {{ form_errors(form.twitchUrl) }}
-                        <div class="text-gray-400 text-sm mt-1">https://twitch.tv/votre-chaine</div>
+                        <div class="form-help">https://twitch.tv/votre-chaine</div>
                     </div>
                 </div>
             </div>
@@ -83,19 +83,20 @@
                     {{ form_label(form.plainPassword, null, {'label_attr': {'class': 'block text-white font-medium mb-2'}}) }}
                     {{ form_widget(form.plainPassword) }}
                     {{ form_errors(form.plainPassword) }}
-                    <div class="text-gray-400 text-sm mt-1">
+                    <div class="form-help">
                         Laissez vide si vous ne souhaitez pas changer votre mot de passe
                     </div>
                 </div>
             </div>
 
             <!-- Actions -->
-            <div class="flex space-x-4">
-                <button type="submit" class="flex-1 bg-blue-600 hover:bg-blue-700 text-white font-bold py-3 px-6 rounded-lg transition-colors">
-                    💾 Sauvegarder les modifications
+            <div class="action-group">
+                <button type="submit" class="btn-full btn-primary btn-with-icon">
+                    <span class="mr-2">💾</span>
+                    Sauvegarder les modifications
                 </button>
-                <a href="{{ path('app_trading_dashboard') }}" 
-                   class="flex-1 bg-gray-600 hover:bg-gray-700 text-white font-bold py-3 px-6 rounded-lg transition-colors text-center">
+                <a href="{{ path('app_trading_dashboard') }}" class="btn-full btn-secondary btn-with-icon text-center">
+                    <span class="mr-2">❌</span>
                     Annuler
                 </a>
             </div>
@@ -105,7 +106,7 @@
             <!-- Informations du compte -->
             <div class="wrapper-background">
                 <h3 class="text-white text-lg font-semibold mb-4">ℹ️ Informations du compte</h3>
-                <div class="grid grid-cols-1 md:grid-cols-2 gap-4 text-sm">
+                <div class="stats-grid-2 text-sm">
                     <div>
                         <span class="text-gray-400">Compte créé le :</span>
                         <span class="text-white">{{ app.user.createdAt|date('d/m/Y à H:i') }}</span>
@@ -130,22 +131,17 @@
             </div>
 
             <!-- Actions avancées -->
-            <div class="wrapper-background">
-                <h3 class="text-white text-lg font-semibold mb-4">🔧 Actions avancées</h3>
-                <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
-                    <a href="{{ path('app_backup_index') }}" 
-                       class="bg-blue-600 hover:bg-blue-700 text-white p-4 rounded-lg text-center transition-colors block">
-                        <div class="text-lg mb-1">💾</div>
-                        <div class="font-medium">Sauvegarder mes données</div>
-                        <div class="text-blue-100 text-sm">Export complet JSON</div>
-                    </a>
-                    <a href="{{ path('app_profile_index') }}" 
-                       class="bg-green-600 hover:bg-green-700 text-white p-4 rounded-lg text-center transition-colors block">
-                        <div class="text-lg mb-1">👥</div>
-                        <div class="font-medium">Gérer mes profils</div>
-                        <div class="text-green-100 text-sm">Profils et personnages</div>
-                    </a>
-                </div>
+            <div class="stats-grid-2">
+                <a href="{{ path('app_backup_index') }}" class="btn-primary p-4 rounded-lg text-center block">
+                    <div class="text-lg mb-1">💾</div>
+                    <div class="font-medium">Sauvegarder mes données</div>
+                    <div class="text-blue-100 text-sm">Export complet JSON</div>
+                </a>
+                <a href="{{ path('app_profile_index') }}" class="btn-success p-4 rounded-lg text-center block">
+                    <div class="text-lg mb-1">👥</div>
+                    <div class="font-medium">Gérer mes profils</div>
+                    <div class="text-green-100 text-sm">Profils et personnages</div>
+                </a>
             </div>
         </div>
     </div>
