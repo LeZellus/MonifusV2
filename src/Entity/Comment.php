@@ -20,6 +20,16 @@ class Comment
     #[ORM\ManyToOne(inversedBy: 'comments')]
     private ?LotUnit $lotUnit = null;
 
+    #[ORM\Column]
+    private ?\DateTimeImmutable $createdAt = null;
+
+    #[ORM\PrePersist]
+    public function setCreatedAtValue(): void
+    {
+        $this->createdAt = new \DateTimeImmutable();
+        $this->updatedAt = new \DateTimeImmutable();
+    }
+
     public function getId(): ?int
     {
         return $this->id;
@@ -47,5 +57,11 @@ class Comment
         $this->lotUnit = $lotUnit;
 
         return $this;
+    }
+
+    // Getters
+    public function getCreatedAt(): ?\DateTimeImmutable
+    {
+        return $this->createdAt;
     }
 }
