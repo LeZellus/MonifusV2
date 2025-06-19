@@ -41,12 +41,25 @@
                 {{ form_start(form) }}
                 
                 <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
-                    <!-- Item -->
-                    <div class="md:col-span-2">
-                        {{ form_label(form.item, null, {'label_attr': {'class': 'block text-white font-medium mb-2'}}) }}
-                        {{ form_widget(form.item, {'attr': {'class': 'w-full px-4 py-3 border border-gray-600 bg-gray-700 text-white rounded-lg focus:outline-none focus:border-blue-500 focus:ring-2 focus:ring-blue-500 focus:ring-opacity-20'}}) }}
+                    <!-- Item avec autocomplétion -->
+                    <div class="md:col-span-2 relative" data-controller="autocomplete" data-autocomplete-url-value="{{ path('api_items_search') }}">
+                        <!-- Label -->
+                        {{ form_label(form.itemSearch, null, {'label_attr': {'class': 'block text-white font-medium mb-2'}}) }}
+                        
+                        <!-- Champ de recherche -->
+                        {{ form_widget(form.itemSearch, {'attr': {'class': 'w-full px-4 py-3 border border-gray-600 bg-gray-700 text-white rounded-lg focus:outline-none focus:border-blue-500 focus:ring-2 focus:ring-blue-500 focus:ring-opacity-20', 'placeholder': 'Tapez pour rechercher un item...', 'data-autocomplete-target': 'input', 'data-action': 'input->autocomplete#search'}}) }}
+                        
+                        <!-- Zone des résultats d'autocomplétion -->
+                        <div data-autocomplete-target="results" 
+                             data-action="click->autocomplete#selectItem"
+                             class="absolute z-10 w-full bg-gray-800 border border-gray-600 rounded-md shadow-lg hidden max-h-60 overflow-y-auto mt-1">
+                        </div>
+
+                        <!-- Select caché pour l'item sélectionné -->
+                        {{ form_widget(form.item, {'attr': {'style': 'display: none;', 'data-autocomplete-target': 'hiddenId'}}) }}
                         {{ form_errors(form.item) }}
-                        <div class="text-gray-400 text-sm mt-1">🔍 Sélectionnez l'item que vous souhaitez trader</div>
+                        
+                        <div class="text-gray-400 text-sm mt-1">🔍 Tapez pour rechercher et sélectionner un item</div>
                     </div>
 
                     <!-- Configuration du lot -->
@@ -139,6 +152,16 @@
             </div>
         </div>
     </div>
+
+    <!-- CSS pour l'autocomplétion -->
+    <style>
+        .autocomplete-item {
+            transition: background-color 0.2s;
+        }
+        .autocomplete-item:hover {
+            background-color: rgba(55, 65, 81, 0.8);
+        }
+    </style>
 
     <script>
     document.addEventListener('DOMContentLoaded', function() {
