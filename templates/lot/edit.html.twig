@@ -2,6 +2,13 @@
 
 {% block title %}Modifier le lot{% endblock %}
 
+{% block navbar %}
+    {% include 'components/navbar.html.twig' with {
+        'title': 'Modifier le lot - ' ~ lot.item.name,
+        'back_url': path('app_lot_index')
+    } %}
+{% endblock %}
+
 {% block body %}
 <div class="bg-gray-900 min-h-screen">
     <nav class="bg-gray-800 border-b border-gray-700">

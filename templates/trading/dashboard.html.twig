@@ -2,21 +2,19 @@
 
 {% block title %}Dashboard Trading{% endblock %}
 
+{% block navbar %}
+    {% include 'components/navbar.html.twig' with {
+        'title': 'Trading Dashboard',
+        'actions': [
+            {'url': path('app_backup_index'), 'label': '💾 Sauvegarde', 'class': 'text-gray-300 hover:text-white'},
+            {'url': path('app_settings_index'), 'label': '⚙️ Paramètres', 'class': 'text-gray-300 hover:text-white'}
+        ],
+        'show_user_menu': true
+    } %}
+{% endblock %}
+
 {% block body %}
 <div class="bg-gray-900 min-h-screen">
-    <nav class="bg-gray-800 border-b border-gray-700">
-        <div class="wrapper-container">
-            <div class="flex justify-between items-center py-4">
-                <h1 class="text-white text-xl font-bold">Trading Dashboard</h1>
-                <div class="flex space-x-4">
-                    <a href="{{ path('app_backup_index') }}" class="text-gray-300 hover:text-white">💾 Sauvegarde</a>
-                    <a href="{{ path('app_settings_index') }}" class="text-gray-300 hover:text-white">⚙️ Paramètres</a>
-                    <span class="text-gray-300">{{ user.pseudonymeWebsite ?? user.email }}</span>
-                    <a href="{{ path('app_logout') }}" class="text-red-400 hover:text-red-300">Déconnexion</a>
-                </div>
-            </div>
-        </div>
-    </nav>
 
     <div class="wrapper-container">
         <!-- Étape 1: Sélection du personnage -->

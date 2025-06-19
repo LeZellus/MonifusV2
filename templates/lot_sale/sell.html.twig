@@ -2,16 +2,15 @@
 
 {% block title %}Vendre le lot - {{ lot_group.item.name }}{% endblock %}
 
+{% block navbar %}
+    {% include 'components/navbar.html.twig' with {
+        'title': 'Vendre le lot - ' ~ lot_group.item.name,
+        'back_url': path('app_lot_index')
+    } %}
+{% endblock %}
+
 {% block body %}
 <div class="bg-gray-900 min-h-screen">
-    <nav class="bg-gray-800 border-b border-gray-700">
-        <div class="wrapper-container">
-            <div class="flex justify-between items-center py-4">
-                <h1 class="text-white text-xl font-bold">Vendre le lot - {{ lot_group.item.name }}</h1>
-                <a href="{{ path('app_lot_index') }}" class="text-blue-400 hover:text-blue-300">← Retour</a>
-            </div>
-        </div>
-    </nav>
 
     <div class="wrapper-container">
         <div class="max-w-2xl mx-auto grid gap-4 w-full">

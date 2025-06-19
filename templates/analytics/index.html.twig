@@ -2,18 +2,17 @@
 
 {% block title %}Analytics Trading{% endblock %}
 
+{% block navbar %}
+    {% include 'components/navbar.html.twig' with {
+        'title': 'Analytics Trading',
+        'back_url': path('app_trading_dashboard'),
+        'back_label': '← Dashboard'
+    } %}
+{% endblock %}
+
 {% block body %}
 <div class="bg-gray-900 min-h-screen">
-    <nav class="bg-gray-800 border-b border-gray-700">
         <div class="wrapper-container">
-            <div class="flex justify-between items-center py-4">
-                <h1 class="text-white text-xl font-bold">Analytics Trading</h1>
-                <a href="{{ path('app_trading_dashboard') }}" class="text-blue-400 hover:text-blue-300">← Dashboard</a>
-            </div>
-        </div>
-    </nav>
-
-    <div class="wrapper-container">
         <!-- Statistiques globales -->
         <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">
             <div class="bg-gray-800 rounded-lg p-4">
