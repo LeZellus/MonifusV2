@@ -15,8 +15,10 @@
             <!-- En-tête avec info personnage -->
             <div class="wrapper-background mb-6">
                 <div class="flex items-center space-x-4">
-                    <div class="w-12 h-12 bg-orange-500 rounded-full flex items-center justify-center">
-                        <span class="text-white font-bold text-lg">{{ character.name|first|upper }}</span>
+                    <div class="w-12 h-12 rounded-full overflow-hidden">
+                        <img src="{{ character.classe.imagePath }}" 
+                            alt="{{ character.classe.name }}" 
+                            class="w-full h-full object-cover">
                     </div>
                     <div>
                         <h2 class="text-white text-xl font-semibold">{{ character.name }}</h2>

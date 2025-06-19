@@ -15,8 +15,10 @@
         <!-- En-tête avec info item -->
         <div class="wrapper-background mb-6">
             <div class="flex items-center space-x-4">
-                <div class="w-16 h-16 bg-gradient-to-br from-orange-500 to-red-500 rounded-lg flex items-center justify-center">
-                    <span class="text-white font-bold text-xl">{{ item.name|first|upper }}</span>
+                <div class="w-12 h-12 rounded-full overflow-hidden">
+                    <img src="{{ character.classe.imagePath }}" 
+                        alt="{{ character.classe.name }}" 
+                        class="w-full h-full object-cover">
                 </div>
                 <div>
                     <h2 class="text-white text-2xl font-bold">{{ item.name }}</h2>

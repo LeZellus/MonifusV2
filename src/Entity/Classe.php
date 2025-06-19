@@ -32,7 +32,6 @@ class Classe
     public function setName(string $name): static
     {
         $this->name = $name;
-
         return $this;
     }
 
@@ -44,7 +43,19 @@ class Classe
     public function setImgUrl(?string $imgUrl): static
     {
         $this->imgUrl = $imgUrl;
-
         return $this;
+    }
+
+    /**
+     * Retourne le chemin vers l'image de la classe
+     */
+    public function getImagePath(): string
+    {
+        if ($this->name) {
+            $filename = strtolower($this->name) . '.png';
+            return '/classes/' . $filename;
+        }
+        
+        return '/classes/default.png';
     }
 }
