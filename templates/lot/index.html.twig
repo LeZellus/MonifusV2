@@ -1,0 +1,118 @@
+{% extends 'base.html.twig' %}
+
+{% block title %}Mes Lots de Trading{% endblock %}
+
+{% block body %}
+<div class="bg-gray-900 min-h-screen">
+    <nav class="bg-gray-800 border-b border-gray-700">
+        <div class="container mx-auto px-4">
+            <div class="flex justify-between items-center py-4">
+                <h1 class="text-white text-xl font-bold">Mes Lots de Trading</h1>
+                <a href="{{ path('app_trading_dashboard') }}" class="text-blue-400 hover:text-blue-300">← Dashboard</a>
+            </div>
+        </div>
+    </nav>
+
+    <div class="container mx-auto px-4 py-8">
+        {% if characters|length == 0 %}
+            <div class="text-center py-12">
+                <p class="text-gray-400 text-lg mb-4">Aucun personnage créé</p>
+                <a href="{{ path('app_profile_index') }}" 
+                   class="bg-blue-600 hover:bg-blue-700 text-white px-6 py-3 rounded-lg transition-colors">
+                    Créer un personnage
+                </a>
+            </div>
+        {% else %}
+            <div class="flex justify-between items-center mb-6">
+                <h2 class="text-white text-2xl font-bold">Lots de Trading</h2>
+                <div class="flex space-x-2">
+                    {% for character in characters %}
+                        <a href="{{ path('app_lot_new', {id: character.id}) }}" 
+                           class="bg-green-600 hover:bg-green-700 text-white px-4 py-2 rounded-lg transition-colors text-sm">
+                            + Lot ({{ character.name }})
+                        </a>
+                    {% endfor %}
+                </div>
+            </div>
+
+            {% if lots|length > 0 %}
+                <div class="bg-gray-800 rounded-lg overflow-hidden">
+                    <table class="w-full">
+                        <thead class="bg-gray-700">
+                            <tr>
+                                <th class="px-6 py-3 text-left text-xs font-medium text-gray-300 uppercase tracking-wider">Item</th>
+                                <th class="px-6 py-3 text-left text-xs font-medium text-gray-300 uppercase tracking-wider">Personnage</th>
+                                <th class="px-6 py-3 text-left text-xs font-medium text-gray-300 uppercase tracking-wider">Lot</th>
+                                <th class="px-6 py-3 text-left text-xs font-medium text-gray-300 uppercase tracking-wider">Prix Achat</th>
+                                <th class="px-6 py-3 text-left text-xs font-medium text-gray-300 uppercase tracking-wider">Prix Vente</th>
+                                <th class="px-6 py-3 text-left text-xs font-medium text-gray-300 uppercase tracking-wider">Profit</th>
+                                <th class="px-6 py-3 text-left text-xs font-medium text-gray-300 uppercase tracking-wider">Statut</th>
+                                <th class="px-6 py-3 text-left text-xs font-medium text-gray-300 uppercase tracking-wider">Actions</th>
+                            </tr>
+                        </thead>
+                        <tbody class="divide-y divide-gray-700">
+                            {% for lot in lots %}
+                                {% set profit = lot.sellPricePerLot - lot.buyPricePerLot %}
+                                {% set profitPercent = lot.buyPricePerLot > 0 ? (profit / lot.buyPricePerLot * 100) : 0 %}
+                                <tr class="hover:bg-gray-700">
+                                    <td class="px-6 py-4 whitespace-nowrap">
+                                        <div class="text-white font-medium">{{ lot.item.name }}</div>
+                                        <div class="text-gray-400 text-sm">Niv.{{ lot.item.level }}</div>
+                                    </td>
+                                    <td class="px-6 py-4 whitespace-nowrap">
+                                        <div class="text-white">{{ lot.dofusCharacter.name }}</div>
+                                        <div class="text-gray-400 text-sm">{{ lot.dofusCharacter.server.name }}</div>
+                                    </td>
+                                    <td class="px-6 py-4 whitespace-nowrap text-white">
+                                        {{ lot.lotSize }}
+                                    </td>
+                                    <td class="px-6 py-4 whitespace-nowrap text-white">
+                                        {{ (lot.buyPricePerLot / 1000)|number_format(0, ',', ' ') }}k
+                                    </td>
+                                    <td class="px-6 py-4 whitespace-nowrap text-white">
+                                        {{ (lot.sellPricePerLot / 1000)|number_format(0, ',', ' ') }}k
+                                    </td>
+                                    <td class="px-6 py-4 whitespace-nowrap">
+                                        <div class="text-{{ profit >= 0 ? 'green' : 'red' }}-400">
+                                            {{ (profit / 1000)|number_format(0, ',', ' ') }}k
+                                        </div>
+                                        <div class="text-{{ profit >= 0 ? 'green' : 'red' }}-400 text-sm">
+                                            ({{ profitPercent|number_format(1) }}%)
+                                        </div>
+                                    </td>
+                                    <td class="px-6 py-4 whitespace-nowrap">
+                                        <span class="px-2 inline-flex text-xs leading-5 font-semibold rounded-full 
+                                                   {{ lot.status.value == 'available' ? 'bg-green-100 text-green-800' : 'bg-gray-100 text-gray-800' }}">
+                                            {{ lot.status.value == 'available' ? 'Disponible' : 'Vendu' }}
+                                        </span>
+                                    </td>
+                                    <td class="px-6 py-4 whitespace-nowrap text-sm">
+                                        <div class="flex space-x-2">
+                                            <a href="{{ path('app_lot_edit', {id: lot.id}) }}" 
+                                               class="text-blue-400 hover:text-blue-300">Modifier</a>
+                                            <form action="{{ path('app_lot_delete', {id: lot.id}) }}" method="post" 
+                                                  onsubmit="return confirm('Êtes-vous sûr de vouloir supprimer ce lot ?')" class="inline">
+                                                <button type="submit" class="text-red-400 hover:text-red-300">Supprimer</button>
+                                            </form>
+                                        </div>
+                                    </td>
+                                </tr>
+                            {% endfor %}
+                        </tbody>
+                    </table>
+                </div>
+            {% else %}
+                <div class="text-center py-12">
+                    <p class="text-gray-400 text-lg mb-4">Aucun lot de trading pour le moment</p>
+                    {% if characters|length > 0 %}
+                        <a href="{{ path('app_lot_new', {id: characters[0].id}) }}" 
+                           class="bg-green-600 hover:bg-green-700 text-white px-6 py-3 rounded-lg transition-colors">
+                            Créer mon premier lot
+                        </a>
+                    {% endif %}
+                </div>
+            {% endif %}
+        {% endif %}
+    </div>
+</div>
+{% endblock %}

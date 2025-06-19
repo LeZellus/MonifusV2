@@ -9,6 +9,7 @@ use Doctrine\ORM\Mapping as ORM;
 use App\Enum\LotStatus;
 
 #[ORM\Entity(repositoryClass: LotGroupRepository::class)]
+#[ORM\HasLifecycleCallbacks]
 class LotGroup
 {
     #[ORM\Id]

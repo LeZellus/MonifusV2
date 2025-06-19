@@ -17,9 +17,9 @@
     </nav>
 
     <div class="container mx-auto px-4 py-8">
-        <div class="grid grid-cols-1 md:grid-cols-3 gap-6 mb-8">
+        <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6 mb-8">
             <div class="bg-gray-800 rounded-lg p-6">
-                <h3 class="text-white text-lg font-semibold mb-2">Profils de Trading</h3>
+                <h3 class="text-white text-lg font-semibold mb-2">Profils</h3>
                 <p class="text-blue-400 text-2xl font-bold">{{ trading_profiles_count }}</p>
             </div>
             <div class="bg-gray-800 rounded-lg p-6">
@@ -27,12 +27,19 @@
                 <p class="text-green-400 text-2xl font-bold">{{ characters_count }}</p>
             </div>
             <div class="bg-gray-800 rounded-lg p-6">
-                <h3 class="text-white text-lg font-semibold mb-2">Groupes de Lots</h3>
+                <h3 class="text-white text-lg font-semibold mb-2">Lots Total</h3>
                 <p class="text-purple-400 text-2xl font-bold">{{ lot_groups_count }}</p>
+                <p class="text-gray-400 text-sm">{{ available_lots }} dispo • {{ sold_lots }} vendus</p>
+            </div>
+            <div class="bg-gray-800 rounded-lg p-6">
+                <h3 class="text-white text-lg font-semibold mb-2">Profit Total</h3>
+                <p class="text-{{ total_profit >= 0 ? 'green' : 'red' }}-400 text-2xl font-bold">
+                    {{ (total_profit / 1000000)|number_format(1) }}M
+                </p>
             </div>
         </div>
 
-        <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+        <div class="grid grid-cols-1 md:grid-cols-2 gap-6 mb-8">
             <a href="{{ path('app_trading_lots') }}" 
                class="bg-blue-600 hover:bg-blue-700 text-white p-6 rounded-lg text-center transition-colors block">
                 <h3 class="text-xl font-bold mb-2">Mon Trading</h3>
