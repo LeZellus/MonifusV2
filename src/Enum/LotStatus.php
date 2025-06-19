@@ -4,6 +4,6 @@ namespace App\Enum;
 
 enum LotStatus: string
 {
-    case AVAILABLE = 'Actif';
-    case SOLD = 'Vendu';
+    case AVAILABLE = 'available';
+    case SOLD = 'sold';
 }

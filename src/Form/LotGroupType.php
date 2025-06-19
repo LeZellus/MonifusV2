@@ -45,7 +45,14 @@ class LotGroupType extends AbstractType
             ])
             ->add('status', EnumType::class, [
                 'class' => LotStatus::class,
+                'choice_label' => function(LotStatus $choice): string {
+                    return match($choice) {
+                        LotStatus::AVAILABLE => 'Disponible',
+                        LotStatus::SOLD => 'Vendu',
+                    };
+                },
                 'label' => 'Statut',
+                'data' => LotStatus::AVAILABLE,
                 'attr' => ['class' => 'w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:border-blue-500']
             ]);
     }

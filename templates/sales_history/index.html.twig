@@ -1,0 +1,137 @@
+{% extends 'base.html.twig' %}
+
+{% block title %}Historique des Ventes{% endblock %}
+
+{% block body %}
+<div class="bg-gray-900 min-h-screen">
+    <nav class="bg-gray-800 border-b border-gray-700">
+        <div class="container mx-auto px-4">
+            <div class="flex justify-between items-center py-4">
+                <h1 class="text-white text-xl font-bold">Historique des Ventes</h1>
+                <a href="{{ path('app_trading_dashboard') }}" class="text-blue-400 hover:text-blue-300">← Dashboard</a>
+            </div>
+        </div>
+    </nav>
+
+    <div class="container mx-auto px-4 py-8">
+        <!-- Statistiques des ventes -->
+        <div class="grid grid-cols-1 md:grid-cols-4 gap-6 mb-8">
+            <div class="bg-gray-800 rounded-lg p-6">
+                <h3 class="text-white text-lg font-semibold mb-2">💰 Profit Réalisé</h3>
+                <p class="text-green-400 text-2xl font-bold">
+                    {{ (total_realized_profit / 1000000)|number_format(1) }}M
+                </p>
+            </div>
+            <div class="bg-gray-800 rounded-lg p-6">
+                <h3 class="text-white text-lg font-semibold mb-2">🎯 Profit Attendu</h3>
+                <p class="text-blue-400 text-2xl font-bold">
+                    {{ (total_expected_profit / 1000000)|number_format(1) }}M
+                </p>
+            </div>
+            <div class="bg-gray-800 rounded-lg p-6">
+                <h3 class="text-white text-lg font-semibold mb-2">📊 Différence</h3>
+                <p class="text-{{ profit_difference >= 0 ? 'green' : 'red' }}-400 text-2xl font-bold">
+                    {{ profit_difference >= 0 ? '+' : '' }}{{ (profit_difference / 1000000)|number_format(1) }}M
+                </p>
+            </div>
+            <div class="bg-gray-800 rounded-lg p-6">
+                <h3 class="text-white text-lg font-semibold mb-2">📈 Ventes Total</h3>
+                <p class="text-purple-400 text-2xl font-bold">{{ sales|length }}</p>
+            </div>
+        </div>
+
+        {% if sales|length > 0 %}
+            <div class="bg-gray-800 rounded-lg overflow-hidden">
+                <table class="w-full">
+                    <thead class="bg-gray-700">
+                        <tr>
+                            <th class="px-6 py-3 text-left text-xs font-medium text-gray-300 uppercase tracking-wider">Date Vente</th>
+                            <th class="px-6 py-3 text-left text-xs font-medium text-gray-300 uppercase tracking-wider">Item</th>
+                            <th class="px-6 py-3 text-left text-xs font-medium text-gray-300 uppercase tracking-wider">Personnage</th>
+                            <th class="px-6 py-3 text-left text-xs font-medium text-gray-300 uppercase tracking-wider">Configuration</th>
+                            <th class="px-6 py-3 text-left text-xs font-medium text-gray-300 uppercase tracking-wider">Prix Réel</th>
+                            <th class="px-6 py-3 text-left text-xs font-medium text-gray-300 uppercase tracking-wider">Prix Attendu</th>
+                            <th class="px-6 py-3 text-left text-xs font-medium text-gray-300 uppercase tracking-wider">Profit Réel</th>
+                            <th class="px-6 py-3 text-left text-xs font-medium text-gray-300 uppercase tracking-wider">Performance</th>
+                            <th class="px-6 py-3 text-left text-xs font-medium text-gray-300 uppercase tracking-wider">Notes</th>
+                        </tr>
+                    </thead>
+                    <tbody class="divide-y divide-gray-700">
+                        {% for sale in sales %}
+                            {% set lotGroup = sale.lotGroup %}
+                            {% set realizedProfit = sale.actualSellPrice - lotGroup.buyPricePerLot %}
+                            {% set expectedProfit = lotGroup.sellPricePerLot - lotGroup.buyPricePerLot %}
+                            {% set performance = sale.actualSellPrice - lotGroup.sellPricePerLot %}
+                            {% set profitPercent = lotGroup.buyPricePerLot > 0 ? (realizedProfit / lotGroup.buyPricePerLot * 100) : 0 %}
+                            
+                            <tr class="hover:bg-gray-700">
+                                <td class="px-6 py-4 whitespace-nowrap text-white text-sm">
+                                    {{ sale.soldAt|date('d/m/Y H:i') }}
+                                </td>
+                                <td class="px-6 py-4 whitespace-nowrap">
+                                    <div class="text-white font-medium">{{ lotGroup.item.name }}</div>
+                                    <div class="text-gray-400 text-sm">Niv.{{ lotGroup.item.level }}</div>
+                                </td>
+                                <td class="px-6 py-4 whitespace-nowrap">
+                                    <div class="text-white">{{ lotGroup.dofusCharacter.name }}</div>
+                                    <div class="text-gray-400 text-sm">{{ lotGroup.dofusCharacter.server.name }}</div>
+                                </td>
+                                <td class="px-6 py-4 whitespace-nowrap">
+                                    <div class="text-white">{{ lotGroup.lotSize }} lots</div>
+                                    <div class="text-gray-400 text-sm">par {{ lotGroup.saleUnit.value }}</div>
+                                </td>
+                                <td class="px-6 py-4 whitespace-nowrap">
+                                    <div class="text-white font-medium">{{ (sale.actualSellPrice / 1000)|number_format(0, ',', ' ') }}k</div>
+                                </td>
+                                <td class="px-6 py-4 whitespace-nowrap">
+                                    <div class="text-gray-300">{{ (lotGroup.sellPricePerLot / 1000)|number_format(0, ',', ' ') }}k</div>
+                                </td>
+                                <td class="px-6 py-4 whitespace-nowrap">
+                                    <div class="text-{{ realizedProfit >= 0 ? 'green' : 'red' }}-400 font-medium">
+                                        {{ (realizedProfit / 1000)|number_format(0, ',', ' ') }}k
+                                    </div>
+                                    <div class="text-{{ realizedProfit >= 0 ? 'green' : 'red' }}-400 text-sm">
+                                        ({{ profitPercent|number_format(1) }}%)
+                                    </div>
+                                </td>
+                                <td class="px-6 py-4 whitespace-nowrap">
+                                    {% if performance == 0 %}
+                                        <span class="px-2 py-1 text-xs rounded-full bg-gray-600 text-gray-300">
+                                            Conforme
+                                        </span>
+                                    {% elseif performance > 0 %}
+                                        <span class="px-2 py-1 text-xs rounded-full bg-green-600 text-green-100">
+                                            +{{ (performance / 1000)|number_format(0, ',', ' ') }}k
+                                        </span>
+                                    {% else %}
+                                        <span class="px-2 py-1 text-xs rounded-full bg-red-600 text-red-100">
+                                            {{ (performance / 1000)|number_format(0, ',', ' ') }}k
+                                        </span>
+                                    {% endif %}
+                                </td>
+                                <td class="px-6 py-4 text-gray-300 max-w-xs">
+                                    {% if sale.notes %}
+                                        <div class="truncate" title="{{ sale.notes }}">
+                                            {{ sale.notes|slice(0, 30) }}{{ sale.notes|length > 30 ? '...' : '' }}
+                                        </div>
+                                    {% else %}
+                                        <span class="text-gray-500">-</span>
+                                    {% endif %}
+                                </td>
+                            </tr>
+                        {% endfor %}
+                    </tbody>
+                </table>
+            </div>
+        {% else %}
+            <div class="text-center py-12">
+                <p class="text-gray-400 text-lg mb-4">Aucune vente enregistrée pour le moment</p>
+                <a href="{{ path('app_lot_index') }}" 
+                   class="bg-green-600 hover:bg-green-700 text-white px-6 py-3 rounded-lg transition-colors">
+                    Voir mes lots disponibles
+                </a>
+            </div>
+        {% endif %}
+    </div>
+</div>
+{% endblock %}
