@@ -19,7 +19,7 @@ class DofusCharacter
     #[ORM\Column(length: 100)]
     private ?string $name = null;
 
-    #[ORM\ManyToOne]
+   #[ORM\ManyToOne(targetEntity: TradingProfile::class, inversedBy: 'dofusCharacters')]
     #[ORM\JoinColumn(nullable: false)]
     private ?TradingProfile $tradingProfile = null;
 

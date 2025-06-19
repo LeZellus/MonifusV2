@@ -10,7 +10,7 @@ use Doctrine\Migrations\AbstractMigration;
 /**
  * Auto-generated Migration: Please modify to your needs!
  */
-final class Version20250619031405 extends AbstractMigration
+final class Version20250619051846 extends AbstractMigration
 {
     public function getDescription(): string
     {
@@ -36,7 +36,7 @@ final class Version20250619031405 extends AbstractMigration
             CREATE TABLE item_custom_field (id INT AUTO_INCREMENT NOT NULL, item_id INT NOT NULL, field_name VARCHAR(100) NOT NULL, field_value LONGTEXT DEFAULT NULL, field_type VARCHAR(255) NOT NULL, INDEX IDX_57A240F0126F525E (item_id), PRIMARY KEY(id)) DEFAULT CHARACTER SET utf8mb4 COLLATE `utf8mb4_unicode_ci` ENGINE = InnoDB
         SQL);
         $this->addSql(<<<'SQL'
-            CREATE TABLE lot_group (id INT AUTO_INCREMENT NOT NULL, dofus_character_id INT NOT NULL, item_id INT NOT NULL, lot_size INT NOT NULL, buy_price_per_lot BIGINT NOT NULL, sell_price_per_lot BIGINT NOT NULL, status VARCHAR(255) NOT NULL, created_at DATETIME NOT NULL COMMENT '(DC2Type:datetime_immutable)', updated_at DATETIME NOT NULL COMMENT '(DC2Type:datetime_immutable)', INDEX IDX_1B8829CBB3033844 (dofus_character_id), INDEX IDX_1B8829CB126F525E (item_id), PRIMARY KEY(id)) DEFAULT CHARACTER SET utf8mb4 COLLATE `utf8mb4_unicode_ci` ENGINE = InnoDB
+            CREATE TABLE lot_group (id INT AUTO_INCREMENT NOT NULL, dofus_character_id INT NOT NULL, item_id INT NOT NULL, lot_size INT NOT NULL, buy_price_per_lot BIGINT NOT NULL, sell_price_per_lot BIGINT NOT NULL, status VARCHAR(255) NOT NULL, sale_unit INT NOT NULL, created_at DATETIME NOT NULL COMMENT '(DC2Type:datetime_immutable)', updated_at DATETIME NOT NULL COMMENT '(DC2Type:datetime_immutable)', INDEX IDX_1B8829CBB3033844 (dofus_character_id), INDEX IDX_1B8829CB126F525E (item_id), PRIMARY KEY(id)) DEFAULT CHARACTER SET utf8mb4 COLLATE `utf8mb4_unicode_ci` ENGINE = InnoDB
         SQL);
         $this->addSql(<<<'SQL'
             CREATE TABLE lot_unit (id INT AUTO_INCREMENT NOT NULL, lot_group_id INT NOT NULL, sold_at DATETIME DEFAULT NULL, actual_sell_price INT DEFAULT NULL, notes LONGTEXT DEFAULT NULL, INDEX IDX_489792135C9E2873 (lot_group_id), PRIMARY KEY(id)) DEFAULT CHARACTER SET utf8mb4 COLLATE `utf8mb4_unicode_ci` ENGINE = InnoDB
