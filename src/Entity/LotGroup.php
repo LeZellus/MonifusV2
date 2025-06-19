@@ -6,6 +6,7 @@ use App\Repository\LotGroupRepository;
 use Doctrine\Common\Collections\ArrayCollection;
 use Doctrine\Common\Collections\Collection;
 use Doctrine\ORM\Mapping as ORM;
+use App\Enum\LotStatus;
 
 #[ORM\Entity(repositoryClass: LotGroupRepository::class)]
 class LotGroup
@@ -18,14 +19,14 @@ class LotGroup
     #[ORM\Column]
     private ?int $lotSize = null;
 
-    #[ORM\Column]
+    #[ORM\Column(type: 'bigint')]
     private ?int $buyPricePerLot = null;
 
-    #[ORM\Column]
+    #[ORM\Column(type: 'bigint')]
     private ?int $sellPricePerLot = null;
 
-    #[ORM\Column(length: 50)]
-    private ?string $status = null;
+    #[ORM\Column(enumType: LotStatus::class)]
+    private ?LotStatus $status = null;
 
     #[ORM\ManyToOne(inversedBy: 'lotGroups')]
     #[ORM\JoinColumn(nullable: false)]
@@ -87,12 +88,12 @@ class LotGroup
         return $this;
     }
 
-    public function getStatus(): ?string
+    public function getStatus(): ?LotStatus
     {
         return $this->status;
     }
 
-    public function setStatus(string $status): static
+    public function setStatus(LotStatus $status): static
     {
         $this->status = $status;
 

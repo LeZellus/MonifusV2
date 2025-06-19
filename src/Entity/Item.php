@@ -6,6 +6,7 @@ use App\Repository\ItemRepository;
 use Doctrine\Common\Collections\ArrayCollection;
 use Doctrine\Common\Collections\Collection;
 use Doctrine\ORM\Mapping as ORM;
+use App\Enum\ItemType;
 
 #[ORM\Entity(repositoryClass: ItemRepository::class)]
 class Item
@@ -21,8 +22,8 @@ class Item
     #[ORM\Column(length: 255)]
     private ?string $name = null;
 
-    #[ORM\Column(length: 50, nullable: true)]
-    private ?string $itemType = null;
+    #[ORM\Column(enumType: ItemType::class, nullable: true)]
+    private ?ItemType $itemType = null;
 
     #[ORM\Column(nullable: true)]
     private ?int $level = null;
@@ -80,12 +81,12 @@ class Item
         return $this;
     }
 
-    public function getItemType(): ?string
+    public function getItemType(): ?ItemType
     {
         return $this->itemType;
     }
 
-    public function setItemType(?string $itemType): static
+    public function setItemType(?ItemType $itemType): static
     {
         $this->itemType = $itemType;
 

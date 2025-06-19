@@ -5,6 +5,7 @@ namespace App\Entity;
 use App\Repository\MarketWatchRepository;
 use Doctrine\DBAL\Types\Types;
 use Doctrine\ORM\Mapping as ORM;
+use App\Enum\PriceType;
 
 #[ORM\Entity(repositoryClass: MarketWatchRepository::class)]
 class MarketWatch
@@ -17,11 +18,11 @@ class MarketWatch
     #[ORM\Column]
     private ?int $lotSize = null;
 
-    #[ORM\Column]
+    #[ORM\Column(type: 'bigint')]
     private ?int $observedPrice = null;
 
-    #[ORM\Column(length: 50)]
-    private ?string $priceType = null;
+    #[ORM\Column(enumType: PriceType::class)]
+    private ?PriceType $priceType = null;
 
     #[ORM\Column(type: Types::TEXT, nullable: true)]
     private ?string $notes = null;
@@ -63,12 +64,12 @@ class MarketWatch
         return $this;
     }
 
-    public function getPriceType(): ?string
+    public function getPriceType(): ?PriceType
     {
         return $this->priceType;
     }
 
-    public function setPriceType(string $priceType): static
+    public function setPriceType(PriceType $priceType): static
     {
         $this->priceType = $priceType;
 
