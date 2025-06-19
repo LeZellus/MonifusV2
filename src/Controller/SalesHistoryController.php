@@ -3,7 +3,7 @@
 namespace App\Controller;
 
 use App\Repository\LotUnitRepository;
-use App\Repository\DofusCharacterRepository;
+use App\Service\CharacterSelectionService;
 use App\Service\ExportService; 
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\HttpFoundation\Response;
@@ -19,19 +19,12 @@ class SalesHistoryController extends AbstractController
     public function index(
         Request $request,
         LotUnitRepository $lotUnitRepository,
-        DofusCharacterRepository $characterRepository
+        CharacterSelectionService $characterService
     ): Response {
         // Récupérer les filtres
-        $serverFilter = $request->query->get('server');
         $periodFilter = $request->query->get('period', '30'); // 30 jours par défaut
-
-        // Récupérer tous les personnages de l'utilisateur
-        $characters = $characterRepository->createQueryBuilder('c')
-            ->join('c.tradingProfile', 'tp')
-            ->where('tp.user = :user')
-            ->setParameter('user', $this->getUser())
-            ->getQuery()
-            ->getResult();
+        $selectedCharacter = $characterService->getSelectedCharacter($this->getUser());
+        $characters = $characterService->getUserCharacters($this->getUser());
 
         // Construire la requête avec filtres
         $qb = $lotUnitRepository->createQueryBuilder('lu')
@@ -39,14 +32,13 @@ class SalesHistoryController extends AbstractController
             ->join('lg.dofusCharacter', 'c')
             ->join('lg.item', 'i')
             ->join('c.tradingProfile', 'tp')
-            ->join('c.server', 's')
             ->where('tp.user = :user')
             ->setParameter('user', $this->getUser());
 
-        // Filtre par serveur
-        if ($serverFilter) {
-            $qb->andWhere('s.id = :server')
-            ->setParameter('server', $serverFilter);
+        // Filtre par personnage sélectionné (optionnel)
+        if ($selectedCharacter) {
+            $qb->andWhere('c = :character')
+               ->setParameter('character', $selectedCharacter);
         }
 
         // Filtre par période
@@ -54,7 +46,7 @@ class SalesHistoryController extends AbstractController
             $date = new \DateTime();
             $date->modify("-{$periodFilter} days");
             $qb->andWhere('lu.soldAt >= :date')
-            ->setParameter('date', $date);
+               ->setParameter('date', $date);
         }
 
         $sales = $qb->orderBy('lu.soldAt', 'DESC')->getQuery()->getResult();
@@ -63,8 +55,8 @@ class SalesHistoryController extends AbstractController
         $totalRealizedProfit = 0;
         $totalExpectedProfit = 0;
         foreach ($sales as $sale) {
-            $realizedProfit = $sale->getActualSellPrice() - $sale->getLotGroup()->getBuyPricePerLot();
-            $expectedProfit = $sale->getLotGroup()->getSellPricePerLot() - $sale->getLotGroup()->getBuyPricePerLot();
+            $realizedProfit = ($sale->getActualSellPrice() - $sale->getLotGroup()->getBuyPricePerLot()) * $sale->getQuantitySold();
+            $expectedProfit = ($sale->getLotGroup()->getSellPricePerLot() - $sale->getLotGroup()->getBuyPricePerLot()) * $sale->getQuantitySold();
             
             $totalRealizedProfit += $realizedProfit;
             $totalExpectedProfit += $expectedProfit;
@@ -73,11 +65,11 @@ class SalesHistoryController extends AbstractController
         return $this->render('sales_history/index.html.twig', [
             'sales' => $sales,
             'characters' => $characters,
+            'selectedCharacter' => $selectedCharacter,
             'total_realized_profit' => $totalRealizedProfit,
             'total_expected_profit' => $totalExpectedProfit,
             'profit_difference' => $totalRealizedProfit - $totalExpectedProfit,
             'current_filters' => [
-                'server' => $serverFilter,
                 'period' => $periodFilter,
             ],
         ]);
@@ -87,25 +79,12 @@ class SalesHistoryController extends AbstractController
     public function export(
         Request $request,
         LotUnitRepository $lotUnitRepository,
-        DofusCharacterRepository $characterRepository,
+        CharacterSelectionService $characterService,
         ExportService $exportService
     ): Response {
         // Récupérer les mêmes filtres que dans index()
-        $serverFilter = $request->query->get('server');
         $periodFilter = $request->query->get('period', '30');
-
-        // Récupérer tous les personnages de l'utilisateur
-        $characters = $characterRepository->createQueryBuilder('c')
-            ->join('c.tradingProfile', 'tp')
-            ->where('tp.user = :user')
-            ->setParameter('user', $this->getUser())
-            ->getQuery()
-            ->getResult();
-
-        if (empty($characters)) {
-            $this->addFlash('warning', 'Aucun personnage trouvé pour l\'export.');
-            return $this->redirectToRoute('app_sales_history_index');
-        }
+        $selectedCharacter = $characterService->getSelectedCharacter($this->getUser());
 
         // Construire la même requête avec filtres que dans index()
         $qb = $lotUnitRepository->createQueryBuilder('lu')
@@ -113,14 +92,13 @@ class SalesHistoryController extends AbstractController
             ->join('lg.dofusCharacter', 'c')
             ->join('lg.item', 'i')
             ->join('c.tradingProfile', 'tp')
-            ->join('c.server', 's')
             ->where('tp.user = :user')
             ->setParameter('user', $this->getUser());
 
-        // Filtre par serveur
-        if ($serverFilter) {
-            $qb->andWhere('s.id = :server')
-            ->setParameter('server', $serverFilter);
+        // Filtre par personnage sélectionné (optionnel)
+        if ($selectedCharacter) {
+            $qb->andWhere('c = :character')
+               ->setParameter('character', $selectedCharacter);
         }
 
         // Filtre par période
@@ -128,7 +106,7 @@ class SalesHistoryController extends AbstractController
             $date = new \DateTime();
             $date->modify("-{$periodFilter} days");
             $qb->andWhere('lu.soldAt >= :date')
-            ->setParameter('date', $date);
+               ->setParameter('date', $date);
         }
 
         $sales = $qb->orderBy('lu.soldAt', 'DESC')->getQuery()->getResult();

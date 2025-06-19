@@ -27,35 +27,62 @@ class LotSaleController extends AbstractController
     ): Response {
         $selectedCharacter = $characterService->getSelectedCharacter($this->getUser());
 
-        // Vérifier que le lot appartient au personnage sélectionné
+        // Vérifications de sécurité
         if ($lotGroup->getDofusCharacter() !== $selectedCharacter) {
             throw $this->createAccessDeniedException();
         }
 
-        // Vérifier que le lot est disponible
         if ($lotGroup->getStatus() !== LotStatus::AVAILABLE) {
             $this->addFlash('error', 'Ce lot n\'est pas disponible à la vente.');
             return $this->redirectToRoute('app_lot_index');
         }
 
+        // Créer la vente
         $lotUnit = new LotUnit();
         $lotUnit->setLotGroup($lotGroup);
         $lotUnit->setSoldAt(new \DateTime());
-        
-        // Préremplir avec le prix de vente prévu
         $lotUnit->setActualSellPrice($lotGroup->getSellPricePerLot());
 
-        $form = $this->createForm(LotUnitType::class, $lotUnit);
+        // Formulaire avec quantité
+        $form = $this->createForm(LotUnitType::class, $lotUnit, [
+            'lot_group' => $lotGroup
+        ]);
+
+        // Pré-remplir la quantité avec tout le stock
+        $form->get('quantitySold')->setData($lotGroup->getLotSize());
 
         $form->handleRequest($request);
         if ($form->isSubmitted() && $form->isValid()) {
-            // Marquer le lot comme vendu
-            $lotGroup->setStatus(LotStatus::SOLD);
-            
+            $quantitySold = $form->get('quantitySold')->getData();
+            $remainingQuantity = $lotGroup->getLotSize() - $quantitySold;
+
+            if ($remainingQuantity < 0) {
+                $this->addFlash('error', 'Quantité vendue supérieure au stock disponible.');
+                return $this->render('lot_sale/sell.html.twig', [
+                    'form' => $form,
+                    'lot_group' => $lotGroup,
+                ]);
+            }
+
+            // Enregistrer la vente avec la quantité
+            $lotUnit->setQuantitySold($quantitySold);
             $em->persist($lotUnit);
+
+            if ($remainingQuantity === 0) {
+                // Tout vendu = marquer le lot comme vendu
+                $lotGroup->setStatus(LotStatus::SOLD);
+            } else {
+                // Vente partielle = réduire la quantité du lot
+                $lotGroup->setLotSize($remainingQuantity);
+            }
+
             $em->flush();
 
-            $this->addFlash('success', 'Lot vendu avec succès !');
+            $message = $remainingQuantity === 0 
+                ? "Lot entièrement vendu !" 
+                : "Vente partielle effectuée ! Reste {$remainingQuantity} lots.";
+                
+            $this->addFlash('success', $message);
             return $this->redirectToRoute('app_lot_index');
         }
 

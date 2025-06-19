@@ -22,6 +22,9 @@ class LotUnit
     #[ORM\Column(nullable: true)]
     private ?int $actualSellPrice = null;
 
+    #[ORM\Column]
+    private ?int $quantitySold = null;
+
     #[ORM\Column(type: Types::TEXT, nullable: true)]
     private ?string $notes = null;
 
@@ -53,7 +56,6 @@ class LotUnit
     public function setSoldAt(?\DateTime $soldAt): static
     {
         $this->soldAt = $soldAt;
-
         return $this;
     }
 
@@ -65,7 +67,17 @@ class LotUnit
     public function setActualSellPrice(?int $actualSellPrice): static
     {
         $this->actualSellPrice = $actualSellPrice;
+        return $this;
+    }
 
+    public function getQuantitySold(): ?int
+    {
+        return $this->quantitySold;
+    }
+
+    public function setQuantitySold(?int $quantitySold): static
+    {
+        $this->quantitySold = $quantitySold;
         return $this;
     }
 
@@ -77,7 +89,6 @@ class LotUnit
     public function setNotes(?string $notes): static
     {
         $this->notes = $notes;
-
         return $this;
     }
 
@@ -89,7 +100,6 @@ class LotUnit
     public function setLotGroup(?LotGroup $lotGroup): static
     {
         $this->lotGroup = $lotGroup;
-
         return $this;
     }
 
@@ -107,19 +117,16 @@ class LotUnit
             $this->comments->add($comment);
             $comment->setLotUnit($this);
         }
-
         return $this;
     }
 
     public function removeComment(Comment $comment): static
     {
         if ($this->comments->removeElement($comment)) {
-            // set the owning side to null (unless already changed)
             if ($comment->getLotUnit() === $this) {
                 $comment->setLotUnit(null);
             }
         }
-
         return $this;
     }
 }

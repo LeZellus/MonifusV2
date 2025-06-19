@@ -25,43 +25,19 @@
                         <div class="text-gray-400 text-sm">Niv.{{ lot_group.item.level }}</div>
                     </div>
                     <div>
+                        <div class="text-gray-400 text-sm">Stock disponible</div>
+                        <div class="text-green-400 font-bold text-lg">{{ lot_group.lotSize }} lots</div>
+                        <div class="text-gray-400 text-sm">Vente par {{ lot_group.saleUnit.value }}</div>
+                    </div>
+                    <div>
                         <div class="text-gray-400 text-sm">Personnage</div>
                         <div class="text-white font-medium">{{ lot_group.dofusCharacter.name }}</div>
                         <div class="text-gray-400 text-sm">{{ lot_group.dofusCharacter.server.name }}</div>
                     </div>
                     <div>
-                        <div class="text-gray-400 text-sm">Configuration</div>
-                        <div class="text-white font-medium">{{ lot_group.lotSize }} lots</div>
-                        <div class="text-gray-400 text-sm">
-                            Vente par {{ lot_group.saleUnit.value }}
-                            {% if lot_group.saleUnit.value == 1 %}
-                                (unité)
-                            {% elseif lot_group.saleUnit.value == 10 %}
-                                (x10)
-                            {% else %}
-                                (x100)
-                            {% endif %}
-                        </div>
-                    </div>
-                    <div>
                         <div class="text-gray-400 text-sm">Prix prévu</div>
                         <div class="text-white font-medium">{{ (lot_group.sellPricePerLot / 1000)|number_format(0, ',', ' ') }}k</div>
                         <div class="text-gray-400 text-sm">par lot de {{ lot_group.saleUnit.value }}</div>
-                    </div>
-                </div>
-
-                <!-- Calcul du profit prévu -->
-                {% set profitPrevu = lot_group.sellPricePerLot - lot_group.buyPricePerLot %}
-                {% set profitPrevuPercent = lot_group.buyPricePerLot > 0 ? (profitPrevu / lot_group.buyPricePerLot * 100) : 0 %}
-                <div class="mt-4 p-4 bg-gray-700 rounded-lg">
-                    <div class="text-gray-400 text-sm mb-2">💰 Profit prévu par lot</div>
-                    <div class="flex justify-between items-center">
-                        <div class="text-{{ profitPrevu >= 0 ? 'green' : 'red' }}-400 text-lg font-bold">
-                            {{ (profitPrevu / 1000)|number_format(0, ',', ' ') }}k
-                        </div>
-                        <div class="text-{{ profitPrevu >= 0 ? 'green' : 'red' }}-400 text-sm">
-                            ({{ profitPrevuPercent|number_format(1) }}%)
-                        </div>
                     </div>
                 </div>
             </div>
@@ -71,6 +47,17 @@
                 <h2 class="text-white text-xl font-semibold mb-4">💸 Enregistrer la vente</h2>
                 {{ form_start(form) }}
                 
+                <!-- Quantité vendue -->
+                <div class="mb-4">
+                    {{ form_label(form.quantitySold, null, {'label_attr': {'class': 'block text-white font-medium mb-2'}}) }}
+                    {{ form_widget(form.quantitySold) }}
+                    {{ form_errors(form.quantitySold) }}
+                    <div class="text-gray-400 text-sm mt-1">
+                        Stock disponible : {{ lot_group.lotSize }} lots
+                    </div>
+                </div>
+
+                <!-- Prix de vente réel -->
                 <div class="mb-4">
                     {{ form_label(form.actualSellPrice, null, {'label_attr': {'class': 'block text-white font-medium mb-2'}}) }}
                     {{ form_widget(form.actualSellPrice) }}
@@ -80,6 +67,7 @@
                     </div>
                 </div>
 
+                <!-- Notes -->
                 <div class="mb-6">
                     {{ form_label(form.notes, null, {'label_attr': {'class': 'block text-white font-medium mb-2'}}) }}
                     {{ form_widget(form.notes) }}
@@ -89,14 +77,20 @@
                     </div>
                 </div>
 
-                <!-- Aperçu du profit réel (JavaScript) -->
+                <!-- Aperçu du profit (JavaScript) -->
                 <div id="profit-preview" class="mb-6 p-4 bg-gray-700 rounded-lg" style="display: none;">
-                    <div class="text-gray-400 text-sm mb-2">📊 Profit réel calculé</div>
-                    <div class="flex justify-between items-center">
-                        <div id="profit-amount" class="text-lg font-bold"></div>
-                        <div id="profit-percent" class="text-sm"></div>
+                    <div class="text-gray-400 text-sm mb-2">📊 Calcul de la vente</div>
+                    <div class="grid grid-cols-2 gap-4">
+                        <div>
+                            <div class="text-white font-medium">Quantité</div>
+                            <div id="quantity-display" class="text-blue-400"></div>
+                        </div>
+                        <div>
+                            <div class="text-white font-medium">Profit total</div>
+                            <div id="total-profit" class="text-green-400"></div>
+                        </div>
                     </div>
-                    <div id="profit-difference" class="text-sm mt-1"></div>
+                    <div id="remaining-stock" class="text-yellow-400 text-sm mt-2"></div>
                 </div>
 
                 <div class="flex space-x-4">
@@ -116,52 +110,40 @@
 </div>
 
 <script>
-// Calcul du profit en temps réel
 document.addEventListener('DOMContentLoaded', function() {
+    const quantityInput = document.getElementById('lot_unit_quantitySold');
     const priceInput = document.getElementById('lot_unit_actualSellPrice');
     const profitPreview = document.getElementById('profit-preview');
-    const profitAmount = document.getElementById('profit-amount');
-    const profitPercent = document.getElementById('profit-percent');
-    const profitDifference = document.getElementById('profit-difference');
     
     const buyPrice = {{ lot_group.buyPricePerLot }};
-    const expectedSellPrice = {{ lot_group.sellPricePerLot }};
-    const expectedProfit = expectedSellPrice - buyPrice;
+    const totalStock = {{ lot_group.lotSize }};
     
-    function updateProfit() {
-        const actualPrice = parseInt(priceInput.value) || 0;
-        const actualProfit = actualPrice - buyPrice;
-        const profitPercent = buyPrice > 0 ? (actualProfit / buyPrice * 100) : 0;
-        const difference = actualProfit - expectedProfit;
+    function updatePreview() {
+        const quantity = parseInt(quantityInput.value) || 0;
+        const price = parseInt(priceInput.value) || 0;
         
-        if (actualPrice > 0) {
+        if (quantity > 0 && price > 0) {
             profitPreview.style.display = 'block';
             
-            // Couleur selon le profit
-            const color = actualProfit >= 0 ? 'text-green-400' : 'text-red-400';
-            profitAmount.className = `text-lg font-bold ${color}`;
-            profitPercent.className = `text-sm ${color}`;
+            const totalProfit = (price - buyPrice) * quantity;
+            const remaining = totalStock - quantity;
             
-            profitAmount.textContent = `${(actualProfit / 1000).toLocaleString()}k`;
-            profitPercent.textContent = `(${profitPercent.toFixed(1)}%)`;
+            document.getElementById('quantity-display').textContent = `${quantity} lots`;
+            document.getElementById('total-profit').textContent = `${(totalProfit / 1000).toLocaleString()}k`;
             
-            // Différence avec le profit prévu
-            if (difference !== 0) {
-                const diffColor = difference >= 0 ? 'text-green-400' : 'text-red-400';
-                const diffSign = difference >= 0 ? '+' : '';
-                profitDifference.className = `text-sm mt-1 ${diffColor}`;
-                profitDifference.textContent = `${diffSign}${(difference / 1000).toLocaleString()}k vs prévu`;
+            if (remaining > 0) {
+                document.getElementById('remaining-stock').textContent = `Il restera ${remaining} lots en stock`;
             } else {
-                profitDifference.textContent = 'Conforme au profit prévu';
-                profitDifference.className = 'text-sm mt-1 text-gray-400';
+                document.getElementById('remaining-stock').textContent = 'Lot entièrement vendu';
             }
         } else {
             profitPreview.style.display = 'none';
         }
     }
     
-    priceInput.addEventListener('input', updateProfit);
-    updateProfit(); // Calcul initial
+    quantityInput.addEventListener('input', updatePreview);
+    priceInput.addEventListener('input', updatePreview);
+    updatePreview(); // Calcul initial
 });
 </script>
 {% endblock %}
