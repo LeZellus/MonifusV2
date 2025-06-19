@@ -24,31 +24,39 @@
             </div>
             <div class="bg-gray-800 rounded-lg p-6">
                 <h3 class="text-white text-lg font-semibold mb-2">Personnages</h3>
-                <p class="text-green-400 text-2xl font-bold">{{ characters_count }}</p>
+                <p class="text-green-400 text-2xl font-bold">{{ stats.charactersCount }}</p>
             </div>
             <div class="bg-gray-800 rounded-lg p-6">
                 <h3 class="text-white text-lg font-semibold mb-2">Lots Total</h3>
-                <p class="text-purple-400 text-2xl font-bold">{{ lot_groups_count }}</p>
-                <p class="text-gray-400 text-sm">{{ available_lots }} dispo • {{ sold_lots }} vendus</p>
+                <p class="text-purple-400 text-2xl font-bold">{{ stats.global.totalLots }}</p>
+                <p class="text-gray-400 text-sm">{{ stats.global.availableLots }} dispo • {{ stats.global.soldLots }} vendus</p>
             </div>
             <div class="bg-gray-800 rounded-lg p-6">
                 <h3 class="text-white text-lg font-semibold mb-2">Profit Total</h3>
-                <p class="text-{{ total_profit >= 0 ? 'green' : 'red' }}-400 text-2xl font-bold">
-                    {{ (total_profit / 1000000)|number_format(1) }}M
+                <p class="text-green-400 text-2xl font-bold">
+                    {{ ((stats.global.realizedProfit + stats.global.potentialProfit) / 1000000)|number_format(1) }}M
+                </p>
+                <p class="text-gray-400 text-sm">
+                    {{ (stats.global.realizedProfit / 1000000)|number_format(1) }}M réalisé
                 </p>
             </div>
         </div>
 
-        <div class="grid grid-cols-1 md:grid-cols-2 gap-6 mb-8">
+        <div class="grid grid-cols-1 md:grid-cols-3 gap-6">
             <a href="{{ path('app_trading_lots') }}" 
-               class="bg-blue-600 hover:bg-blue-700 text-white p-6 rounded-lg text-center transition-colors block">
+            class="bg-blue-600 hover:bg-blue-700 text-white p-6 rounded-lg text-center transition-colors block">
                 <h3 class="text-xl font-bold mb-2">Mon Trading</h3>
                 <p class="text-blue-100">Gérer mes lots et ventes</p>
             </a>
             <a href="{{ path('app_trading_surveillance') }}" 
-               class="bg-green-600 hover:bg-green-700 text-white p-6 rounded-lg text-center transition-colors block">
+            class="bg-green-600 hover:bg-green-700 text-white p-6 rounded-lg text-center transition-colors block">
                 <h3 class="text-xl font-bold mb-2">Surveillance</h3>
                 <p class="text-green-100">Surveiller les prix du marché</p>
+            </a>
+            <a href="{{ path('app_analytics_index') }}" 
+            class="bg-purple-600 hover:bg-purple-700 text-white p-6 rounded-lg text-center transition-colors block">
+                <h3 class="text-xl font-bold mb-2">Analytics</h3>
+                <p class="text-purple-100">Analyser mes performances</p>
             </a>
         </div>
 
