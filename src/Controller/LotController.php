@@ -56,7 +56,11 @@ class LotController extends AbstractController
         }
 
         $lotGroup = new LotGroup();
-        $form = $this->createForm(LotGroupType::class, $lotGroup);
+        
+        // Créer le formulaire avec l'option is_edit = false (par défaut)
+        $form = $this->createForm(LotGroupType::class, $lotGroup, [
+            'is_edit' => false
+        ]);
 
         $form->handleRequest($request);
         if ($form->isSubmitted() && $form->isValid()) {
@@ -88,7 +92,10 @@ class LotController extends AbstractController
             throw $this->createAccessDeniedException();
         }
 
-        $form = $this->createForm(LotGroupType::class, $lotGroup);
+        // Créer le formulaire avec l'option is_edit = true
+        $form = $this->createForm(LotGroupType::class, $lotGroup, [
+            'is_edit' => true
+        ]);
 
         $form->handleRequest($request);
         if ($form->isSubmitted() && $form->isValid()) {

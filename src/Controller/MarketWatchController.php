@@ -123,7 +123,11 @@ class MarketWatchController extends AbstractController
         }
 
         $marketWatch = new MarketWatch();
-        $form = $this->createForm(MarketWatchType::class, $marketWatch);
+        
+        // Créer le formulaire avec l'option is_edit = false
+        $form = $this->createForm(MarketWatchType::class, $marketWatch, [
+            'is_edit' => false
+        ]);
 
         $form->handleRequest($request);
         if ($form->isSubmitted() && $form->isValid()) {
@@ -155,7 +159,10 @@ class MarketWatchController extends AbstractController
             throw $this->createAccessDeniedException();
         }
 
-        $form = $this->createForm(MarketWatchType::class, $marketWatch);
+        // Créer le formulaire avec l'option is_edit = true
+        $form = $this->createForm(MarketWatchType::class, $marketWatch, [
+            'is_edit' => true
+        ]);
 
         $form->handleRequest($request);
         if ($form->isSubmitted() && $form->isValid()) {

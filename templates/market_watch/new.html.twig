@@ -55,18 +55,31 @@
                 {{ form_start(form) }}
                 
                 <div class="space-y-6">
-                    <!-- Ressource -->
-                    <div>
-                        {{ form_label(form.item, null, {'label_attr': {'class': 'block text-white font-medium mb-2'}}) }}
-                        {{ form_widget(form.item, {'attr': {'class': 'w-full px-4 py-3 border border-gray-600 bg-gray-700 text-white rounded-lg focus:outline-none focus:border-orange-500 focus:ring-2 focus:ring-orange-500 focus:ring-opacity-20'}}) }}
+                    <!-- Ressource avec autocomplétion -->
+                    <div class="relative" data-controller="autocomplete" data-autocomplete-url-value="{{ path('api_items_search_resources') }}">
+                        <!-- Label -->
+                        {{ form_label(form.itemSearch, null, {'label_attr': {'class': 'block text-white font-medium mb-2'}}) }}
+                        
+                        <!-- Champ de recherche -->
+                        {{ form_widget(form.itemSearch, {'attr': {'class': 'w-full px-4 py-3 border border-gray-600 bg-gray-700 text-white rounded-lg focus:outline-none focus:border-orange-500 focus:ring-2 focus:ring-orange-500 focus:ring-opacity-20', 'placeholder': 'Tapez pour rechercher une ressource...', 'data-autocomplete-target': 'input', 'data-action': 'input->autocomplete#search'}}) }}
+                        
+                        <!-- Zone des résultats d'autocomplétion -->
+                        <div data-autocomplete-target="results" 
+                             data-action="click->autocomplete#selectItem"
+                             class="absolute z-10 w-full bg-gray-800 border border-gray-600 rounded-md shadow-lg hidden max-h-60 overflow-y-auto mt-1">
+                        </div>
+
+                        <!-- Select caché pour l'item sélectionné -->
+                        {{ form_widget(form.item, {'attr': {'style': 'display: none;', 'data-autocomplete-target': 'hiddenId'}}) }}
                         {{ form_errors(form.item) }}
-                        <div class="text-gray-400 text-sm mt-1">🔍 Quelle ressource observez-vous ?</div>
+                        
+                        <div class="text-gray-400 text-sm mt-1">🔍 Recherche filtrée sur les ressources</div>
                     </div>
 
                     <!-- Date d'observation -->
                     <div>
                         {{ form_label(form.observedAt, null, {'label_attr': {'class': 'block text-white font-medium mb-2'}}) }}
-                        {{ form_widget(form.observedAt, {'attr': {'class': 'w-full px-4 py-3 border border-gray-600 bg-gray-700 text-white rounded-lg focus:outline-none focus:border-orange-500 focus:ring-2 focus:ring-orange-500 focus:ring-opacity-20'}}) }}
+                        {{ form_widget(form.observedAt, {'attr': {'class': 'w-full px-3 py-2 border border-gray-600 bg-gray-700 text-white rounded-md focus:outline-none focus:border-orange-500'}}) }}
                         {{ form_errors(form.observedAt) }}
                         <div class="text-gray-400 text-sm mt-1">📅 Quand avez-vous observé ces prix ?</div>
                     </div>
@@ -85,7 +98,7 @@
                             <div class="bg-white bg-opacity-10 rounded-lg p-4">
                                 {{ form_label(form.pricePerUnit, null, {'label_attr': {'class': 'block text-white font-medium mb-2'}}) }}
                                 <div class="relative">
-                                    {{ form_widget(form.pricePerUnit, {'attr': {'class': 'w-full px-4 py-3 pr-12 border border-gray-600 bg-gray-700 text-white rounded-lg focus:outline-none focus:border-green-500 focus:ring-2 focus:ring-green-500 focus:ring-opacity-20'}}) }}
+                                    {{ form_widget(form.pricePerUnit, {'attr': {'class': 'w-full px-4 py-3 pr-12 border border-gray-600 bg-gray-700 text-white rounded-lg focus:outline-none focus:border-green-500'}}) }}
                                     <div class="absolute inset-y-0 right-0 pr-3 flex items-center">
                                         <span class="text-gray-400 text-sm">kamas</span>
                                     </div>
@@ -97,7 +110,7 @@
                             <div class="bg-white bg-opacity-10 rounded-lg p-4">
                                 {{ form_label(form.pricePer10, null, {'label_attr': {'class': 'block text-white font-medium mb-2'}}) }}
                                 <div class="relative">
-                                    {{ form_widget(form.pricePer10, {'attr': {'class': 'w-full px-4 py-3 pr-12 border border-gray-600 bg-gray-700 text-white rounded-lg focus:outline-none focus:border-blue-500 focus:ring-2 focus:ring-blue-500 focus:ring-opacity-20'}}) }}
+                                    {{ form_widget(form.pricePer10, {'attr': {'class': 'w-full px-4 py-3 pr-12 border border-gray-600 bg-gray-700 text-white rounded-lg focus:outline-none focus:border-blue-500'}}) }}
                                     <div class="absolute inset-y-0 right-0 pr-3 flex items-center">
                                         <span class="text-gray-400 text-sm">kamas</span>
                                     </div>
@@ -109,7 +122,7 @@
                             <div class="bg-white bg-opacity-10 rounded-lg p-4">
                                 {{ form_label(form.pricePer100, null, {'label_attr': {'class': 'block text-white font-medium mb-2'}}) }}
                                 <div class="relative">
-                                    {{ form_widget(form.pricePer100, {'attr': {'class': 'w-full px-4 py-3 pr-12 border border-gray-600 bg-gray-700 text-white rounded-lg focus:outline-none focus:border-purple-500 focus:ring-2 focus:ring-purple-500 focus:ring-opacity-20'}}) }}
+                                    {{ form_widget(form.pricePer100, {'attr': {'class': 'w-full px-4 py-3 pr-12 border border-gray-600 bg-gray-700 text-white rounded-lg focus:outline-none focus:border-purple-500'}}) }}
                                     <div class="absolute inset-y-0 right-0 pr-3 flex items-center">
                                         <span class="text-gray-400 text-sm">kamas</span>
                                     </div>
@@ -123,22 +136,9 @@
                     <!-- Notes -->
                     <div>
                         {{ form_label(form.notes, null, {'label_attr': {'class': 'block text-white font-medium mb-2'}}) }}
-                        {{ form_widget(form.notes, {'attr': {'class': 'w-full px-4 py-3 border border-gray-600 bg-gray-700 text-white rounded-lg focus:outline-none focus:border-orange-500 focus:ring-2 focus:ring-orange-500 focus:ring-opacity-20', 'rows': 3}}) }}
+                        {{ form_widget(form.notes, {'attr': {'class': 'w-full px-3 py-2 border border-gray-600 bg-gray-700 text-white rounded-md focus:outline-none focus:border-orange-500', 'rows': 3}}) }}
                         {{ form_errors(form.notes) }}
                         <div class="text-gray-400 text-sm mt-1">📝 Contexte du marché, tendances observées...</div>
-                    </div>
-                </div>
-
-                <!-- Calcul automatique du prix unitaire -->
-                <div id="price-analysis" class="mt-6 bg-gradient-to-r from-green-600 to-teal-600 rounded-lg p-4" style="display: none;">
-                    <h4 class="text-white font-semibold mb-2 flex items-center">
-                        <span class="mr-2">📊</span>
-                        Analyse des prix
-                    </h4>
-                    <div class="grid grid-cols-1 md:grid-cols-3 gap-4 text-sm">
-                        <div id="unit-price-analysis" class="text-green-100"></div>
-                        <div id="per10-analysis" class="text-green-100"></div>
-                        <div id="per100-analysis" class="text-green-100"></div>
                     </div>
                 </div>
 
@@ -160,41 +160,13 @@
         </div>
     </div>
 
-    <script>
-    document.addEventListener('DOMContentLoaded', function() {
-        const priceUnit = document.getElementById('market_watch_pricePerUnit');
-        const price10 = document.getElementById('market_watch_pricePer10');
-        const price100 = document.getElementById('market_watch_pricePer100');
-        const analysisDiv = document.getElementById('price-analysis');
-        
-        function updateAnalysis() {
-            const p1 = parseInt(priceUnit.value) || 0;
-            const p10 = parseInt(price10.value) || 0;
-            const p100 = parseInt(price100.value) || 0;
-            
-            if (p1 > 0 || p10 > 0 || p100 > 0) {
-                analysisDiv.style.display = 'block';
-                
-                // Calcul du prix unitaire à partir des lots
-                const unitFrom10 = p10 > 0 ? p10 / 10 : 0;
-                const unitFrom100 = p100 > 0 ? p100 / 100 : 0;
-                
-                document.getElementById('unit-price-analysis').innerHTML = 
-                    p1 > 0 ? `Prix unitaire direct: ${p1.toLocaleString()}k` : '';
-                    
-                document.getElementById('per10-analysis').innerHTML = 
-                    p10 > 0 ? `Prix unitaire via x10: ${unitFrom10.toLocaleString()}k` : '';
-                    
-                document.getElementById('per100-analysis').innerHTML = 
-                    p100 > 0 ? `Prix unitaire via x100: ${unitFrom100.toLocaleString()}k` : '';
-            } else {
-                analysisDiv.style.display = 'none';
-            }
+    <!-- CSS pour l'autocomplétion -->
+    <style>
+        .autocomplete-item {
+            transition: background-color 0.2s;
         }
-        
-        [priceUnit, price10, price100].forEach(input => {
-            if (input) input.addEventListener('input', updateAnalysis);
-        });
-    });
-    </script>
+        .autocomplete-item:hover {
+            background-color: rgba(55, 65, 81, 0.8);
+        }
+    </style>
 {% endblock %}

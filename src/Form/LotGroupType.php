@@ -18,9 +18,11 @@ class LotGroupType extends AbstractType
 {
     public function buildForm(FormBuilderInterface $builder, array $options): void
     {
-        $builder
-            // Nouveau champ pour l'autocomplétion
-            ->add('itemSearch', TextType::class, [
+        $isEdit = $options['is_edit'] ?? false;
+        
+        // Champ de recherche uniquement pour la création
+        if (!$isEdit) {
+            $builder->add('itemSearch', TextType::class, [
                 'label' => 'Rechercher un item',
                 'mapped' => false,
                 'required' => false,
@@ -29,14 +31,18 @@ class LotGroupType extends AbstractType
                     'data-autocomplete-target' => 'input',
                     'data-action' => 'input->autocomplete#search'
                 ]
-            ])
+            ]);
+        }
+        
+        $builder
             ->add('item', EntityType::class, [
                 'class' => Item::class,
                 'choice_label' => 'name',
                 'label' => 'Item',
-                'attr' => [
-                    'data-autocomplete-target' => 'hiddenId'
-                ]
+                'attr' => array_merge(
+                    ['class' => 'w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:border-blue-500'],
+                    !$isEdit ? ['data-autocomplete-target' => 'hiddenId', 'style' => 'display: none;'] : []
+                )
             ])
             ->add('saleUnit', EnumType::class, [
                 'class' => SaleUnit::class,
@@ -74,6 +80,7 @@ class LotGroupType extends AbstractType
     {
         $resolver->setDefaults([
             'data_class' => LotGroup::class,
+            'is_edit' => false,
         ]);
     }
 }

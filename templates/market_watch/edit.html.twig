@@ -16,8 +16,8 @@
             <div class="wrapper-background mb-6">
                 <div class="flex items-center space-x-4">
                     <div class="w-12 h-12 rounded-full overflow-hidden">
-                        <img src="{{ character.classe.imagePath }}" 
-                            alt="{{ character.classe.name }}" 
+                        <img src="{{ market_watch.dofusCharacter.classe.imagePath }}" 
+                            alt="{{ market_watch.dofusCharacter.classe.name }}" 
                             class="w-full h-full object-cover">
                     </div>
                     <div>
@@ -75,10 +75,10 @@
                 {{ form_start(form) }}
                 
                 <div class="space-y-6">
-                    <!-- Ressource (lecture seule) -->
+                    <!-- Ressource (lecture seule en édition) -->
                     <div>
                         {{ form_label(form.item, null, {'label_attr': {'class': 'block text-white font-medium mb-2'}}) }}
-                        {{ form_widget(form.item, {'attr': {'class': 'w-full px-4 py-3 border border-gray-600 bg-gray-700 text-white rounded-lg focus:outline-none focus:border-orange-500 focus:ring-2 focus:ring-orange-500 focus:ring-opacity-20', 'readonly': true}}) }}
+                        {{ form_widget(form.item, {'attr': {'class': 'w-full px-4 py-3 border border-gray-600 bg-gray-700 text-white rounded-lg focus:outline-none focus:border-orange-500', 'readonly': true}}) }}
                         {{ form_errors(form.item) }}
                         <div class="text-gray-400 text-sm mt-1">🔒 Ressource observée (non modifiable)</div>
                     </div>
@@ -86,7 +86,7 @@
                     <!-- Date d'observation -->
                     <div>
                         {{ form_label(form.observedAt, null, {'label_attr': {'class': 'block text-white font-medium mb-2'}}) }}
-                        {{ form_widget(form.observedAt, {'attr': {'class': 'w-full px-4 py-3 border border-gray-600 bg-gray-700 text-white rounded-lg focus:outline-none focus:border-orange-500 focus:ring-2 focus:ring-orange-500 focus:ring-opacity-20'}}) }}
+                        {{ form_widget(form.observedAt, {'attr': {'class': 'w-full px-3 py-2 border border-gray-600 bg-gray-700 text-white rounded-md focus:outline-none focus:border-orange-500'}}) }}
                         {{ form_errors(form.observedAt) }}
                         <div class="text-gray-400 text-sm mt-1">📅 Date de cette observation</div>
                     </div>
@@ -105,7 +105,7 @@
                             <div class="bg-white bg-opacity-10 rounded-lg p-4">
                                 {{ form_label(form.pricePerUnit, null, {'label_attr': {'class': 'block text-white font-medium mb-2'}}) }}
                                 <div class="relative">
-                                    {{ form_widget(form.pricePerUnit, {'attr': {'class': 'w-full px-4 py-3 pr-12 border border-gray-600 bg-gray-700 text-white rounded-lg focus:outline-none focus:border-green-500 focus:ring-2 focus:ring-green-500 focus:ring-opacity-20'}}) }}
+                                    {{ form_widget(form.pricePerUnit, {'attr': {'class': 'w-full px-4 py-3 pr-12 border border-gray-600 bg-gray-700 text-white rounded-lg focus:outline-none focus:border-green-500'}}) }}
                                     <div class="absolute inset-y-0 right-0 pr-3 flex items-center">
                                         <span class="text-gray-400 text-sm">kamas</span>
                                     </div>
@@ -117,7 +117,7 @@
                             <div class="bg-white bg-opacity-10 rounded-lg p-4">
                                 {{ form_label(form.pricePer10, null, {'label_attr': {'class': 'block text-white font-medium mb-2'}}) }}
                                 <div class="relative">
-                                    {{ form_widget(form.pricePer10, {'attr': {'class': 'w-full px-4 py-3 pr-12 border border-gray-600 bg-gray-700 text-white rounded-lg focus:outline-none focus:border-blue-500 focus:ring-2 focus:ring-blue-500 focus:ring-opacity-20'}}) }}
+                                    {{ form_widget(form.pricePer10, {'attr': {'class': 'w-full px-4 py-3 pr-12 border border-gray-600 bg-gray-700 text-white rounded-lg focus:outline-none focus:border-blue-500'}}) }}
                                     <div class="absolute inset-y-0 right-0 pr-3 flex items-center">
                                         <span class="text-gray-400 text-sm">kamas</span>
                                     </div>
@@ -129,7 +129,7 @@
                             <div class="bg-white bg-opacity-10 rounded-lg p-4">
                                 {{ form_label(form.pricePer100, null, {'label_attr': {'class': 'block text-white font-medium mb-2'}}) }}
                                 <div class="relative">
-                                    {{ form_widget(form.pricePer100, {'attr': {'class': 'w-full px-4 py-3 pr-12 border border-gray-600 bg-gray-700 text-white rounded-lg focus:outline-none focus:border-purple-500 focus:ring-2 focus:ring-purple-500 focus:ring-opacity-20'}}) }}
+                                    {{ form_widget(form.pricePer100, {'attr': {'class': 'w-full px-4 py-3 pr-12 border border-gray-600 bg-gray-700 text-white rounded-lg focus:outline-none focus:border-purple-500'}}) }}
                                     <div class="absolute inset-y-0 right-0 pr-3 flex items-center">
                                         <span class="text-gray-400 text-sm">kamas</span>
                                     </div>
@@ -143,22 +143,9 @@
                     <!-- Notes -->
                     <div>
                         {{ form_label(form.notes, null, {'label_attr': {'class': 'block text-white font-medium mb-2'}}) }}
-                        {{ form_widget(form.notes, {'attr': {'class': 'w-full px-4 py-3 border border-gray-600 bg-gray-700 text-white rounded-lg focus:outline-none focus:border-orange-500 focus:ring-2 focus:ring-orange-500 focus:ring-opacity-20', 'rows': 3}}) }}
+                        {{ form_widget(form.notes, {'attr': {'class': 'w-full px-3 py-2 border border-gray-600 bg-gray-700 text-white rounded-md focus:outline-none focus:border-orange-500', 'rows': 3}}) }}
                         {{ form_errors(form.notes) }}
                         <div class="text-gray-400 text-sm mt-1">📝 Contexte du marché, évolutions observées...</div>
-                    </div>
-                </div>
-
-                <!-- Évolution des prix (si possible) -->
-                <div id="price-evolution" class="mt-6 bg-gradient-to-r from-indigo-600 to-blue-600 rounded-lg p-4" style="display: none;">
-                    <h4 class="text-white font-semibold mb-2 flex items-center">
-                        <span class="mr-2">📈</span>
-                        Évolution par rapport aux prix actuels
-                    </h4>
-                    <div class="grid grid-cols-1 md:grid-cols-3 gap-4 text-sm">
-                        <div id="unit-evolution" class="text-indigo-100"></div>
-                        <div id="per10-evolution" class="text-indigo-100"></div>
-                        <div id="per100-evolution" class="text-indigo-100"></div>
                     </div>
                 </div>
 
@@ -179,78 +166,4 @@
             </div>
         </div>
     </div>
-
-    <script>
-    document.addEventListener('DOMContentLoaded', function() {
-        const priceUnit = document.getElementById('market_watch_pricePerUnit');
-        const price10 = document.getElementById('market_watch_pricePer10');
-        const price100 = document.getElementById('market_watch_pricePer100');
-        const evolutionDiv = document.getElementById('price-evolution');
-        
-        // Prix actuels (avant modification)
-        const currentPrices = {
-            unit: {{ market_watch.pricePerUnit ?? 'null' }},
-            per10: {{ market_watch.pricePer10 ?? 'null' }},
-            per100: {{ market_watch.pricePer100 ?? 'null' }}
-        };
-        
-        function updateEvolution() {
-            const newPrices = {
-                unit: parseInt(priceUnit.value) || null,
-                per10: parseInt(price10.value) || null,
-                per100: parseInt(price100.value) || null
-            };
-            
-            let hasChanges = false;
-            
-            // Vérifier s'il y a des changements
-            if ((newPrices.unit !== currentPrices.unit) || 
-                (newPrices.per10 !== currentPrices.per10) || 
-                (newPrices.per100 !== currentPrices.per100)) {
-                hasChanges = true;
-            }
-            
-            if (hasChanges) {
-                evolutionDiv.style.display = 'block';
-                
-                // Calculer et afficher les évolutions
-                updateEvolutionDisplay('unit', currentPrices.unit, newPrices.unit, 'unit-evolution');
-                updateEvolutionDisplay('per10', currentPrices.per10, newPrices.per10, 'per10-evolution');
-                updateEvolutionDisplay('per100', currentPrices.per100, newPrices.per100, 'per100-evolution');
-            } else {
-                evolutionDiv.style.display = 'none';
-            }
-        }
-        
-        function updateEvolutionDisplay(type, oldPrice, newPrice, elementId) {
-            const element = document.getElementById(elementId);
-            
-            if (oldPrice === null && newPrice !== null) {
-                element.innerHTML = `<span class="text-green-300">+ Nouveau prix ajouté</span>`;
-            } else if (oldPrice !== null && newPrice === null) {
-                element.innerHTML = `<span class="text-red-300">- Prix supprimé</span>`;
-            } else if (oldPrice !== null && newPrice !== null) {
-                const diff = newPrice - oldPrice;
-                const percent = ((diff / oldPrice) * 100).toFixed(1);
-                
-                if (diff > 0) {
-                    element.innerHTML = `<span class="text-red-300">↗ +${diff.toLocaleString()}k (+${percent}%)</span>`;
-                } else if (diff < 0) {
-                    element.innerHTML = `<span class="text-green-300">↘ ${diff.toLocaleString()}k (${percent}%)</span>`;
-                } else {
-                    element.innerHTML = `<span class="text-gray-300">= Aucun changement</span>`;
-                }
-            } else {
-                element.innerHTML = '';
-            }
-        }
-        
-        [priceUnit, price10, price100].forEach(input => {
-            if (input) input.addEventListener('input', updateEvolution);
-        });
-        
-        // Vérification initiale
-        updateEvolution();
-    });
-    </script>
 {% endblock %}

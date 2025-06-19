@@ -9,6 +9,7 @@ use Symfony\Component\Form\AbstractType;
 use Symfony\Component\Form\Extension\Core\Type\DateTimeType;
 use Symfony\Component\Form\Extension\Core\Type\IntegerType;
 use Symfony\Component\Form\Extension\Core\Type\TextareaType;
+use Symfony\Component\Form\Extension\Core\Type\TextType;
 use Symfony\Component\Form\FormBuilderInterface;
 use Symfony\Component\OptionsResolver\OptionsResolver;
 use Symfony\Component\Validator\Constraints\Callback;
@@ -18,12 +19,31 @@ class MarketWatchType extends AbstractType
 {
     public function buildForm(FormBuilderInterface $builder, array $options): void
     {
+        $isEdit = $options['is_edit'] ?? false;
+        
+        // Champ de recherche uniquement pour la création
+        if (!$isEdit) {
+            $builder->add('itemSearch', TextType::class, [
+                'label' => 'Rechercher une ressource',
+                'mapped' => false,
+                'required' => false,
+                'attr' => [
+                    'placeholder' => 'Tapez le nom de la ressource...',
+                    'data-autocomplete-target' => 'input',
+                    'data-action' => 'input->autocomplete#search'
+                ]
+            ]);
+        }
+        
         $builder
             ->add('item', EntityType::class, [
                 'class' => Item::class,
                 'choice_label' => 'name',
-                'label' => 'Ressource observée',
-                'attr' => ['class' => 'w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:border-blue-500']
+                'label' => $isEdit ? 'Ressource observée' : 'Ressource sélectionnée',
+                'attr' => array_merge(
+                    ['class' => 'w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:border-blue-500'],
+                    !$isEdit ? ['data-autocomplete-target' => 'hiddenId', 'style' => 'display: none;'] : []
+                )
             ])
             ->add('observedAt', DateTimeType::class, [
                 'widget' => 'single_text',
@@ -70,15 +90,13 @@ class MarketWatchType extends AbstractType
     {
         $resolver->setDefaults([
             'data_class' => MarketWatch::class,
+            'is_edit' => false,
             'constraints' => [
                 new Callback([$this, 'validateAtLeastOnePrice'])
             ]
         ]);
     }
 
-    /**
-     * Validation custom : au moins un prix doit être renseigné
-     */
     public function validateAtLeastOnePrice(MarketWatch $marketWatch, ExecutionContextInterface $context): void
     {
         if (!$marketWatch->hasAnyPrice()) {

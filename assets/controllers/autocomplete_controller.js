@@ -5,13 +5,9 @@ export default class extends Controller {
     static values = { url: String }
 
     connect() {
-        console.log('Autocomplete controller connected');
-        console.log('Available targets:', this.targets);
-        console.log('Input target exists:', this.hasInputTarget);
-        console.log('Results target exists:', this.hasResultsTarget);
-        console.log('HiddenId target exists:', this.hasHiddenIdTarget);
-        
         this.timeout = null;
+        this.cache = new Map();
+        this.abortController = null;
         this.hideResultsOnClick = this.hideResultsOnClick.bind(this);
         document.addEventListener('click', this.hideResultsOnClick);
     }
@@ -21,95 +17,111 @@ export default class extends Controller {
         if (this.timeout) {
             clearTimeout(this.timeout);
         }
+        if (this.abortController) {
+            this.abortController.abort();
+        }
     }
 
     search() {
-        console.log('Search triggered');
-        
-        if (!this.hasInputTarget) {
-            console.error('Input target not found');
-            return;
-        }
-        
-        if (!this.hasResultsTarget) {
-            console.error('Results target not found');
-            return;
-        }
-        
         clearTimeout(this.timeout);
-        const query = this.inputTarget.value.trim();
-        console.log('Query:', query);
+        
+        if (this.abortController) {
+            this.abortController.abort();
+        }
+        
+        const query = this.inputTarget.value.trim().toLowerCase();
         
         if (query.length < 2) {
             this.hideResults();
             return;
         }
 
+        if (this.cache.has(query)) {
+            this.displayResults(this.cache.get(query));
+            return;
+        }
+
         this.timeout = setTimeout(() => {
             this.fetchResults(query);
-        }, 300);
+        }, 150);
     }
 
     async fetchResults(query) {
         try {
-            const url = `${this.urlValue}?q=${encodeURIComponent(query)}&limit=10`;
-            console.log('Fetching:', url);
+            this.abortController = new AbortController();
             
-            const response = await fetch(url);
+            const url = `${this.urlValue}?q=${encodeURIComponent(query)}&limit=10`;
+            
+            const response = await fetch(url, {
+                signal: this.abortController.signal,
+                headers: {
+                    'Accept': 'application/json',
+                }
+            });
             
             if (!response.ok) {
-                throw new Error(`HTTP ${response.status}: ${response.statusText}`);
+                throw new Error(`HTTP ${response.status}`);
             }
             
             const data = await response.json();
-            console.log('API Response:', data);
-            this.displayResults(data.items || []);
+            const items = data.items || [];
+            
+            this.cache.set(query, items);
+            
+            if (this.cache.size > 50) {
+                const firstKey = this.cache.keys().next().value;
+                this.cache.delete(firstKey);
+            }
+            
+            this.displayResults(items);
         } catch (error) {
-            console.error('Search error:', error);
-            this.hideResults();
+            if (error.name !== 'AbortError') {
+                console.error('Search error:', error);
+                this.hideResults();
+            }
         }
     }
 
     displayResults(items) {
-        console.log('Displaying results:', items);
-        
         if (items.length === 0) {
             this.resultsTarget.innerHTML = '<div class="p-3 text-gray-400 text-center">Aucun item trouvé</div>';
             this.resultsTarget.classList.remove('hidden');
             return;
         }
 
-        this.resultsTarget.innerHTML = items.map(item => `
-            <div class="autocomplete-item p-3 hover:bg-gray-700 cursor-pointer border-b border-gray-600 last:border-b-0" 
-                 data-item-id="${item.id}" 
-                 data-item-name="${item.name}">
+        const fragment = document.createDocumentFragment();
+        
+        items.forEach(item => {
+            const div = document.createElement('div');
+            div.className = 'autocomplete-item p-3 hover:bg-gray-700 cursor-pointer border-b border-gray-600 last:border-b-0';
+            div.dataset.itemId = item.id;
+            div.dataset.itemName = item.name;
+            
+            div.innerHTML = `
                 <div class="text-white font-medium">${this.escapeHtml(item.name)}</div>
                 ${item.level ? `<div class="text-gray-400 text-sm">Niveau ${item.level}</div>` : ''}
                 ${item.type ? `<div class="text-blue-400 text-xs">${this.escapeHtml(item.type)}</div>` : ''}
-            </div>
-        `).join('');
+            `;
+            
+            fragment.appendChild(div);
+        });
 
+        this.resultsTarget.innerHTML = '';
+        this.resultsTarget.appendChild(fragment);
         this.resultsTarget.classList.remove('hidden');
     }
 
     selectItem(event) {
-        console.log('Item selection triggered');
         const item = event.target.closest('.autocomplete-item');
         if (!item) return;
 
         const itemId = item.dataset.itemId;
         const itemName = item.dataset.itemName;
-        console.log('Selected:', itemId, itemName);
 
-        // Mettre à jour le champ de recherche
         this.inputTarget.value = itemName;
         
-        // Mettre à jour le select caché
         if (this.hasHiddenIdTarget) {
             this.hiddenIdTarget.value = itemId;
-            console.log('Updated hidden field to:', itemId);
-            
-            // Déclencher l'événement change
             this.hiddenIdTarget.dispatchEvent(new Event('change', { bubbles: true }));
         }
         
