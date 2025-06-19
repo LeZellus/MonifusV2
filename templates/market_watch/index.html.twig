@@ -1,10 +1,10 @@
 {% extends 'base.html.twig' %}
 
-{% block title %}Surveillance du Marché{% endblock %}
+{% block title %}Observation des Prix{% endblock %}
 
 {% block navbar %}
     {% include 'components/navbar.html.twig' with {
-        'title': 'Surveillance du Marché',
+        'title': 'Observation des Prix',
         'back_url': path('app_trading_dashboard'),
         'back_label': '← Dashboard'
     } %}
@@ -18,68 +18,74 @@
         {% if selectedCharacter %}
             <div class="flex justify-between items-center">
                 <h2 class="text-white text-2xl font-bold">
-                    Surveillances de {{ selectedCharacter.name }}
+                    Items observés par {{ selectedCharacter.name }}
                 </h2>
                 <a href="{{ path('app_market_watch_new') }}" 
                    class="bg-orange-600 hover:bg-orange-700 text-white px-4 py-2 rounded-lg transition-colors">
-                    + Nouvelle surveillance
+                    + Nouvelle observation
                 </a>
             </div>
 
-            {% if watch_list|length > 0 %}
-                <div class="bg-gray-800 rounded-lg overflow-hidden">
+            {% if items_data|length > 0 %}
+                <!-- Vue desktop -->
+                <div class="hidden lg:block bg-gray-800 rounded-lg overflow-hidden">
                     <table class="w-full">
                         <thead class="bg-gray-700">
                             <tr>
-                                <th class="px-6 py-3 text-left text-xs font-medium text-gray-300 uppercase tracking-wider">Item</th>
-                                <th class="px-6 py-3 text-left text-xs font-medium text-gray-300 uppercase tracking-wider">Lot</th>
-                                <th class="px-6 py-3 text-left text-xs font-medium text-gray-300 uppercase tracking-wider">Prix Observé</th>
-                                <th class="px-6 py-3 text-left text-xs font-medium text-gray-300 uppercase tracking-wider">Type</th>
-                                <th class="px-6 py-3 text-left text-xs font-medium text-gray-300 uppercase tracking-wider">Notes</th>
-                                <th class="px-6 py-3 text-left text-xs font-medium text-gray-300 uppercase tracking-wider">Dernière MAJ</th>
+                                <th class="px-6 py-3 text-left text-xs font-medium text-gray-300 uppercase tracking-wider">Ressource</th>
+                                <th class="px-6 py-3 text-left text-xs font-medium text-gray-300 uppercase tracking-wider">Moy. x1</th>
+                                <th class="px-6 py-3 text-left text-xs font-medium text-gray-300 uppercase tracking-wider">Moy. x10</th>
+                                <th class="px-6 py-3 text-left text-xs font-medium text-gray-300 uppercase tracking-wider">Moy. x100</th>
+                                <th class="px-6 py-3 text-left text-xs font-medium text-gray-300 uppercase tracking-wider">Suivi</th>
                                 <th class="px-6 py-3 text-left text-xs font-medium text-gray-300 uppercase tracking-wider">Actions</th>
                             </tr>
                         </thead>
                         <tbody class="divide-y divide-gray-700">
-                            {% for watch in watch_list %}
+                            {% for data in items_data %}
                                 <tr class="hover:bg-gray-700">
                                     <td class="px-6 py-4 whitespace-nowrap">
-                                        <div class="text-white font-medium">{{ watch.item.name }}</div>
-                                        <div class="text-gray-400 text-sm">Niv.{{ watch.item.level }}</div>
-                                    </td>
-                                    <td class="px-6 py-4 whitespace-nowrap text-white">
-                                        {{ watch.lotSize }}
-                                    </td>
-                                    <td class="px-6 py-4 whitespace-nowrap text-white">
-                                        {{ (watch.observedPrice / 1000)|number_format(0, ',', ' ') }}k
+                                        <a href="{{ path('app_market_watch_history', {itemId: data.item.id}) }}" class="text-white font-medium hover:text-blue-400 transition-colors">
+                                            {{ data.item.name }}
+                                        </a>
+                                        <div class="text-gray-400 text-sm">Niv.{{ data.item.level ?? 'N/A' }}</div>
                                     </td>
                                     <td class="px-6 py-4 whitespace-nowrap">
-                                        <span class="px-2 inline-flex text-xs leading-5 font-semibold rounded-full 
-                                                   {{ watch.priceType.value == 'Acheter' ? 'bg-red-100 text-red-800' : 'bg-green-100 text-green-800' }}">
-                                            {{ watch.priceType.value == 'Acheter' ? 'Achat' : 'Vente' }}
-                                        </span>
+                                        {% if data.avg_price_unit %}
+                                            <div class="text-green-400 font-medium">{{ (data.avg_price_unit / 1000)|number_format(0, ',', ' ') }}k</div>
+                                            <div class="text-gray-500 text-xs">{{ data.price_unit_count }} obs</div>
+                                        {% else %}
+                                            <span class="text-gray-500">-</span>
+                                        {% endif %}
                                     </td>
-                                    <td class="px-6 py-4 text-gray-300 max-w-xs">
-                                        {% if watch.notes %}
-                                            <div class="truncate" title="{{ watch.notes }}">
-                                                {{ watch.notes|slice(0, 50) }}{{ watch.notes|length > 50 ? '...' : '' }}
-                                            </div>
+                                    <td class="px-6 py-4 whitespace-nowrap">
+                                        {% if data.avg_price_10 %}
+                                            <div class="text-blue-400 font-medium">{{ (data.avg_price_10 / 1000)|number_format(0, ',', ' ') }}k</div>
+                                            <div class="text-gray-500 text-xs">{{ data.price_10_count }} obs</div>
+                                        {% else %}
+                                            <span class="text-gray-500">-</span>
+                                        {% endif %}
+                                    </td>
+                                    <td class="px-6 py-4 whitespace-nowrap">
+                                        {% if data.avg_price_100 %}
+                                            <div class="text-purple-400 font-medium">{{ (data.avg_price_100 / 1000)|number_format(0, ',', ' ') }}k</div>
+                                            <div class="text-gray-500 text-xs">{{ data.price_100_count }} obs</div>
                                         {% else %}
                                             <span class="text-gray-500">-</span>
                                         {% endif %}
                                     </td>
                                     <td class="px-6 py-4 whitespace-nowrap text-gray-300 text-sm">
-                                        {{ watch.updatedAt|date('d/m/Y H:i') }}
+                                        <div class="font-medium">{{ data.observation_count }} observations</div>
+                                        <div class="text-gray-500 text-xs">
+                                            {% if data.tracking_period_days > 0 %}
+                                                sur {{ data.tracking_period_days }} jour{{ data.tracking_period_days > 1 ? 's' : '' }}
+                                            {% else %}
+                                                même jour
+                                            {% endif %}
+                                        </div>
                                     </td>
                                     <td class="px-6 py-4 whitespace-nowrap text-sm">
-                                        <div class="flex space-x-2">
-                                            <a href="{{ path('app_market_watch_edit', {id: watch.id}) }}" 
-                                               class="text-blue-400 hover:text-blue-300">Modifier</a>
-                                            <form action="{{ path('app_market_watch_delete', {id: watch.id}) }}" method="post" 
-                                                  onsubmit="return confirm('Êtes-vous sûr de vouloir supprimer cette surveillance ?')" class="inline">
-                                                <button type="submit" class="text-red-400 hover:text-red-300">Supprimer</button>
-                                            </form>
-                                        </div>
+                                        <a href="{{ path('app_market_watch_history', {itemId: data.item.id}) }}" 
+                                           class="text-blue-400 hover:text-blue-300">Voir historique</a>
                                     </td>
                                 </tr>
                             {% endfor %}
@@ -87,35 +93,108 @@
                     </table>
                 </div>
 
+                <!-- Vue mobile -->
+                <div class="lg:hidden space-y-4">
+                    {% for data in items_data %}
+                        <div class="wrapper-background">
+                            <div class="flex justify-between items-start mb-3">
+                                <div>
+                                    <a href="{{ path('app_market_watch_history', {itemId: data.item.id}) }}" class="text-white font-medium hover:text-blue-400 transition-colors">
+                                        {{ data.item.name }}
+                                    </a>
+                                    <p class="text-gray-400 text-sm">Niv.{{ data.item.level ?? 'N/A' }}</p>
+                                </div>
+                                <div class="text-right">
+                                    <span class="bg-orange-600 text-orange-100 px-2 py-1 rounded-full text-xs">
+                                        {{ data.observation_count }} obs
+                                    </span>
+                                    <div class="text-gray-400 text-xs mt-1">
+                                        {% if data.tracking_period_days > 0 %}
+                                            {{ data.tracking_period_days }}j
+                                        {% else %}
+                                            1j
+                                        {% endif %}
+                                    </div>
+                                </div>
+                            </div>
+
+                            <div class="grid grid-cols-3 gap-2 mb-3 text-center">
+                                <div class="bg-gray-700 rounded p-2">
+                                    <div class="text-gray-400 text-xs">Moy. x1</div>
+                                    {% if data.avg_price_unit %}
+                                        <div class="text-green-400 text-sm font-medium">{{ (data.avg_price_unit / 1000)|number_format(0, ',', ' ') }}k</div>
+                                        <div class="text-gray-500 text-xs">{{ data.price_unit_count }}</div>
+                                    {% else %}
+                                        <div class="text-gray-500 text-sm">-</div>
+                                    {% endif %}
+                                </div>
+                                <div class="bg-gray-700 rounded p-2">
+                                    <div class="text-gray-400 text-xs">Moy. x10</div>
+                                    {% if data.avg_price_10 %}
+                                        <div class="text-blue-400 text-sm font-medium">{{ (data.avg_price_10 / 1000)|number_format(0, ',', ' ') }}k</div>
+                                        <div class="text-gray-500 text-xs">{{ data.price_10_count }}</div>
+                                    {% else %}
+                                        <div class="text-gray-500 text-sm">-</div>
+                                    {% endif %}
+                                </div>
+                                <div class="bg-gray-700 rounded p-2">
+                                    <div class="text-gray-400 text-xs">Moy. x100</div>
+                                    {% if data.avg_price_100 %}
+                                        <div class="text-purple-400 text-sm font-medium">{{ (data.avg_price_100 / 1000)|number_format(0, ',', ' ') }}k</div>
+                                        <div class="text-gray-500 text-xs">{{ data.price_100_count }}</div>
+                                    {% else %}
+                                        <div class="text-gray-500 text-sm">-</div>
+                                    {% endif %}
+                                </div>
+                            </div>
+
+                            <div class="text-center">
+                                <a href="{{ path('app_market_watch_history', {itemId: data.item.id}) }}" 
+                                   class="bg-blue-600 hover:bg-blue-700 text-white text-center py-2 px-4 rounded text-sm transition-colors">
+                                    Voir l'historique
+                                </a>
+                            </div>
+                        </div>
+                    {% endfor %}
+                </div>
+
                 <div class="mt-6 wrapper-background">
                     <h3 class="text-white font-semibold mb-2">📊 Résumé pour {{ selectedCharacter.name }}</h3>
-                    <div class="grid grid-cols-1 md:grid-cols-3 gap-4 text-sm">
+                    <div class="grid grid-cols-1 md:grid-cols-4 gap-4 text-sm">
                         <div class="text-gray-300">
-                            <span class="font-medium">Total surveillances :</span> {{ watch_list|length }}
+                            <span class="font-medium">Items suivis :</span> {{ items_data|length }}
                         </div>
                         <div class="text-gray-300">
-                            <span class="font-medium">Prix d'achat :</span> 
-                            {{ watch_list|filter(w => w.priceType.value == 'Acheter')|length }}
+                            <span class="font-medium">Total observations :</span> 
+                            {% set total_obs = 0 %}
+                            {% for data in items_data %}
+                                {% set total_obs = total_obs + data.observation_count %}
+                            {% endfor %}
+                            {{ total_obs }}
                         </div>
                         <div class="text-gray-300">
-                            <span class="font-medium">Prix de vente :</span> 
-                            {{ watch_list|filter(w => w.priceType.value == 'Vendre')|length }}
+                            <span class="font-medium">Items avec prix x1 :</span> 
+                            {{ items_data|filter(d => d.avg_price_unit is not null)|length }}
+                        </div>
+                        <div class="text-gray-300">
+                            <span class="font-medium">Items avec prix x100 :</span> 
+                            {{ items_data|filter(d => d.avg_price_100 is not null)|length }}
                         </div>
                     </div>
                 </div>
             {% else %}
                 <div class="text-center py-12">
-                    <p class="text-gray-400 text-lg mb-4">Aucune surveillance pour {{ selectedCharacter.name }}</p>
+                    <p class="text-gray-400 text-lg mb-4">Aucune observation pour {{ selectedCharacter.name }}</p>
                     <a href="{{ path('app_market_watch_new') }}" 
                        class="bg-orange-600 hover:bg-orange-700 text-white px-6 py-3 rounded-lg transition-colors">
-                        Créer la première surveillance
+                        Créer la première observation
                     </a>
                 </div>
             {% endif %}
         {% else %}
             <!-- Aucun personnage sélectionné -->
             <div class="text-center py-12">
-                <p class="text-gray-400 text-lg mb-4">Sélectionnez un personnage pour voir ses surveillances</p>
+                <p class="text-gray-400 text-lg mb-4">Sélectionnez un personnage pour voir ses observations</p>
             </div>
         {% endif %}
     </div>

@@ -1,0 +1,212 @@
+{% extends 'base.html.twig' %}
+
+{% block title %}Historique des prix - {{ item.name }}{% endblock %}
+
+{% block navbar %}
+    {% include 'components/navbar.html.twig' with {
+        'title': 'Historique - ' ~ item.name,
+        'back_url': path('app_market_watch_index'),
+        'back_label': '← Observations'
+    } %}
+{% endblock %}
+
+{% block body %}
+    <div class="wrapper-container">
+        <!-- En-tête avec info item -->
+        <div class="wrapper-background mb-6">
+            <div class="flex items-center space-x-4">
+                <div class="w-16 h-16 bg-gradient-to-br from-orange-500 to-red-500 rounded-lg flex items-center justify-center">
+                    <span class="text-white font-bold text-xl">{{ item.name|first|upper }}</span>
+                </div>
+                <div>
+                    <h2 class="text-white text-2xl font-bold">{{ item.name }}</h2>
+                    <p class="text-gray-400">
+                        {% if item.level %}Niveau {{ item.level }} • {% endif %}
+                        {{ item.itemType ? item.itemType.value : 'Type non défini' }}
+                    </p>
+                </div>
+                <div class="ml-auto text-right">
+                    <div class="text-orange-400 font-semibold">📈 Historique des Prix</div>
+                    <div class="text-gray-400 text-sm">{{ character.name }} • {{ character.server.name }}</div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Statistiques rapides -->
+        <div class="grid grid-cols-1 md:grid-cols-4 gap-4 mb-6">
+            <div class="wrapper-background text-center">
+                <div class="text-2xl font-bold text-blue-400">{{ price_history|length }}</div>
+                <div class="text-gray-400 text-sm">Observations total</div>
+            </div>
+            <div class="wrapper-background text-center">
+                <div class="text-lg font-bold text-green-400">
+                    {% if averages.avg_price_unit %}
+                        {{ (averages.avg_price_unit / 1000)|number_format(0, ',', ' ') }}k
+                    {% else %}
+                        -
+                    {% endif %}
+                </div>
+                <div class="text-gray-400 text-sm">
+                    Moyenne x1 
+                    {% if averages.price_unit_count > 0 %}
+                        ({{ averages.price_unit_count }} obs)
+                    {% endif %}
+                </div>
+            </div>
+            <div class="wrapper-background text-center">
+                <div class="text-lg font-bold text-blue-400">
+                    {% if averages.avg_price_10 %}
+                        {{ (averages.avg_price_10 / 1000)|number_format(0, ',', ' ') }}k
+                    {% else %}
+                        -
+                    {% endif %}
+                </div>
+                <div class="text-gray-400 text-sm">
+                    Moyenne x10
+                    {% if averages.price_10_count > 0 %}
+                        ({{ averages.price_10_count }} obs)
+                    {% endif %}
+                </div>
+            </div>
+            <div class="wrapper-background text-center">
+                <div class="text-lg font-bold text-purple-400">
+                    {% if averages.avg_price_100 %}
+                        {{ (averages.avg_price_100 / 1000)|number_format(0, ',', ' ') }}k
+                    {% else %}
+                        -
+                    {% endif %}
+                </div>
+                <div class="text-gray-400 text-sm">
+                    Moyenne x100
+                    {% if averages.price_100_count > 0 %}
+                        ({{ averages.price_100_count }} obs)
+                    {% endif %}
+                </div>
+            </div>
+        </div>
+
+        <!-- Actions -->
+        <div class="flex justify-between items-center mb-6">
+            <h3 class="text-white text-xl font-bold">Évolution des prix</h3>
+            <a href="{{ path('app_market_watch_new') }}" 
+               class="bg-orange-600 hover:bg-orange-700 text-white px-4 py-2 rounded-lg transition-colors">
+                + Nouvelle observation
+            </a>
+        </div>
+
+        <!-- Timeline des prix -->
+        <div class="space-y-4">
+            {% for observation in price_history %}
+                {% set isLatest = loop.first %}
+                {% set isOldest = loop.last %}
+                
+                <div class="wrapper-background border-l-4 {{ isLatest ? 'border-green-500' : (isOldest ? 'border-gray-500' : 'border-blue-500') }}">
+                    <div class="flex justify-between items-start mb-4">
+                        <div>
+                            <div class="flex items-center space-x-2">
+                                <h4 class="text-white font-semibold">{{ observation.observedAt|date('d/m/Y à H:i') }}</h4>
+                                {% if isLatest %}
+                                    <span class="bg-green-600 text-green-100 px-2 py-1 rounded-full text-xs">RÉCENT</span>
+                                {% elseif isOldest %}
+                                    <span class="bg-gray-600 text-gray-100 px-2 py-1 rounded-full text-xs">PREMIER</span>
+                                {% endif %}
+                            </div>
+                            <p class="text-gray-400 text-sm">
+                                Il y a {{ (observation.observedAt.diff(date())).days }} jour(s)
+                            </p>
+                        </div>
+                        <div class="flex space-x-2">
+                            <a href="{{ path('app_market_watch_edit', {id: observation.id}) }}" 
+                               class="text-blue-400 hover:text-blue-300 text-sm">Modifier</a>
+                        </div>
+                    </div>
+
+                    <!-- Prix observés -->
+                    <div class="grid grid-cols-1 md:grid-cols-3 gap-4 mb-4">
+                        <div class="bg-gray-700 rounded-lg p-3">
+                            <div class="text-gray-400 text-sm mb-1">Prix x1</div>
+                            {% if observation.pricePerUnit %}
+                                <div class="text-green-400 text-lg font-bold">{{ (observation.pricePerUnit / 1000)|number_format(0, ',', ' ') }}k</div>
+                                {% if not loop.last %}
+                                    {% set prevObservation = price_history[loop.index] %}
+                                    {% if prevObservation.pricePerUnit %}
+                                        {% set diff = observation.pricePerUnit - prevObservation.pricePerUnit %}
+                                        {% if diff != 0 %}
+                                            <div class="text-{{ diff > 0 ? 'red' : 'green' }}-400 text-xs">
+                                                {{ diff > 0 ? '↗' : '↘' }} {{ (diff / 1000)|number_format(0, ',', ' ') }}k
+                                            </div>
+                                        {% endif %}
+                                    {% endif %}
+                                {% endif %}
+                            {% else %}
+                                <div class="text-gray-500">Non observé</div>
+                            {% endif %}
+                        </div>
+
+                        <div class="bg-gray-700 rounded-lg p-3">
+                            <div class="text-gray-400 text-sm mb-1">Prix x10</div>
+                            {% if observation.pricePer10 %}
+                                <div class="text-blue-400 text-lg font-bold">{{ (observation.pricePer10 / 1000)|number_format(0, ',', ' ') }}k</div>
+                                {% if not loop.last %}
+                                    {% set prevObservation = price_history[loop.index] %}
+                                    {% if prevObservation.pricePer10 %}
+                                        {% set diff = observation.pricePer10 - prevObservation.pricePer10 %}
+                                        {% if diff != 0 %}
+                                            <div class="text-{{ diff > 0 ? 'red' : 'green' }}-400 text-xs">
+                                                {{ diff > 0 ? '↗' : '↘' }} {{ (diff / 1000)|number_format(0, ',', ' ') }}k
+                                            </div>
+                                        {% endif %}
+                                    {% endif %}
+                                {% endif %}
+                            {% else %}
+                                <div class="text-gray-500">Non observé</div>
+                            {% endif %}
+                        </div>
+
+                        <div class="bg-gray-700 rounded-lg p-3">
+                            <div class="text-gray-400 text-sm mb-1">Prix x100</div>
+                            {% if observation.pricePer100 %}
+                                <div class="text-purple-400 text-lg font-bold">{{ (observation.pricePer100 / 1000)|number_format(0, ',', ' ') }}k</div>
+                                {% if not loop.last %}
+                                    {% set prevObservation = price_history[loop.index] %}
+                                    {% if prevObservation.pricePer100 %}
+                                        {% set diff = observation.pricePer100 - prevObservation.pricePer100 %}
+                                        {% if diff != 0 %}
+                                            <div class="text-{{ diff > 0 ? 'red' : 'green' }}-400 text-xs">
+                                                {{ diff > 0 ? '↗' : '↘' }} {{ (diff / 1000)|number_format(0, ',', ' ') }}k
+                                            </div>
+                                        {% endif %}
+                                    {% endif %}
+                                {% endif %}
+                            {% else %}
+                                <div class="text-gray-500">Non observé</div>
+                            {% endif %}
+                        </div>
+                    </div>
+
+                    <!-- Notes -->
+                    {% if observation.notes %}
+                        <div class="bg-gray-700 bg-opacity-50 rounded-lg p-3">
+                            <div class="text-gray-400 text-sm mb-1">📝 Notes :</div>
+                            <p class="text-gray-300 text-sm italic">"{{ observation.notes }}"</p>
+                        </div>
+                    {% endif %}
+                </div>
+            {% endfor %}
+        </div>
+
+        <!-- Conseils -->
+        <div class="mt-8 bg-gradient-to-r from-blue-600 to-indigo-600 rounded-lg p-4">
+            <h4 class="text-white font-semibold mb-2 flex items-center">
+                <span class="mr-2">💡</span>
+                Analyser l'évolution
+            </h4>
+            <div class="text-blue-100 text-sm space-y-1">
+                <p>• 📈 Les flèches indiquent l'évolution par rapport à l'observation précédente</p>
+                <p>• 🔄 Ajoutez régulièrement de nouvelles observations pour suivre les tendances</p>
+                <p>• 💰 Utilisez ces données pour optimiser vos achats et ventes</p>
+                <p>• 📊 Plus vous avez de données, plus vos analyses seront précises</p>
+            </div>
+        </div>
+    </div>
+{% endblock %}

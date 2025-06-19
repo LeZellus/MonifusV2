@@ -10,7 +10,7 @@ use Doctrine\Migrations\AbstractMigration;
 /**
  * Auto-generated Migration: Please modify to your needs!
  */
-final class Version20250619051846 extends AbstractMigration
+final class Version20250619155512 extends AbstractMigration
 {
     public function getDescription(): string
     {
@@ -39,10 +39,10 @@ final class Version20250619051846 extends AbstractMigration
             CREATE TABLE lot_group (id INT AUTO_INCREMENT NOT NULL, dofus_character_id INT NOT NULL, item_id INT NOT NULL, lot_size INT NOT NULL, buy_price_per_lot BIGINT NOT NULL, sell_price_per_lot BIGINT NOT NULL, status VARCHAR(255) NOT NULL, sale_unit INT NOT NULL, created_at DATETIME NOT NULL COMMENT '(DC2Type:datetime_immutable)', updated_at DATETIME NOT NULL COMMENT '(DC2Type:datetime_immutable)', INDEX IDX_1B8829CBB3033844 (dofus_character_id), INDEX IDX_1B8829CB126F525E (item_id), PRIMARY KEY(id)) DEFAULT CHARACTER SET utf8mb4 COLLATE `utf8mb4_unicode_ci` ENGINE = InnoDB
         SQL);
         $this->addSql(<<<'SQL'
-            CREATE TABLE lot_unit (id INT AUTO_INCREMENT NOT NULL, lot_group_id INT NOT NULL, sold_at DATETIME DEFAULT NULL, actual_sell_price INT DEFAULT NULL, notes LONGTEXT DEFAULT NULL, INDEX IDX_489792135C9E2873 (lot_group_id), PRIMARY KEY(id)) DEFAULT CHARACTER SET utf8mb4 COLLATE `utf8mb4_unicode_ci` ENGINE = InnoDB
+            CREATE TABLE lot_unit (id INT AUTO_INCREMENT NOT NULL, lot_group_id INT NOT NULL, sold_at DATETIME DEFAULT NULL, actual_sell_price INT DEFAULT NULL, quantity_sold INT NOT NULL, notes LONGTEXT DEFAULT NULL, INDEX IDX_489792135C9E2873 (lot_group_id), PRIMARY KEY(id)) DEFAULT CHARACTER SET utf8mb4 COLLATE `utf8mb4_unicode_ci` ENGINE = InnoDB
         SQL);
         $this->addSql(<<<'SQL'
-            CREATE TABLE market_watch (id INT AUTO_INCREMENT NOT NULL, dofus_character_id INT NOT NULL, item_id INT NOT NULL, lot_size INT NOT NULL, observed_price BIGINT NOT NULL, price_type VARCHAR(255) NOT NULL, notes LONGTEXT DEFAULT NULL, created_at DATETIME NOT NULL COMMENT '(DC2Type:datetime_immutable)', updated_at DATETIME NOT NULL COMMENT '(DC2Type:datetime_immutable)', INDEX IDX_9B25F553B3033844 (dofus_character_id), INDEX IDX_9B25F553126F525E (item_id), PRIMARY KEY(id)) DEFAULT CHARACTER SET utf8mb4 COLLATE `utf8mb4_unicode_ci` ENGINE = InnoDB
+            CREATE TABLE market_watch (id INT AUTO_INCREMENT NOT NULL, item_id INT NOT NULL, dofus_character_id INT NOT NULL, price_per_unit BIGINT DEFAULT NULL, price_per10 BIGINT DEFAULT NULL, price_per100 BIGINT DEFAULT NULL, notes LONGTEXT DEFAULT NULL, observed_at DATETIME NOT NULL COMMENT '(DC2Type:datetime_immutable)', created_at DATETIME NOT NULL COMMENT '(DC2Type:datetime_immutable)', updated_at DATETIME NOT NULL COMMENT '(DC2Type:datetime_immutable)', INDEX IDX_9B25F553126F525E (item_id), INDEX IDX_9B25F553B3033844 (dofus_character_id), PRIMARY KEY(id)) DEFAULT CHARACTER SET utf8mb4 COLLATE `utf8mb4_unicode_ci` ENGINE = InnoDB
         SQL);
         $this->addSql(<<<'SQL'
             CREATE TABLE server (id INT AUTO_INCREMENT NOT NULL, name VARCHAR(255) NOT NULL, community VARCHAR(50) NOT NULL, PRIMARY KEY(id)) DEFAULT CHARACTER SET utf8mb4 COLLATE `utf8mb4_unicode_ci` ENGINE = InnoDB
@@ -81,10 +81,10 @@ final class Version20250619051846 extends AbstractMigration
             ALTER TABLE lot_unit ADD CONSTRAINT FK_489792135C9E2873 FOREIGN KEY (lot_group_id) REFERENCES lot_group (id)
         SQL);
         $this->addSql(<<<'SQL'
-            ALTER TABLE market_watch ADD CONSTRAINT FK_9B25F553B3033844 FOREIGN KEY (dofus_character_id) REFERENCES dofus_character (id)
+            ALTER TABLE market_watch ADD CONSTRAINT FK_9B25F553126F525E FOREIGN KEY (item_id) REFERENCES item (id)
         SQL);
         $this->addSql(<<<'SQL'
-            ALTER TABLE market_watch ADD CONSTRAINT FK_9B25F553126F525E FOREIGN KEY (item_id) REFERENCES item (id)
+            ALTER TABLE market_watch ADD CONSTRAINT FK_9B25F553B3033844 FOREIGN KEY (dofus_character_id) REFERENCES dofus_character (id)
         SQL);
         $this->addSql(<<<'SQL'
             ALTER TABLE trading_profile ADD CONSTRAINT FK_E44B7B64A76ED395 FOREIGN KEY (user_id) REFERENCES user (id)
@@ -119,10 +119,10 @@ final class Version20250619051846 extends AbstractMigration
             ALTER TABLE lot_unit DROP FOREIGN KEY FK_489792135C9E2873
         SQL);
         $this->addSql(<<<'SQL'
-            ALTER TABLE market_watch DROP FOREIGN KEY FK_9B25F553B3033844
+            ALTER TABLE market_watch DROP FOREIGN KEY FK_9B25F553126F525E
         SQL);
         $this->addSql(<<<'SQL'
-            ALTER TABLE market_watch DROP FOREIGN KEY FK_9B25F553126F525E
+            ALTER TABLE market_watch DROP FOREIGN KEY FK_9B25F553B3033844
         SQL);
         $this->addSql(<<<'SQL'
             ALTER TABLE trading_profile DROP FOREIGN KEY FK_E44B7B64A76ED395

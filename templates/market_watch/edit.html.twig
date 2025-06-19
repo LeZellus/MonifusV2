@@ -1,10 +1,10 @@
 {% extends 'base.html.twig' %}
 
-{% block title %}Nouvelle Observation - {{ character.name }}{% endblock %}
+{% block title %}Modifier l'observation - {{ market_watch.item.name }}{% endblock %}
 
 {% block navbar %}
     {% include 'components/navbar.html.twig' with {
-        'title': 'Nouvelle Observation - ' ~ character.name,
+        'title': 'Modifier l\'observation - ' ~ market_watch.item.name,
         'back_url': path('app_market_watch_index')
     } %}
 {% endblock %}
@@ -12,53 +12,73 @@
 {% block body %}
     <div class="wrapper-container">
         <div class="max-w-2xl mx-auto">
-            <!-- En-tête avec info personnage -->
+            <!-- En-tête avec info -->
             <div class="wrapper-background mb-6">
                 <div class="flex items-center space-x-4">
                     <div class="w-12 h-12 bg-orange-500 rounded-full flex items-center justify-center">
-                        <span class="text-white font-bold text-lg">{{ character.name|first|upper }}</span>
+                        <span class="text-white font-bold text-lg">{{ market_watch.item.name|first|upper }}</span>
                     </div>
                     <div>
-                        <h2 class="text-white text-xl font-semibold">{{ character.name }}</h2>
-                        <p class="text-gray-400">{{ character.classe.name }} • {{ character.server.name }}</p>
+                        <h2 class="text-white text-xl font-semibold">{{ market_watch.item.name }}</h2>
+                        <p class="text-gray-400">Observé le {{ market_watch.observedAt|date('d/m/Y à H:i') }}</p>
                     </div>
                     <div class="ml-auto text-right">
-                        <div class="text-orange-400 font-semibold">📊 Nouvelle Observation</div>
-                        <div class="text-gray-400 text-sm">Observer les prix du marché</div>
+                        <div class="text-orange-400 font-semibold">📝 Modifier Observation</div>
+                        <div class="text-gray-400 text-sm">{{ market_watch.dofusCharacter.name }}</div>
                     </div>
                 </div>
             </div>
 
-            <!-- Explication du système -->
-            <div class="bg-gradient-to-r from-orange-600 to-red-600 rounded-lg p-4 mb-6">
-                <h3 class="text-white font-bold mb-2 flex items-center">
-                    <span class="text-xl mr-2">💡</span>
-                    Comment ça marche ?
+            <!-- Historique récent pour contexte -->
+            <div class="wrapper-background mb-6">
+                <h3 class="text-white font-semibold mb-3 flex items-center">
+                    <span class="mr-2">📈</span>
+                    Prix actuels à modifier
                 </h3>
-                <div class="text-orange-100 text-sm space-y-1">
-                    <p>• 📋 Observez les prix sur l'hôtel de vente de votre serveur</p>
-                    <p>• 🔢 Notez les prix par unité (x1), par 10 (x10) et/ou par 100 (x100)</p>
-                    <p>• 📈 Répétez régulièrement pour suivre l'évolution des prix</p>
-                    <p>• 💰 Identifiez les meilleures opportunités d'achat/vente</p>
+                <div class="grid grid-cols-3 gap-4">
+                    <div class="bg-gray-700 rounded-lg p-3 text-center">
+                        <div class="text-gray-400 text-sm">Prix x1</div>
+                        {% if market_watch.pricePerUnit %}
+                            <div class="text-green-400 text-lg font-bold">{{ (market_watch.pricePerUnit / 1000)|number_format(0, ',', ' ') }}k</div>
+                        {% else %}
+                            <div class="text-gray-500">Non renseigné</div>
+                        {% endif %}
+                    </div>
+                    <div class="bg-gray-700 rounded-lg p-3 text-center">
+                        <div class="text-gray-400 text-sm">Prix x10</div>
+                        {% if market_watch.pricePer10 %}
+                            <div class="text-blue-400 text-lg font-bold">{{ (market_watch.pricePer10 / 1000)|number_format(0, ',', ' ') }}k</div>
+                        {% else %}
+                            <div class="text-gray-500">Non renseigné</div>
+                        {% endif %}
+                    </div>
+                    <div class="bg-gray-700 rounded-lg p-3 text-center">
+                        <div class="text-gray-400 text-sm">Prix x100</div>
+                        {% if market_watch.pricePer100 %}
+                            <div class="text-purple-400 text-lg font-bold">{{ (market_watch.pricePer100 / 1000)|number_format(0, ',', ' ') }}k</div>
+                        {% else %}
+                            <div class="text-gray-500">Non renseigné</div>
+                        {% endif %}
+                    </div>
                 </div>
             </div>
 
-            <!-- Formulaire principal -->
+            <!-- Formulaire de modification -->
             <div class="wrapper-background">
                 <h3 class="text-white text-lg font-semibold mb-6 flex items-center">
-                    <span class="text-2xl mr-3">📝</span>
-                    Observer les prix du marché
+                    <span class="text-2xl mr-3">🔄</span>
+                    Mettre à jour les prix
                 </h3>
 
                 {{ form_start(form) }}
                 
                 <div class="space-y-6">
-                    <!-- Ressource -->
+                    <!-- Ressource (lecture seule) -->
                     <div>
                         {{ form_label(form.item, null, {'label_attr': {'class': 'block text-white font-medium mb-2'}}) }}
-                        {{ form_widget(form.item, {'attr': {'class': 'w-full px-4 py-3 border border-gray-600 bg-gray-700 text-white rounded-lg focus:outline-none focus:border-orange-500 focus:ring-2 focus:ring-orange-500 focus:ring-opacity-20'}}) }}
+                        {{ form_widget(form.item, {'attr': {'class': 'w-full px-4 py-3 border border-gray-600 bg-gray-700 text-white rounded-lg focus:outline-none focus:border-orange-500 focus:ring-2 focus:ring-orange-500 focus:ring-opacity-20', 'readonly': true}}) }}
                         {{ form_errors(form.item) }}
-                        <div class="text-gray-400 text-sm mt-1">🔍 Quelle ressource observez-vous ?</div>
+                        <div class="text-gray-400 text-sm mt-1">🔒 Ressource observée (non modifiable)</div>
                     </div>
 
                     <!-- Date d'observation -->
@@ -66,17 +86,17 @@
                         {{ form_label(form.observedAt, null, {'label_attr': {'class': 'block text-white font-medium mb-2'}}) }}
                         {{ form_widget(form.observedAt, {'attr': {'class': 'w-full px-4 py-3 border border-gray-600 bg-gray-700 text-white rounded-lg focus:outline-none focus:border-orange-500 focus:ring-2 focus:ring-orange-500 focus:ring-opacity-20'}}) }}
                         {{ form_errors(form.observedAt) }}
-                        <div class="text-gray-400 text-sm mt-1">📅 Quand avez-vous observé ces prix ?</div>
+                        <div class="text-gray-400 text-sm mt-1">📅 Date de cette observation</div>
                     </div>
 
                     <!-- Prix observés -->
                     <div class="bg-gradient-to-r from-blue-600 to-purple-600 rounded-lg p-4">
                         <h4 class="text-white font-semibold mb-4 flex items-center">
                             <span class="mr-2">💰</span>
-                            Prix observés sur l'hôtel de vente
+                            Nouveaux prix observés
                         </h4>
                         <div class="text-blue-100 text-sm mb-4">
-                            Renseignez au moins un prix. Laissez vide si cette unité n'est pas disponible.
+                            Modifiez les prix selon vos dernières observations. Laissez vide pour supprimer un prix.
                         </div>
                         
                         <div class="grid grid-cols-1 md:grid-cols-3 gap-4">
@@ -123,28 +143,28 @@
                         {{ form_label(form.notes, null, {'label_attr': {'class': 'block text-white font-medium mb-2'}}) }}
                         {{ form_widget(form.notes, {'attr': {'class': 'w-full px-4 py-3 border border-gray-600 bg-gray-700 text-white rounded-lg focus:outline-none focus:border-orange-500 focus:ring-2 focus:ring-orange-500 focus:ring-opacity-20', 'rows': 3}}) }}
                         {{ form_errors(form.notes) }}
-                        <div class="text-gray-400 text-sm mt-1">📝 Contexte du marché, tendances observées...</div>
+                        <div class="text-gray-400 text-sm mt-1">📝 Contexte du marché, évolutions observées...</div>
                     </div>
                 </div>
 
-                <!-- Calcul automatique du prix unitaire -->
-                <div id="price-analysis" class="mt-6 bg-gradient-to-r from-green-600 to-teal-600 rounded-lg p-4" style="display: none;">
+                <!-- Évolution des prix (si possible) -->
+                <div id="price-evolution" class="mt-6 bg-gradient-to-r from-indigo-600 to-blue-600 rounded-lg p-4" style="display: none;">
                     <h4 class="text-white font-semibold mb-2 flex items-center">
-                        <span class="mr-2">📊</span>
-                        Analyse des prix
+                        <span class="mr-2">📈</span>
+                        Évolution par rapport aux prix actuels
                     </h4>
                     <div class="grid grid-cols-1 md:grid-cols-3 gap-4 text-sm">
-                        <div id="unit-price-analysis" class="text-green-100"></div>
-                        <div id="per10-analysis" class="text-green-100"></div>
-                        <div id="per100-analysis" class="text-green-100"></div>
+                        <div id="unit-evolution" class="text-indigo-100"></div>
+                        <div id="per10-evolution" class="text-indigo-100"></div>
+                        <div id="per100-evolution" class="text-indigo-100"></div>
                     </div>
                 </div>
 
                 <!-- Actions -->
                 <div class="flex space-x-4 mt-8">
-                    <button type="submit" class="flex-1 bg-orange-600 hover:bg-orange-700 text-white font-bold py-3 px-6 rounded-lg transition-colors flex items-center justify-center">
-                        <span class="mr-2">📊</span>
-                        Enregistrer l'observation
+                    <button type="submit" class="flex-1 bg-blue-600 hover:bg-blue-700 text-white font-bold py-3 px-6 rounded-lg transition-colors flex items-center justify-center">
+                        <span class="mr-2">💾</span>
+                        Sauvegarder les modifications
                     </button>
                     <a href="{{ path('app_market_watch_index') }}" 
                        class="flex-1 bg-gray-600 hover:bg-gray-700 text-white font-bold py-3 px-6 rounded-lg transition-colors text-center flex items-center justify-center">
@@ -163,36 +183,72 @@
         const priceUnit = document.getElementById('market_watch_pricePerUnit');
         const price10 = document.getElementById('market_watch_pricePer10');
         const price100 = document.getElementById('market_watch_pricePer100');
-        const analysisDiv = document.getElementById('price-analysis');
+        const evolutionDiv = document.getElementById('price-evolution');
         
-        function updateAnalysis() {
-            const p1 = parseInt(priceUnit.value) || 0;
-            const p10 = parseInt(price10.value) || 0;
-            const p100 = parseInt(price100.value) || 0;
+        // Prix actuels (avant modification)
+        const currentPrices = {
+            unit: {{ market_watch.pricePerUnit ?? 'null' }},
+            per10: {{ market_watch.pricePer10 ?? 'null' }},
+            per100: {{ market_watch.pricePer100 ?? 'null' }}
+        };
+        
+        function updateEvolution() {
+            const newPrices = {
+                unit: parseInt(priceUnit.value) || null,
+                per10: parseInt(price10.value) || null,
+                per100: parseInt(price100.value) || null
+            };
             
-            if (p1 > 0 || p10 > 0 || p100 > 0) {
-                analysisDiv.style.display = 'block';
+            let hasChanges = false;
+            
+            // Vérifier s'il y a des changements
+            if ((newPrices.unit !== currentPrices.unit) || 
+                (newPrices.per10 !== currentPrices.per10) || 
+                (newPrices.per100 !== currentPrices.per100)) {
+                hasChanges = true;
+            }
+            
+            if (hasChanges) {
+                evolutionDiv.style.display = 'block';
                 
-                // Calcul du prix unitaire à partir des lots
-                const unitFrom10 = p10 > 0 ? p10 / 10 : 0;
-                const unitFrom100 = p100 > 0 ? p100 / 100 : 0;
-                
-                document.getElementById('unit-price-analysis').innerHTML = 
-                    p1 > 0 ? `Prix unitaire direct: ${p1.toLocaleString()}k` : '';
-                    
-                document.getElementById('per10-analysis').innerHTML = 
-                    p10 > 0 ? `Prix unitaire via x10: ${unitFrom10.toLocaleString()}k` : '';
-                    
-                document.getElementById('per100-analysis').innerHTML = 
-                    p100 > 0 ? `Prix unitaire via x100: ${unitFrom100.toLocaleString()}k` : '';
+                // Calculer et afficher les évolutions
+                updateEvolutionDisplay('unit', currentPrices.unit, newPrices.unit, 'unit-evolution');
+                updateEvolutionDisplay('per10', currentPrices.per10, newPrices.per10, 'per10-evolution');
+                updateEvolutionDisplay('per100', currentPrices.per100, newPrices.per100, 'per100-evolution');
             } else {
-                analysisDiv.style.display = 'none';
+                evolutionDiv.style.display = 'none';
+            }
+        }
+        
+        function updateEvolutionDisplay(type, oldPrice, newPrice, elementId) {
+            const element = document.getElementById(elementId);
+            
+            if (oldPrice === null && newPrice !== null) {
+                element.innerHTML = `<span class="text-green-300">+ Nouveau prix ajouté</span>`;
+            } else if (oldPrice !== null && newPrice === null) {
+                element.innerHTML = `<span class="text-red-300">- Prix supprimé</span>`;
+            } else if (oldPrice !== null && newPrice !== null) {
+                const diff = newPrice - oldPrice;
+                const percent = ((diff / oldPrice) * 100).toFixed(1);
+                
+                if (diff > 0) {
+                    element.innerHTML = `<span class="text-red-300">↗ +${diff.toLocaleString()}k (+${percent}%)</span>`;
+                } else if (diff < 0) {
+                    element.innerHTML = `<span class="text-green-300">↘ ${diff.toLocaleString()}k (${percent}%)</span>`;
+                } else {
+                    element.innerHTML = `<span class="text-gray-300">= Aucun changement</span>`;
+                }
+            } else {
+                element.innerHTML = '';
             }
         }
         
         [priceUnit, price10, price100].forEach(input => {
-            if (input) input.addEventListener('input', updateAnalysis);
+            if (input) input.addEventListener('input', updateEvolution);
         });
+        
+        // Vérification initiale
+        updateEvolution();
     });
     </script>
 {% endblock %}
