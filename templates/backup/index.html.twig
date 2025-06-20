@@ -2,14 +2,6 @@
 
 {% block title %}Sauvegarde des Données{% endblock %}
 
-{% block navbar %}
-    {% include 'components/navbar.html.twig' with {
-        'title': 'Sauvegarde & Données',
-        'back_url': path('app_trading_dashboard'),
-        'back_label': '← Dashboard'
-    } %}
-{% endblock %}
-
 {% block body %}
     <div class="wrapper-container">
         <div class="max-w-4xl mx-auto grid gap-8">

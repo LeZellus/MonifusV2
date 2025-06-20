@@ -2,14 +2,6 @@
 
 {% block title %}Paramètres du Compte{% endblock %}
 
-{% block navbar %}
-    {% include 'components/navbar.html.twig' with {
-        'title': 'Paramètres du Compte',
-        'back_url': path('app_trading_dashboard'),
-        'back_label': '← Dashboard'
-    } %}
-{% endblock %}
-
 {% block body %}
     <div class="wrapper-container">
         <div class="max-w-2xl mx-auto grid gap-8">

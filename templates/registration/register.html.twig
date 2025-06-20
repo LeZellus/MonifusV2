@@ -2,14 +2,6 @@
 
 {% block title %}Créer un compte{% endblock %}
 
-{% block navbar %}
-    {% include 'components/navbar.html.twig' with {
-        'title': 'Créer un compte',
-        'back_url': path('app_home'),
-        'back_label': '← Accueil'
-    } %}
-{% endblock %}
-
 {% block body %}
     <div class="wrapper-container">
         <div class="max-w-md mx-auto wrapper-background w-full">

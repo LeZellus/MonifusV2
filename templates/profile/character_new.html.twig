@@ -2,13 +2,6 @@
 
 {% block title %}Nouveau Personnage{% endblock %}
 
-{% block navbar %}
-    {% include 'components/navbar.html.twig' with {
-        'title': 'Nouveau Personnage - ' ~ profile.name,
-        'back_url': path('app_profile_index')
-    } %}
-{% endblock %}
-
 {% block body %}
     <div class="wrapper-container">
         {% include 'profile/_form.html.twig' with {

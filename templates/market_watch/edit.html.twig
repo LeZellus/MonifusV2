@@ -2,13 +2,6 @@
 
 {% block title %}Modifier l'observation - {{ market_watch.item.name }}{% endblock %}
 
-{% block navbar %}
-    {% include 'components/navbar.html.twig' with {
-        'title': 'Modifier l\'observation - ' ~ market_watch.item.name,
-        'back_url': path('app_market_watch_index')
-    } %}
-{% endblock %}
-
 {% block body %}
     <div class="wrapper-container">
         {% include 'market_watch/_form.html.twig' with {

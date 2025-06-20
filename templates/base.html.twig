@@ -14,7 +14,9 @@
     </head>
     <body>
         <!-- Navbar -->
-        {% block navbar %}{% endblock %}
+        {% include 'components/main_navbar.html.twig' with {
+            'title': block('title')
+        } %}
 
         {% block body %}{% endblock %}
 

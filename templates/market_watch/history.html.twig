@@ -2,14 +2,6 @@
 
 {% block title %}Historique des prix - {{ item.name }}{% endblock %}
 
-{% block navbar %}
-    {% include 'components/navbar.html.twig' with {
-        'title': 'Historique - ' ~ item.name,
-        'back_url': path('app_market_watch_index'),
-        'back_label': '← Observations'
-    } %}
-{% endblock %}
-
 {% block body %}
     <div class="wrapper-container">
         <!-- En-tête avec info item -->

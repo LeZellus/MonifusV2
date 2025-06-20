@@ -2,13 +2,6 @@
 
 {% block title %}Modifier le lot - {{ lot.item.name }}{% endblock %}
 
-{% block navbar %}
-    {% include 'components/navbar.html.twig' with {
-        'title': 'Modifier le lot - ' ~ lot.item.name,
-        'back_url': path('app_lot_index')
-    } %}
-{% endblock %}
-
 {% block body %}
     <div class="wrapper-container">
         {% include 'lot/_form.html.twig' with {

@@ -2,13 +2,6 @@
 
 {% block title %}Nouveau Lot - {{ character.name }}{% endblock %}
 
-{% block navbar %}
-    {% include 'components/navbar.html.twig' with {
-        'title': 'Nouveau Lot - ' ~ character.name,
-        'back_url': path('app_lot_index')
-    } %}
-{% endblock %}
-
 {% block body %}
     <div class="wrapper-container">
         {% include 'lot/_form.html.twig' with {
