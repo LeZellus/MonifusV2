@@ -5,6 +5,8 @@
 {% block body %}
     <div class="wrapper-container">
         <div class="max-w-2xl mx-auto grid gap-8">
+            {{ include("components/app_auth.html.twig") }}
+            
             {{ form_start(form, {'attr': {'class': 'grid gap-8'}}) }}
             
             <!-- Informations générales -->

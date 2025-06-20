@@ -106,10 +106,11 @@
                     <!-- Menu utilisateur -->
                     <div class="relative group">
                         <button class="flex items-center space-x-2 text-gray-300 hover:text-white transition-colors">
-                            <div class="w-8 h-8 bg-gradient-to-br from-blue-500 to-purple-600 rounded-full flex items-center justify-center">
-                                <span class="text-white text-sm font-bold">
-                                    {{ (app.user.pseudonymeWebsite ?? app.user.email)|first|upper }}
-                                </span>
+                                
+                            <div class="w-8 h-8 rounded-full overflow-hidden">
+                                {% if app.user.bestAvatarUrl %}
+                                    <img src="{{ app.user.bestAvatarUrl('64') }}" alt="Avatar">
+                                {% endif %}
                             </div>
                             <span class="hidden md:block">{{ app.user.pseudonymeWebsite ?? app.user.email }}</span>
                             <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">

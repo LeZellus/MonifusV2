@@ -55,6 +55,12 @@ class User implements UserInterface, PasswordAuthenticatedUserInterface
     #[ORM\Column(length: 255, nullable: true)]
     private ?string $discordId = null;
 
+    #[ORM\Column(length: 100, nullable: true)]
+    private ?string $discordUsername = null;
+
+    #[ORM\Column(length: 255, nullable: true)]
+    private ?string $discordAvatar = null;
+
     #[ORM\Column(nullable: true)]
     private ?bool $isTutorial = null;
 
@@ -251,6 +257,29 @@ class User implements UserInterface, PasswordAuthenticatedUserInterface
         return $this;
     }
 
+    public function getDiscordUsername(): ?string
+    {
+        return $this->discordUsername;
+    }
+
+    public function setDiscordUsername(?string $discordUsername): static
+    {
+        $this->discordUsername = $discordUsername;
+
+        return $this;
+    }
+
+    public function getDiscordAvatar(): ?string
+    {
+        return $this->discordAvatar;
+    }
+
+    public function setDiscordAvatar(?string $discordAvatar): static
+    {
+        $this->discordAvatar = $discordAvatar;
+        return $this;
+    }
+
     public function isTutorial(): ?bool
     {
         return $this->isTutorial;
@@ -374,5 +403,65 @@ class User implements UserInterface, PasswordAuthenticatedUserInterface
     public function getUpdatedAt(): ?\DateTimeImmutable
     {
         return $this->updatedAt;
+    }
+
+    /**
+     * Retourne l'URL complète de l'avatar Discord
+     */
+    public function getDiscordAvatarUrl(?string $size = '128'): ?string
+    {
+        if (!$this->discordId || !$this->discordAvatar) {
+            return null;
+        }
+        
+        return sprintf(
+            'https://cdn.discordapp.com/avatars/%s/%s.png?size=%s',
+            $this->discordId,
+            $this->discordAvatar,
+            $size
+        );
+    }
+
+    /**
+     * Retourne l'avatar par défaut Discord si pas d'avatar custom
+     */
+    public function getDiscordDefaultAvatarUrl(): string
+    {
+        if (!$this->discordId) {
+            return '';
+        }
+        
+        // Discord calcule l'avatar par défaut avec (user_id >> 22) % 6
+        $defaultIndex = (int)($this->discordId >> 22) % 6;
+        return "https://cdn.discordapp.com/embed/avatars/{$defaultIndex}.png";
+    }
+
+    /**
+     * Retourne la meilleure URL d'avatar disponible
+     */
+    public function getBestAvatarUrl(string $size = '128'): ?string
+    {
+        // Priorité : Discord > avatar uploadé > défaut Discord
+        if ($url = $this->getDiscordAvatarUrl($size)) {
+            return $url;
+        }
+        
+        if ($this->profilePicture) {
+            return $this->profilePicture;
+        }
+        
+        if ($this->discordId) {
+            return $this->getDiscordDefaultAvatarUrl();
+        }
+        
+        return null;
+    }
+
+    /**
+     * Méthode helper pour savoir si l'utilisateur s'est connecté via Discord
+     */
+    public function isDiscordUser(): bool
+    {
+        return $this->discordId !== null;
     }
 }

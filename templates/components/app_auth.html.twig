@@ -1,0 +1,23 @@
+<div class="flex items-center space-x-4 wrapper-background">
+    <div class="w-16 h-16 rounded-full overflow-hidden border-4 border-lime-500">
+        {% if app.user.bestAvatarUrl('128') %}
+            <img src="{{ app.user.bestAvatarUrl('128') }}" alt="Avatar" class="w-full h-full object-cover">
+        {% else %}
+            <div class="w-full h-full bg-gradient-to-br from-blue-500 to-purple-600 flex items-center justify-center">
+                <span class="text-white text-xl font-bold">
+                    {{ (app.user.pseudonymeWebsite ?? app.user.email)|first|upper }}
+                </span>
+            </div>
+        {% endif %}
+    </div>
+    <div>
+        <h2 class="text-white text-xl font-bold">{{ app.user.pseudonymeWebsite ?? app.user.email }}</h2>
+        <p class="text-gray-400">
+            {% if app.user.isDiscordUser %}
+                <span class="text-lime-400">🔗 Connecté via Discord</span>
+            {% else %}
+                Compte local
+            {% endif %}
+        </p>
+    </div>
+</div>
