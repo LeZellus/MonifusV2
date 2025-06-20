@@ -15,81 +15,106 @@
         <!-- Sélecteur de personnage -->
         {% include 'components/character_selector.html.twig' %}
 
-        <!-- Statistiques des ventes -->
-        <div class="grid grid-cols-1 md:grid-cols-4 gap-4">
-            <div class="bg-gray-800 rounded-lg p-6">
-                <h3 class="text-white text-lg font-semibold mb-2">💰 Profit Réalisé</h3>
-                <p class="text-green-400 text-2xl font-bold">
-                    {{ (total_realized_profit / 1000000)|number_format(1) }}M
-                </p>
+        {% if selectedCharacter %}
+            <!-- Statistiques des ventes -->
+            <div class="stats-grid">
+                {% include 'components/stats_card.html.twig' with {
+                    title: 'Profit Réalisé',
+                    value: (total_realized_profit / 1000000)|number_format(1) ~ 'M',
+                    icon: '💰',
+                    color: 'green'
+                } %}
+                {% include 'components/stats_card.html.twig' with {
+                    title: 'Profit Attendu',
+                    value: (total_expected_profit / 1000000)|number_format(1) ~ 'M',
+                    icon: '🎯',
+                    color: 'blue'
+                } %}
+                {% include 'components/stats_card.html.twig' with {
+                    title: 'Différence',
+                    value: (profit_difference >= 0 ? '+' : '') ~ (profit_difference / 1000000)|number_format(1) ~ 'M',
+                    icon: '📊',
+                    color: profit_difference >= 0 ? 'green' : 'red'
+                } %}
+                {% include 'components/stats_card.html.twig' with {
+                    title: 'Ventes Total',
+                    value: sales|length,
+                    icon: '📈',
+                    color: 'purple'
+                } %}
             </div>
-            <div class="bg-gray-800 rounded-lg p-6">
-                <h3 class="text-white text-lg font-semibold mb-2">🎯 Profit Attendu</h3>
-                <p class="text-blue-400 text-2xl font-bold">
-                    {{ (total_expected_profit / 1000000)|number_format(1) }}M
-                </p>
-            </div>
-            <div class="bg-gray-800 rounded-lg p-6">
-                <h3 class="text-white text-lg font-semibold mb-2">📊 Différence</h3>
-                <p class="text-{{ profit_difference >= 0 ? 'green' : 'red' }}-400 text-2xl font-bold">
-                    {{ profit_difference >= 0 ? '+' : '' }}{{ (profit_difference / 1000000)|number_format(1) }}M
-                </p>
-            </div>
-            <div class="bg-gray-800 rounded-lg p-6">
-                <h3 class="text-white text-lg font-semibold mb-2">📈 Ventes Total</h3>
-                <p class="text-purple-400 text-2xl font-bold">{{ sales|length }}</p>
-            </div>
-        </div>
 
-        <!-- Filtres -->
-        <div class="wrapper-background">
-            <form method="GET" class="grid grid-cols-1 md:grid-cols-3 gap-4 items-end">
-                <div>
-                    <label class="block text-white font-medium mb-2">Période</label>
-                    <select name="period" class="w-full px-3 py-2 border border-gray-600 bg-gray-700 text-white rounded-md">
-                        <option value="7" {{ current_filters.period == '7' ? 'selected' : '' }}>7 derniers jours</option>
-                        <option value="30" {{ current_filters.period == '30' ? 'selected' : '' }}>30 derniers jours</option>
-                        <option value="90" {{ current_filters.period == '90' ? 'selected' : '' }}>3 derniers mois</option>
-                        <option value="365" {{ current_filters.period == '365' ? 'selected' : '' }}>Dernière année</option>
-                        <option value="all" {{ current_filters.period == 'all' ? 'selected' : '' }}>Toute la période</option>
-                    </select>
-                </div>
+            <!-- Filtres -->
+            <div class="wrapper-background">
+                {% include 'components/section_header.html.twig' with {
+                    type: 'simple',
+                    title: 'Filtres',
+                    icon: '🔍',
+                    color: 'blue',
+                    wrapper_class: ''
+                } %}
+                
+                <form method="GET" class="grid grid-cols-1 md:grid-cols-3 gap-4 items-end">
+                    <div>
+                        <label class="form-label">Période</label>
+                        <select name="period" class="form-input">
+                            <option value="7" {{ current_filters.period == '7' ? 'selected' : '' }}>7 derniers jours</option>
+                            <option value="30" {{ current_filters.period == '30' ? 'selected' : '' }}>30 derniers jours</option>
+                            <option value="90" {{ current_filters.period == '90' ? 'selected' : '' }}>3 derniers mois</option>
+                            <option value="365" {{ current_filters.period == '365' ? 'selected' : '' }}>Dernière année</option>
+                            <option value="all" {{ current_filters.period == 'all' ? 'selected' : '' }}>Toute la période</option>
+                        </select>
+                    </div>
 
-                <div class="flex space-x-2">
-                    <button type="submit" class="bg-blue-600 hover:bg-blue-700 text-white px-4 py-2 rounded-md transition-colors">
-                        Filtrer
-                    </button>
-                    <a href="{{ path('app_sales_history_index') }}" class="bg-gray-600 hover:bg-gray-700 text-white px-4 py-2 rounded-md transition-colors">
-                        Reset
+                    <div class="action-group">
+                        <button type="submit" class="btn-primary">
+                            Filtrer
+                        </button>
+                        <a href="{{ path('app_sales_history_index') }}" class="btn-secondary">
+                            Reset
+                        </a>
+                    </div>
+                </form>
+            </div>
+
+            <!-- En-tête et actions -->
+            <div class="flex justify-between items-center">
+                <h2 class="page-title">
+                    Historique des Ventes - {{ selectedCharacter.name }}
+                </h2>
+                {% if sales|length > 0 %}
+                    <a href="{{ path('app_sales_history_export', app.request.query.all) }}" 
+                       class="btn-success">
+                        📊 Exporter CSV
                     </a>
-                </div>
-            </form>
-        </div>
-
-        <div class="flex justify-between items-center">
-            <h2 class="text-white text-2xl font-bold">
-                Historique des Ventes
-                {% if selectedCharacter %}
-                    - {{ selectedCharacter.name }}
                 {% endif %}
-            </h2>
-            {% if sales|length > 0 %}
-                <a href="{{ path('app_sales_history_export', app.request.query.all) }}" 
-                class="bg-green-600 hover:bg-green-700 text-white px-4 py-2 rounded-lg transition-colors">
-                    📊 Exporter CSV
-                </a>
-            {% endif %}
-        </div>
+            </div>
 
-        {% include 'components/data_table.html.twig' with {
-            headers: ['Date Vente', 'Item', 'Personnage', 'Quantité', 'Prix Réel', 'Prix Attendu', 'Profit Total', 'Performance', 'Notes'],
-            rows: sales,
-            row_template: 'sales_history/_table_row.html.twig',
-            empty_message: 'Aucune vente enregistrée pour le moment',
-            empty_action: {
-                url: path('app_lot_index'),
-                text: 'Voir mes lots disponibles'
-            }
-        } %}
+            <!-- Tableau des ventes -->
+            {% include 'components/data_table.html.twig' with {
+                headers: ['Date Vente', 'Item', 'Personnage', 'Quantité', 'Prix Réel', 'Prix Attendu', 'Profit Total', 'Performance', 'Notes'],
+                rows: sales,
+                row_template: 'sales_history/_table_row.html.twig',
+                empty_message: 'Aucune vente enregistrée',
+                empty_action: {
+                    url: path('app_lot_index'),
+                    text: 'Voir mes lots disponibles',
+                    icon: '📦'
+                }
+            } %}
+
+        {% else %}
+            <!-- Aucun personnage sélectionné -->
+            {% include 'components/empty_state.html.twig' with {
+                type: 'no_character',
+                title: 'Aucun personnage sélectionné',
+                message: 'Sélectionnez un personnage pour voir son historique de ventes.',
+                action: {
+                    url: path('app_profile_index'),
+                    text: 'Gérer les personnages',
+                    icon: '👥'
+                }
+            } %}
+        {% endif %}
     </div>
 {% endblock %}

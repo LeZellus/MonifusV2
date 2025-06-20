@@ -1,0 +1,101 @@
+{# templates/components/empty_state.html.twig #}
+{#
+État vide générique avec message et action
+Usage: {% include 'components/empty_state.html.twig' with {
+    type: 'no_character|no_data|no_results',
+    icon: '👤',
+    title: 'Titre principal',
+    message: 'Message descriptif',
+    action: {url: path('route'), text: 'Action à faire', icon: '➕'},
+    secondary_action: {url: path('route'), text: 'Action secondaire'} (optionnel),
+    size: 'normal|large' (optionnel),
+    character_name: 'NomPersonnage' (si type=no_data)
+} %}
+#}
+
+{% set size_class = size|default('normal') == 'large' ? 'py-20' : 'py-12' %}
+{% set icon_size = size|default('normal') == 'large' ? 'text-6xl' : 'text-4xl' %}
+
+<div class="text-center {{ size_class }}">
+    {% if type == 'no_character' %}
+        <!-- État: Aucun personnage sélectionné -->
+        <div class="wrapper-background max-w-md mx-auto">
+            <div class="{{ icon_size }} mb-4">👤</div>
+            <h3 class="text-white text-xl font-bold mb-3">{{ title|default('Aucun personnage sélectionné') }}</h3>
+            <p class="text-gray-400 mb-6">
+                {{ message|default('Sélectionnez un personnage pour voir son contenu, ou créez votre premier personnage.') }}
+            </p>
+            {% if action is defined %}
+                <a href="{{ action.url }}" 
+                   class="bg-blue-600 hover:bg-blue-700 text-white px-6 py-3 rounded-lg transition-colors inline-flex items-center">
+                    {% if action.icon is defined %}
+                        <span class="mr-2">{{ action.icon }}</span>
+                    {% endif %}
+                    {{ action.text|default('Gérer les personnages') }}
+                </a>
+            {% endif %}
+        </div>
+        
+    {% elseif type == 'no_data' %}
+        <!-- État: Pas de données pour le personnage -->
+        <div class="wrapper-background max-w-md mx-auto">
+            <div class="{{ icon_size }} mb-4">{{ icon|default('📦') }}</div>
+            <h3 class="text-white text-xl font-bold mb-3">{{ title }}</h3>
+            <p class="text-gray-400 mb-6">
+                {% if character_name is defined %}
+                    {{ message|replace('{character}', character_name) }}
+                {% else %}
+                    {{ message }}
+                {% endif %}
+            </p>
+            <div class="space-y-3">
+                {% if action is defined %}
+                    <a href="{{ action.url }}" 
+                       class="bg-green-600 hover:bg-green-700 text-white px-6 py-3 rounded-lg transition-colors inline-flex items-center">
+                        {% if action.icon is defined %}
+                            <span class="mr-2">{{ action.icon }}</span>
+                        {% endif %}
+                        {{ action.text }}
+                    </a>
+                {% endif %}
+                {% if secondary_action is defined %}
+                    <div>
+                        <a href="{{ secondary_action.url }}" 
+                           class="text-blue-400 hover:text-blue-300 text-sm">
+                            {{ secondary_action.text }}
+                        </a>
+                    </div>
+                {% endif %}
+            </div>
+        </div>
+        
+    {% elseif type == 'no_results' %}
+        <!-- État: Aucun résultat (plus simple) -->
+        <div class="text-gray-400 text-lg mb-4">{{ title|default('Aucun résultat trouvé') }}</div>
+        {% if action is defined %}
+            <a href="{{ action.url }}" 
+               class="bg-green-600 hover:bg-green-700 text-white px-6 py-3 rounded-lg transition-colors">
+                {{ action.text }}
+            </a>
+        {% endif %}
+        
+    {% else %}
+        <!-- État générique personnalisable -->
+        {% if icon is defined %}
+            <div class="{{ icon_size }} mb-4">{{ icon }}</div>
+        {% endif %}
+        <h3 class="text-white text-xl font-bold mb-3">{{ title }}</h3>
+        {% if message is defined %}
+            <p class="text-gray-400 mb-6">{{ message }}</p>
+        {% endif %}
+        {% if action is defined %}
+            <a href="{{ action.url }}" 
+               class="bg-blue-600 hover:bg-blue-700 text-white px-6 py-3 rounded-lg transition-colors inline-flex items-center">
+                {% if action.icon is defined %}
+                    <span class="mr-2">{{ action.icon }}</span>
+                {% endif %}
+                {{ action.text }}
+            </a>
+        {% endif %}
+    {% endif %}
+</div>

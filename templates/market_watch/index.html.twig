@@ -39,9 +39,16 @@
             } %}
         {% else %}
             <!-- Aucun personnage sélectionné -->
-            <div class="text-center py-12">
-                <p class="text-gray-400 text-lg mb-4">Sélectionnez un personnage pour voir ses observations</p>
-            </div>
+            {% include 'components/empty_state.html.twig' with {
+                type: 'no_character',
+                title: 'Aucun personnage sélectionné',
+                message: 'Sélectionnez un personnage pour voir ses observations de prix.',
+                action: {
+                    url: path('app_profile_index'),
+                    text: 'Gérer les personnages',
+                    icon: '👥'
+                }
+            } %}
         {% endif %}
     </div>
 {% endblock %}
