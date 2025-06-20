@@ -28,6 +28,29 @@ class ProfileController extends AbstractController
         $selectedCharacter = $characterService->getSelectedCharacter($this->getUser());
         $allCharacters = $characterService->getUserCharacters($this->getUser());
         
+        // Code ajouté
+        foreach ($profiles as $profile) {
+            foreach ($profile->getDofusCharacters() as $character) {
+                $lotsCount = $character->getLotGroups()->count();
+                $watchesCount = $character->getMarketWatches()->count();
+                $soldLotsCount = 0;
+                $availableLotsCount = 0;
+                
+                foreach ($character->getLotGroups() as $lot) {
+                    if ($lot->getStatus()->value === 'sold') {
+                        $soldLotsCount++;
+                    } else {
+                        $availableLotsCount++;
+                    }
+                }
+                
+                $character->tempLotsCount = $lotsCount;
+                $character->tempWatchesCount = $watchesCount;
+                $character->tempSoldLotsCount = $soldLotsCount;
+                $character->tempAvailableLotsCount = $availableLotsCount;
+            }
+        }
+        
         return $this->render('profile/index.html.twig', [
             'profiles' => $profiles,
             'selectedCharacter' => $selectedCharacter,
@@ -103,6 +126,119 @@ class ProfileController extends AbstractController
         $characterService->setSelectedCharacter($character);
         $this->addFlash('success', "Personnage {$character->getName()} sélectionné !");
         
+        return $this->redirectToRoute('app_profile_index');
+    }
+
+    #[Route('/switch/{id}', name: 'app_profile_switch')]
+    public function switchProfile(
+        TradingProfile $profile,
+        CharacterSelectionService $characterService
+    ): Response {
+        // Vérifier que le profil appartient à l'utilisateur
+        if ($profile->getUser() !== $this->getUser()) {
+            throw $this->createAccessDeniedException();
+        }
+
+        // Sélectionner le premier personnage de ce profil s'il existe
+        $characters = $profile->getDofusCharacters();
+        if ($characters->count() > 0) {
+            $firstCharacter = $characters->first();
+            $characterService->setSelectedCharacter($firstCharacter);
+            $this->addFlash('success', "Profil '{$profile->getName()}' activé avec le personnage {$firstCharacter->getName()}");
+        } else {
+            // Pas de personnage dans ce profil, on peut quand même le sélectionner
+            $this->addFlash('info', "Profil '{$profile->getName()}' activé. Ajoutez un personnage pour commencer !");
+        }
+
+        return $this->redirectToRoute('app_profile_index');
+    }
+
+    #[Route('/{id}/edit', name: 'app_profile_edit')]
+    public function edit(
+        TradingProfile $profile,
+        Request $request,
+        EntityManagerInterface $em
+    ): Response {
+        // Vérifier que le profil appartient à l'utilisateur
+        if ($profile->getUser() !== $this->getUser()) {
+            throw $this->createAccessDeniedException();
+        }
+
+        $form = $this->createForm(TradingProfileType::class, $profile);
+        
+        $form->handleRequest($request);
+        if ($form->isSubmitted() && $form->isValid()) {
+            $em->flush();
+            
+            $this->addFlash('success', 'Profil mis à jour avec succès !');
+            return $this->redirectToRoute('app_profile_index');
+        }
+
+        return $this->render('profile/edit.html.twig', [
+            'form' => $form,
+            'profile' => $profile,
+        ]);
+    }
+
+    #[Route('/{id}/delete', name: 'app_profile_delete', methods: ['POST'])]
+    public function deleteProfile(
+        TradingProfile $profile,
+        EntityManagerInterface $em
+    ): Response {
+        // Vérifier que le profil appartient à l'utilisateur
+        if ($profile->getUser() !== $this->getUser()) {
+            throw $this->createAccessDeniedException();
+        }
+
+        $profileName = $profile->getName();
+        
+        // Supprimer tous les personnages et leurs données associées
+        foreach ($profile->getDofusCharacters() as $character) {
+            $em->remove($character);
+        }
+        
+        $em->remove($profile);
+        $em->flush();
+
+        $this->addFlash('success', "Profil '{$profileName}' supprimé avec succès.");
+        return $this->redirectToRoute('app_profile_index');
+    }
+
+    #[Route('/character/{id}/delete', name: 'app_profile_character_delete', methods: ['POST'])]
+    public function deleteCharacter(
+        DofusCharacter $character,
+        EntityManagerInterface $em,
+        CharacterSelectionService $characterService
+    ): Response {
+        // Vérifier que le personnage appartient à l'utilisateur
+        if ($character->getTradingProfile()->getUser() !== $this->getUser()) {
+            throw $this->createAccessDeniedException();
+        }
+
+        $characterName = $character->getName();
+        $selectedCharacter = $characterService->getSelectedCharacter($this->getUser());
+        
+        // Si on supprime le personnage actif, désélectionner
+        if ($selectedCharacter && $selectedCharacter->getId() === $character->getId()) {
+            // Sélectionner un autre personnage du même profil ou null
+            $otherCharacters = $character->getTradingProfile()->getDofusCharacters();
+            $newSelected = null;
+            foreach ($otherCharacters as $otherChar) {
+                if ($otherChar->getId() !== $character->getId()) {
+                    $newSelected = $otherChar;
+                    break;
+                }
+            }
+            
+            if ($newSelected) {
+                $characterService->setSelectedCharacter($newSelected);
+            }
+        }
+        
+        $em->remove($character);
+        $em->flush();
+
+        $this->addFlash('success', "Personnage '{$characterName}' supprimé avec succès.");
         return $this->redirectToRoute('app_profile_index');
     }
 }

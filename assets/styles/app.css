@@ -4,6 +4,7 @@
 
 body {
     @apply bg-gray-900;
+    font-family: "Jost", sans-serif;
 }
 
 /* ============================================

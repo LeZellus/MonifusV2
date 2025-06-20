@@ -1,0 +1,38 @@
+{% extends 'base.html.twig' %}
+
+{% block title %}Modifier le Profil - {{ profile.name }}{% endblock %}
+
+{% block body %}
+    <div class="wrapper-container">
+        {% include 'profile/_form.html.twig' with {
+            form: form,
+            icon: '✏️',
+            page_title: 'Modifier le Profil',
+            page_description: 'Modifiez les informations de votre profil de trading.',
+            form_title: 'Informations du profil',
+            form_icon: '📝',
+            form_color: 'orange',
+            form_fields: [
+                {
+                    name: 'name',
+                    placeholder: 'ex: Trading Principal, Kamas Farm, etc.',
+                    help_text: '💡 Nom qui décrit votre stratégie',
+                    focus_color: 'orange'
+                },
+                {
+                    name: 'description',
+                    attributes: {
+                        'class': 'w-full px-4 py-3 border border-gray-600 bg-gray-700 text-white rounded-lg focus:outline-none focus:border-orange-500 focus:ring-2 focus:ring-orange-500 focus:ring-opacity-20',
+                        'rows': 4
+                    },
+                    placeholder: 'Décrivez votre stratégie de trading, vos objectifs, les serveurs ciblés...',
+                    help_text: '📋 Description de votre approche'
+                }
+            ],
+            submit_text: 'Sauvegarder les modifications',
+            submit_icon: '💾',
+            submit_color: 'warning',
+            cancel_url: path('app_profile_index')
+        } %}
+    </div>
+{% endblock %}

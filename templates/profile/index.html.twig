@@ -4,87 +4,135 @@
 
 {% block body %}
     <div class="wrapper-container">
-        <!-- Sélection du personnage actif -->
-        {% if characters|length > 0 %}
+        <!-- Bloc Profil Actif (ex-section bleue) -->
+        {% if profiles|length > 0 %}
+            {% set activeProfile = selectedCharacter ? selectedCharacter.tradingProfile : profiles[0] %}
             <div class="bg-gradient-to-r from-blue-600 to-purple-600 rounded-lg p-6">
-                <h2 class="text-white text-xl font-bold mb-4 flex items-center">
-                    <span class="text-2xl mr-3">🎮</span>
-                    Personnage actif
-                </h2>
-                
+                <div class="flex items-center justify-between mb-4">
+                    <h2 class="text-white text-2xl font-bold flex items-center">
+                        <span class="text-3xl mr-3">👥</span>
+                        {{ activeProfile.name }}
+                    </h2>
+                    <div class="text-right">
+                        <span class="bg-green-600 text-green-100 px-3 py-1 rounded-full text-sm font-medium">
+                            ✓ PROFIL ACTIF
+                        </span>
+                    </div>
+                </div>
+
+                {% if activeProfile.description %}
+                    <div class="bg-white bg-opacity-10 rounded-lg p-3 mb-4">
+                        <p class="text-blue-100 text-sm italic">"{{ activeProfile.description }}"</p>
+                    </div>
+                {% endif %}
+
+                <!-- Personnage actif -->
                 {% if selectedCharacter %}
                     <div class="bg-white bg-opacity-20 rounded-lg p-4 mb-4">
-                        <div class="flex items-center justify-between">
-                            <div class="flex items-center space-x-4">
-                                <div class="w-16 h-16 rounded-full overflow-hidden border-4 border-white border-opacity-20">
-                                    <img src="{{ selectedCharacter.classe.imagePath }}" 
-                                         alt="{{ selectedCharacter.classe.name }}" 
-                                         class="w-full h-full object-cover"
-                                         onerror="this.style.display='none'; this.nextElementSibling.style.display='flex';">
-                                    <div class="w-full h-full bg-blue-500 flex items-center justify-center text-white font-bold text-xl" style="display: none;">
-                                        {{ selectedCharacter.name|first|upper }}
-                                    </div>
-                                </div>
-                                <div>
-                                    <h3 class="text-white text-xl font-bold">{{ selectedCharacter.name }}</h3>
-                                    <p class="text-blue-100">
-                                        {{ selectedCharacter.classe.name }} • {{ selectedCharacter.server.name }}
-                                    </p>
-                                    <div class="flex items-center mt-1">
-                                        <span class="text-blue-200 text-sm">Profil:</span>
-                                        <span class="text-white text-sm font-medium ml-1">{{ selectedCharacter.tradingProfile.name }}</span>
-                                    </div>
+                        <div class="flex items-center space-x-4">
+                            <div class="w-16 h-16 rounded-full overflow-hidden border-4 border-white border-opacity-20">
+                                <img src="{{ selectedCharacter.classe.imagePath }}" 
+                                     alt="{{ selectedCharacter.classe.name }}" 
+                                     class="w-full h-full object-cover"
+                                     onerror="this.style.display='none'; this.nextElementSibling.style.display='flex';">
+                                <div class="w-full h-full bg-blue-500 flex items-center justify-center text-white font-bold text-xl" style="display: none;">
+                                    {{ selectedCharacter.name|first|upper }}
                                 </div>
                             </div>
-                            <div class="text-center">
-                                <div class="bg-green-500 text-white px-4 py-2 rounded-full font-bold text-sm mb-2">
-                                    ✓ PERSONNAGE ACTIF
+                            <div class="flex-1">
+                                <h3 class="text-white text-xl font-bold">{{ selectedCharacter.name }}</h3>
+                                <p class="text-blue-100">
+                                    {{ selectedCharacter.classe.name }} • {{ selectedCharacter.server.name }}
+                                </p>
+                                <div class="flex space-x-4 text-sm mt-2">
+                                    <span class="text-green-200">📦 {{ selectedCharacter.tempLotsCount ?? 0 }} lots</span>
+                                    <span class="text-orange-200">👁️ {{ selectedCharacter.tempWatchesCount ?? 0 }} watch</span>
+                                    <span class="text-blue-200">✅ {{ selectedCharacter.tempSoldLotsCount ?? 0 }} vendus</span>
                                 </div>
-                                <div class="text-green-200 text-xs">Toutes les actions utilisent ce personnage</div>
                             </div>
-                        </div>
-                    </div>
-                {% else %}
-                    <div class="bg-red-500 bg-opacity-20 rounded-lg p-4 mb-4 border border-red-400">
-                        <div class="text-center text-white">
-                            <div class="text-3xl mb-2">⚠️</div>
-                            <div class="text-lg font-semibold mb-2">Aucun personnage sélectionné</div>
-                            <div class="text-red-200 text-sm">Sélectionnez un personnage ci-dessous pour commencer</div>
+                            <div class="bg-green-500 text-white px-3 py-1 rounded-full text-sm font-bold">
+                                ★ ACTIF
+                            </div>
                         </div>
                     </div>
                 {% endif %}
 
-                {% if characters|length > 1 or not selectedCharacter %}
+                <!-- Sélection des personnages du profil actif -->
+                {% set profileCharacters = activeProfile.dofusCharacters %}
+                {% if profileCharacters|length > 1 or not selectedCharacter %}
                     <div class="text-center">
-                        <h4 class="text-white font-medium mb-4">Changer de personnage actif :</h4>
+                        <h4 class="text-white font-medium mb-4">
+                            {{ selectedCharacter ? 'Changer de personnage :' : 'Sélectionnez un personnage :' }}
+                        </h4>
                         <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-3">
-                            {% for character in characters %}
-                                <a href="{{ path('app_profile_character_select', {id: character.id}) }}" 
-                                   class="bg-white bg-opacity-10 hover:bg-opacity-25 rounded-lg p-4 transition-all duration-200 border-2 
-                                          {{ selectedCharacter and character.id == selectedCharacter.id ? 'border-yellow-400 bg-yellow-400 bg-opacity-20' : 'border-transparent hover:border-white hover:border-opacity-30' }}">
-                                    <div class="flex items-center space-x-3">
-                                        <div class="w-10 h-10 rounded-full overflow-hidden">
-                                            <img src="{{ character.classe.imagePath }}" 
-                                                 alt="{{ character.classe.name }}" 
-                                                 class="w-full h-full object-cover"
-                                                 onerror="this.style.display='none'; this.nextElementSibling.style.display='flex';">
-                                            <div class="w-full h-full bg-blue-400 rounded-full flex items-center justify-center text-white font-bold" style="display: none;">
-                                                {{ character.name|first|upper }}
+                            {% for character in profileCharacters %}
+                                <div class="bg-white bg-opacity-10 hover:bg-opacity-25 rounded-lg p-4 transition-all duration-200 border-2 {{ selectedCharacter and character.id == selectedCharacter.id ? 'border-yellow-400 bg-yellow-400 bg-opacity-20' : 'border-transparent hover:border-white hover:border-opacity-30' }}">
+                                    
+                                    <a href="{{ path('app_profile_character_select', {id: character.id}) }}" class="block">
+                                        <div class="flex items-center space-x-3 mb-2">
+                                            <div class="w-10 h-10 rounded-full overflow-hidden">
+                                                <img src="{{ character.classe.imagePath }}" 
+                                                     alt="{{ character.classe.name }}" 
+                                                     class="w-full h-full object-cover"
+                                                     onerror="this.style.display='none'; this.nextElementSibling.style.display='flex';">
+                                                <div class="w-full h-full bg-blue-400 rounded-full flex items-center justify-center text-white font-bold" style="display: none;">
+                                                    {{ character.name|first|upper }}
+                                                </div>
                                             </div>
+                                            <div class="text-left flex-1">
+                                                <div class="text-white font-medium">{{ character.name }}</div>
+                                                <div class="text-blue-200 text-sm">{{ character.server.name }}</div>
+                                            </div>
+                                            {% if selectedCharacter and character.id == selectedCharacter.id %}
+                                                <div class="text-yellow-400 text-xl">★</div>
+                                            {% endif %}
                                         </div>
-                                        <div class="text-left flex-1">
-                                            <div class="text-white font-medium">{{ character.name }}</div>
-                                            <div class="text-blue-200 text-sm">{{ character.server.name }}</div>
+                                        <div class="flex space-x-3 text-xs">
+                                            <span class="text-green-200">📦 {{ character.tempLotsCount ?? 0 }}</span>
+                                            <span class="text-orange-200">👁️ {{ character.tempWatchesCount ?? 0 }}</span>
+                                            <span class="text-blue-200">✅ {{ character.tempSoldLotsCount ?? 0 }}</span>
                                         </div>
-                                        {% if selectedCharacter and character.id == selectedCharacter.id %}
-                                            <div class="text-yellow-400 text-xl">★</div>
-                                        {% endif %}
-                                    </div>
-                                </a>
+                                    </a>
+                                    
+                                    <!-- Bouton de suppression du personnage -->
+                                    {% if profileCharacters|length > 1 %}
+                                        <form method="post" action="{{ path('app_profile_character_delete', {id: character.id}) }}" 
+                                              onsubmit="return confirm('Supprimer {{ character.name }} et toutes ses données ?')" 
+                                              class="mt-2">
+                                            <button type="submit" class="w-full bg-red-600 hover:bg-red-700 text-white px-2 py-1 rounded text-xs transition-colors">
+                                                🗑️ Supprimer
+                                            </button>
+                                        </form>
+                                    {% endif %}
+                                </div>
                             {% endfor %}
                         </div>
                     </div>
                 {% endif %}
+
+                <!-- Boutons d'action du profil -->
+                <div class="flex justify-center space-x-3 mt-4">
+                    <a href="{{ path('app_profile_character_new', {id: activeProfile.id}) }}" 
+                    class="bg-white bg-opacity-20 hover:bg-opacity-30 text-white px-4 py-2 rounded-lg transition-all duration-200 font-medium inline-flex items-center">
+                        <span class="mr-2">👤</span>
+                        Ajouter un personnage
+                    </a>
+                    
+                    <a href="{{ path('app_profile_edit', {id: activeProfile.id}) }}" 
+                    class="bg-orange-600 hover:bg-orange-700 text-white px-4 py-2 rounded-lg transition-all duration-200 font-medium inline-flex items-center">
+                        <span class="mr-2">✏️</span>
+                        Modifier le profil
+                    </a>
+                    
+                    <form method="post" action="{{ path('app_profile_delete', {id: activeProfile.id}) }}" 
+                        onsubmit="return confirm('Êtes-vous sûr de vouloir supprimer le profil {{ activeProfile.name }} et tous ses personnages ?')" 
+                        class="inline">
+                        <button type="submit" class="bg-red-600 hover:bg-red-700 text-white px-4 py-2 rounded-lg transition-all duration-200 font-medium inline-flex items-center">
+                            <span class="mr-2">🗑️</span>
+                            Supprimer ce profil
+                        </button>
+                    </form>
+                </div>
             </div>
         {% endif %}
 
@@ -118,11 +166,11 @@
             </div>
         {% endif %}
 
-        <!-- Gestion des profils - Section améliorée -->
+        <!-- Sélection des Profils -->
         <div class="flex justify-between items-center">
             <h2 class="text-white text-2xl font-bold flex items-center">
-                <span class="text-3xl mr-3">👥</span>
-                Profils de Trading
+                <span class="text-3xl mr-3">🔄</span>
+                Changer de Profil
             </h2>
             <a href="{{ path('app_profile_new') }}" 
                class="bg-gradient-to-r from-blue-500 to-purple-600 hover:from-blue-600 hover:to-purple-700 text-white px-6 py-3 rounded-lg transition-all duration-200 font-semibold flex items-center shadow-lg transform hover:scale-105">
@@ -131,110 +179,77 @@
             </a>
         </div>
 
-        {% if profiles|length > 0 %}
+        {% if profiles|length > 1 %}
             <div class="grid grid-cols-1 lg:grid-cols-2 xl:grid-cols-3 gap-6">
                 {% for profile in profiles %}
-                    <div class="wrapper-background border-2 {{ selectedCharacter and selectedCharacter.tradingProfile.id == profile.id ? 'border-green-500 bg-green-900 bg-opacity-20' : 'border-gray-700 hover:border-gray-600' }} transition-all duration-200">
-                        <!-- En-tête du profil -->
-                        <div class="flex justify-between items-start mb-4">
-                            <div class="flex items-center space-x-3">
-                                <div class="w-12 h-12 bg-gradient-to-br from-blue-500 to-purple-600 rounded-lg flex items-center justify-center">
-                                    <span class="text-white font-bold text-lg">{{ profile.name|first|upper }}</span>
-                                </div>
-                                <div>
-                                    <h3 class="text-white text-xl font-bold">{{ profile.name }}</h3>
-                                    {% if selectedCharacter and selectedCharacter.tradingProfile.id == profile.id %}
-                                        <span class="bg-green-600 text-green-100 px-2 py-1 rounded-full text-xs font-medium">✓ PROFIL ACTIF</span>
-                                    {% endif %}
-                                </div>
-                            </div>
-                        </div>
-                        
-                        {% if profile.description %}
-                            <div class="bg-gray-700 bg-opacity-50 rounded-lg p-3 mb-4">
-                                <p class="text-gray-300 text-sm italic">"{{ profile.description }}"</p>
-                            </div>
-                        {% endif %}
-                        
-                        <!-- Statistiques du profil -->
-                        <div class="grid grid-cols-2 gap-4 mb-4">
-                            <div class="text-center">
-                                <div class="text-2xl font-bold text-blue-400">{{ profile.dofusCharacters|length }}</div>
-                                <div class="text-gray-400 text-sm">{{ profile.dofusCharacters|length > 1 ? 'Personnages' : 'Personnage' }}</div>
-                            </div>
-                            <div class="text-center">
-                                <div class="text-sm text-gray-400">Créé le</div>
-                                <div class="text-white font-medium">{{ profile.createdAt|date('d/m/Y') }}</div>
-                            </div>
-                        </div>
-
-                        <!-- Action d'ajout de personnage -->
-                        <div class="mb-4">
-                            <a href="{{ path('app_profile_character_new', {id: profile.id}) }}" 
-                               class="w-full bg-green-600 hover:bg-green-700 text-white px-4 py-2 rounded-lg text-center transition-colors font-medium flex items-center justify-center">
-                                <span class="mr-2">👤</span>
-                                Ajouter un personnage
-                            </a>
-                        </div>
-
-                        <!-- Liste des personnages -->
-                        {% if profile.dofusCharacters|length > 0 %}
-                            <div class="border-t border-gray-700 pt-4">
-                                <h4 class="text-gray-300 font-semibold mb-3 flex items-center">
-                                    <span class="mr-2">🎮</span>
-                                    Personnages ({{ profile.dofusCharacters|length }})
-                                </h4>
-                                <div class="space-y-2">
-                                    {% for character in profile.dofusCharacters %}
-                                        <div class="flex justify-between items-center p-3 bg-gray-700 bg-opacity-50 rounded-lg 
-                                                    {{ selectedCharacter and character.id == selectedCharacter.id ? 'ring-2 ring-green-400 bg-green-800 bg-opacity-30' : '' }}">
-                                            <div class="flex items-center space-x-3">
-                                                <div class="w-8 h-8 rounded-full overflow-hidden">
-                                                    <img src="{{ character.classe.imagePath }}" 
-                                                         alt="{{ character.classe.name }}" 
-                                                         class="w-full h-full object-cover"
-                                                         onerror="this.style.display='none'; this.nextElementSibling.style.display='flex';">
-                                                    <div class="w-full h-full bg-gradient-to-br from-blue-400 to-purple-500 rounded-full flex items-center justify-center text-white font-bold text-sm" style="display: none;">
-                                                        {{ character.name|first|upper }}
-                                                    </div>
-                                                </div>
-                                                <div>
-                                                    <div class="text-white font-medium">{{ character.name }}</div>
-                                                    <div class="text-gray-400 text-sm">{{ character.classe.name }} • {{ character.server.name }}</div>
-                                                </div>
-                                            </div>
-                                            <div>
-                                                {% if selectedCharacter and character.id == selectedCharacter.id %}
-                                                    <span class="text-green-400 text-sm font-medium flex items-center">
-                                                        <span class="mr-1">★</span>
-                                                        ACTIF
-                                                    </span>
-                                                {% else %}
-                                                    <a href="{{ path('app_profile_character_select', {id: character.id}) }}" 
-                                                       class="bg-blue-600 hover:bg-blue-700 text-white text-xs px-3 py-1 rounded-full transition-colors">
-                                                        Sélectionner
-                                                    </a>
-                                                {% endif %}
-                                            </div>
+                    {% if profile.id != activeProfile.id %}
+                        <a href="{{ path('app_profile_switch', {id: profile.id}) }}" 
+                           class="wrapper-background border-2 border-gray-700 hover:border-gray-600 transition-all duration-200 block">
+                            <div class="flex justify-between items-start mb-4">
+                                <div class="flex items-center space-x-3">
+                                    <div class="w-12 h-12 bg-gradient-to-br from-purple-500 to-pink-600 rounded-lg flex items-center justify-center">
+                                        <span class="text-white font-bold text-lg">{{ profile.name|first|upper }}</span>
+                                    </div>
+                                    <div>
+                                        <h3 class="text-white text-xl font-bold">{{ profile.name }}</h3>
+                                        <div class="text-gray-400 text-sm">
+                                            {{ profile.dofusCharacters|length }} personnage{{ profile.dofusCharacters|length > 1 ? 's' : '' }}
                                         </div>
-                                    {% endfor %}
+                                    </div>
                                 </div>
                             </div>
-                        {% else %}
-                            <div class="border-t border-gray-700 pt-4 text-center">
-                                <div class="text-gray-400 text-sm mb-2">Aucun personnage dans ce profil</div>
-                                <div class="text-2xl mb-2">👤</div>
-                                <a href="{{ path('app_profile_character_new', {id: profile.id}) }}" 
-                                   class="text-blue-400 hover:text-blue-300 text-sm">
-                                    Ajouter le premier personnage
-                                </a>
-                            </div>
-                        {% endif %}
-                    </div>
+
+                            {% if profile.description %}
+                                <div class="bg-gray-700 bg-opacity-50 rounded-lg p-3 mb-4">
+                                    <p class="text-gray-300 text-sm italic">"{{ profile.description }}"</p>
+                                </div>
+                            {% else %}
+                                <div class="bg-gray-700 bg-opacity-50 rounded-lg p-3 mb-4">
+                                    <p class="text-gray-500 text-sm italic">Aucune description</p>
+                                </div>
+                            {% endif %}
+
+                            <!-- Aperçu des personnages -->
+                            {% if profile.dofusCharacters|length > 0 %}
+                                <div class="bg-gray-700 bg-opacity-30 rounded-lg p-3">
+                                    <div class="text-gray-300 text-sm mb-2">Personnages :</div>
+                                    <div class="flex flex-wrap gap-2">
+                                        {% for character in profile.dofusCharacters|slice(0, 3) %}
+                                            <span class="bg-gray-600 text-gray-200 px-2 py-1 rounded text-xs">
+                                                {{ character.name }}
+                                            </span>
+                                        {% endfor %}
+                                        {% if profile.dofusCharacters|length > 3 %}
+                                            <span class="text-gray-400 text-xs">+{{ profile.dofusCharacters|length - 3 }} autres</span>
+                                        {% endif %}
+                                    </div>
+                                </div>
+                            {% else %}
+                                <div class="text-center text-gray-400 text-sm">
+                                    Aucun personnage dans ce profil
+                                </div>
+                            {% endif %}
+                        </a>
+                    {% endif %}
                 {% endfor %}
             </div>
+        {% elseif profiles|length == 1 %}
+            <div class="text-center py-8">
+                <div class="wrapper-background max-w-md mx-auto">
+                    <div class="text-4xl mb-4">👥</div>
+                    <h3 class="text-white text-lg font-bold mb-3">Un seul profil</h3>
+                    <p class="text-gray-400 mb-6">
+                        Vous n'avez qu'un seul profil de trading. Créez-en un autre pour organiser différentes stratégies.
+                    </p>
+                    <a href="{{ path('app_profile_new') }}" 
+                       class="bg-gradient-to-r from-blue-500 to-purple-600 hover:from-blue-600 hover:to-purple-700 text-white px-6 py-3 rounded-lg transition-all duration-200 font-bold inline-flex items-center shadow-lg">
+                        <span class="text-lg mr-2">✨</span>
+                        Créer un second profil
+                    </a>
+                </div>
+            </div>
         {% else %}
-            <!-- État vide amélioré -->
+            <!-- État vide -->
             <div class="text-center py-16">
                 <div class="wrapper-background max-w-md mx-auto">
                     <div class="text-6xl mb-4">👥</div>
