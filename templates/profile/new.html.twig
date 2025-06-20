@@ -22,54 +22,54 @@
             </div>
 
             <!-- Formulaire principal -->
-            <div class="wrapper-background">
-                <h3 class="text-white text-lg font-semibold mb-6 flex items-center">
-                    <span class="text-2xl mr-3">📝</span>
-                    Informations du profil
-                </h3>
-
+            {% set form_content %}
                 {{ form_start(form) }}
-                
-                <div class="space-y-6">
-                    <div>
-                        {{ form_label(form.name, null, {'label_attr': {'class': 'block text-white font-medium mb-2'}}) }}
-                        {{ form_widget(form.name, {'attr': {'class': 'w-full px-4 py-3 border border-gray-600 bg-gray-700 text-white rounded-lg focus:outline-none focus:border-blue-500 focus:ring-2 focus:ring-blue-500 focus:ring-opacity-20', 'placeholder': 'ex: Trading Principal, Kamas Farm, etc.'}}) }}
-                        {{ form_errors(form.name) }}
-                        <div class="form-help">💡 Choisissez un nom qui décrit votre stratégie</div>
+                    <div class="space-y-6">
+                        <div>
+                            {{ form_label(form.name, null, {'label_attr': {'class': 'block text-white font-medium mb-2'}}) }}
+                            {{ form_widget(form.name, {'attr': {'class': 'w-full px-4 py-3 border border-gray-600 bg-gray-700 text-white rounded-lg focus:outline-none focus:border-blue-500 focus:ring-2 focus:ring-blue-500 focus:ring-opacity-20', 'placeholder': 'ex: Trading Principal, Kamas Farm, etc.'}}) }}
+                            {{ form_errors(form.name) }}
+                            <div class="form-help">💡 Choisissez un nom qui décrit votre stratégie</div>
+                        </div>
+
+                        <div>
+                            {{ form_label(form.description, null, {'label_attr': {'class': 'block text-white font-medium mb-2'}}) }}
+                            {{ form_widget(form.description, {'attr': {'class': 'w-full px-4 py-3 border border-gray-600 bg-gray-700 text-white rounded-lg focus:outline-none focus:border-blue-500 focus:ring-2 focus:ring-blue-500 focus:ring-opacity-20', 'rows': 4, 'placeholder': 'Décrivez votre stratégie de trading, vos objectifs, les serveurs ciblés...'}}) }}
+                            {{ form_errors(form.description) }}
+                            <div class="form-help">📋 Description optionnelle de votre approche</div>
+                        </div>
                     </div>
 
-                    <div>
-                        {{ form_label(form.description, null, {'label_attr': {'class': 'block text-white font-medium mb-2'}}) }}
-                        {{ form_widget(form.description, {'attr': {'class': 'w-full px-4 py-3 border border-gray-600 bg-gray-700 text-white rounded-lg focus:outline-none focus:border-blue-500 focus:ring-2 focus:ring-blue-500 focus:ring-opacity-20', 'rows': 4, 'placeholder': 'Décrivez votre stratégie de trading, vos objectifs, les serveurs ciblés...'}}) }}
-                        {{ form_errors(form.description) }}
-                        <div class="form-help">📋 Description optionnelle de votre approche</div>
+                    <!-- Étapes suivantes -->
+                    <div class="mt-6 bg-gradient-to-r from-blue-600 to-purple-600 rounded-lg p-4">
+                        <h4 class="text-white font-semibold mb-2">🚀 Prochaines étapes</h4>
+                        <div class="text-blue-100 text-sm space-y-1">
+                            <p>1. ✅ Créer le profil</p>
+                            <p>2. 👤 Ajouter vos personnages Dofus</p>
+                            <p>3. 📦 Commencer à tracker vos lots</p>
+                            <p>4. 📊 Analyser vos profits</p>
+                        </div>
                     </div>
-                </div>
 
-                <!-- Étapes suivantes -->
-                <div class="mt-6 bg-gradient-to-r from-blue-600 to-purple-600 rounded-lg p-4">
-                    <h4 class="text-white font-semibold mb-2">🚀 Prochaines étapes</h4>
-                    <div class="text-blue-100 text-sm space-y-1">
-                        <p>1. ✅ Créer le profil</p>
-                        <p>2. 👤 Ajouter vos personnages Dofus</p>
-                        <p>3. 📦 Commencer à tracker vos lots</p>
-                        <p>4. 📊 Analyser vos profits</p>
+                    <div class="action-group">
+                        <button type="submit" class="btn-full btn-primary btn-with-icon">
+                            <span class="mr-2">✨</span>
+                            Créer le profil
+                        </button>
+                        <a href="{{ path('app_profile_index') }}" class="btn-full btn-secondary btn-with-icon text-center">
+                            <span class="mr-2">❌</span>
+                            Annuler
+                        </a>
                     </div>
-                </div>
-
-                <div class="action-group">
-                    <button type="submit" class="btn-full btn-primary btn-with-icon">
-                        <span class="mr-2">✨</span>
-                        Créer le profil
-                    </button>
-                    <a href="{{ path('app_profile_index') }}" class="btn-full btn-secondary btn-with-icon text-center">
-                        <span class="mr-2">❌</span>
-                        Annuler
-                    </a>
-                </div>
-
                 {{ form_end(form) }}
-            </div>
+            {% endset %}
+
+            {% include 'components/form_section.html.twig' with {
+                title: 'Informations du profil',
+                icon: '📝',
+                color: 'green',
+                content: form_content
+            } %}
         </div>
     </div>
 {% endblock %}

@@ -44,6 +44,150 @@
         </div>
     {% endif %}
 
+    {% set form_content %}
+        <div data-controller="profit-calculator">
+            {{ form_start(form) }}
+                <div class="form-grid">
+                    <!-- Item avec autocomplétion ou lecture seule -->
+                    {% if is_edit %}
+                        <div class="md:col-span-2">
+                            <label class="form-label">Item sélectionné</label>
+                            <div class="w-full px-4 py-3 border border-gray-600 bg-gray-700 text-white rounded-lg flex items-center justify-between">
+                                <div class="flex items-center space-x-3">
+                                    <div class="w-10 h-10 bg-gradient-to-br from-blue-500 to-purple-600 rounded-lg flex items-center justify-center text-white font-bold">
+                                        {{ lot.item.name|first|upper }}
+                                    </div>
+                                    <div>
+                                        {% include 'components/item_display.html.twig' with {item: lot.item} %}
+                                    </div>
+                                </div>
+                                <div class="bg-gray-600 text-gray-300 px-3 py-1 rounded-full text-sm flex items-center">
+                                    <span class="mr-1">🔒</span>
+                                    Fixé
+                                </div>
+                            </div>
+                            {{ form_widget(form.item, {'attr': {'style': 'display: none;'}}) }}
+                            {{ form_errors(form.item) }}
+                            <div class="form-help">💡 L'item ne peut pas être modifié après création</div>
+                        </div>
+                    {% else %}
+                        <div class="md:col-span-2 relative" data-controller="autocomplete" data-autocomplete-url-value="{{ path('api_items_search') }}">
+                            {{ form_label(form.itemSearch, null, {'label_attr': {'class': 'form-label'}}) }}
+                            {{ form_widget(form.itemSearch, {'attr': {'class': 'form-input-lg', 'placeholder': 'Tapez pour rechercher un item...', 'data-autocomplete-target': 'input', 'data-action': 'input->autocomplete#search'}}) }}
+                            
+                            <div data-autocomplete-target="results" 
+                                data-action="click->autocomplete#selectItem"
+                                class="absolute z-10 w-full bg-gray-800 border border-gray-600 rounded-md shadow-lg hidden max-h-60 overflow-y-auto mt-1">
+                            </div>
+
+                            {{ form_widget(form.item, {'attr': {'style': 'display: none;', 'data-autocomplete-target': 'hiddenId'}}) }}
+                            {{ form_errors(form.item) }}
+                            
+                            <div class="form-help">🔍 Tapez pour rechercher et sélectionner un item</div>
+                        </div>
+                    {% endif %}
+
+                    <!-- Configuration du lot -->
+                    <div>
+                        {{ form_label(form.lotSize, null, {'label_attr': {'class': 'form-label'}}) }}
+                        <div class="relative">
+                            {{ form_widget(form.lotSize, {'attr': {
+                                'class': 'form-input-lg', 
+                                'placeholder': 'ex: 100',
+                                'data-profit-calculator-target': 'lotSize',
+                                'data-action': 'input->profit-calculator#updateProfit'
+                            }}) }}
+                            <div class="absolute inset-y-0 right-0 pr-3 flex items-center">
+                                <span class="text-gray-400 text-sm">lots</span>
+                            </div>
+                        </div>
+                        {{ form_errors(form.lotSize) }}
+                        <div class="form-help">📊 Quantité totale à trader</div>
+                    </div>
+
+                    <div>
+                        {{ form_label(form.saleUnit, null, {'label_attr': {'class': 'form-label'}}) }}
+                        {{ form_widget(form.saleUnit, {'attr': {'class': 'form-input-lg'}}) }}
+                        {{ form_errors(form.saleUnit) }}
+                        <div class="form-help">🎯 Comment vous vendez sur Dofus</div>
+                    </div>
+
+                    <!-- Prix -->
+                    <div>
+                        {{ form_label(form.buyPricePerLot, null, {'label_attr': {'class': 'form-label'}}) }}
+                        <div class="relative">
+                            {{ form_widget(form.buyPricePerLot, {'attr': {
+                                'class': 'form-input-lg form-input-danger', 
+                                'placeholder': '1000',
+                                'data-profit-calculator-target': 'buyPrice',
+                                'data-action': 'input->profit-calculator#updateProfit'
+                            }}) }}
+                            <div class="absolute inset-y-0 right-0 pr-3 flex items-center">
+                                <span class="text-gray-400 text-sm">kamas</span>
+                            </div>
+                        </div>
+                        {{ form_errors(form.buyPricePerLot) }}
+                        <div class="text-red-400 text-sm mt-1">💸 Prix payé pour acheter</div>
+                    </div>
+
+                    <div>
+                        {{ form_label(form.sellPricePerLot, null, {'label_attr': {'class': 'form-label'}}) }}
+                        <div class="relative">
+                            {{ form_widget(form.sellPricePerLot, {'attr': {
+                                'class': 'form-input-lg form-input-success', 
+                                'placeholder': '1200',
+                                'data-profit-calculator-target': 'sellPrice',
+                                'data-action': 'input->profit-calculator#updateProfit'
+                            }}) }}
+                            <div class="absolute inset-y-0 right-0 pr-3 flex items-center">
+                                <span class="text-gray-400 text-sm">kamas</span>
+                            </div>
+                        </div>
+                        {{ form_errors(form.sellPricePerLot) }}
+                        <div class="text-green-400 text-sm mt-1">💰 Prix de vente souhaité</div>
+                    </div>
+
+                    <!-- Statut -->
+                    <div class="md:col-span-2">
+                        {{ form_label(form.status, null, {'label_attr': {'class': 'form-label'}}) }}
+                        {{ form_widget(form.status, {'attr': {'class': 'form-input-lg'}}) }}
+                        {{ form_errors(form.status) }}
+                        <div class="form-help">📋 {{ is_edit ? 'Statut du lot' : 'Statut initial du lot' }}</div>
+                    </div>
+                </div>
+
+                <!-- Aperçu du profit -->
+                <div class="mt-6 info-box-primary">
+                    <h4 class="info-title">
+                        <span>💡</span>
+                        {{ is_edit ? 'Nouveau calcul de profit' : 'Aperçu du profit' }}
+                    </h4>
+                    <div class="stats-grid-3 text-center">
+                        <!-- contenu -->
+                    </div>
+                </div>
+
+                <!-- Actions -->
+                <div class="action-group mt-8">
+                    <button type="submit" class="btn-full btn-{{ is_edit ? 'primary' : 'success' }} btn-with-icon">
+                        <span>{{ is_edit ? '💾' : '✅' }}</span>
+                        {{ is_edit ? 'Sauvegarder les modifications' : 'Créer le lot' }}
+                    </button>
+                    <a href="{{ path('app_lot_index') }}" class="btn-full btn-secondary btn-with-icon text-center">
+                        <span>❌</span>
+                        Annuler
+                    </a>
+                </div>
+            {{ form_end(form) }}
+        </div>
+    {% endset %}
+
+    {% include 'components/form_section.html.twig' with {
+        title: is_edit ? 'Modifier les informations' : 'Informations du lot',
+        icon: is_edit ? '🔄' : '📝',
+        content: form_content
+    } %}
+
     <!-- Formulaire principal -->
     <div class="wrapper-background" data-controller="profit-calculator">
         <h3 class="text-white text-lg font-semibold mb-6 flex items-center">
@@ -53,137 +197,7 @@
 
         {{ form_start(form) }}
         
-        <div class="form-grid">
-            <!-- Item avec autocomplétion ou lecture seule -->
-            {% if is_edit %}
-                <div class="md:col-span-2">
-                    <label class="form-label">Item sélectionné</label>
-                    <div class="w-full px-4 py-3 border border-gray-600 bg-gray-700 text-white rounded-lg flex items-center justify-between">
-                        <div class="flex items-center space-x-3">
-                            <div class="w-10 h-10 bg-gradient-to-br from-blue-500 to-purple-600 rounded-lg flex items-center justify-center text-white font-bold">
-                                {{ lot.item.name|first|upper }}
-                            </div>
-                            <div>
-                                {% include 'components/item_display.html.twig' with {item: lot.item} %}
-                            </div>
-                        </div>
-                        <div class="bg-gray-600 text-gray-300 px-3 py-1 rounded-full text-sm flex items-center">
-                            <span class="mr-1">🔒</span>
-                            Fixé
-                        </div>
-                    </div>
-                    {{ form_widget(form.item, {'attr': {'style': 'display: none;'}}) }}
-                    {{ form_errors(form.item) }}
-                    <div class="form-help">💡 L'item ne peut pas être modifié après création</div>
-                </div>
-            {% else %}
-                <div class="md:col-span-2 relative" data-controller="autocomplete" data-autocomplete-url-value="{{ path('api_items_search') }}">
-                    {{ form_label(form.itemSearch, null, {'label_attr': {'class': 'form-label'}}) }}
-                    {{ form_widget(form.itemSearch, {'attr': {'class': 'form-input-lg', 'placeholder': 'Tapez pour rechercher un item...', 'data-autocomplete-target': 'input', 'data-action': 'input->autocomplete#search'}}) }}
-                    
-                    <div data-autocomplete-target="results" 
-                         data-action="click->autocomplete#selectItem"
-                         class="absolute z-10 w-full bg-gray-800 border border-gray-600 rounded-md shadow-lg hidden max-h-60 overflow-y-auto mt-1">
-                    </div>
-
-                    {{ form_widget(form.item, {'attr': {'style': 'display: none;', 'data-autocomplete-target': 'hiddenId'}}) }}
-                    {{ form_errors(form.item) }}
-                    
-                    <div class="form-help">🔍 Tapez pour rechercher et sélectionner un item</div>
-                </div>
-            {% endif %}
-
-            <!-- Configuration du lot -->
-            <div>
-                {{ form_label(form.lotSize, null, {'label_attr': {'class': 'form-label'}}) }}
-                <div class="relative">
-                    {{ form_widget(form.lotSize, {'attr': {
-                        'class': 'form-input-lg', 
-                        'placeholder': 'ex: 100',
-                        'data-profit-calculator-target': 'lotSize',
-                        'data-action': 'input->profit-calculator#updateProfit'
-                    }}) }}
-                    <div class="absolute inset-y-0 right-0 pr-3 flex items-center">
-                        <span class="text-gray-400 text-sm">lots</span>
-                    </div>
-                </div>
-                {{ form_errors(form.lotSize) }}
-                <div class="form-help">📊 Quantité totale à trader</div>
-            </div>
-
-            <div>
-                {{ form_label(form.saleUnit, null, {'label_attr': {'class': 'form-label'}}) }}
-                {{ form_widget(form.saleUnit, {'attr': {'class': 'form-input-lg'}}) }}
-                {{ form_errors(form.saleUnit) }}
-                <div class="form-help">🎯 Comment vous vendez sur Dofus</div>
-            </div>
-
-            <!-- Prix -->
-            <div>
-                {{ form_label(form.buyPricePerLot, null, {'label_attr': {'class': 'form-label'}}) }}
-                <div class="relative">
-                    {{ form_widget(form.buyPricePerLot, {'attr': {
-                        'class': 'form-input-lg form-input-danger', 
-                        'placeholder': '1000',
-                        'data-profit-calculator-target': 'buyPrice',
-                        'data-action': 'input->profit-calculator#updateProfit'
-                    }}) }}
-                    <div class="absolute inset-y-0 right-0 pr-3 flex items-center">
-                        <span class="text-gray-400 text-sm">kamas</span>
-                    </div>
-                </div>
-                {{ form_errors(form.buyPricePerLot) }}
-                <div class="text-red-400 text-sm mt-1">💸 Prix payé pour acheter</div>
-            </div>
-
-            <div>
-                {{ form_label(form.sellPricePerLot, null, {'label_attr': {'class': 'form-label'}}) }}
-                <div class="relative">
-                    {{ form_widget(form.sellPricePerLot, {'attr': {
-                        'class': 'form-input-lg form-input-success', 
-                        'placeholder': '1200',
-                        'data-profit-calculator-target': 'sellPrice',
-                        'data-action': 'input->profit-calculator#updateProfit'
-                    }}) }}
-                    <div class="absolute inset-y-0 right-0 pr-3 flex items-center">
-                        <span class="text-gray-400 text-sm">kamas</span>
-                    </div>
-                </div>
-                {{ form_errors(form.sellPricePerLot) }}
-                <div class="text-green-400 text-sm mt-1">💰 Prix de vente souhaité</div>
-            </div>
-
-            <!-- Statut -->
-            <div class="md:col-span-2">
-                {{ form_label(form.status, null, {'label_attr': {'class': 'form-label'}}) }}
-                {{ form_widget(form.status, {'attr': {'class': 'form-input-lg'}}) }}
-                {{ form_errors(form.status) }}
-                <div class="form-help">📋 {{ is_edit ? 'Statut du lot' : 'Statut initial du lot' }}</div>
-            </div>
-        </div>
-
-        <!-- Aperçu du profit -->
-        <div class="mt-6 info-box-primary">
-            <h4 class="info-title">
-                <span>💡</span>
-                {{ is_edit ? 'Nouveau calcul de profit' : 'Aperçu du profit' }}
-            </h4>
-            <div class="stats-grid-3 text-center">
-                <!-- contenu -->
-            </div>
-        </div>
-
-        <!-- Actions -->
-        <div class="action-group mt-8">
-            <button type="submit" class="btn-full btn-{{ is_edit ? 'primary' : 'success' }} btn-with-icon">
-                <span>{{ is_edit ? '💾' : '✅' }}</span>
-                {{ is_edit ? 'Sauvegarder les modifications' : 'Créer le lot' }}
-            </button>
-            <a href="{{ path('app_lot_index') }}" class="btn-full btn-secondary btn-with-icon text-center">
-                <span>❌</span>
-                Annuler
-            </a>
-        </div>
+        
 
         {{ form_end(form) }}
     </div>

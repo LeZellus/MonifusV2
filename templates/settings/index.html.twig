@@ -13,12 +13,10 @@
 {% block body %}
     <div class="wrapper-container">
         <div class="max-w-2xl mx-auto grid gap-8">
+            {{ form_start(form, {'attr': {'class': 'grid gap-4'}}) }}
+            
             <!-- Informations générales -->
-            <div class="wrapper-background">
-                <h2 class="text-white text-xl font-semibold">👤 Informations personnelles</h2>
-                
-                {{ form_start(form) }}
-                
+            {% set personal_info_content %}
                 <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
                     <div>
                         {{ form_label(form.email, null, {'label_attr': {'class': 'block text-white font-medium mb-2'}}) }}
@@ -52,12 +50,17 @@
                     {{ form_errors(form.description) }}
                     <div class="form-help">Une courte description de votre profil</div>
                 </div>
-            </div>
+            {% endset %}
+
+            {% include 'components/form_section.html.twig' with {
+                title: 'Informations personnelles',
+                icon: '👤',
+                color: 'blue',
+                content: personal_info_content
+            } %}
 
             <!-- Réseaux sociaux -->
-            <div class="wrapper-background">
-                <h2 class="text-white text-xl font-semibold">🌐 Réseaux sociaux</h2>
-                
+            {% set social_content %}
                 <div class="space-y-4">
                     <div>
                         {{ form_label(form.youtubeUrl, null, {'label_attr': {'class': 'block text-white font-medium mb-2'}}) }}
@@ -73,12 +76,17 @@
                         <div class="form-help">https://twitch.tv/votre-chaine</div>
                     </div>
                 </div>
-            </div>
+            {% endset %}
+
+            {% include 'components/form_section.html.twig' with {
+                title: 'Réseaux sociaux',
+                icon: '🌐',
+                color: 'purple',
+                content: social_content
+            } %}
 
             <!-- Sécurité -->
-            <div class="wrapper-background">
-                <h2 class="text-white text-xl font-semibold">🔒 Sécurité</h2>
-                
+            {% set security_content %}
                 <div>
                     {{ form_label(form.plainPassword, null, {'label_attr': {'class': 'block text-white font-medium mb-2'}}) }}
                     {{ form_widget(form.plainPassword) }}
@@ -87,7 +95,14 @@
                         Laissez vide si vous ne souhaitez pas changer votre mot de passe
                     </div>
                 </div>
-            </div>
+            {% endset %}
+
+            {% include 'components/form_section.html.twig' with {
+                title: 'Sécurité',
+                icon: '🔒',
+                color: 'red',
+                content: security_content
+            } %}
 
             <!-- Actions -->
             <div class="action-group">
@@ -104,8 +119,7 @@
             {{ form_end(form) }}
 
             <!-- Informations du compte -->
-            <div class="wrapper-background">
-                <h3 class="text-white text-lg font-semibold mb-4">ℹ️ Informations du compte</h3>
+            {% set account_info_content %}
                 <div class="stats-grid-2 text-sm">
                     <div>
                         <span class="text-gray-400">Compte créé le :</span>
@@ -128,7 +142,14 @@
                         </span>
                     </div>
                 </div>
-            </div>
+            {% endset %}
+
+            {% include 'components/form_section.html.twig' with {
+                title: 'Informations du compte',
+                icon: 'ℹ️',
+                color: 'gray',
+                content: account_info_content
+            } %}
 
             <!-- Actions avancées -->
             <div class="stats-grid-2">

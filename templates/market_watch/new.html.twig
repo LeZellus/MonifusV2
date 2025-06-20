@@ -36,117 +36,117 @@
             </div>
 
             <!-- Formulaire principal -->
-            <div class="wrapper-background">
-                <h3 class="text-white text-lg font-semibold mb-6 flex items-center">
-                    <span class="text-2xl mr-3">📝</span>
-                    Observer les prix du marché
-                </h3>
-
+            {% set form_content %}
                 {{ form_start(form) }}
-                
-                <div class="space-y-6">
-                    <!-- Ressource avec autocomplétion -->
-                    <div class="relative" data-controller="autocomplete" data-autocomplete-url-value="{{ path('api_items_search_resources') }}">
-                        <!-- Label -->
-                        {{ form_label(form.itemSearch, null, {'label_attr': {'class': 'block text-white font-medium mb-2'}}) }}
-                        
-                        <!-- Champ de recherche -->
-                        {{ form_widget(form.itemSearch, {'attr': {'class': 'w-full px-4 py-3 border border-gray-600 bg-gray-700 text-white rounded-lg focus:outline-none focus:border-orange-500 focus:ring-2 focus:ring-orange-500 focus:ring-opacity-20', 'placeholder': 'Tapez pour rechercher une ressource...', 'data-autocomplete-target': 'input', 'data-action': 'input->autocomplete#search'}}) }}
-                        
-                        <!-- Zone des résultats d'autocomplétion -->
-                        <div data-autocomplete-target="results" 
-                             data-action="click->autocomplete#selectItem"
-                             class="absolute z-10 w-full bg-gray-800 border border-gray-600 rounded-md shadow-lg hidden max-h-60 overflow-y-auto mt-1">
-                        </div>
-
-                        <!-- Select caché pour l'item sélectionné -->
-                        {{ form_widget(form.item, {'attr': {'style': 'display: none;', 'data-autocomplete-target': 'hiddenId'}}) }}
-                        {{ form_errors(form.item) }}
-                        
-                        <div class="form-help">🔍 Recherche filtrée sur les ressources</div>
-                    </div>
-
-                    <!-- Date d'observation -->
-                    <div>
-                        {{ form_label(form.observedAt, null, {'label_attr': {'class': 'block text-white font-medium mb-2'}}) }}
-                        {{ form_widget(form.observedAt, {'attr': {'class': 'w-full px-3 py-2 border border-gray-600 bg-gray-700 text-white rounded-md focus:outline-none focus:border-orange-500'}}) }}
-                        {{ form_errors(form.observedAt) }}
-                        <div class="form-help">📅 Quand avez-vous observé ces prix ?</div>
-                    </div>
-
-                    <!-- Prix observés -->
-                    <div class="bg-gradient-to-r from-blue-600 to-purple-600 rounded-lg p-4">
-                        <h4 class="text-white font-semibold mb-4 flex items-center">
-                            <span class="mr-2">💰</span>
-                            Prix observés sur l'hôtel de vente
-                        </h4>
-                        <div class="text-blue-100 text-sm mb-4">
-                            Renseignez au moins un prix. Laissez vide si cette unité n'est pas disponible.
-                        </div>
-                        
-                        <div class="grid grid-cols-1 md:grid-cols-3 gap-4">
-                            <div class="bg-white bg-opacity-10 rounded-lg p-4">
-                                {{ form_label(form.pricePerUnit, null, {'label_attr': {'class': 'block text-white font-medium mb-2'}}) }}
-                                <div class="relative">
-                                    {{ form_widget(form.pricePerUnit, {'attr': {'class': 'w-full px-4 py-3 pr-12 border border-gray-600 bg-gray-700 text-white rounded-lg focus:outline-none focus:border-green-500'}}) }}
-                                    <div class="absolute inset-y-0 right-0 pr-3 flex items-center">
-                                        <span class="text-gray-400 text-sm">kamas</span>
-                                    </div>
-                                </div>
-                                {{ form_errors(form.pricePerUnit) }}
-                                <div class="text-green-200 text-xs mt-1">Prix d'1 seule unité</div>
+                    <div class="space-y-6">
+                        <!-- Ressource avec autocomplétion -->
+                        <div class="relative" data-controller="autocomplete" data-autocomplete-url-value="{{ path('api_items_search_resources') }}">
+                            <!-- Label -->
+                            {{ form_label(form.itemSearch, null, {'label_attr': {'class': 'block text-white font-medium mb-2'}}) }}
+                            
+                            <!-- Champ de recherche -->
+                            {{ form_widget(form.itemSearch, {'attr': {'class': 'w-full px-4 py-3 border border-gray-600 bg-gray-700 text-white rounded-lg focus:outline-none focus:border-orange-500 focus:ring-2 focus:ring-orange-500 focus:ring-opacity-20', 'placeholder': 'Tapez pour rechercher une ressource...', 'data-autocomplete-target': 'input', 'data-action': 'input->autocomplete#search'}}) }}
+                            
+                            <!-- Zone des résultats d'autocomplétion -->
+                            <div data-autocomplete-target="results" 
+                                data-action="click->autocomplete#selectItem"
+                                class="absolute z-10 w-full bg-gray-800 border border-gray-600 rounded-md shadow-lg hidden max-h-60 overflow-y-auto mt-1">
                             </div>
 
-                            <div class="bg-white bg-opacity-10 rounded-lg p-4">
-                                {{ form_label(form.pricePer10, null, {'label_attr': {'class': 'block text-white font-medium mb-2'}}) }}
-                                <div class="relative">
-                                    {{ form_widget(form.pricePer10, {'attr': {'class': 'w-full px-4 py-3 pr-12 border border-gray-600 bg-gray-700 text-white rounded-lg focus:outline-none focus:border-blue-500'}}) }}
-                                    <div class="absolute inset-y-0 right-0 pr-3 flex items-center">
-                                        <span class="text-gray-400 text-sm">kamas</span>
-                                    </div>
-                                </div>
-                                {{ form_errors(form.pricePer10) }}
-                                <div class="text-blue-200 text-xs mt-1">Prix d'un lot de 10</div>
-                            </div>
+                            <!-- Select caché pour l'item sélectionné -->
+                            {{ form_widget(form.item, {'attr': {'style': 'display: none;', 'data-autocomplete-target': 'hiddenId'}}) }}
+                            {{ form_errors(form.item) }}
+                            
+                            <div class="form-help">🔍 Recherche filtrée sur les ressources</div>
+                        </div>
 
-                            <div class="bg-white bg-opacity-10 rounded-lg p-4">
-                                {{ form_label(form.pricePer100, null, {'label_attr': {'class': 'block text-white font-medium mb-2'}}) }}
-                                <div class="relative">
-                                    {{ form_widget(form.pricePer100, {'attr': {'class': 'w-full px-4 py-3 pr-12 border border-gray-600 bg-gray-700 text-white rounded-lg focus:outline-none focus:border-purple-500'}}) }}
-                                    <div class="absolute inset-y-0 right-0 pr-3 flex items-center">
-                                        <span class="text-gray-400 text-sm">kamas</span>
-                                    </div>
-                                </div>
-                                {{ form_errors(form.pricePer100) }}
-                                <div class="text-purple-200 text-xs mt-1">Prix d'un lot de 100</div>
+                        <!-- Date d'observation -->
+                        <div>
+                            {{ form_label(form.observedAt, null, {'label_attr': {'class': 'block text-white font-medium mb-2'}}) }}
+                            {{ form_widget(form.observedAt, {'attr': {'class': 'w-full px-3 py-2 border border-gray-600 bg-gray-700 text-white rounded-md focus:outline-none focus:border-orange-500'}}) }}
+                            {{ form_errors(form.observedAt) }}
+                            <div class="form-help">📅 Quand avez-vous observé ces prix ?</div>
+                        </div>
+
+                        <!-- Prix observés -->
+                        <div class="bg-gradient-to-r from-blue-600 to-purple-600 rounded-lg p-4">
+                            <h4 class="text-white font-semibold mb-4 flex items-center">
+                                <span class="mr-2">💰</span>
+                                Prix observés sur l'hôtel de vente
+                            </h4>
+                            <div class="text-blue-100 text-sm mb-4">
+                                Renseignez au moins un prix. Laissez vide si cette unité n'est pas disponible.
                             </div>
+                            
+                            <div class="grid grid-cols-1 md:grid-cols-3 gap-4">
+                                <div class="bg-white bg-opacity-10 rounded-lg p-4">
+                                    {{ form_label(form.pricePerUnit, null, {'label_attr': {'class': 'block text-white font-medium mb-2'}}) }}
+                                    <div class="relative">
+                                        {{ form_widget(form.pricePerUnit, {'attr': {'class': 'w-full px-4 py-3 pr-12 border border-gray-600 bg-gray-700 text-white rounded-lg focus:outline-none focus:border-green-500'}}) }}
+                                        <div class="absolute inset-y-0 right-0 pr-3 flex items-center">
+                                            <span class="text-gray-400 text-sm">kamas</span>
+                                        </div>
+                                    </div>
+                                    {{ form_errors(form.pricePerUnit) }}
+                                    <div class="text-green-200 text-xs mt-1">Prix d'1 seule unité</div>
+                                </div>
+
+                                <div class="bg-white bg-opacity-10 rounded-lg p-4">
+                                    {{ form_label(form.pricePer10, null, {'label_attr': {'class': 'block text-white font-medium mb-2'}}) }}
+                                    <div class="relative">
+                                        {{ form_widget(form.pricePer10, {'attr': {'class': 'w-full px-4 py-3 pr-12 border border-gray-600 bg-gray-700 text-white rounded-lg focus:outline-none focus:border-blue-500'}}) }}
+                                        <div class="absolute inset-y-0 right-0 pr-3 flex items-center">
+                                            <span class="text-gray-400 text-sm">kamas</span>
+                                        </div>
+                                    </div>
+                                    {{ form_errors(form.pricePer10) }}
+                                    <div class="text-blue-200 text-xs mt-1">Prix d'un lot de 10</div>
+                                </div>
+
+                                <div class="bg-white bg-opacity-10 rounded-lg p-4">
+                                    {{ form_label(form.pricePer100, null, {'label_attr': {'class': 'block text-white font-medium mb-2'}}) }}
+                                    <div class="relative">
+                                        {{ form_widget(form.pricePer100, {'attr': {'class': 'w-full px-4 py-3 pr-12 border border-gray-600 bg-gray-700 text-white rounded-lg focus:outline-none focus:border-purple-500'}}) }}
+                                        <div class="absolute inset-y-0 right-0 pr-3 flex items-center">
+                                            <span class="text-gray-400 text-sm">kamas</span>
+                                        </div>
+                                    </div>
+                                    {{ form_errors(form.pricePer100) }}
+                                    <div class="text-purple-200 text-xs mt-1">Prix d'un lot de 100</div>
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- Notes -->
+                        <div>
+                            {{ form_label(form.notes, null, {'label_attr': {'class': 'block text-white font-medium mb-2'}}) }}
+                            {{ form_widget(form.notes, {'attr': {'class': 'w-full px-3 py-2 border border-gray-600 bg-gray-700 text-white rounded-md focus:outline-none focus:border-orange-500', 'rows': 3}}) }}
+                            {{ form_errors(form.notes) }}
+                            <div class="form-help">📝 Contexte du marché, tendances observées...</div>
                         </div>
                     </div>
 
-                    <!-- Notes -->
-                    <div>
-                        {{ form_label(form.notes, null, {'label_attr': {'class': 'block text-white font-medium mb-2'}}) }}
-                        {{ form_widget(form.notes, {'attr': {'class': 'w-full px-3 py-2 border border-gray-600 bg-gray-700 text-white rounded-md focus:outline-none focus:border-orange-500', 'rows': 3}}) }}
-                        {{ form_errors(form.notes) }}
-                        <div class="form-help">📝 Contexte du marché, tendances observées...</div>
+                    <!-- Actions -->
+                    <div class="flex space-x-4 mt-8">
+                        <button type="submit" class="flex-1 bg-orange-600 hover:bg-orange-700 text-white font-bold py-3 px-6 rounded-lg transition-colors flex items-center justify-center">
+                            <span class="mr-2">📊</span>
+                            Enregistrer l'observation
+                        </button>
+                        <a href="{{ path('app_market_watch_index') }}" 
+                        class="flex-1 bg-gray-600 hover:bg-gray-700 text-white font-bold py-3 px-6 rounded-lg transition-colors text-center flex items-center justify-center">
+                            <span class="mr-2">❌</span>
+                            Annuler
+                        </a>
                     </div>
-                </div>
-
-                <!-- Actions -->
-                <div class="flex space-x-4 mt-8">
-                    <button type="submit" class="flex-1 bg-orange-600 hover:bg-orange-700 text-white font-bold py-3 px-6 rounded-lg transition-colors flex items-center justify-center">
-                        <span class="mr-2">📊</span>
-                        Enregistrer l'observation
-                    </button>
-                    <a href="{{ path('app_market_watch_index') }}" 
-                       class="flex-1 bg-gray-600 hover:bg-gray-700 text-white font-bold py-3 px-6 rounded-lg transition-colors text-center flex items-center justify-center">
-                        <span class="mr-2">❌</span>
-                        Annuler
-                    </a>
-                </div>
-
                 {{ form_end(form) }}
-            </div>
+            {% endset %}
+
+            {% include 'components/form_section.html.twig' with {
+                title: 'Observer les prix du marché',
+                icon: '📝',
+                color: 'orange',
+                content: form_content
+            } %}
         </div>
     </div>
 
