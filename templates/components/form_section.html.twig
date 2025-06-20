@@ -11,13 +11,14 @@ Usage: {% include 'components/form_section.html.twig' with {
 
 {% set icon_class = color is defined ? 'text-' ~ color ~ '-400' : '' %}
 
-<div class="wrapper-background">
-    <h3 class="text-white text-lg font-semibold mb-6 flex items-center {{ icon_class }}">
+<div>
+    <h3 class="text-white text-lg font-semibold mb-4 flex items-center {{ icon_class }}">
         {% if icon is defined %}
             <span class="text-2xl mr-3">{{ icon }}</span>
         {% endif %}
         {{ title }}
     </h3>
-    
-    {{ content|raw }}
+    <div class="wrapper-background">        
+        {{ content|raw }}
+    </div>
 </div>

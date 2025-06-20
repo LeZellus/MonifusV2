@@ -6,7 +6,7 @@
     <div class="wrapper-container">
         <!-- Bloc Profil Actif (ex-section bleue) -->
         {% if profiles|length > 0 %}
-            {% set activeProfile = selectedCharacter ? selectedCharacter.tradingProfile : profiles[0] %}
+            {% set activeProfile = selectedProfile ?? profiles[0] %}
             <div class="bg-gradient-to-r from-blue-600 to-purple-600 rounded-lg p-6">
                 <div class="flex items-center justify-between mb-4">
                     <h2 class="text-white text-2xl font-bold flex items-center">
@@ -27,7 +27,7 @@
                 {% endif %}
 
                 <!-- Personnage actif -->
-                {% if selectedCharacter %}
+                {% if selectedCharacter and selectedCharacter.tradingProfile.id == activeProfile.id %}
                     <div class="bg-white bg-opacity-20 rounded-lg p-4 mb-4">
                         <div class="flex items-center space-x-4">
                             <div class="w-16 h-16 rounded-full overflow-hidden border-4 border-white border-opacity-20">
@@ -200,33 +200,12 @@
                             </div>
 
                             {% if profile.description %}
-                                <div class="bg-gray-700 bg-opacity-50 rounded-lg p-3 mb-4">
+                                <div class="bg-gray-700 bg-opacity-50 rounded-lg p-3">
                                     <p class="text-gray-300 text-sm italic">"{{ profile.description }}"</p>
                                 </div>
                             {% else %}
-                                <div class="bg-gray-700 bg-opacity-50 rounded-lg p-3 mb-4">
+                                <div class="bg-gray-700 bg-opacity-50 rounded-lg p-3">
                                     <p class="text-gray-500 text-sm italic">Aucune description</p>
-                                </div>
-                            {% endif %}
-
-                            <!-- Aperçu des personnages -->
-                            {% if profile.dofusCharacters|length > 0 %}
-                                <div class="bg-gray-700 bg-opacity-30 rounded-lg p-3">
-                                    <div class="text-gray-300 text-sm mb-2">Personnages :</div>
-                                    <div class="flex flex-wrap gap-2">
-                                        {% for character in profile.dofusCharacters|slice(0, 3) %}
-                                            <span class="bg-gray-600 text-gray-200 px-2 py-1 rounded text-xs">
-                                                {{ character.name }}
-                                            </span>
-                                        {% endfor %}
-                                        {% if profile.dofusCharacters|length > 3 %}
-                                            <span class="text-gray-400 text-xs">+{{ profile.dofusCharacters|length - 3 }} autres</span>
-                                        {% endif %}
-                                    </div>
-                                </div>
-                            {% else %}
-                                <div class="text-center text-gray-400 text-sm">
-                                    Aucun personnage dans ce profil
                                 </div>
                             {% endif %}
                         </a>

@@ -12,6 +12,7 @@ use Doctrine\ORM\EntityManagerInterface;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
+use Symfony\Component\HttpFoundation\RequestStack; // AJOUT
 use Symfony\Component\Routing\Attribute\Route;
 use Symfony\Component\Security\Http\Attribute\IsGranted;
 
@@ -19,6 +20,12 @@ use Symfony\Component\Security\Http\Attribute\IsGranted;
 #[IsGranted('ROLE_USER')]
 class ProfileController extends AbstractController
 {
+    // AJOUT du constructeur pour RequestStack
+    public function __construct(
+        private RequestStack $requestStack
+    ) {
+    }
+
     #[Route('/', name: 'app_profile_index')]
     public function index(
         TradingProfileRepository $repository,
@@ -28,7 +35,36 @@ class ProfileController extends AbstractController
         $selectedCharacter = $characterService->getSelectedCharacter($this->getUser());
         $allCharacters = $characterService->getUserCharacters($this->getUser());
         
-        // Code ajouté
+        // NOUVEAU : Récupérer le profil sélectionné depuis la session
+        $session = $this->requestStack->getSession();
+        $selectedProfileId = $session->get('selected_profile_id');
+        $selectedProfile = null;
+        
+        // Trouver le profil sélectionné
+        if ($selectedProfileId) {
+            foreach ($profiles as $profile) {
+                if ($profile->getId() === $selectedProfileId) {
+                    $selectedProfile = $profile;
+                    break;
+                }
+            }
+        }
+        
+        // Si pas de profil en session ou profil introuvable, utiliser celui du personnage ou le premier
+        if (!$selectedProfile) {
+            if ($selectedCharacter) {
+                $selectedProfile = $selectedCharacter->getTradingProfile();
+                // Sauvegarder en session pour la prochaine fois
+                $session->set('selected_profile_id', $selectedProfile->getId());
+            } else {
+                $selectedProfile = $profiles[0] ?? null;
+                if ($selectedProfile) {
+                    $session->set('selected_profile_id', $selectedProfile->getId());
+                }
+            }
+        }
+        
+        // Code des stats (inchangé)
         foreach ($profiles as $profile) {
             foreach ($profile->getDofusCharacters() as $character) {
                 $lotsCount = $character->getLotGroups()->count();
@@ -54,6 +90,7 @@ class ProfileController extends AbstractController
         return $this->render('profile/index.html.twig', [
             'profiles' => $profiles,
             'selectedCharacter' => $selectedCharacter,
+            'selectedProfile' => $selectedProfile, // NOUVEAU
             'characters' => $allCharacters,
         ]);
     }
@@ -129,7 +166,6 @@ class ProfileController extends AbstractController
         return $this->redirectToRoute('app_profile_index');
     }
 
-    // FIX : Remettre la méthode GET et POST
     #[Route('/switch/{id}', name: 'app_profile_switch')]
     public function switchProfile(
         TradingProfile $profile,
@@ -140,6 +176,14 @@ class ProfileController extends AbstractController
             throw $this->createAccessDeniedException();
         }
 
+        $session = $this->requestStack->getSession();
+        
+        // TOUJOURS nettoyer la sélection de personnage d'abord
+        $session->remove('selected_character_id');
+        
+        // Puis sauvegarder le nouveau profil
+        $session->set('selected_profile_id', $profile->getId());
+
         // Sélectionner le premier personnage de ce profil s'il existe
         $characters = $profile->getDofusCharacters();
         if ($characters->count() > 0) {
@@ -147,7 +191,6 @@ class ProfileController extends AbstractController
             $characterService->setSelectedCharacter($firstCharacter);
             $this->addFlash('success', "Profil '{$profile->getName()}' activé avec le personnage {$firstCharacter->getName()}");
         } else {
-            // Pas de personnage dans ce profil, on peut quand même le sélectionner
             $this->addFlash('info', "Profil '{$profile->getName()}' activé. Ajoutez un personnage pour commencer !");
         }
 
