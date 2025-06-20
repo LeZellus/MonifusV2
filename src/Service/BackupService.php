@@ -81,10 +81,11 @@ class BackupService
                     $data['market_watch'][] = [
                         'character_name' => $character->getName(),
                         'item_name' => $watch->getItem()->getName(),
-                        'lot_size' => $watch->getLotSize(),
-                        'observed_price' => $watch->getObservedPrice(),
-                        'price_type' => $watch->getPriceType()->value,
+                        'price_per_unit' => $watch->getPricePerUnit(), // CORRIGÉ : utilise les bonnes méthodes
+                        'price_per_10' => $watch->getPricePer10(),
+                        'price_per_100' => $watch->getPricePer100(),
                         'notes' => $watch->getNotes(),
+                        'observed_at' => $watch->getObservedAt()->format('Y-m-d H:i:s'),
                         'updated_at' => $watch->getUpdatedAt()->format('Y-m-d H:i:s')
                     ];
                 }
