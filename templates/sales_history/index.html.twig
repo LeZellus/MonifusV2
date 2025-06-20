@@ -81,104 +81,15 @@
             {% endif %}
         </div>
 
-        {% if sales|length > 0 %}
-            <div class="bg-gray-800 rounded-lg overflow-hidden">
-                <table class="w-full">
-                    <thead class="bg-gray-700">
-                        <tr>
-                            <th class="px-6 py-3 text-left text-xs font-medium text-gray-300 uppercase tracking-wider">Date Vente</th>
-                            <th class="px-6 py-3 text-left text-xs font-medium text-gray-300 uppercase tracking-wider">Item</th>
-                            <th class="px-6 py-3 text-left text-xs font-medium text-gray-300 uppercase tracking-wider">Personnage</th>
-                            <th class="px-6 py-3 text-left text-xs font-medium text-gray-300 uppercase tracking-wider">Quantité</th>
-                            <th class="px-6 py-3 text-left text-xs font-medium text-gray-300 uppercase tracking-wider">Prix Réel</th>
-                            <th class="px-6 py-3 text-left text-xs font-medium text-gray-300 uppercase tracking-wider">Prix Attendu</th>
-                            <th class="px-6 py-3 text-left text-xs font-medium text-gray-300 uppercase tracking-wider">Profit Total</th>
-                            <th class="px-6 py-3 text-left text-xs font-medium text-gray-300 uppercase tracking-wider">Performance</th>
-                            <th class="px-6 py-3 text-left text-xs font-medium text-gray-300 uppercase tracking-wider">Notes</th>
-                        </tr>
-                    </thead>
-                    <tbody class="divide-y divide-gray-700">
-                        {% for sale in sales %}
-                            {% set lotGroup = sale.lotGroup %}
-                            {% set quantitySold = sale.quantitySold %}
-                            {% set expectedProfitPerLot = lotGroup.sellPricePerLot - lotGroup.buyPricePerLot %}
-                            {% set expectedProfitTotal = expectedProfitPerLot * quantitySold %}
-                            {% set performancePerLot = sale.actualSellPrice - lotGroup.sellPricePerLot %}
-                            {% set performanceTotal = performancePerLot * quantitySold %}
-                            
-                            <tr class="hover:bg-gray-700">
-                                <td class="px-6 py-4 whitespace-nowrap text-white text-sm">
-                                    {{ sale.soldAt|date('d/m/Y H:i') }}
-                                </td>
-                                <td class="px-6 py-4 whitespace-nowrap">
-                                    {% include 'components/item_display.html.twig' with {item: lotGroup.item} %}
-                                </td>
-                                <td class="px-6 py-4 whitespace-nowrap">
-                                    <div class="text-white">{{ lotGroup.dofusCharacter.name }}</div>
-                                    <div class="text-gray-400 text-sm">{{ lotGroup.dofusCharacter.server.name }}</div>
-                                </td>
-                                <td class="px-6 py-4 whitespace-nowrap">
-                                    <div class="text-white font-medium">{{ quantitySold }} lots</div>
-                                    <div class="text-gray-400 text-sm">par {{ lotGroup.saleUnit.value }}</div>
-                                </td>
-                                <td class="px-6 py-4 whitespace-nowrap">
-                                    {% include 'components/price_display.html.twig' with {
-                                        price: sale.actualSellPrice,
-                                        color: 'green'
-                                    } %}
-                                    <div class="text-gray-400 text-sm">par lot</div>
-                                </td>
-                                <td class="px-6 py-4 whitespace-nowrap">
-                                    {% include 'components/price_display.html.twig' with {
-                                        price: lotGroup.sellPricePerLot,
-                                        color: 'orange'
-                                    } %}
-                                    <div class="text-gray-400 text-sm">par lot</div>
-                                </td>
-                                <td class="px-6 py-4 whitespace-nowrap">
-                                    {% include 'components/profit_display.html.twig' with {
-                                        buy_price: lotGroup.buyPricePerLot,
-                                        sell_price: sale.actualSellPrice,
-                                        quantity: sale.quantitySold
-                                    } %}
-                                </td>
-                                <td class="px-6 py-4 whitespace-nowrap">
-                                    {% if performanceTotal == 0 %}
-                                        <span class="px-2 py-1 text-xs rounded-full bg-gray-600 text-gray-300">
-                                            Conforme
-                                        </span>
-                                    {% elseif performanceTotal > 0 %}
-                                        <span class="px-2 py-1 text-xs rounded-full bg-green-600 text-green-100">
-                                            +{{ (performanceTotal / 1000)|number_format(0, ',', ' ') }}k
-                                        </span>
-                                    {% else %}
-                                        <span class="px-2 py-1 text-xs rounded-full bg-red-600 text-red-100">
-                                            {{ (performanceTotal / 1000)|number_format(0, ',', ' ') }}k
-                                        </span>
-                                    {% endif %}
-                                </td>
-                                <td class="px-6 py-4 text-gray-300 max-w-xs">
-                                    {% if sale.notes %}
-                                        <div class="truncate" title="{{ sale.notes }}">
-                                            {{ sale.notes|slice(0, 30) }}{{ sale.notes|length > 30 ? '...' : '' }}
-                                        </div>
-                                    {% else %}
-                                        <span class="text-gray-500">-</span>
-                                    {% endif %}
-                                </td>
-                            </tr>
-                        {% endfor %}
-                    </tbody>
-                </table>
-            </div>
-        {% else %}
-            <div class="text-center py-12">
-                <p class="text-gray-400 text-lg mb-4">Aucune vente enregistrée pour le moment</p>
-                <a href="{{ path('app_lot_index') }}" 
-                   class="bg-green-600 hover:bg-green-700 text-white px-6 py-3 rounded-lg transition-colors">
-                    Voir mes lots disponibles
-                </a>
-            </div>
-        {% endif %}
+        {% include 'components/data_table.html.twig' with {
+            headers: ['Date Vente', 'Item', 'Personnage', 'Quantité', 'Prix Réel', 'Prix Attendu', 'Profit Total', 'Performance', 'Notes'],
+            rows: sales,
+            row_template: 'sales_history/_table_row.html.twig',
+            empty_message: 'Aucune vente enregistrée pour le moment',
+            empty_action: {
+                url: path('app_lot_index'),
+                text: 'Voir mes lots disponibles'
+            }
+        } %}
     </div>
 {% endblock %}

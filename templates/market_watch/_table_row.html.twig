@@ -1,0 +1,58 @@
+<tr class="table-row">
+    <td class="table-cell">
+        {% include 'components/item_display.html.twig' with {
+            item: item.item, 
+            link: path('app_market_watch_history', {itemId: item.item.id})
+        } %}
+    </td>
+    <td class="table-cell">
+        {% if item.avg_price_unit %}
+            {% include 'components/price_display.html.twig' with {
+                price: item.avg_price_unit,
+                color: 'green',
+                show_kamas: false
+            } %}
+            <div class="text-gray-500 text-xs">{{ item.price_unit_count }} obs</div>
+        {% else %}
+            <span class="text-gray-500">-</span>
+        {% endif %}
+    </td>
+    <td class="table-cell">
+        {% if item.avg_price_10 %}
+            {% include 'components/price_display.html.twig' with {
+                price: item.avg_price_10,
+                color: 'blue',
+                show_kamas: false
+            } %}
+            <div class="text-gray-500 text-xs">{{ item.price_10_count }} obs</div>
+        {% else %}
+            <span class="text-gray-500">-</span>
+        {% endif %}
+    </td>
+    <td class="table-cell">
+        {% if item.avg_price_100 %}
+            {% include 'components/price_display.html.twig' with {
+                price: item.avg_price_100,
+                color: 'purple',
+                show_kamas: false
+            } %}
+            <div class="text-gray-500 text-xs">{{ item.price_100_count }} obs</div>
+        {% else %}
+            <span class="text-gray-500">-</span>
+        {% endif %}
+    </td>
+    <td class="table-cell">
+        <div class="font-medium">{{ item.observation_count }} observations</div>
+        <div class="text-gray-500 text-xs">
+            {% if item.tracking_period_days > 0 %}
+                sur {{ item.tracking_period_days }} jour{{ item.tracking_period_days > 1 ? 's' : '' }}
+            {% else %}
+                même jour
+            {% endif %}
+        </div>
+    </td>
+    <td class="table-cell">
+        <a href="{{ path('app_market_watch_history', {itemId: item.item.id}) }}" 
+           class="text-blue-400 hover:text-blue-300">Voir historique</a>
+    </td>
+</tr>

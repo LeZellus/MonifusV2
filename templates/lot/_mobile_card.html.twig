@@ -1,0 +1,56 @@
+{# templates/lot/_mobile_card.html.twig #}
+{% set profit = item.sellPricePerLot - item.buyPricePerLot %}
+{% set profitPercent = item.buyPricePerLot > 0 ? (profit / item.buyPricePerLot * 100) : 0 %}
+
+<div class="wrapper-background">
+    <div class="flex justify-between items-start mb-3">
+        <div>
+            <h3 class="text-white font-medium">{{ item.item.name }}</h3>
+            <p class="text-gray-400 text-sm">Niv.{{ item.item.level }}</p>
+        </div>
+        <span class="status-{{ item.status.value == 'available' ? 'available' : 'sold' }}">
+            {{ item.status.value == 'available' ? 'Dispo' : 'Vendu' }}
+        </span>
+    </div>
+
+    <div class="grid grid-cols-2 gap-4 mb-3">
+        <div>
+            <p class="text-gray-400 text-xs">Configuration</p>
+            <p class="text-white text-sm">{{ item.lotSize }} lots</p>
+            <p class="text-gray-400 text-xs">par {{ item.saleUnit.value }}</p>
+        </div>
+        <div>
+            <p class="text-gray-400 text-xs">Profit</p>
+            <p class="profit-{{ profit >= 0 ? 'positive' : 'negative' }} text-sm font-medium">
+                {{ (profit / 1000)|number_format(0, ',', ' ') }}k
+            </p>
+            <p class="profit-{{ profit >= 0 ? 'positive' : 'negative' }} text-xs">
+                ({{ profitPercent|number_format(1) }}%)
+            </p>
+        </div>
+    </div>
+
+    <div class="grid grid-cols-2 gap-2 mb-3 text-center">
+        <div>
+            <p class="text-gray-400 text-xs">Achat</p>
+            <p class="text-white text-sm">{{ (item.buyPricePerLot / 1000)|number_format(0, ',', ' ') }}k</p>
+        </div>
+        <div>
+            <p class="text-gray-400 text-xs">Vente</p>
+            <p class="text-white text-sm">{{ (item.sellPricePerLot / 1000)|number_format(0, ',', ' ') }}k</p>
+        </div>
+    </div>
+
+    <div class="flex space-x-2">
+        {% if item.status.value == 'available' %}
+            <a href="{{ path('app_lot_sell', {id: item.id}) }}" 
+               class="btn-success btn-full text-center py-2 text-sm">
+                Vendre
+            </a>
+        {% endif %}
+        <a href="{{ path('app_lot_edit', {id: item.id}) }}" 
+           class="btn-primary btn-full text-center py-2 text-sm">
+            Modifier
+        </a>
+    </div>
+</div>

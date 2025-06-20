@@ -1,0 +1,49 @@
+<tr class="table-row">
+    <td class="table-cell">
+        {% include 'components/item_display.html.twig' with {item: item.item} %}
+    </td>
+    <td class="table-cell">
+        <div class="text-white font-medium">{{ item.lotSize }} lots</div>
+        <div class="text-gray-400 text-sm">Vente par {{ item.saleUnit.value }}</div>
+    </td>
+    <td class="table-cell">
+        {% include 'components/price_display.html.twig' with {
+            price: item.buyPricePerLot,
+            color: 'orange'
+        } %}
+        <div class="text-gray-400 text-sm">par lot</div>
+    </td>
+    <td class="table-cell">
+        {% include 'components/price_display.html.twig' with {
+            price: item.sellPricePerLot,
+            color: 'green'
+        } %}
+        <div class="text-gray-400 text-sm">par lot</div>
+    </td>
+    <td class="table-cell">
+        {% include 'components/profit_display.html.twig' with {
+            buy_price: item.buyPricePerLot,
+            sell_price: item.sellPricePerLot,
+            quantity: item.lotSize
+        } %}
+    </td>
+    <td class="table-cell">
+        <span class="status-{{ item.status.value == 'available' ? 'available' : 'sold' }}">
+            {{ item.status.value == 'available' ? 'Disponible' : 'Vendu' }}
+        </span>
+    </td>
+    <td class="table-cell">
+        <div class="action-group">
+            {% if item.status.value == 'available' %}
+                <a href="{{ path('app_lot_sell', {id: item.id}) }}" 
+                   class="text-green-400 hover:text-green-300">Vendre</a>
+            {% endif %}
+            <a href="{{ path('app_lot_edit', {id: item.id}) }}" 
+               class="text-blue-400 hover:text-blue-300">Modifier</a>
+            <form action="{{ path('app_lot_delete', {id: item.id}) }}" method="post" 
+                  onsubmit="return confirm('Supprimer ce lot ?')" class="inline">
+                <button type="submit" class="text-red-400 hover:text-red-300">Supprimer</button>
+            </form>
+        </div>
+    </td>
+</tr>

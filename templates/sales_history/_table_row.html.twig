@@ -1,0 +1,66 @@
+{% set lotGroup = item.lotGroup %}
+{% set quantitySold = item.quantitySold %}
+{% set expectedProfitPerLot = lotGroup.sellPricePerLot - lotGroup.buyPricePerLot %}
+{% set expectedProfitTotal = expectedProfitPerLot * quantitySold %}
+{% set performancePerLot = item.actualSellPrice - lotGroup.sellPricePerLot %}
+{% set performanceTotal = performancePerLot * quantitySold %}
+
+<tr class="table-row">
+    <td class="table-cell">
+        {{ item.soldAt|date('d/m/Y H:i') }}
+    </td>
+    <td class="table-cell">
+        {% include 'components/item_display.html.twig' with {item: lotGroup.item} %}
+    </td>
+    <td class="table-cell">
+        <div class="text-white">{{ lotGroup.dofusCharacter.name }}</div>
+        <div class="text-gray-400 text-sm">{{ lotGroup.dofusCharacter.server.name }}</div>
+    </td>
+    <td class="table-cell">
+        <div class="text-white font-medium">{{ quantitySold }} lots</div>
+        <div class="text-gray-400 text-sm">par {{ lotGroup.saleUnit.value }}</div>
+    </td>
+    <td class="table-cell">
+        {% include 'components/price_display.html.twig' with {
+            price: item.actualSellPrice,
+            color: 'green'
+        } %}
+        <div class="text-gray-400 text-sm">par lot</div>
+    </td>
+    <td class="table-cell">
+        {% include 'components/price_display.html.twig' with {
+            price: lotGroup.sellPricePerLot,
+            color: 'orange'
+        } %}
+        <div class="text-gray-400 text-sm">par lot</div>
+    </td>
+    <td class="table-cell">
+        {% include 'components/profit_display.html.twig' with {
+            buy_price: lotGroup.buyPricePerLot,
+            sell_price: item.actualSellPrice,
+            quantity: item.quantitySold
+        } %}
+    </td>
+    <td class="table-cell">
+        {% if performanceTotal == 0 %}
+            <span class="status-badge bg-gray-600 text-gray-300">Conforme</span>
+        {% elseif performanceTotal > 0 %}
+            <span class="status-badge bg-green-600 text-green-100">
+                +{{ (performanceTotal / 1000)|number_format(0, ',', ' ') }}k
+            </span>
+        {% else %}
+            <span class="status-badge bg-red-600 text-red-100">
+                {{ (performanceTotal / 1000)|number_format(0, ',', ' ') }}k
+            </span>
+        {% endif %}
+    </td>
+    <td class="table-cell">
+        {% if item.notes %}
+            <div class="truncate" title="{{ item.notes }}">
+                {{ item.notes|slice(0, 30) }}{{ item.notes|length > 30 ? '...' : '' }}
+            </div>
+        {% else %}
+            <span class="text-gray-500">-</span>
+        {% endif %}
+    </td>
+</tr>

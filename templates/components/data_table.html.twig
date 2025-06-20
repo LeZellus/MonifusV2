@@ -1,0 +1,51 @@
+{# templates/components/data_table.html.twig #}
+{#
+Tableau de données responsive avec en-têtes et actions
+Usage: {% include 'components/data_table.html.twig' with {
+    headers: ['Nom', 'Prix', 'Actions'],
+    rows: array_of_data,
+    row_template: 'lot/_table_row.html.twig',
+    empty_message: 'Aucun élément trouvé',
+    empty_action: {url: path('route'), text: 'Créer'},
+    mobile_card_template: 'lot/_mobile_card.html.twig' (optionnel)
+} %}
+#}
+
+{% if rows|length > 0 %}
+    <!-- Vue desktop -->
+    <div class="hidden {{ mobile_breakpoint|default('md') }}:block bg-gray-800 rounded-lg overflow-hidden">
+        <table class="w-full">
+            <thead class="bg-gray-700">
+                <tr>
+                    {% for header in headers %}
+                        <th class="table-header">{{ header }}</th>
+                    {% endfor %}
+                </tr>
+            </thead>
+            <tbody class="divide-y divide-gray-700">
+                {% for row in rows %}
+                    {% include row_template with {item: row, loop: loop} %}
+                {% endfor %}
+            </tbody>
+        </table>
+    </div>
+
+    <!-- Vue mobile (optionnelle) -->
+    {% if mobile_card_template is defined %}
+        <div class="{{ mobile_breakpoint|default('md') }}:hidden space-y-4">
+            {% for row in rows %}
+                {% include mobile_card_template with {item: row, loop: loop} %}
+            {% endfor %}
+        </div>
+    {% endif %}
+{% else %}
+    <div class="text-center py-12">
+        <p class="text-gray-400 text-lg mb-4">{{ empty_message }}</p>
+        {% if empty_action is defined %}
+            <a href="{{ empty_action.url }}" 
+               class="bg-green-600 hover:bg-green-700 text-white px-6 py-3 rounded-lg transition-colors">
+                {{ empty_action.text }}
+            </a>
+        {% endif %}
+    </div>
+{% endif %}

@@ -1,0 +1,75 @@
+<div class="wrapper-background">
+    <div class="flex justify-between items-start mb-3">
+        <div>
+            <a href="{{ path('app_market_watch_history', {itemId: item.item.id}) }}" 
+               class="text-white font-medium hover:text-blue-400 transition-colors">
+                {{ item.item.name }}
+            </a>
+            <p class="text-gray-400 text-sm">Niv.{{ item.item.level ?? 'N/A' }}</p>
+        </div>
+        <div class="text-right">
+            <span class="bg-orange-600 text-orange-100 px-2 py-1 rounded-full text-xs">
+                {{ item.observation_count }} obs
+            </span>
+            <div class="text-gray-400 text-xs mt-1">
+                {% if item.tracking_period_days > 0 %}
+                    {{ item.tracking_period_days }}j
+                {% else %}
+                    1j
+                {% endif %}
+            </div>
+        </div>
+    </div>
+
+    <div class="grid grid-cols-3 gap-2 mb-3 text-center">
+        <div class="bg-gray-700 rounded p-2">
+            <div class="text-gray-400 text-xs">Moy. x1</div>
+            {% if item.avg_price_unit %}
+                {% include 'components/price_display.html.twig' with {
+                    price: item.avg_price_unit,
+                    size: 'small',
+                    color: 'green',
+                    show_kamas: false
+                } %}
+                <div class="text-gray-500 text-xs">{{ item.price_unit_count }}</div>
+            {% else %}
+                <div class="text-gray-500 text-sm">-</div>
+            {% endif %}
+        </div>
+        <div class="bg-gray-700 rounded p-2">
+            <div class="text-gray-400 text-xs">Moy. x10</div>
+            {% if item.avg_price_10 %}
+                {% include 'components/price_display.html.twig' with {
+                    price: item.avg_price_10,
+                    size: 'small',
+                    color: 'blue',
+                    show_kamas: false
+                } %}
+                <div class="text-gray-500 text-xs">{{ item.price_10_count }}</div>
+            {% else %}
+                <div class="text-gray-500 text-sm">-</div>
+            {% endif %}
+        </div>
+        <div class="bg-gray-700 rounded p-2">
+            <div class="text-gray-400 text-xs">Moy. x100</div>
+            {% if item.avg_price_100 %}
+                {% include 'components/price_display.html.twig' with {
+                    price: item.avg_price_100,
+                    size: 'small',
+                    color: 'purple',
+                    show_kamas: false
+                } %}
+                <div class="text-gray-500 text-xs">{{ item.price_100_count }}</div>
+            {% else %}
+                <div class="text-gray-500 text-sm">-</div>
+            {% endif %}
+        </div>
+    </div>
+
+    <div class="text-center">
+        <a href="{{ path('app_market_watch_history', {itemId: item.item.id}) }}" 
+           class="bg-blue-600 hover:bg-blue-700 text-white text-center py-2 px-4 rounded text-sm transition-colors">
+            Voir l'historique
+        </a>
+    </div>
+</div>
