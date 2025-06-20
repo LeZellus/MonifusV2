@@ -59,10 +59,10 @@
                     </div>
 
                     <div class="action-group">
-                        <button type="submit" class="btn-primary">
+                        <button type="submit" class="btn btn-primary">
                             Filtrer
                         </button>
-                        <a href="{{ path('app_sales_history_index') }}" class="btn-secondary">
+                        <a href="{{ path('app_sales_history_index') }}" class="btn btn-secondary">
                             Reset
                         </a>
                     </div>
@@ -76,7 +76,7 @@
                 </h2>
                 {% if sales|length > 0 %}
                     <a href="{{ path('app_sales_history_export', app.request.query.all) }}" 
-                       class="btn-success">
+                       class="btn btn-success">
                         📊 Exporter CSV
                     </a>
                 {% endif %}

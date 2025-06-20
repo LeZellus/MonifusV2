@@ -44,12 +44,12 @@
     <div class="flex space-x-2">
         {% if item.status.value == 'available' %}
             <a href="{{ path('app_lot_sell', {id: item.id}) }}" 
-               class="btn-success btn-full text-center py-2 text-sm">
+               class="btn btn-success btn-full">
                 Vendre
             </a>
         {% endif %}
         <a href="{{ path('app_lot_edit', {id: item.id}) }}" 
-           class="btn-primary btn-full text-center py-2 text-sm">
+           class="btn btn-primary btn-full">
             Modifier
         </a>
     </div>

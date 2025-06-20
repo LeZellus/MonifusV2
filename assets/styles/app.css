@@ -20,50 +20,41 @@ body {
 /* ============================================
    BOUTONS - Classes de Base
    ============================================ */
-.btn-base {
-    @apply font-bold py-3 px-6 rounded-lg transition-colors duration-200;
+.btn {
+    @apply rounded-lg text-center text-white font-bold py-3 px-6 rounded-lg transition-colors duration-200;
 }
 
 .btn-full {
-    @apply btn-base flex-1;
+    @apply btn flex-1;
 }
 
 .btn-primary {
-    @apply btn-base bg-blue-600 hover:bg-blue-700 text-white;
+    @apply btn bg-blue-600 hover:bg-blue-700;
 }
 
 .btn-success {
-    @apply btn-base bg-green-600 hover:bg-green-700 text-white;
+    @apply btn bg-green-600 hover:bg-green-700;
 }
 
 .btn-warning {
-    @apply btn-base bg-orange-600 hover:bg-orange-700 text-white;
+    @apply btn bg-orange-600 hover:bg-orange-700;
 }
 
 .btn-danger {
-    @apply btn-base bg-red-600 hover:bg-red-700 text-white;
+    @apply btn bg-red-600 hover:bg-red-700;
 }
 
 .btn-secondary {
-    @apply btn-base bg-gray-600 hover:bg-gray-700 text-white;
+    @apply btn bg-gray-600 hover:bg-gray-700;
 }
 
 .btn-purple {
-    @apply btn-base bg-purple-600 hover:bg-purple-700 text-white;
+    @apply btn bg-purple-600 hover:bg-purple-700;
 }
 
 /* Variantes avec icônes */
 .btn-with-icon {
-    @apply flex items-center justify-center;
-}
-
-/* Boutons de taille alternative */
-.btn-sm {
-    @apply py-2 px-4 text-sm;
-}
-
-.btn-lg {
-    @apply py-4 px-8 text-lg;
+    @apply flex items-center justify-center text-center p-4 rounded-lg;
 }
 
 /* ============================================

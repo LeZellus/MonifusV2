@@ -12,17 +12,17 @@ Usage: {% include 'components/action_buttons.html.twig' with {
 } %}
 #}
 
-{% set submit_color_class = 'btn-' ~ (submit_color|default('primary')) %}
+{% set submit_color_class = 'btn btn-' ~ (submit_color|default('primary')) %}
 {% set layout_class = (layout|default('horizontal')) == 'vertical' ? 'action-group-vertical' : 'action-group' %}
 
 <div class="{{ layout_class }}">
-    <button type="submit" class="btn-full {{ submit_color_class }} btn-with-icon">
+    <button type="submit" class="btn btn-full {{ submit_color_class }} btn-with-icon">
         {% if submit_icon is defined %}
             <span class="mr-2">{{ submit_icon }}</span>
         {% endif %}
         {{ submit_text }}
     </button>
-    <a href="{{ cancel_url }}" class="btn-full btn-secondary btn-with-icon text-center">
+    <a href="{{ cancel_url }}" class="btn btn-full btn-secondary btn-with-icon">
         {% if cancel_icon is defined %}
             <span class="mr-2">{{ cancel_icon }}</span>
         {% endif %}
