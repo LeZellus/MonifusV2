@@ -1,8 +1,6 @@
-<!-- templates/components/character_selector.html.twig -->
+<!-- templates/components/character_selector.html.twig - VERSION SIMPLIFIÉE -->
 {% if characters|length > 0 %}
-    <div class="bg-gradient-to-r from-gray-800 to-gray-700 rounded-lg p-6 border border-gray-600" 
-         data-controller="profile-switcher" 
-         data-profile-switcher-target="container">
+    <div class="bg-gradient-to-r from-gray-800 to-gray-700 rounded-lg p-6 border border-gray-600">
         {% if selectedCharacter %}
             <!-- En-tête avec profil et personnage -->
             <div class="flex items-center justify-between mb-4">
@@ -47,48 +45,12 @@
                 </div>
 
                 <div class="flex items-center space-x-2">
-                    {% if characters|length > 1 %}
-                        <!-- Dropdown pour changer de profil -->
-                        <div class="relative group">
-                            <button class="bg-purple-600 hover:bg-purple-700 text-white px-3 py-2 rounded-lg transition-colors text-sm flex items-center">
-                                <span class="mr-1">🔄</span>
-                                Profil
-                                <svg class="w-3 h-3 ml-1" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7"></path>
-                                </svg>
-                            </button>
-                            <div class="absolute right-0 mt-2 w-48 bg-gray-800 rounded-md shadow-lg opacity-0 invisible group-hover:opacity-100 group-hover:visible transition-all duration-200 border border-gray-700 z-50">
-                                <div class="py-1">
-                                    {% set currentProfile = selectedCharacter.tradingProfile %}
-                                    {% set allProfiles = [] %}
-                                    {% for character in characters %}
-                                        {% if character.tradingProfile not in allProfiles %}
-                                            {% set allProfiles = allProfiles|merge([character.tradingProfile]) %}
-                                        {% endif %}
-                                    {% endfor %}
-                                    
-                                    {% for profile in allProfiles %}
-                                        {% if profile.id != currentProfile.id %}
-                                            <a href="#" 
-                                               data-action="click->profile-switcher#switchProfile"
-                                               data-profile-id="{{ profile.id }}"
-                                               data-profile-name="{{ profile.name }}"
-                                               class="block px-4 py-2 text-sm text-gray-300 hover:bg-gray-700 hover:text-white">
-                                                <div class="font-medium">{{ profile.name }}</div>
-                                                <div class="text-xs text-gray-400">{{ profile.dofusCharacters|length }} personnages</div>
-                                            </a>
-                                        {% endif %}
-                                    {% endfor %}
-                                    
-                                    <hr class="border-gray-700 my-1">
-                                    <a href="{{ path('app_profile_index') }}" 
-                                       class="block px-4 py-2 text-sm text-gray-300 hover:bg-gray-700 hover:text-white">
-                                        ⚙️ Gérer tous les profils
-                                    </a>
-                                </div>
-                            </div>
-                        </div>
-                    {% endif %}
+                    <!-- Lien simple vers la gestion des profils -->
+                    <a href="{{ path('app_profile_index') }}" 
+                       class="bg-purple-600 hover:bg-purple-700 text-white px-3 py-2 rounded-lg transition-colors text-sm flex items-center">
+                        <span class="mr-1">⚙️</span>
+                        Gérer profils
+                    </a>
                     
                     <a href="{{ path('app_profile_character_new', {id: selectedCharacter.tradingProfile.id}) }}" 
                        class="bg-green-600 hover:bg-green-700 text-white p-2 rounded-lg transition-colors" 
@@ -100,14 +62,13 @@
                 </div>
             </div>
 
-            <!-- Statistiques supprimées - déplacées dans la ligne du profil -->
-
-            <!-- Sélection rapide si plusieurs personnages -->
-            {% if characters|length > 1 %}
+            <!-- Sélection rapide si plusieurs personnages dans le profil actuel -->
+            {% set currentProfileCharacters = characters|filter(char => char.tradingProfile.id == selectedCharacter.tradingProfile.id) %}
+            {% if currentProfileCharacters|length > 1 %}
                 <div class="border-t border-gray-600 pt-4">
-                    <div class="text-white text-sm font-medium mb-3">Changer de personnage :</div>
+                    <div class="text-white text-sm font-medium mb-3">Autres personnages de {{ selectedCharacter.tradingProfile.name }} :</div>
                     <div class="grid grid-cols-2 md:grid-cols-3 gap-2">
-                        {% for character in characters %}
+                        {% for character in currentProfileCharacters %}
                             {% if character.id != selectedCharacter.id %}
                                 <button onclick="window.location.href='{{ path('app_character_select', {id: character.id}) }}'"
                                         class="bg-gray-700 hover:bg-gray-600 rounded-lg p-2 text-left transition-colors group">
@@ -148,7 +109,7 @@
             {% endif %}
 
         {% else %}
-            <!-- Aucun personnage sélectionné -->
+            <!-- Aucun personnage sélectionné - VERSION SIMPLIFIÉE -->
             <div class="text-center">
                 <div class="w-16 h-16 bg-gray-600 rounded-lg flex items-center justify-center mx-auto mb-4">
                     <svg class="w-8 h-8 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -158,45 +119,7 @@
                 <h3 class="text-white font-bold text-lg mb-2">Aucun personnage sélectionné</h3>
                 <p class="text-gray-400 text-sm mb-6">Sélectionnez un personnage pour commencer</p>
                 
-                <div class="grid grid-cols-1 md:grid-cols-2 gap-3">
-                    {% for character in characters %}
-                        <button onclick="window.location.href='{{ path('app_character_select', {id: character.id}) }}'"
-                                class="bg-gray-700 hover:bg-gray-600 rounded-lg p-3 text-left transition-colors group">
-                            <div class="flex items-center space-x-3 mb-2">
-                                <div class="w-10 h-10 rounded overflow-hidden">
-                                    <img src="{{ character.classe.imagePath }}" 
-                                         alt="{{ character.classe.name }}" 
-                                         class="w-full h-full object-cover"
-                                         onerror="this.style.display='none'; this.nextElementSibling.style.display='flex';">
-                                    <div class="w-full h-full bg-gradient-to-br from-purple-500 to-pink-600 flex items-center justify-center text-white font-bold" style="display: none;">
-                                        {{ character.name|first|upper }}
-                                    </div>
-                                </div>
-                                <div class="flex-1">
-                                    <div class="text-white font-medium group-hover:text-blue-300">{{ character.name }}</div>
-                                    <div class="text-gray-400 text-sm">{{ character.classe.name }} • {{ character.server.name }}</div>
-                                    <div class="text-blue-400 text-xs">{{ character.tradingProfile.name }}</div>
-                                </div>
-                            </div>
-                            <div class="grid grid-cols-3 gap-2 text-xs text-center">
-                                <div class="bg-gray-600 rounded p-1">
-                                    <div class="text-green-400 font-bold">{{ character.lotGroups|filter(lot => lot.status.value == 'available')|length }}</div>
-                                    <div class="text-gray-400">📦 Dispo</div>
-                                </div>
-                                <div class="bg-gray-600 rounded p-1">
-                                    <div class="text-blue-400 font-bold">{{ character.lotGroups|filter(lot => lot.status.value == 'sold')|length }}</div>
-                                    <div class="text-gray-400">✅ Vendus</div>
-                                </div>
-                                <div class="bg-gray-600 rounded p-1">
-                                    <div class="text-orange-400 font-bold">{{ character.marketWatches|length }}</div>
-                                    <div class="text-gray-400">👁️ Watch</div>
-                                </div>
-                            </div>
-                        </button>
-                    {% endfor %}
-                </div>
-                
-                <div class="mt-4 pt-4 border-t border-gray-600">
+                <div class="text-center">
                     <a href="{{ path('app_profile_index') }}" 
                        class="bg-blue-600 hover:bg-blue-700 text-white px-4 py-2 rounded-lg transition-colors inline-flex items-center">
                         <span class="mr-2">⚙️</span>
