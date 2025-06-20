@@ -23,7 +23,7 @@
                     </div>
                     <div>
                         <div class="text-gray-400 text-sm">Stock disponible</div>
-                        <div class="text-green-400 font-bold text-lg">{{ lot_group.lotSize }} lots</div>
+                        <div class="text-orange-400 font-bold text-lg">{{ lot_group.lotSize }} lots</div>
                         <div class="text-gray-400 text-sm">Vente par {{ lot_group.saleUnit.value }}</div>
                     </div>
                     <div>
@@ -33,7 +33,10 @@
                     </div>
                     <div>
                         <div class="text-gray-400 text-sm">Prix prévu</div>
-                        <div class="text-white font-medium">{{ (lot_group.sellPricePerLot / 1000)|number_format(0, ',', ' ') }}k</div>
+                        {% include 'components/price_display.html.twig' with {
+                            price: lot_group.sellPricePerLot,
+                            color: 'green'
+                        } %}
                         <div class="text-gray-400 text-sm">par lot de {{ lot_group.saleUnit.value }}</div>
                     </div>
                 </div>

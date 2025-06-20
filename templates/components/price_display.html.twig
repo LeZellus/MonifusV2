@@ -1,0 +1,21 @@
+{# templates/components/price_display.html.twig #}
+{#
+Affichage cohérent des prix Dofus avec texte kamas
+Usage: {% include 'components/price_display.html.twig' with {
+    price: 1500000,
+    size: 'normal' (optional: small, normal, large),
+    color: 'white' (optional: white, green, blue, purple, red, yellow),
+    show_kamas: true (optional, default: true),
+    prefix: '' (optional, ex: '+', '-'),
+    suffix: '' (optional, ex: ' par lot')
+} %}
+#}
+
+{% set formatted_price = price|number_format(0, ',', ' ') %}
+{% set size_class = (size|default('normal')) == 'small' ? 'text-sm' : ((size|default('normal')) == 'large' ? 'text-xl' : 'text-base') %}
+{% set color_class = 'text-' ~ (color|default('gray')) ~ '-400' %}
+
+<span class="{{ size_class }} {{ color_class }} font-medium">
+    {% if prefix is defined %}{{ prefix }}{% endif %}{{ formatted_price }}{% if suffix is defined %}{{ suffix }}{% endif %}
+    {% if show_kamas|default(true) %} kamas{% endif %}
+</span>

@@ -51,7 +51,11 @@
                                     </td>
                                     <td class="px-6 py-4 whitespace-nowrap">
                                         {% if data.avg_price_unit %}
-                                            <div class="text-green-400 font-medium">{{ (data.avg_price_unit / 1000)|number_format(0, ',', ' ') }}k</div>
+                                            {% include 'components/price_display.html.twig' with {
+                                                price: data.avg_price_unit,
+                                                color: 'green',
+                                                show_kamas: false
+                                            } %}
                                             <div class="text-gray-500 text-xs">{{ data.price_unit_count }} obs</div>
                                         {% else %}
                                             <span class="text-gray-500">-</span>
@@ -59,7 +63,11 @@
                                     </td>
                                     <td class="px-6 py-4 whitespace-nowrap">
                                         {% if data.avg_price_10 %}
-                                            <div class="text-blue-400 font-medium">{{ (data.avg_price_10 / 1000)|number_format(0, ',', ' ') }}k</div>
+                                            {% include 'components/price_display.html.twig' with {
+                                                price: data.avg_price_10,
+                                                color: 'blue',
+                                                show_kamas: false
+                                            } %}
                                             <div class="text-gray-500 text-xs">{{ data.price_10_count }} obs</div>
                                         {% else %}
                                             <span class="text-gray-500">-</span>
@@ -67,7 +75,11 @@
                                     </td>
                                     <td class="px-6 py-4 whitespace-nowrap">
                                         {% if data.avg_price_100 %}
-                                            <div class="text-purple-400 font-medium">{{ (data.avg_price_100 / 1000)|number_format(0, ',', ' ') }}k</div>
+                                            {% include 'components/price_display.html.twig' with {
+                                                price: data.avg_price_100,
+                                                color: 'purple',
+                                                show_kamas: false
+                                            } %}
                                             <div class="text-gray-500 text-xs">{{ data.price_100_count }} obs</div>
                                         {% else %}
                                             <span class="text-gray-500">-</span>
@@ -122,7 +134,12 @@
                                 <div class="bg-gray-700 rounded p-2">
                                     <div class="text-gray-400 text-xs">Moy. x1</div>
                                     {% if data.avg_price_unit %}
-                                        <div class="text-green-400 text-sm font-medium">{{ (data.avg_price_unit / 1000)|number_format(0, ',', ' ') }}k</div>
+                                        {% include 'components/price_display.html.twig' with {
+                                            price: data.avg_price_unit,
+                                            size: 'small',
+                                            color: 'green',
+                                            show_kamas: false
+                                        } %}
                                         <div class="text-gray-500 text-xs">{{ data.price_unit_count }}</div>
                                     {% else %}
                                         <div class="text-gray-500 text-sm">-</div>
@@ -131,7 +148,12 @@
                                 <div class="bg-gray-700 rounded p-2">
                                     <div class="text-gray-400 text-xs">Moy. x10</div>
                                     {% if data.avg_price_10 %}
-                                        <div class="text-blue-400 text-sm font-medium">{{ (data.avg_price_10 / 1000)|number_format(0, ',', ' ') }}k</div>
+                                        {% include 'components/price_display.html.twig' with {
+                                            price: data.avg_price_10,
+                                            size: 'small',
+                                            color: 'blue',
+                                            show_kamas: false
+                                        } %}
                                         <div class="text-gray-500 text-xs">{{ data.price_10_count }}</div>
                                     {% else %}
                                         <div class="text-gray-500 text-sm">-</div>
@@ -140,7 +162,12 @@
                                 <div class="bg-gray-700 rounded p-2">
                                     <div class="text-gray-400 text-xs">Moy. x100</div>
                                     {% if data.avg_price_100 %}
-                                        <div class="text-purple-400 text-sm font-medium">{{ (data.avg_price_100 / 1000)|number_format(0, ',', ' ') }}k</div>
+                                        {% include 'components/price_display.html.twig' with {
+                                            price: data.avg_price_100,
+                                            size: 'small',
+                                            color: 'purple',
+                                            show_kamas: false
+                                        } %}
                                         <div class="text-gray-500 text-xs">{{ data.price_100_count }}</div>
                                     {% else %}
                                         <div class="text-gray-500 text-sm">-</div>

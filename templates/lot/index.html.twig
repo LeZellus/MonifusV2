@@ -61,11 +61,17 @@
                                         </div>
                                     </td>
                                     <td class="px-6 py-4 whitespace-nowrap">
-                                        <div class="text-white">{{ (lot.buyPricePerLot / 1000)|number_format(0, ',', ' ') }}k</div>
+                                        {% include 'components/price_display.html.twig' with {
+                                            price: lot.buyPricePerLot,
+                                            color: 'orange'
+                                        } %}
                                         <div class="text-gray-400 text-sm">par lot de {{ lot.saleUnit.value }}</div>
                                     </td>
                                     <td class="px-6 py-4 whitespace-nowrap">
-                                        <div class="text-white">{{ (lot.sellPricePerLot / 1000)|number_format(0, ',', ' ') }}k</div>
+                                        {% include 'components/price_display.html.twig' with {
+                                            price: lot.sellPricePerLot,
+                                            color: 'green'
+                                        } %}
                                         <div class="text-gray-400 text-sm">par lot de {{ lot.saleUnit.value }}</div>
                                     </td>
                                     <td class="px-6 py-4 whitespace-nowrap">

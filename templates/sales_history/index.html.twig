@@ -101,13 +101,10 @@
                         {% for sale in sales %}
                             {% set lotGroup = sale.lotGroup %}
                             {% set quantitySold = sale.quantitySold %}
-                            {% set realizedProfitPerLot = sale.actualSellPrice - lotGroup.buyPricePerLot %}
-                            {% set realizedProfitTotal = realizedProfitPerLot * quantitySold %}
                             {% set expectedProfitPerLot = lotGroup.sellPricePerLot - lotGroup.buyPricePerLot %}
                             {% set expectedProfitTotal = expectedProfitPerLot * quantitySold %}
                             {% set performancePerLot = sale.actualSellPrice - lotGroup.sellPricePerLot %}
                             {% set performanceTotal = performancePerLot * quantitySold %}
-                            {% set profitPercent = lotGroup.buyPricePerLot > 0 ? (realizedProfitPerLot / lotGroup.buyPricePerLot * 100) : 0 %}
                             
                             <tr class="hover:bg-gray-700">
                                 <td class="px-6 py-4 whitespace-nowrap text-white text-sm">
@@ -125,20 +122,25 @@
                                     <div class="text-gray-400 text-sm">par {{ lotGroup.saleUnit.value }}</div>
                                 </td>
                                 <td class="px-6 py-4 whitespace-nowrap">
-                                    <div class="text-white font-medium">{{ (sale.actualSellPrice / 1000)|number_format(0, ',', ' ') }}k</div>
+                                    {% include 'components/price_display.html.twig' with {
+                                        price: sale.actualSellPrice,
+                                        color: 'green'
+                                    } %}
                                     <div class="text-gray-400 text-sm">par lot</div>
                                 </td>
                                 <td class="px-6 py-4 whitespace-nowrap">
-                                    <div class="text-gray-300">{{ (lotGroup.sellPricePerLot / 1000)|number_format(0, ',', ' ') }}k</div>
+                                    {% include 'components/price_display.html.twig' with {
+                                        price: lotGroup.sellPricePerLot,
+                                        color: 'orange'
+                                    } %}
                                     <div class="text-gray-400 text-sm">par lot</div>
                                 </td>
                                 <td class="px-6 py-4 whitespace-nowrap">
-                                    <div class="text-{{ realizedProfitTotal >= 0 ? 'green' : 'red' }}-400 font-medium">
-                                        {{ (realizedProfitTotal / 1000)|number_format(0, ',', ' ') }}k
-                                    </div>
-                                    <div class="text-{{ realizedProfitTotal >= 0 ? 'green' : 'red' }}-400 text-sm">
-                                        ({{ profitPercent|number_format(1) }}%)
-                                    </div>
+                                    {% include 'components/profit_display.html.twig' with {
+                                        buy_price: lotGroup.buyPricePerLot,
+                                        sell_price: sale.actualSellPrice,
+                                        quantity: sale.quantitySold
+                                    } %}
                                 </td>
                                 <td class="px-6 py-4 whitespace-nowrap">
                                     {% if performanceTotal == 0 %}
