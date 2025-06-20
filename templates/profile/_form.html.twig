@@ -1,0 +1,96 @@
+{# templates/profile/_form.html.twig #}
+<div class="max-w-lg mx-auto">
+    <!-- En-tête explicatif -->
+    <div class="wrapper-background mb-6 text-center">
+        <div class="text-4xl mb-3">{{ icon }}</div>
+        <h2 class="text-white text-xl font-bold mb-2">{{ page_title }}</h2>
+        <p class="text-gray-400">{{ page_description }}</p>
+    </div>
+
+    {% if profile_info is defined %}
+        <!-- En-tête avec profil parent (pour character_new) -->
+        <div class="wrapper-background mb-6">
+            <div class="flex items-center space-x-4">
+                <div class="w-12 h-12 bg-gradient-to-br from-blue-500 to-purple-600 rounded-lg flex items-center justify-center">
+                    <span class="text-white font-bold text-lg">{{ profile_info.name|first|upper }}</span>
+                </div>
+                <div>
+                    <h2 class="text-white text-xl font-semibold">{{ profile_info.name }}</h2>
+                    <p class="text-gray-400">{{ profile_info.description }}</p>
+                </div>
+                <div class="ml-auto text-right">
+                    <div class="text-green-400 font-semibold">{{ profile_info.action_title }}</div>
+                    <div class="text-gray-400 text-sm">{{ profile_info.action_description }}</div>
+                </div>
+            </div>
+        </div>
+    {% endif %}
+
+    <!-- Info box explicative -->
+    {% if info_content is defined %}
+        {% include 'components/info_box.html.twig' with {
+            title: info_title,
+            icon: info_icon,
+            color: info_color,
+            content: info_content
+        } %}
+    {% endif %}
+
+    <!-- Formulaire principal -->
+    <div class="wrapper-background">
+        {% include 'components/section_header.html.twig' with {
+            type: 'form',
+            title: form_title,
+            icon: form_icon,
+            color: form_color,
+            wrapper_class: ''
+        } %}
+
+        {{ form_start(form) }}
+            <div class="space-y-6">
+                {% for field_config in form_fields %}
+                    <div class="{{ field_config.container_class|default('') }}">
+                        {{ form_label(attribute(form, field_config.name), field_config.label|default(null), {
+                            'label_attr': {'class': 'block text-white font-medium mb-2'}
+                        }) }}
+                        
+                        {{ form_widget(attribute(form, field_config.name), {
+                            'attr': field_config.attributes|default({
+                                'class': 'w-full px-4 py-3 border border-gray-600 bg-gray-700 text-white rounded-lg focus:outline-none focus:border-' ~ (field_config.focus_color|default('blue')) ~ '-500 focus:ring-2 focus:ring-' ~ (field_config.focus_color|default('blue')) ~ '-500 focus:ring-opacity-20'
+                            })|merge({'placeholder': field_config.placeholder|default('')})
+                        }) }}
+                        
+                        {{ form_errors(attribute(form, field_config.name)) }}
+                        
+                        {% if field_config.help_text is defined %}
+                            <div class="form-help">{{ field_config.help_text }}</div>
+                        {% endif %}
+                    </div>
+                {% endfor %}
+            </div>
+
+            <!-- Étapes suivantes -->
+            {% if next_steps is defined %}
+                <div class="mt-6">
+                    {% include 'components/info_box.html.twig' with {
+                        title: next_steps.title,
+                        icon: next_steps.icon,
+                        color: next_steps.color,
+                        content: next_steps.content
+                    } %}
+                </div>
+            {% endif %}
+
+            <!-- Actions -->
+            <div class="mt-8">
+                {% include 'components/action_buttons.html.twig' with {
+                    submit_text: submit_text,
+                    submit_icon: submit_icon,
+                    submit_color: submit_color,
+                    cancel_url: cancel_url,
+                    cancel_icon: '❌'
+                } %}
+            </div>
+        {{ form_end(form) }}
+    </div>
+</div>

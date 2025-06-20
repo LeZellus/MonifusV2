@@ -11,68 +11,41 @@
 
 {% block body %}
     <div class="wrapper-container">
-        <div class="max-w-lg mx-auto">
-            <!-- En-tête explicatif -->
-            <div class="wrapper-background mb-6 text-center">
-                <div class="text-4xl mb-3">👥</div>
-                <h2 class="text-white text-xl font-bold mb-2">Créer un Profil de Trading</h2>
-                <p class="text-gray-400">
-                    Un profil regroupe plusieurs personnages Dofus et organise votre activité de trading.
-                </p>
-            </div>
-
-            <!-- Formulaire principal -->
-            {% set form_content %}
-                {{ form_start(form) }}
-                    <div class="space-y-6">
-                        <div>
-                            {{ form_label(form.name, null, {'label_attr': {'class': 'block text-white font-medium mb-2'}}) }}
-                            {{ form_widget(form.name, {'attr': {'class': 'w-full px-4 py-3 border border-gray-600 bg-gray-700 text-white rounded-lg focus:outline-none focus:border-blue-500 focus:ring-2 focus:ring-blue-500 focus:ring-opacity-20', 'placeholder': 'ex: Trading Principal, Kamas Farm, etc.'}}) }}
-                            {{ form_errors(form.name) }}
-                            <div class="form-help">💡 Choisissez un nom qui décrit votre stratégie</div>
-                        </div>
-
-                        <div>
-                            {{ form_label(form.description, null, {'label_attr': {'class': 'block text-white font-medium mb-2'}}) }}
-                            {{ form_widget(form.description, {'attr': {'class': 'w-full px-4 py-3 border border-gray-600 bg-gray-700 text-white rounded-lg focus:outline-none focus:border-blue-500 focus:ring-2 focus:ring-blue-500 focus:ring-opacity-20', 'rows': 4, 'placeholder': 'Décrivez votre stratégie de trading, vos objectifs, les serveurs ciblés...'}}) }}
-                            {{ form_errors(form.description) }}
-                            <div class="form-help">📋 Description optionnelle de votre approche</div>
-                        </div>
-                    </div>
-
-                    <!-- Étapes suivantes -->
-                    {% set steps_content %}
-                        <p>1. ✅ Créer le profil</p>
-                        <p>2. 👤 Ajouter vos personnages Dofus</p>
-                        <p>3. 📦 Commencer à tracker vos lots</p>
-                        <p>4. 📊 Analyser vos profits</p>
-                    {% endset %}
-
-                    <div class="mt-6">
-                        {% include 'components/info_box.html.twig' with {
-                            title: 'Prochaines étapes',
-                            icon: '🚀',
-                            color: 'blue',
-                            content: steps_content
-                        } %}
-                    </div>
-
-                    {% include 'components/action_buttons.html.twig' with {
-                        submit_text: 'Créer le profil',
-                        submit_icon: '✨',
-                        submit_color: 'primary',
-                        cancel_url: path('app_profile_index'),
-                        cancel_icon: '❌'
-                    } %}
-                {{ form_end(form) }}
-            {% endset %}
-
-            {% include 'components/form_section.html.twig' with {
-                title: 'Informations du profil',
-                icon: '📝',
-                color: 'green',
-                content: form_content
-            } %}
-        </div>
+        {% include 'profile/_form.html.twig' with {
+            form: form,
+            icon: '👥',
+            page_title: 'Créer un Profil de Trading',
+            page_description: 'Un profil regroupe plusieurs personnages Dofus et organise votre activité de trading.',
+            form_title: 'Informations du profil',
+            form_icon: '📝',
+            form_color: 'green',
+            form_fields: [
+                {
+                    name: 'name',
+                    placeholder: 'ex: Trading Principal, Kamas Farm, etc.',
+                    help_text: '💡 Choisissez un nom qui décrit votre stratégie',
+                    focus_color: 'blue'
+                },
+                {
+                    name: 'description',
+                    attributes: {
+                        'class': 'w-full px-4 py-3 border border-gray-600 bg-gray-700 text-white rounded-lg focus:outline-none focus:border-blue-500 focus:ring-2 focus:ring-blue-500 focus:ring-opacity-20',
+                        'rows': 4
+                    },
+                    placeholder: 'Décrivez votre stratégie de trading, vos objectifs, les serveurs ciblés...',
+                    help_text: '📋 Description optionnelle de votre approche'
+                }
+            ],
+            next_steps: {
+                title: 'Prochaines étapes',
+                icon: '🚀',
+                color: 'blue',
+                content: '<p>1. ✅ Créer le profil</p><p>2. 👤 Ajouter vos personnages Dofus</p><p>3. 📦 Commencer à tracker vos lots</p><p>4. 📊 Analyser vos profits</p>'
+            },
+            submit_text: 'Créer le profil',
+            submit_icon: '✨',
+            submit_color: 'primary',
+            cancel_url: path('app_profile_index')
+        } %}
     </div>
 {% endblock %}

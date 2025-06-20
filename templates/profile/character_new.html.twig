@@ -11,104 +11,52 @@
 
 {% block body %}
     <div class="wrapper-container">
-        <div class="max-w-lg mx-auto">
-            <!-- En-tête avec profil parent -->
-            <div class="wrapper-background mb-6">
-                <div class="flex items-center space-x-4">
-                    <div class="w-12 h-12 bg-gradient-to-br from-blue-500 to-purple-600 rounded-lg flex items-center justify-center">
-                        <span class="text-white font-bold text-lg">{{ profile.name|first|upper }}</span>
-                    </div>
-                    <div>
-                        <h2 class="text-white text-xl font-semibold">{{ profile.name }}</h2>
-                        <p class="text-gray-400">Profil de trading</p>
-                    </div>
-                    <div class="ml-auto text-right">
-                        <div class="text-green-400 font-semibold">👤 Nouveau Personnage</div>
-                        <div class="text-gray-400 text-sm">Ajouter un trader</div>
-                    </div>
-                </div>
-            </div>
-
-            <!-- Information importante -->
-            {% set character_info_content %}
-                <p>• 🎮 Chaque personnage peut avoir sa propre stratégie de trading</p>
-                <p>• 🗂️ Organiser vos lots par serveur et spécialisation</p>
-                <p>• 📊 Analyser les performances par personnage</p>
-                <p>• 🔄 Basculer facilement entre vos différents traders</p>
-            {% endset %}
-
-            {% include 'components/info_box.html.twig' with {
-                title: 'Pourquoi ajouter un personnage ?',
-                icon: 'ℹ️',
-                color: 'green',
-                content: character_info_content
-            } %}
-
-            <!-- Formulaire principal -->
-            <div class="wrapper-background">
-                {% include 'components/section_header.html.twig' with {
-                    type: 'form',
-                    title: 'Informations du personnage',
-                    icon: '📝',
-                    color: 'green',
-                    wrapper_class: ''
-                } %}
-
-                {{ form_start(form) }}
-                
-                <div class="space-y-6">
-                    <div>
-                        {{ form_label(form.name, null, {'label_attr': {'class': 'block text-white font-medium mb-2'}}) }}
-                        {{ form_widget(form.name, {'attr': {'class': 'w-full px-4 py-3 border border-gray-600 bg-gray-700 text-white rounded-lg focus:outline-none focus:border-green-500 focus:ring-2 focus:ring-green-500 focus:ring-opacity-20', 'placeholder': 'ex: Kama-Hunter, Trading-Master...'}}) }}
-                        {{ form_errors(form.name) }}
-                        <div class="form-help">🎮 Nom exact de votre personnage Dofus</div>
-                    </div>
-
-                    <div>
-                        {{ form_label(form.server, null, {'label_attr': {'class': 'block text-white font-medium mb-2'}}) }}
-                        {{ form_widget(form.server, {'attr': {'class': 'w-full px-4 py-3 border border-gray-600 bg-gray-700 text-white rounded-lg focus:outline-none focus:border-green-500 focus:ring-2 focus:ring-green-500 focus:ring-opacity-20'}}) }}
-                        {{ form_errors(form.server) }}
-                        <div class="form-help">🌍 Serveur sur lequel joue ce personnage</div>
-                    </div>
-
-                    <div>
-                        {{ form_label(form.classe, null, {'label_attr': {'class': 'block text-white font-medium mb-2'}}) }}
-                        {{ form_widget(form.classe, {'attr': {'class': 'w-full px-4 py-3 border border-gray-600 bg-gray-700 text-white rounded-lg focus:outline-none focus:border-green-500 focus:ring-2 focus:ring-green-500 focus:ring-opacity-20'}}) }}
-                        {{ form_errors(form.classe) }}
-                        <div class="form-help">⚔️ Classe de votre personnage</div>
-                    </div>
-                </div>
-
-                <!-- Informations sur ce qui se passera après -->
-                {% set next_steps_content %}
-                    <p>1. ✅ Le personnage sera ajouté au profil "{{ profile.name }}"</p>
-                    <p>2. 🎯 Il sera automatiquement sélectionné comme personnage actif</p>
-                    <p>3. 📦 Vous pourrez commencer à ajouter des lots de trading</p>
-                    <p>4. 👁️ Configurer des surveillances de marché</p>
-                {% endset %}
-
-                <div class="mt-6">
-                    {% include 'components/info_box.html.twig' with {
-                        title: 'Après la création',
-                        icon: '🚀',
-                        color: 'blue',
-                        content: next_steps_content
-                    } %}
-                </div>
-
-                <!-- Actions -->
-                <div class="mt-8">
-                    {% include 'components/action_buttons.html.twig' with {
-                        submit_text: 'Créer le personnage',
-                        submit_icon: '👤',
-                        submit_color: 'success',
-                        cancel_url: path('app_profile_index'),
-                        cancel_icon: '❌'
-                    } %}
-                </div>
-
-                {{ form_end(form) }}
-            </div>
-        </div>
+        {% include 'profile/_form.html.twig' with {
+            form: form,
+            icon: '👤',
+            page_title: 'Créer un Personnage',
+            page_description: 'Ajoutez un nouveau trader à votre profil de trading.',
+            profile_info: {
+                name: profile.name,
+                description: 'Profil de trading',
+                action_title: '👤 Nouveau Personnage',
+                action_description: 'Ajouter un trader'
+            },
+            info_title: 'Pourquoi ajouter un personnage ?',
+            info_icon: 'ℹ️',
+            info_color: 'green',
+            info_content: '<p>• 🎮 Chaque personnage peut avoir sa propre stratégie de trading</p><p>• 🗂️ Organiser vos lots par serveur et spécialisation</p><p>• 📊 Analyser les performances par personnage</p><p>• 🔄 Basculer facilement entre vos différents traders</p>',
+            form_title: 'Informations du personnage',
+            form_icon: '📝',
+            form_color: 'green',
+            form_fields: [
+                {
+                    name: 'name',
+                    placeholder: 'ex: Kama-Hunter, Trading-Master...',
+                    help_text: '🎮 Nom exact de votre personnage Dofus',
+                    focus_color: 'green'
+                },
+                {
+                    name: 'server',
+                    help_text: '🌍 Serveur sur lequel joue ce personnage',
+                    focus_color: 'green'
+                },
+                {
+                    name: 'classe',
+                    help_text: '⚔️ Classe de votre personnage',
+                    focus_color: 'green'
+                }
+            ],
+            next_steps: {
+                title: 'Après la création',
+                icon: '🚀',
+                color: 'blue',
+                content: '<p>1. ✅ Le personnage sera ajouté au profil "' ~ profile.name ~ '"</p><p>2. 🎯 Il sera automatiquement sélectionné comme personnage actif</p><p>3. 📦 Vous pourrez commencer à ajouter des lots de trading</p><p>4. 👁️ Configurer des surveillances de marché</p>'
+            },
+            submit_text: 'Créer le personnage',
+            submit_icon: '👤',
+            submit_color: 'success',
+            cancel_url: path('app_profile_index')
+        } %}
     </div>
 {% endblock %}
