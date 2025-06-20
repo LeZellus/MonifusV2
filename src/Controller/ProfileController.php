@@ -129,10 +129,11 @@ class ProfileController extends AbstractController
         return $this->redirectToRoute('app_profile_index');
     }
 
-    #[Route('/switch/{id}', name: 'app_profile_switch')]
+    #[Route('/switch/{id}', name: 'app_profile_switch', methods: ['POST'])]
     public function switchProfile(
         TradingProfile $profile,
-        CharacterSelectionService $characterService
+        CharacterSelectionService $characterService,
+        Request $request
     ): Response {
         // Vérifier que le profil appartient à l'utilisateur
         if ($profile->getUser() !== $this->getUser()) {
@@ -144,12 +145,25 @@ class ProfileController extends AbstractController
         if ($characters->count() > 0) {
             $firstCharacter = $characters->first();
             $characterService->setSelectedCharacter($firstCharacter);
-            $this->addFlash('success', "Profil '{$profile->getName()}' activé avec le personnage {$firstCharacter->getName()}");
+            $message = "Profil '{$profile->getName()}' activé avec le personnage {$firstCharacter->getName()}";
         } else {
-            // Pas de personnage dans ce profil, on peut quand même le sélectionner
-            $this->addFlash('info', "Profil '{$profile->getName()}' activé. Ajoutez un personnage pour commencer !");
+            $message = "Profil '{$profile->getName()}' activé. Ajoutez un personnage pour commencer !";
         }
 
+        // Si c'est une requête AJAX, retourner du JSON
+        if ($request->isXmlHttpRequest()) {
+            return new JsonResponse([
+                'success' => true,
+                'message' => $message,
+                'profile' => [
+                    'id' => $profile->getId(),
+                    'name' => $profile->getName()
+                ]
+            ]);
+        }
+
+        // Sinon, comportement classique avec flash message
+        $this->addFlash('success', $message);
         return $this->redirectToRoute('app_profile_index');
     }
 
@@ -240,5 +254,17 @@ class ProfileController extends AbstractController
 
         $this->addFlash('success', "Personnage '{$characterName}' supprimé avec succès.");
         return $this->redirectToRoute('app_profile_index');
+    }
+
+    #[Route('/character-selector-refresh', name: 'app_profile_character_selector_refresh')]
+    public function refreshCharacterSelector(CharacterSelectionService $characterService): Response
+    {
+        $selectedCharacter = $characterService->getSelectedCharacter($this->getUser());
+        $characters = $characterService->getUserCharacters($this->getUser());
+        
+        return $this->render('components/character_selector.html.twig', [
+            'selectedCharacter' => $selectedCharacter,
+            'characters' => $characters,
+        ]);
     }
 }

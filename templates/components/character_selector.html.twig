@@ -1,14 +1,14 @@
 <!-- templates/components/character_selector.html.twig -->
 {% if characters|length > 0 %}
-    <div class="bg-gradient-to-r from-gray-800 to-gray-700 rounded-lg p-4 border border-gray-600" {{ stimulus_controller('character-selector', {
-        selectedId: selectedCharacter ? selectedCharacter.id : null
-    }) }}>
+    <div class="bg-gradient-to-r from-gray-800 to-gray-700 rounded-lg p-6 border border-gray-600" 
+         data-controller="profile-switcher" 
+         data-profile-switcher-target="container">
         {% if selectedCharacter %}
-            <!-- Personnage actuel avec style card -->
-            <div class="flex items-center justify-between">
+            <!-- En-tête avec profil et personnage -->
+            <div class="flex items-center justify-between mb-4">
                 <div class="flex items-center space-x-4">
                     <div class="relative">
-                        <div class="w-12 h-12 rounded-lg overflow-hidden shadow-lg">
+                        <div class="w-14 h-14 rounded-lg overflow-hidden shadow-lg border-2 border-green-400">
                             <img src="{{ selectedCharacter.classe.imagePath }}" 
                                 alt="{{ selectedCharacter.classe.name }}" 
                                 class="w-full h-full object-cover"
@@ -17,11 +17,16 @@
                                 {{ selectedCharacter.name|first|upper }}
                             </div>
                         </div>
-                        <div class="absolute -bottom-1 -right-1 w-4 h-4 bg-green-500 rounded-full border-2 border-gray-800"></div>
+                        <div class="absolute -bottom-1 -right-1 w-5 h-5 bg-green-500 rounded-full border-2 border-gray-800 flex items-center justify-center">
+                            <span class="text-white text-xs font-bold">✓</span>
+                        </div>
                     </div>
                     <div class="flex-1">
-                        <h3 class="text-white font-semibold text-lg">{{ selectedCharacter.name }}</h3>
-                        <div class="flex items-center space-x-3 text-sm text-gray-300">
+                        <div class="flex items-center space-x-2 mb-1">
+                            <h3 class="text-white font-bold text-lg">{{ selectedCharacter.name }}</h3>
+                            <span class="bg-green-600 text-green-100 px-2 py-1 rounded-full text-xs font-medium">ACTIF</span>
+                        </div>
+                        <div class="flex items-center space-x-3 text-sm text-gray-300 mb-2">
                             <span class="flex items-center space-x-1">
                                 <span class="text-blue-400">⚔️</span>
                                 <span>{{ selectedCharacter.classe.name }}</span>
@@ -32,27 +37,59 @@
                                 <span>{{ selectedCharacter.server.name }}</span>
                             </span>
                         </div>
+                        <div class="flex items-center space-x-4 text-sm">
+                            <span class="text-blue-400 font-medium">📁 {{ selectedCharacter.tradingProfile.name }}</span>
+                            <span class="text-green-400">📦 {{ selectedCharacter.lotGroups|filter(lot => lot.status.value == 'available')|length }}</span>
+                            <span class="text-blue-400">✅ {{ selectedCharacter.lotGroups|filter(lot => lot.status.value == 'sold')|length }}</span>
+                            <span class="text-orange-400">👁️ {{ selectedCharacter.marketWatches|length }}</span>
+                        </div>
                     </div>
                 </div>
 
                 <div class="flex items-center space-x-2">
                     {% if characters|length > 1 %}
-                        <select 
-                            {{ stimulus_target('character-selector', 'select') }}
-                            {{ stimulus_action('character-selector', 'change', 'change') }}
-                            class="bg-gray-700 hover:bg-gray-600 text-white px-3 py-2 rounded-lg border border-gray-600 focus:border-blue-500 focus:ring-1 focus:ring-blue-500 text-sm transition-colors"
-                        >
-                            {% for character in characters %}
-                                <option 
-                                    value="{{ character.id }}" 
-                                    {{ character.id == selectedCharacter.id ? 'selected' : '' }}
-                                >
-                                    {{ character.name }}
-                                </option>
-                            {% endfor %}
-                        </select>
+                        <!-- Dropdown pour changer de profil -->
+                        <div class="relative group">
+                            <button class="bg-purple-600 hover:bg-purple-700 text-white px-3 py-2 rounded-lg transition-colors text-sm flex items-center">
+                                <span class="mr-1">🔄</span>
+                                Profil
+                                <svg class="w-3 h-3 ml-1" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7"></path>
+                                </svg>
+                            </button>
+                            <div class="absolute right-0 mt-2 w-48 bg-gray-800 rounded-md shadow-lg opacity-0 invisible group-hover:opacity-100 group-hover:visible transition-all duration-200 border border-gray-700 z-50">
+                                <div class="py-1">
+                                    {% set currentProfile = selectedCharacter.tradingProfile %}
+                                    {% set allProfiles = [] %}
+                                    {% for character in characters %}
+                                        {% if character.tradingProfile not in allProfiles %}
+                                            {% set allProfiles = allProfiles|merge([character.tradingProfile]) %}
+                                        {% endif %}
+                                    {% endfor %}
+                                    
+                                    {% for profile in allProfiles %}
+                                        {% if profile.id != currentProfile.id %}
+                                            <a href="#" 
+                                               data-action="click->profile-switcher#switchProfile"
+                                               data-profile-id="{{ profile.id }}"
+                                               data-profile-name="{{ profile.name }}"
+                                               class="block px-4 py-2 text-sm text-gray-300 hover:bg-gray-700 hover:text-white">
+                                                <div class="font-medium">{{ profile.name }}</div>
+                                                <div class="text-xs text-gray-400">{{ profile.dofusCharacters|length }} personnages</div>
+                                            </a>
+                                        {% endif %}
+                                    {% endfor %}
+                                    
+                                    <hr class="border-gray-700 my-1">
+                                    <a href="{{ path('app_profile_index') }}" 
+                                       class="block px-4 py-2 text-sm text-gray-300 hover:bg-gray-700 hover:text-white">
+                                        ⚙️ Gérer tous les profils
+                                    </a>
+                                </div>
+                            </div>
+                        </div>
                     {% endif %}
-
+                    
                     <a href="{{ path('app_profile_character_new', {id: selectedCharacter.tradingProfile.id}) }}" 
                        class="bg-green-600 hover:bg-green-700 text-white p-2 rounded-lg transition-colors" 
                        title="Ajouter un personnage">
@@ -62,45 +99,108 @@
                     </a>
                 </div>
             </div>
-        {% else %}
-            <!-- Aucun personnage sélectionné -->
-            <div class="flex items-center justify-between">
-                <div class="flex items-center space-x-4">
-                    <div class="w-12 h-12 bg-gray-600 rounded-lg flex items-center justify-center text-gray-400">
-                        <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z"></path>
-                        </svg>
-                    </div>
-                    <div>
-                        <h3 class="text-gray-400 font-medium">Aucun personnage sélectionné</h3>
-                        <p class="text-gray-500 text-sm">Choisissez un personnage pour commencer</p>
+
+            <!-- Statistiques supprimées - déplacées dans la ligne du profil -->
+
+            <!-- Sélection rapide si plusieurs personnages -->
+            {% if characters|length > 1 %}
+                <div class="border-t border-gray-600 pt-4">
+                    <div class="text-white text-sm font-medium mb-3">Changer de personnage :</div>
+                    <div class="grid grid-cols-2 md:grid-cols-3 gap-2">
+                        {% for character in characters %}
+                            {% if character.id != selectedCharacter.id %}
+                                <button onclick="window.location.href='{{ path('app_character_select', {id: character.id}) }}'"
+                                        class="bg-gray-700 hover:bg-gray-600 rounded-lg p-2 text-left transition-colors group">
+                                    <div class="flex items-center space-x-2">
+                                        <div class="w-8 h-8 rounded overflow-hidden">
+                                            <img src="{{ character.classe.imagePath }}" 
+                                                 alt="{{ character.classe.name }}" 
+                                                 class="w-full h-full object-cover"
+                                                 onerror="this.style.display='none'; this.nextElementSibling.style.display='flex';">
+                                            <div class="w-full h-full bg-gradient-to-br from-purple-500 to-pink-600 flex items-center justify-center text-white font-bold text-sm" style="display: none;">
+                                                {{ character.name|first|upper }}
+                                            </div>
+                                        </div>
+                                        <div class="flex-1 min-w-0">
+                                            <div class="text-white text-sm font-medium truncate group-hover:text-blue-300">{{ character.name }}</div>
+                                            <div class="text-gray-400 text-xs">{{ character.server.name }}</div>
+                                        </div>
+                                    </div>
+                                    <div class="flex items-center space-x-2 text-xs mt-1">
+                                        <span class="text-green-400 flex items-center">
+                                            <span class="mr-1">📦</span>
+                                            {{ character.lotGroups|filter(lot => lot.status.value == 'available')|length }}
+                                        </span>
+                                        <span class="text-blue-400 flex items-center">
+                                            <span class="mr-1">✅</span>
+                                            {{ character.lotGroups|filter(lot => lot.status.value == 'sold')|length }}
+                                        </span>
+                                        <span class="text-orange-400 flex items-center">
+                                            <span class="mr-1">👁️</span>
+                                            {{ character.marketWatches|length }}
+                                        </span>
+                                    </div>
+                                </button>
+                            {% endif %}
+                        {% endfor %}
                     </div>
                 </div>
+            {% endif %}
 
-                <div class="flex items-center space-x-2">
-                    {% if characters|length > 1 %}
-                        <select 
-                            {{ stimulus_target('character-selector', 'select') }}
-                            {{ stimulus_action('character-selector', 'change', 'change') }}
-                            class="bg-gray-700 hover:bg-gray-600 text-white px-3 py-2 rounded-lg border border-gray-600 focus:border-blue-500 focus:ring-1 focus:ring-blue-500 text-sm transition-colors"
-                        >
-                            <option value="">-- Sélectionner --</option>
-                            {% for character in characters %}
-                                <option value="{{ character.id }}">
-                                    {{ character.name }} ({{ character.server.name }})
-                                </option>
-                            {% endfor %}
-                        </select>
-                    {% else %}
-                        <span class="text-gray-500 text-sm">{{ characters[0].name }} ({{ characters[0].server.name }})</span>
-                    {% endif %}
-
-                    <a href="{{ path('app_profile_character_new', {id: characters[0].tradingProfile.id}) }}" 
-                       class="bg-green-600 hover:bg-green-700 text-white p-2 rounded-lg transition-colors" 
-                       title="Ajouter un personnage">
-                        <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 6v6m0 0v6m0-6h6m-6 0H6"></path>
-                        </svg>
+        {% else %}
+            <!-- Aucun personnage sélectionné -->
+            <div class="text-center">
+                <div class="w-16 h-16 bg-gray-600 rounded-lg flex items-center justify-center mx-auto mb-4">
+                    <svg class="w-8 h-8 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z"></path>
+                    </svg>
+                </div>
+                <h3 class="text-white font-bold text-lg mb-2">Aucun personnage sélectionné</h3>
+                <p class="text-gray-400 text-sm mb-6">Sélectionnez un personnage pour commencer</p>
+                
+                <div class="grid grid-cols-1 md:grid-cols-2 gap-3">
+                    {% for character in characters %}
+                        <button onclick="window.location.href='{{ path('app_character_select', {id: character.id}) }}'"
+                                class="bg-gray-700 hover:bg-gray-600 rounded-lg p-3 text-left transition-colors group">
+                            <div class="flex items-center space-x-3 mb-2">
+                                <div class="w-10 h-10 rounded overflow-hidden">
+                                    <img src="{{ character.classe.imagePath }}" 
+                                         alt="{{ character.classe.name }}" 
+                                         class="w-full h-full object-cover"
+                                         onerror="this.style.display='none'; this.nextElementSibling.style.display='flex';">
+                                    <div class="w-full h-full bg-gradient-to-br from-purple-500 to-pink-600 flex items-center justify-center text-white font-bold" style="display: none;">
+                                        {{ character.name|first|upper }}
+                                    </div>
+                                </div>
+                                <div class="flex-1">
+                                    <div class="text-white font-medium group-hover:text-blue-300">{{ character.name }}</div>
+                                    <div class="text-gray-400 text-sm">{{ character.classe.name }} • {{ character.server.name }}</div>
+                                    <div class="text-blue-400 text-xs">{{ character.tradingProfile.name }}</div>
+                                </div>
+                            </div>
+                            <div class="grid grid-cols-3 gap-2 text-xs text-center">
+                                <div class="bg-gray-600 rounded p-1">
+                                    <div class="text-green-400 font-bold">{{ character.lotGroups|filter(lot => lot.status.value == 'available')|length }}</div>
+                                    <div class="text-gray-400">📦 Dispo</div>
+                                </div>
+                                <div class="bg-gray-600 rounded p-1">
+                                    <div class="text-blue-400 font-bold">{{ character.lotGroups|filter(lot => lot.status.value == 'sold')|length }}</div>
+                                    <div class="text-gray-400">✅ Vendus</div>
+                                </div>
+                                <div class="bg-gray-600 rounded p-1">
+                                    <div class="text-orange-400 font-bold">{{ character.marketWatches|length }}</div>
+                                    <div class="text-gray-400">👁️ Watch</div>
+                                </div>
+                            </div>
+                        </button>
+                    {% endfor %}
+                </div>
+                
+                <div class="mt-4 pt-4 border-t border-gray-600">
+                    <a href="{{ path('app_profile_index') }}" 
+                       class="bg-blue-600 hover:bg-blue-700 text-white px-4 py-2 rounded-lg transition-colors inline-flex items-center">
+                        <span class="mr-2">⚙️</span>
+                        Gérer profils et personnages
                     </a>
                 </div>
             </div>
