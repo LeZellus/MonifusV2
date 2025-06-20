@@ -114,8 +114,7 @@
                                     {{ sale.soldAt|date('d/m/Y H:i') }}
                                 </td>
                                 <td class="px-6 py-4 whitespace-nowrap">
-                                    <div class="text-white font-medium">{{ lotGroup.item.name }}</div>
-                                    <div class="text-gray-400 text-sm">Niv.{{ lotGroup.item.level }}</div>
+                                    {% include 'components/item_display.html.twig' with {item: lotGroup.item} %}
                                 </td>
                                 <td class="px-6 py-4 whitespace-nowrap">
                                     <div class="text-white">{{ lotGroup.dofusCharacter.name }}</div>

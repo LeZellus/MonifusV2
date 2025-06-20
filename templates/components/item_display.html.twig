@@ -1,0 +1,27 @@
+{# templates/components/item_display.html.twig #}
+{# 
+Affichage cohérent des items Dofus dans toute l'app
+Usage: {% include 'components/item_display.html.twig' with {
+    item: item,
+    mode: 'compact|full' (optional, default: full),
+    link: '/path/to/item' (optional)
+} %}
+#}
+
+{% set content %}
+    <div class="text-white font-medium">{{ item.name }}</div>
+    {% if mode|default('full') != 'compact' and item.level %}
+        <div class="text-gray-400 text-sm">Niv.{{ item.level }}</div>
+    {% endif %}
+    {% if mode|default('full') != 'compact' and item.itemType %}
+        <div class="text-blue-400 text-xs">{{ item.itemType.value }}</div>
+    {% endif %}
+{% endset %}
+
+{% if link is defined %}
+    <a href="{{ link }}" class="hover:text-blue-400 transition-colors">
+        {{ content|raw }}
+    </a>
+{% else %}
+    {{ content|raw }}
+{% endif %}

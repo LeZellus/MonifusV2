@@ -44,10 +44,10 @@
                             {% for data in items_data %}
                                 <tr class="hover:bg-gray-700">
                                     <td class="px-6 py-4 whitespace-nowrap">
-                                        <a href="{{ path('app_market_watch_history', {itemId: data.item.id}) }}" class="text-white font-medium hover:text-blue-400 transition-colors">
-                                            {{ data.item.name }}
-                                        </a>
-                                        <div class="text-gray-400 text-sm">Niv.{{ data.item.level ?? 'N/A' }}</div>
+                                        {% include 'components/item_display.html.twig' with {
+                                            item: data.item, 
+                                            link: path('app_market_watch_history', {itemId: data.item.id})
+                                        } %}
                                     </td>
                                     <td class="px-6 py-4 whitespace-nowrap">
                                         {% if data.avg_price_unit %}

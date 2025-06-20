@@ -47,8 +47,7 @@
                                 {% set profitPercent = lot.buyPricePerLot > 0 ? (profit / lot.buyPricePerLot * 100) : 0 %}
                                 <tr class="hover:bg-gray-700">
                                     <td class="px-6 py-4 whitespace-nowrap">
-                                        <div class="text-white font-medium">{{ lot.item.name }}</div>
-                                        <div class="text-gray-400 text-sm">Niv.{{ lot.item.level }}</div>
+                                        {% include 'components/item_display.html.twig' with {item: lot.item} %}
                                     </td>
                                     <td class="px-6 py-4 whitespace-nowrap">
                                         <div class="text-white font-medium">{{ lot.lotSize }} lots</div>
