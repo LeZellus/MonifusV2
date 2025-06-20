@@ -1,0 +1,66 @@
+{# templates/components/section_header.html.twig #}
+{#
+En-tête de section unifié pour personnages, formulaires, etc.
+Usage: {% include 'components/section_header.html.twig' with {
+    type: 'character|form|simple',
+    title: 'Titre principal',
+    subtitle: 'Sous-titre optionnel',
+    icon: '📝',
+    color: 'blue',
+    character: character_object (si type=character),
+    action_title: 'Action' (si type=character),
+    action_description: 'Description action',
+    wrapper_class: 'wrapper-background mb-6' (optionnel)
+} %}
+#}
+
+{% set color_class = 'text-' ~ (color|default('blue')) ~ '-400' %}
+{% set wrapper_class = wrapper_class|default('wrapper-background') %}
+
+<div class="{{ wrapper_class }}">
+    {% if type == 'character' and character is defined %}
+        <!-- En-tête personnage -->
+        <div class="flex items-center space-x-4">
+            <div class="w-12 h-12 rounded-full overflow-hidden">
+                <img src="{{ character.classe.imagePath }}" 
+                     alt="{{ character.classe.name }}" 
+                     class="w-full h-full object-cover">
+            </div>
+            <div>
+                <h2 class="text-white text-xl font-semibold">{{ character.name }}</h2>
+                <p class="text-gray-400">{{ character.classe.name }} • {{ character.server.name }}</p>
+            </div>
+            {% if action_title is defined %}
+                <div class="ml-auto text-right">
+                    <div class="{{ color_class }} font-semibold">
+                        {% if icon is defined %}{{ icon }} {% endif %}{{ action_title }}
+                    </div>
+                    {% if action_description is defined %}
+                        <div class="text-gray-400 text-sm">{{ action_description }}</div>
+                    {% endif %}
+                </div>
+            {% endif %}
+        </div>
+    {% elseif type == 'form' %}
+        <!-- En-tête formulaire -->
+        <h3 class="text-white text-lg font-semibold mb-6 flex items-center {{ color_class }}">
+            {% if icon is defined %}
+                <span class="text-2xl mr-3">{{ icon }}</span>
+            {% endif %}
+            {{ title }}
+        </h3>
+    {% else %}
+        <!-- En-tête simple -->
+        <div class="flex items-center {% if subtitle is defined %}mb-4{% else %}mb-6{% endif %}">
+            {% if icon is defined %}
+                <span class="text-2xl mr-3 {{ color_class }}">{{ icon }}</span>
+            {% endif %}
+            <div>
+                <h3 class="text-white text-lg font-semibold">{{ title }}</h3>
+                {% if subtitle is defined %}
+                    <p class="text-gray-400 text-sm">{{ subtitle }}</p>
+                {% endif %}
+            </div>
+        </div>
+    {% endif %}
+</div>

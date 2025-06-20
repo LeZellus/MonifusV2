@@ -1,0 +1,185 @@
+{# templates/market_watch/_form.html.twig #}
+<div class="max-w-2xl mx-auto">
+    <!-- En-tête avec info personnage -->
+    {% include 'components/section_header.html.twig' with {
+        type: 'character',
+        character: character,
+        action_title: is_edit ? 'Modifier Observation - ' ~ market_watch.item.name : 'Nouvelle Observation',
+        action_description: is_edit ? ('Observé le ' ~ market_watch.observedAt|date('d/m/Y à H:i')) : 'Observer les prix du marché',
+        color: 'orange',
+        icon: is_edit ? '📝' : '📊'
+    } %}
+
+    {% if is_edit %}
+        <!-- Historique récent pour contexte -->
+        <div class="wrapper-background mb-6">
+            {% include 'components/section_header.html.twig' with {
+                type: 'simple',
+                title: 'Prix actuels à modifier',
+                icon: '📈',
+                color: 'orange',
+                wrapper_class: ''
+            } %}
+            
+            <div class="grid grid-cols-3 gap-4">
+                <div class="bg-gray-700 rounded-lg p-3 text-center">
+                    <div class="text-gray-400 text-sm">Prix x1</div>
+                    {% if market_watch.pricePerUnit %}
+                        <div class="text-green-400 text-lg font-bold">{{ (market_watch.pricePerUnit / 1000)|number_format(0, ',', ' ') }}k</div>
+                    {% else %}
+                        <div class="text-gray-500">Non renseigné</div>
+                    {% endif %}
+                </div>
+                <div class="bg-gray-700 rounded-lg p-3 text-center">
+                    <div class="text-gray-400 text-sm">Prix x10</div>
+                    {% if market_watch.pricePer10 %}
+                        <div class="text-blue-400 text-lg font-bold">{{ (market_watch.pricePer10 / 1000)|number_format(0, ',', ' ') }}k</div>
+                    {% else %}
+                        <div class="text-gray-500">Non renseigné</div>
+                    {% endif %}
+                </div>
+                <div class="bg-gray-700 rounded-lg p-3 text-center">
+                    <div class="text-gray-400 text-sm">Prix x100</div>
+                    {% if market_watch.pricePer100 %}
+                        <div class="text-purple-400 text-lg font-bold">{{ (market_watch.pricePer100 / 1000)|number_format(0, ',', ' ') }}k</div>
+                    {% else %}
+                        <div class="text-gray-500">Non renseigné</div>
+                    {% endif %}
+                </div>
+            </div>
+        </div>
+    {% else %}
+        <!-- Explication du système pour nouveau -->
+        {% set explanation_content %}
+            <p>• 📋 Observez les prix sur l'hôtel de vente de votre serveur</p>
+            <p>• 🔢 Notez les prix par unité (x1), par 10 (x10) et/ou par 100 (x100)</p>
+            <p>• 📈 Répétez régulièrement pour suivre l'évolution des prix</p>
+            <p>• 💰 Identifiez les meilleures opportunités d'achat/vente</p>
+        {% endset %}
+
+        <div class="mb-6">
+            {% include 'components/info_box.html.twig' with {
+                title: 'Comment ça marche ?',
+                icon: '💡',
+                color: 'orange',
+                content: explanation_content
+            } %}
+        </div>
+    {% endif %}
+
+    <!-- Formulaire principal -->
+    <div class="wrapper-background">
+        {% include 'components/section_header.html.twig' with {
+            type: 'form',
+            title: is_edit ? 'Mettre à jour les prix' : 'Observer les prix du marché',
+            icon: is_edit ? '🔄' : '📝',
+            color: 'orange',
+            wrapper_class: ''
+        } %}
+
+        {{ form_start(form) }}
+            <div class="space-y-6">
+                <!-- Ressource avec autocomplétion ou lecture seule -->
+                {% if is_edit %}
+                    {% include 'components/autocomplete_field.html.twig' with {
+                        form: form,
+                        search_field: 'itemSearch',
+                        hidden_field: 'item',
+                        is_readonly: true,
+                        current_item: market_watch.item,
+                        container_class: '',
+                        label: 'Ressource observée',
+                        readonly_help: '🔒 Ressource observée (non modifiable)'
+                    } %}
+                {% else %}
+                    {% include 'components/autocomplete_field.html.twig' with {
+                        form: form,
+                        search_field: 'itemSearch',
+                        hidden_field: 'item', 
+                        api_url: path('api_items_search_resources'),
+                        container_class: '',
+                        label: 'Rechercher une ressource',
+                        placeholder: 'Tapez pour rechercher une ressource...',
+                        help_text: '🔍 Recherche filtrée sur les ressources'
+                    } %}
+                {% endif %}
+
+                <!-- Date d'observation -->
+                <div>
+                    {{ form_label(form.observedAt, null, {'label_attr': {'class': 'block text-white font-medium mb-2'}}) }}
+                    {{ form_widget(form.observedAt, {'attr': {'class': 'w-full px-3 py-2 border border-gray-600 bg-gray-700 text-white rounded-md focus:outline-none focus:border-orange-500'}}) }}
+                    {{ form_errors(form.observedAt) }}
+                    <div class="form-help">📅 {{ is_edit ? 'Date de cette observation' : 'Quand avez-vous observé ces prix ?' }}</div>
+                </div>
+
+                <!-- Prix observés -->
+                <div class="bg-gradient-to-r from-blue-600 to-purple-600 rounded-lg p-4">
+                    <h4 class="text-white font-semibold mb-4 flex items-center">
+                        <span class="mr-2">💰</span>
+                        {{ is_edit ? 'Nouveaux prix observés' : 'Prix observés sur l\'hôtel de vente' }}
+                    </h4>
+                    <div class="text-blue-100 text-sm mb-4">
+                        {{ is_edit ? 'Modifiez les prix selon vos dernières observations. Laissez vide pour supprimer un prix.' : 'Renseignez au moins un prix. Laissez vide si cette unité n\'est pas disponible.' }}
+                    </div>
+                    
+                    <div class="grid grid-cols-1 md:grid-cols-3 gap-4">
+                        <div class="bg-white bg-opacity-10 rounded-lg p-4">
+                            {{ form_label(form.pricePerUnit, null, {'label_attr': {'class': 'block text-white font-medium mb-2'}}) }}
+                            <div class="relative">
+                                {{ form_widget(form.pricePerUnit, {'attr': {'class': 'w-full px-4 py-3 pr-12 border border-gray-600 bg-gray-700 text-white rounded-lg focus:outline-none focus:border-green-500'}}) }}
+                                <div class="absolute inset-y-0 right-0 pr-3 flex items-center">
+                                    <span class="text-gray-400 text-sm">kamas</span>
+                                </div>
+                            </div>
+                            {{ form_errors(form.pricePerUnit) }}
+                            <div class="text-green-200 text-xs mt-1">Prix d'1 seule unité</div>
+                        </div>
+
+                        <div class="bg-white bg-opacity-10 rounded-lg p-4">
+                            {{ form_label(form.pricePer10, null, {'label_attr': {'class': 'block text-white font-medium mb-2'}}) }}
+                            <div class="relative">
+                                {{ form_widget(form.pricePer10, {'attr': {'class': 'w-full px-4 py-3 pr-12 border border-gray-600 bg-gray-700 text-white rounded-lg focus:outline-none focus:border-blue-500'}}) }}
+                                <div class="absolute inset-y-0 right-0 pr-3 flex items-center">
+                                    <span class="text-gray-400 text-sm">kamas</span>
+                                </div>
+                            </div>
+                            {{ form_errors(form.pricePer10) }}
+                            <div class="text-blue-200 text-xs mt-1">Prix d'un lot de 10</div>
+                        </div>
+
+                        <div class="bg-white bg-opacity-10 rounded-lg p-4">
+                            {{ form_label(form.pricePer100, null, {'label_attr': {'class': 'block text-white font-medium mb-2'}}) }}
+                            <div class="relative">
+                                {{ form_widget(form.pricePer100, {'attr': {'class': 'w-full px-4 py-3 pr-12 border border-gray-600 bg-gray-700 text-white rounded-lg focus:outline-none focus:border-purple-500'}}) }}
+                                <div class="absolute inset-y-0 right-0 pr-3 flex items-center">
+                                    <span class="text-gray-400 text-sm">kamas</span>
+                                </div>
+                            </div>
+                            {{ form_errors(form.pricePer100) }}
+                            <div class="text-purple-200 text-xs mt-1">Prix d'un lot de 100</div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Notes -->
+                <div>
+                    {{ form_label(form.notes, null, {'label_attr': {'class': 'block text-white font-medium mb-2'}}) }}
+                    {{ form_widget(form.notes, {'attr': {'class': 'w-full px-3 py-2 border border-gray-600 bg-gray-700 text-white rounded-md focus:outline-none focus:border-orange-500', 'rows': 3}}) }}
+                    {{ form_errors(form.notes) }}
+                    <div class="form-help">📝 {{ is_edit ? 'Contexte du marché, évolutions observées...' : 'Contexte du marché, tendances observées...' }}</div>
+                </div>
+            </div>
+
+            <!-- Actions -->
+            <div class="mt-8">
+                {% include 'components/action_buttons.html.twig' with {
+                    submit_text: is_edit ? 'Sauvegarder les modifications' : 'Enregistrer l\'observation',
+                    submit_icon: is_edit ? '💾' : '📊',
+                    submit_color: is_edit ? 'primary' : 'warning',
+                    cancel_url: path('app_market_watch_index'),
+                    cancel_icon: '❌'
+                } %}
+            </div>
+        {{ form_end(form) }}
+    </div>
+</div>

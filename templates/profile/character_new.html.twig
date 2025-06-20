@@ -29,7 +29,7 @@
                 </div>
             </div>
 
-            <!-- Information importante - AVANT le formulaire -->
+            <!-- Information importante -->
             {% set character_info_content %}
                 <p>• 🎮 Chaque personnage peut avoir sa propre stratégie de trading</p>
                 <p>• 🗂️ Organiser vos lots par serveur et spécialisation</p>
@@ -45,7 +45,15 @@
             } %}
 
             <!-- Formulaire principal -->
-            {% set form_content %}
+            <div class="wrapper-background">
+                {% include 'components/section_header.html.twig' with {
+                    type: 'form',
+                    title: 'Informations du personnage',
+                    icon: '📝',
+                    color: 'green',
+                    wrapper_class: ''
+                } %}
+
                 {{ form_start(form) }}
                 
                 <div class="space-y-6">
@@ -100,14 +108,7 @@
                 </div>
 
                 {{ form_end(form) }}
-            {% endset %}
-
-            {% include 'components/form_section.html.twig' with {
-                title: 'Informations du personnage',
-                icon: '📝',
-                color: 'green',
-                content: form_content
-            } %}
+            </div>
         </div>
     </div>
 {% endblock %}
