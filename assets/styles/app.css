@@ -87,7 +87,7 @@ body {
 }
 
 .form-help {
-    @apply text-gray-400 text-sm mt-1;
+    @apply text-gray-400 text-sm mt-2;
 }
 
 /* ============================================

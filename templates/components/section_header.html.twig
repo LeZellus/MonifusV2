@@ -20,15 +20,17 @@ Usage: {% include 'components/section_header.html.twig' with {
 <div class="{{ wrapper_class }}">
     {% if type == 'character' and character is defined %}
         <!-- En-tête personnage -->
-        <div class="flex items-center space-x-4">
-            <div class="w-12 h-12 rounded-full overflow-hidden">
-                <img src="{{ character.classe.imagePath }}" 
-                     alt="{{ character.classe.name }}" 
-                     class="w-full h-full object-cover">
-            </div>
-            <div>
-                <h2 class="text-white text-xl font-semibold">{{ character.name }}</h2>
-                <p class="text-gray-400">{{ character.classe.name }} • {{ character.server.name }}</p>
+        <div class="flex items-center justify-between space-x-4">
+            <div class="flex">
+                <div class="w-12 h-12 rounded-full overflow-hidden">
+                    <img src="{{ character.classe.imagePath }}" 
+                        alt="{{ character.classe.name }}" 
+                        class="w-full h-full object-cover">
+                </div>
+                <div>
+                    <h2 class="text-white text-xl font-semibold">{{ character.name }}</h2>
+                    <p class="text-gray-400">{{ character.classe.name }} • {{ character.server.name }}</p>
+                </div>
             </div>
             {% if action_title is defined %}
                 <div class="ml-auto text-right">

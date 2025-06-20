@@ -1,5 +1,5 @@
 {# templates/market_watch/_form.html.twig #}
-<div class="max-w-2xl mx-auto">
+<div class="max-w-2xl mx-auto grid gap-8">
     <!-- En-tête avec info personnage -->
     {% include 'components/section_header.html.twig' with {
         type: 'character',
@@ -57,14 +57,12 @@
             <p>• 💰 Identifiez les meilleures opportunités d'achat/vente</p>
         {% endset %}
 
-        <div class="mb-6">
-            {% include 'components/info_box.html.twig' with {
-                title: 'Comment ça marche ?',
-                icon: '💡',
-                color: 'orange',
-                content: explanation_content
-            } %}
-        </div>
+        {% include 'components/info_box.html.twig' with {
+            title: 'Comment ça marche ?',
+            icon: '💡',
+            color: 'orange',
+            content: explanation_content
+        } %}
     {% endif %}
 
     <!-- Formulaire principal -->
