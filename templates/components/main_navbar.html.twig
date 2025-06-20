@@ -5,16 +5,11 @@
             <!-- Logo et titre -->
             <div class="flex items-center space-x-4">
                 <a href="{{ app.user ? path('app_trading_dashboard') : path('app_home') }}" class="flex items-center space-x-3">
-                    <div class="w-10 h-10 bg-gradient-to-br from-blue-500 to-purple-600 rounded-lg flex items-center justify-center">
-                        <span class="text-white font-bold text-lg">DT</span>
-                    </div>
+
+                    <img src="{{ asset('uploads/logo.svg')}}" alt="Logo site" class="w-10 h-10">
                     <div class="hidden md:block">
                         <h1 class="text-white text-xl font-bold">
-                            {% if app.user %}
-                                Dofus Trading
-                            {% else %}
-                                Dofus Trading V2
-                            {% endif %}
+                            Monifus
                         </h1>
                         {% if app.user %}
                             <div class="text-gray-400 text-xs">{{ title|default('Dashboard') }}</div>

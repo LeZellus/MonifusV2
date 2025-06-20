@@ -1,7 +1,7 @@
 {# templates/profile/_form.html.twig #}
 <div class="max-w-lg mx-auto">
     <!-- En-tête explicatif -->
-    <div class="wrapper-background mb-6 text-center">
+    <div class="wrapper-background text-center">
         <div class="text-4xl mb-3">{{ icon }}</div>
         <h2 class="text-white text-xl font-bold mb-2">{{ page_title }}</h2>
         <p class="text-gray-400">{{ page_description }}</p>
@@ -9,7 +9,7 @@
 
     {% if profile_info is defined %}
         <!-- En-tête avec profil parent (pour character_new) -->
-        <div class="wrapper-background mb-6">
+        <div class="wrapper-background">
             <div class="flex items-center space-x-4">
                 <div class="w-12 h-12 bg-gradient-to-br from-blue-500 to-purple-600 rounded-lg flex items-center justify-center">
                     <span class="text-white font-bold text-lg">{{ profile_info.name|first|upper }}</span>

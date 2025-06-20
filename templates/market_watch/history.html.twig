@@ -4,24 +4,17 @@
 
 {% block body %}
     <div class="wrapper-container">
-        <!-- En-tête avec info item -->
-        {% include 'components/character_info_header.html.twig' with {
-            character: {
-                name: item.name,
-                classe: {
-                    name: (item.level ? 'Niveau ' ~ item.level ~ ' • ' : '') ~ (item.itemType ? item.itemType.value : 'Type non défini'),
-                    imagePath: character.classe.imagePath
-                },
-                server: {name: ''}
-            },
+        {% include 'components/section_header.html.twig' with {
+            type: 'character',
+            character: character,
             action_title: 'Historique des Prix',
-            action_description: character.name ~ ' • ' ~ character.server.name,
-            action_color: 'orange',
-            action_icon: '📈'
+            action_description: 'Consulter les évolutions de prix',
+            color: 'orange',
+            icon: '📈'
         } %}
 
         <!-- Statistiques rapides -->
-        <div class="grid grid-cols-1 md:grid-cols-4 gap-4 mb-6">
+        <div class="grid grid-cols-1 md:grid-cols-4 gap-4">
             <div class="wrapper-background text-center">
                 <div class="text-2xl font-bold text-blue-400">{{ price_history|length }}</div>
                 <div class="text-gray-400 text-sm">Observations total</div>
@@ -93,17 +86,15 @@
             <p>• 📊 Plus vous avez de données, plus vos analyses seront précises</p>
         {% endset %}
 
-        <div class="mt-8">
-            {% include 'components/info_box.html.twig' with {
-                title: 'Analyser l\'évolution',
-                icon: '💡',
-                color: 'info',
-                content: analysis_tips_content
-            } %}
-        </div>
+        {% include 'components/info_box.html.twig' with {
+            title: 'Analyser l\'évolution',
+            icon: '💡',
+            color: 'info',
+            content: analysis_tips_content
+        } %}
 
         <!-- Actions -->
-        <div class="flex justify-between items-center mb-6">
+        <div class="flex justify-between items-center">
             <h3 class="text-white text-xl font-bold">Évolution des prix</h3>
             <a href="{{ path('app_market_watch_new') }}" 
                class="bg-orange-600 hover:bg-orange-700 text-white px-4 py-2 rounded-lg transition-colors">
