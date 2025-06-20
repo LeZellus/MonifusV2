@@ -14,32 +14,34 @@
     <div class="wrapper-container">
         <!-- Statistiques globales -->
         <div class="stats-grid">
-            <div class="stats-card">
-                <h3 class="stats-title">💰 Investi</h3>
-                <p class="stats-value-warning">
-                    {{ (stats.global.investedAmount / 1000000)|number_format(1) }}M
-                </p>
-                <p class="stats-subtitle">{{ stats.global.availableLots }} lots disponibles</p>
-            </div>
-            <div class="stats-card">
-                <h3 class="stats-title">✅ Profit Réalisé</h3>
-                <p class="stats-value-success">
-                    {{ (stats.global.realizedProfit / 1000000)|number_format(1) }}M
-                </p>
-                <p class="stats-subtitle">{{ stats.global.soldLots }} lots vendus</p>
-            </div>
-            <div class="stats-card">
-                <h3 class="stats-title">🎯 Profit Potentiel</h3>
-                <p class="stats-value-primary">
-                    {{ (stats.global.potentialProfit / 1000000)|number_format(1) }}M
-                </p>
-                <p class="stats-subtitle">Si tout vendu au prix cible</p>
-            </div>
-            <div class="stats-card">
-                <h3 class="stats-title">📊 Total Lots</h3>
-                <p class="stats-value-purple">{{ stats.global.totalLots }}</p>
-                <p class="stats-subtitle">{{ stats.charactersCount }} personnages</p>
-            </div>
+            {% include 'components/stats_card.html.twig' with {
+                title: 'Investi',
+                value: (stats.global.investedAmount / 1000000)|number_format(1) ~ 'M',
+                subtitle: stats.global.availableLots ~ ' lots disponibles',
+                icon: '💰',
+                color: 'orange'
+            } %}
+            {% include 'components/stats_card.html.twig' with {
+                title: 'Profit Réalisé',
+                value: (stats.global.realizedProfit / 1000000)|number_format(1) ~ 'M',
+                subtitle: stats.global.soldLots ~ ' lots vendus',
+                icon: '✅',
+                color: 'green'
+            } %}
+            {% include 'components/stats_card.html.twig' with {
+                title: 'Profit Potentiel',
+                value: (stats.global.potentialProfit / 1000000)|number_format(1) ~ 'M',
+                subtitle: 'Si tout vendu au prix cible',
+                icon: '🎯',
+                color: 'blue'
+            } %}
+            {% include 'components/stats_card.html.twig' with {
+                title: 'Total Lots',
+                value: stats.global.totalLots,
+                subtitle: stats.charactersCount ~ ' personnages',
+                icon: '📊',
+                color: 'purple'
+            } %}
         </div>
 
         <!-- Top items rentables -->

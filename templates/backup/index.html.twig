@@ -14,30 +14,32 @@
     <div class="wrapper-container">
         <div class="max-w-4xl mx-auto grid gap-8">
             <!-- Résumé des données -->
-            <div class="wrapper-background">
-                <h2 class="text-white text-xl font-semibold mb-4">📊 Résumé de vos données</h2>
-                <div class="grid grid-cols-2 md:grid-cols-5 gap-4">
-                    <div class="text-center">
-                        <div class="text-2xl font-bold text-blue-400">{{ summary.profiles_count }}</div>
-                        <div class="text-gray-400 text-sm">Profils</div>
-                    </div>
-                    <div class="text-center">
-                        <div class="text-2xl font-bold text-green-400">{{ summary.characters_count }}</div>
-                        <div class="text-gray-400 text-sm">Personnages</div>
-                    </div>
-                    <div class="text-center">
-                        <div class="text-2xl font-bold text-purple-400">{{ summary.lots_count }}</div>
-                        <div class="text-gray-400 text-sm">Lots</div>
-                    </div>
-                    <div class="text-center">
-                        <div class="text-2xl font-bold text-yellow-400">{{ summary.sales_count }}</div>
-                        <div class="text-gray-400 text-sm">Ventes</div>
-                    </div>
-                    <div class="text-center">
-                        <div class="text-2xl font-bold text-orange-400">{{ summary.watches_count }}</div>
-                        <div class="text-gray-400 text-sm">Surveillances</div>
-                    </div>
-                </div>
+            <div class="grid grid-cols-2 md:grid-cols-5 gap-4">
+                {% include 'components/stats_card.html.twig' with {
+                    title: 'Profils',
+                    value: summary.profiles_count,
+                    color: 'blue'
+                } %}
+                {% include 'components/stats_card.html.twig' with {
+                    title: 'Personnages',
+                    value: summary.characters_count,
+                    color: 'green'
+                } %}
+                {% include 'components/stats_card.html.twig' with {
+                    title: 'Lots',
+                    value: summary.lots_count,
+                    color: 'purple'
+                } %}
+                {% include 'components/stats_card.html.twig' with {
+                    title: 'Ventes',
+                    value: summary.sales_count,
+                    color: 'yellow'
+                } %}
+                {% include 'components/stats_card.html.twig' with {
+                    title: 'Surveillances',
+                    value: summary.watches_count,
+                    color: 'orange'
+                } %}
             </div>
 
             <!-- Actions de sauvegarde -->

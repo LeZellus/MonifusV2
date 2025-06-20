@@ -53,28 +53,28 @@
 
     <!-- Statistiques globales -->
     <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">
-        <div class="wrapper-background">
-            <h3 class="text-white text-lg font-semibold mb-2">Profils</h3>
-            <p class="text-blue-400 text-2xl font-bold">{{ trading_profiles_count }}</p>
-        </div>
-        <div class="wrapper-background">
-            <h3 class="text-white text-lg font-semibold mb-2">Personnages</h3>
-            <p class="text-green-400 text-2xl font-bold">{{ stats.charactersCount }}</p>
-        </div>
-        <div class="wrapper-background">
-            <h3 class="text-white text-lg font-semibold mb-2">Lots Total</h3>
-            <p class="text-purple-400 text-2xl font-bold">{{ stats.global.totalLots }}</p>
-            <p class="text-gray-400 text-sm">{{ stats.global.availableLots }} dispo • {{ stats.global.soldLots }} vendus</p>
-        </div>
-        <div class="wrapper-background">
-            <h3 class="text-white text-lg font-semibold mb-2">Profit Total</h3>
-            <p class="text-green-400 text-2xl font-bold">
-                {{ ((stats.global.realizedProfit + stats.global.potentialProfit) / 1000000)|number_format(1) }}M
-            </p>
-            <p class="text-gray-400 text-sm">
-                {{ (stats.global.realizedProfit / 1000000)|number_format(1) }}M réalisé
-            </p>
-        </div>
+        {% include 'components/stats_card.html.twig' with {
+            title: 'Profils',
+            value: trading_profiles_count,
+            color: 'blue'
+        } %}
+        {% include 'components/stats_card.html.twig' with {
+            title: 'Personnages', 
+            value: stats.charactersCount,
+            color: 'green'
+        } %}
+        {% include 'components/stats_card.html.twig' with {
+            title: 'Lots Total',
+            value: stats.global.totalLots,
+            subtitle: stats.global.availableLots ~ ' dispo • ' ~ stats.global.soldLots ~ ' vendus',
+            color: 'purple'
+        } %}
+        {% include 'components/stats_card.html.twig' with {
+            title: 'Profit Total',
+            value: ((stats.global.realizedProfit + stats.global.potentialProfit) / 1000000)|number_format(1) ~ 'M',
+            subtitle: (stats.global.realizedProfit / 1000000)|number_format(1) ~ 'M réalisé',
+            color: 'green'
+        } %}
     </div>
 
     <!-- Notifications -->

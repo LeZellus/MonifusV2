@@ -1,0 +1,28 @@
+{# templates/components/stats_card.html.twig #}
+{#
+Composant réutilisable pour afficher des cartes de statistiques
+Usage: {% include 'components/stats_card.html.twig' with {
+    title: 'Titre',
+    value: '42M',
+    subtitle: 'Description optionnelle',
+    icon: '💰' (optionnel),
+    color: 'blue' (optionnel: blue, green, orange, red, purple, yellow),
+    size: 'normal' (optionnel: normal, large)
+} %}
+#}
+
+{% set color_class = 'text-' ~ (color|default('blue')) ~ '-400' %}
+{% set value_size = (size|default('normal')) == 'large' ? 'text-3xl' : 'text-2xl' %}
+
+<div class="wrapper-background text-center">
+    <h3 class="text-white text-lg font-semibold mb-2 flex items-center justify-center">
+        {% if icon is defined %}
+            <span class="mr-2">{{ icon }}</span>
+        {% endif %}
+        {{ title }}
+    </h3>
+    <p class="{{ color_class }} {{ value_size }} font-bold">{{ value }}</p>
+    {% if subtitle is defined %}
+        <p class="text-gray-400 text-sm">{{ subtitle }}</p>
+    {% endif %}
+</div>
