@@ -1,0 +1,31 @@
+{# templates/components/action_buttons.html.twig #}
+{#
+Boutons d'action standardisés pour les formulaires
+Usage: {% include 'components/action_buttons.html.twig' with {
+    submit_text: 'Sauvegarder',
+    submit_icon: '💾' (optionnel),
+    submit_color: 'primary' (optionnel: primary, success, warning, danger),
+    cancel_url: path('route'),
+    cancel_text: 'Annuler' (optionnel),
+    cancel_icon: '❌' (optionnel),
+    layout: 'horizontal' (optionnel: horizontal, vertical)
+} %}
+#}
+
+{% set submit_color_class = 'btn-' ~ (submit_color|default('primary')) %}
+{% set layout_class = (layout|default('horizontal')) == 'vertical' ? 'action-group-vertical' : 'action-group' %}
+
+<div class="{{ layout_class }}">
+    <button type="submit" class="btn-full {{ submit_color_class }} btn-with-icon">
+        {% if submit_icon is defined %}
+            <span class="mr-2">{{ submit_icon }}</span>
+        {% endif %}
+        {{ submit_text }}
+    </button>
+    <a href="{{ cancel_url }}" class="btn-full btn-secondary btn-with-icon text-center">
+        {% if cancel_icon is defined %}
+            <span class="mr-2">{{ cancel_icon }}</span>
+        {% endif %}
+        {{ cancel_text|default('Annuler') }}
+    </a>
+</div>

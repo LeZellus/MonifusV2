@@ -155,16 +155,13 @@
                 </div>
 
                 <!-- Actions -->
-                <div class="action-group">
-                    <button type="submit" class="btn-full btn-primary btn-with-icon">
-                        <span class="mr-2">💾</span>
-                        Sauvegarder les modifications
-                    </button>
-                    <a href="{{ path('app_market_watch_index') }}" class="btn-full btn-secondary btn-with-icon text-center">
-                        <span class="mr-2">❌</span>
-                        Annuler
-                    </a>
-                </div>
+                {% include 'components/action_buttons.html.twig' with {
+                    submit_text: 'Sauvegarder les modifications',
+                    submit_icon: '💾',
+                    submit_color: 'primary',
+                    cancel_url: path('app_market_watch_index'),
+                    cancel_icon: '❌'
+                } %}
 
                 {{ form_end(form) }}
             {% endset %}

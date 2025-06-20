@@ -84,16 +84,14 @@
                     </div>
 
                     <!-- Actions -->
-                    <div class="flex space-x-4 mt-8">
-                        <button type="submit" class="flex-1 bg-green-600 hover:bg-green-700 text-white font-bold py-3 px-6 rounded-lg transition-colors flex items-center justify-center">
-                            <span class="mr-2">👤</span>
-                            Créer le personnage
-                        </button>
-                        <a href="{{ path('app_profile_index') }}" 
-                        class="flex-1 bg-gray-600 hover:bg-gray-700 text-white font-bold py-3 px-6 rounded-lg transition-colors text-center flex items-center justify-center">
-                            <span class="mr-2">❌</span>
-                            Annuler
-                        </a>
+                    <div class="mt-8">
+                        {% include 'components/action_buttons.html.twig' with {
+                            submit_text: 'Créer le personnage',
+                            submit_icon: '👤',
+                            submit_color: 'success',
+                            cancel_url: path('app_profile_index'),
+                            cancel_icon: '❌'
+                        } %}
                     </div>
                 {{ form_end(form) }}
             {% endset %}

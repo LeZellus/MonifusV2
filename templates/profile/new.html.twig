@@ -51,16 +51,13 @@
                         </div>
                     </div>
 
-                    <div class="action-group">
-                        <button type="submit" class="btn-full btn-primary btn-with-icon">
-                            <span class="mr-2">✨</span>
-                            Créer le profil
-                        </button>
-                        <a href="{{ path('app_profile_index') }}" class="btn-full btn-secondary btn-with-icon text-center">
-                            <span class="mr-2">❌</span>
-                            Annuler
-                        </a>
-                    </div>
+                    {% include 'components/action_buttons.html.twig' with {
+                        submit_text: 'Créer le profil',
+                        submit_icon: '✨',
+                        submit_color: 'primary',
+                        cancel_url: path('app_profile_index'),
+                        cancel_icon: '❌'
+                    } %}
                 {{ form_end(form) }}
             {% endset %}
 

@@ -90,15 +90,13 @@
                     <div id="remaining-stock" class="text-yellow-400 text-sm mt-2"></div>
                 </div>
 
-                <div class="flex space-x-4">
-                    <button type="submit" class="flex-1 bg-green-600 hover:bg-green-700 text-white font-bold py-3 px-4 rounded transition-colors">
-                        ✅ Confirmer la vente
-                    </button>
-                    <a href="{{ path('app_lot_index') }}" 
-                       class="flex-1 bg-gray-600 hover:bg-gray-700 text-white font-bold py-3 px-4 rounded transition-colors text-center">
-                        Annuler
-                    </a>
-                </div>
+                {% include 'components/action_buttons.html.twig' with {
+                    submit_text: 'Confirmer la vente',
+                    submit_icon: '✅',
+                    submit_color: 'success',
+                    cancel_url: path('app_lot_index'),
+                    cancel_icon: '❌',
+                } %}
 
                 {{ form_end(form) }}
             </div>

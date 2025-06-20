@@ -168,15 +168,14 @@
                 </div>
 
                 <!-- Actions -->
-                <div class="action-group mt-8">
-                    <button type="submit" class="btn-full btn-{{ is_edit ? 'primary' : 'success' }} btn-with-icon">
-                        <span>{{ is_edit ? '💾' : '✅' }}</span>
-                        {{ is_edit ? 'Sauvegarder les modifications' : 'Créer le lot' }}
-                    </button>
-                    <a href="{{ path('app_lot_index') }}" class="btn-full btn-secondary btn-with-icon text-center">
-                        <span>❌</span>
-                        Annuler
-                    </a>
+                <div class="mt-8">
+                    {% include 'components/action_buttons.html.twig' with {
+                        submit_text: is_edit ? 'Sauvegarder les modifications' : 'Créer le lot',
+                        submit_icon: is_edit ? '💾' : '✅',
+                        submit_color: is_edit ? 'primary' : 'success',
+                        cancel_url: path('app_lot_index'),
+                        cancel_icon: '❌'
+                    } %}
                 </div>
             {{ form_end(form) }}
         </div>
