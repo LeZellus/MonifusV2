@@ -1,27 +1,13 @@
 <!-- templates/lot/_form.html.twig -->
 <div class="max-w-2xl mx-auto">
     <!-- En-tête avec info personnage -->
-    <div class="wrapper-background mb-6">
-        <div class="flex items-center space-x-4">
-            <div class="w-12 h-12 rounded-full overflow-hidden">
-                <img src="{{ character.classe.imagePath }}" 
-                    alt="{{ character.classe.name }}" 
-                    class="w-full h-full object-cover">
-            </div>
-            <div>
-                <h2 class="text-white text-xl font-semibold">{{ character.name }}</h2>
-                <p class="text-gray-400">{{ character.classe.name }} • {{ character.server.name }}</p>
-            </div>
-            <div class="ml-auto text-right">
-                <div class="text-{{ is_edit ? 'blue' : 'green' }}-400 font-semibold">
-                    {{ is_edit ? '📝 Modifier le Lot' : '📦 Nouveau Lot' }}
-                </div>
-                <div class="text-gray-400 text-sm">
-                    {{ is_edit ? 'Modifier un item du trading' : 'Ajouter un item au trading' }}
-                </div>
-            </div>
-        </div>
-    </div>
+        {% include 'components/character_info_header.html.twig' with {
+        character: character,
+        action_title: 'Nouveau Lot',
+        action_description: 'Ajouter un item au trading',
+        action_color: 'green',
+        action_icon: '📦'
+    } %}
 
     {% if is_edit %}
         <!-- Informations actuelles du lot -->

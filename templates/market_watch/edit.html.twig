@@ -13,23 +13,17 @@
     <div class="wrapper-container">
         <div class="max-w-2xl mx-auto">
             <!-- En-tête avec info -->
-            <div class="wrapper-background mb-6">
-                <div class="flex items-center space-x-4">
-                    <div class="w-12 h-12 rounded-full overflow-hidden">
-                        <img src="{{ market_watch.dofusCharacter.classe.imagePath }}" 
-                            alt="{{ market_watch.dofusCharacter.classe.name }}" 
-                            class="w-full h-full object-cover">
-                    </div>
-                    <div>
-                        <h2 class="text-white text-xl font-semibold">{{ market_watch.item.name }}</h2>
-                        <p class="text-gray-400">Observé le {{ market_watch.observedAt|date('d/m/Y à H:i') }}</p>
-                    </div>
-                    <div class="ml-auto text-right">
-                        <div class="text-orange-400 font-semibold">📝 Modifier Observation</div>
-                        <div class="text-gray-400 text-sm">{{ market_watch.dofusCharacter.name }}</div>
-                    </div>
-                </div>
-            </div>
+            {% include 'components/character_info_header.html.twig' with {
+                character: {
+                    name: market_watch.item.name,
+                    classe: {name: 'Observé le ' ~ market_watch.observedAt|date('d/m/Y à H:i'), imagePath: market_watch.dofusCharacter.classe.imagePath},
+                    server: {name: ''}
+                },
+                action_title: 'Modifier Observation',
+                action_description: market_watch.dofusCharacter.name,
+                action_color: 'orange',
+                action_icon: '📝'
+            } %}
 
             <!-- Historique récent pour contexte -->
             <div class="wrapper-background mb-6">
