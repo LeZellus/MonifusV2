@@ -48,10 +48,11 @@
                 </div>
                 <div class="bg-gray-700 rounded-lg p-3 text-center">
                     <div class="text-gray-400 text-sm">Profit total</div>
-                    {% set totalProfit = (lot.sellPricePerLot - lot.buyPricePerLot) * lot.lotSize %}
-                    <div class="text-{{ totalProfit >= 0 ? 'green' : 'red' }}-400 text-lg font-bold">{{ (totalProfit / 1000)|number_format(0, ',', ' ') }}k</div>
-                    {% set profitPercent = lot.buyPricePerLot > 0 ? ((lot.sellPricePerLot - lot.buyPricePerLot) / lot.buyPricePerLot * 100) : 0 %}
-                    <div class="text-gray-400 text-xs">({{ profitPercent|number_format(1) }}%)</div>
+                    {% include 'components/profit_display.html.twig' with {
+                        buy_price: lot.buyPricePerLot,
+                        sell_price: lot.sellPricePerLot,
+                        quantity: lot.lotSize
+                    } %}
                 </div>
             </div>
         </div>

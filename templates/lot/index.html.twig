@@ -43,8 +43,6 @@
                         </thead>
                         <tbody class="divide-y divide-gray-700">
                             {% for lot in lots %}
-                                {% set profit = lot.sellPricePerLot - lot.buyPricePerLot %}
-                                {% set profitPercent = lot.buyPricePerLot > 0 ? (profit / lot.buyPricePerLot * 100) : 0 %}
                                 <tr class="hover:bg-gray-700">
                                     <td class="px-6 py-4 whitespace-nowrap">
                                         {% include 'components/item_display.html.twig' with {item: lot.item} %}
@@ -71,12 +69,11 @@
                                         <div class="text-gray-400 text-sm">par lot de {{ lot.saleUnit.value }}</div>
                                     </td>
                                     <td class="px-6 py-4 whitespace-nowrap">
-                                        <div class="text-{{ profit >= 0 ? 'green' : 'red' }}-400 font-medium">
-                                            {{ (profit / 1000)|number_format(0, ',', ' ') }}k
-                                        </div>
-                                        <div class="text-{{ profit >= 0 ? 'green' : 'red' }}-400 text-sm">
-                                            ({{ profitPercent|number_format(1) }}%)
-                                        </div>
+                                        {% include 'components/profit_display.html.twig' with {
+                                            buy_price: lot.buyPricePerLot,
+                                            sell_price: lot.sellPricePerLot,
+                                            quantity: lot.lotSize
+                                        } %}
                                     </td>
                                     <td class="px-6 py-4 whitespace-nowrap">
                                         <span class="px-2 inline-flex text-xs leading-5 font-semibold rounded-full 
