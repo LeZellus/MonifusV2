@@ -41,14 +41,20 @@
                     </div>
 
                     <!-- Étapes suivantes -->
-                    <div class="mt-6 bg-gradient-to-r from-blue-600 to-purple-600 rounded-lg p-4">
-                        <h4 class="text-white font-semibold mb-2">🚀 Prochaines étapes</h4>
-                        <div class="text-blue-100 text-sm space-y-1">
-                            <p>1. ✅ Créer le profil</p>
-                            <p>2. 👤 Ajouter vos personnages Dofus</p>
-                            <p>3. 📦 Commencer à tracker vos lots</p>
-                            <p>4. 📊 Analyser vos profits</p>
-                        </div>
+                    {% set steps_content %}
+                        <p>1. ✅ Créer le profil</p>
+                        <p>2. 👤 Ajouter vos personnages Dofus</p>
+                        <p>3. 📦 Commencer à tracker vos lots</p>
+                        <p>4. 📊 Analyser vos profits</p>
+                    {% endset %}
+
+                    <div class="mt-6">
+                        {% include 'components/info_box.html.twig' with {
+                            title: 'Prochaines étapes',
+                            icon: '🚀',
+                            color: 'blue',
+                            content: steps_content
+                        } %}
                     </div>
 
                     {% include 'components/action_buttons.html.twig' with {

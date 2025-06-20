@@ -81,6 +81,23 @@
             </div>
         </div>
 
+        <!-- Conseils -->
+        {% set analysis_tips_content %}
+            <p>• 📈 Les flèches indiquent l'évolution par rapport à l'observation précédente</p>
+            <p>• 🔄 Ajoutez régulièrement de nouvelles observations pour suivre les tendances</p>
+            <p>• 💰 Utilisez ces données pour optimiser vos achats et ventes</p>
+            <p>• 📊 Plus vous avez de données, plus vos analyses seront précises</p>
+        {% endset %}
+
+        <div class="mt-8">
+            {% include 'components/info_box.html.twig' with {
+                title: 'Analyser l\'évolution',
+                icon: '💡',
+                color: 'info',
+                content: analysis_tips_content
+            } %}
+        </div>
+
         <!-- Actions -->
         <div class="flex justify-between items-center mb-6">
             <h3 class="text-white text-xl font-bold">Évolution des prix</h3>
@@ -189,20 +206,6 @@
                     {% endif %}
                 </div>
             {% endfor %}
-        </div>
-
-        <!-- Conseils -->
-        <div class="mt-8 bg-gradient-to-r from-blue-600 to-indigo-600 rounded-lg p-4">
-            <h4 class="text-white font-semibold mb-2 flex items-center">
-                <span class="mr-2">💡</span>
-                Analyser l'évolution
-            </h4>
-            <div class="text-blue-100 text-sm space-y-1">
-                <p>• 📈 Les flèches indiquent l'évolution par rapport à l'observation précédente</p>
-                <p>• 🔄 Ajoutez régulièrement de nouvelles observations pour suivre les tendances</p>
-                <p>• 💰 Utilisez ces données pour optimiser vos achats et ventes</p>
-                <p>• 📊 Plus vous avez de données, plus vos analyses seront précises</p>
-            </div>
         </div>
     </div>
 {% endblock %}

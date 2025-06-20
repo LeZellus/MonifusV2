@@ -22,17 +22,20 @@
             } %}
 
             <!-- Explication du système -->
-            <div class="bg-gradient-to-r from-orange-600 to-red-600 rounded-lg p-4 mb-6">
-                <h3 class="text-white font-bold mb-2 flex items-center">
-                    <span class="text-xl mr-2">💡</span>
-                    Comment ça marche ?
-                </h3>
-                <div class="text-orange-100 text-sm space-y-1">
-                    <p>• 📋 Observez les prix sur l'hôtel de vente de votre serveur</p>
-                    <p>• 🔢 Notez les prix par unité (x1), par 10 (x10) et/ou par 100 (x100)</p>
-                    <p>• 📈 Répétez régulièrement pour suivre l'évolution des prix</p>
-                    <p>• 💰 Identifiez les meilleures opportunités d'achat/vente</p>
-                </div>
+            {% set explanation_content %}
+                <p>• 📋 Observez les prix sur l'hôtel de vente de votre serveur</p>
+                <p>• 🔢 Notez les prix par unité (x1), par 10 (x10) et/ou par 100 (x100)</p>
+                <p>• 📈 Répétez régulièrement pour suivre l'évolution des prix</p>
+                <p>• 💰 Identifiez les meilleures opportunités d'achat/vente</p>
+            {% endset %}
+
+            <div class="mb-6">
+                {% include 'components/info_box.html.twig' with {
+                    title: 'Comment ça marche ?',
+                    icon: '💡',
+                    color: 'orange',
+                    content: explanation_content
+                } %}
             </div>
 
             <!-- Formulaire principal -->

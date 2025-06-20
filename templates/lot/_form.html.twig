@@ -157,14 +157,30 @@
                 </div>
 
                 <!-- Aperçu du profit -->
-                <div class="mt-6 info-box-primary">
-                    <h4 class="info-title">
-                        <span>💡</span>
-                        {{ is_edit ? 'Nouveau calcul de profit' : 'Aperçu du profit' }}
-                    </h4>
+                {% set profit_content %}
                     <div class="stats-grid-3 text-center">
-                        <!-- contenu -->
+                        <div>
+                            <div class="text-white font-medium">Investissement</div>
+                            <div data-profit-calculator-target="investment" class="text-red-400 font-bold">-</div>
+                        </div>
+                        <div>
+                            <div class="text-white font-medium">Profit par lot</div>
+                            <div data-profit-calculator-target="profitPerLot" class="text-green-400 font-bold">-</div>
+                        </div>
+                        <div>
+                            <div class="text-white font-medium">Profit total</div>
+                            <div data-profit-calculator-target="totalProfit" class="text-green-400 font-bold">-</div>
+                        </div>
                     </div>
+                {% endset %}
+
+                <div class="mt-6">
+                    {% include 'components/info_box.html.twig' with {
+                        title: is_edit ? 'Nouveau calcul de profit' : 'Aperçu du profit',
+                        icon: '💡',
+                        color: 'blue',
+                        content: profit_content
+                    } %}
                 </div>
 
                 <!-- Actions -->

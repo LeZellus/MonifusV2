@@ -29,70 +29,76 @@
                 </div>
             </div>
 
-            <!-- Information importante -->
-            <div class="bg-gradient-to-r from-green-600 to-blue-600 rounded-lg p-4 mb-6">
-                <h3 class="text-white font-bold mb-2 flex items-center">
-                    <span class="text-xl mr-2">ℹ️</span>
-                    Pourquoi ajouter un personnage ?
-                </h3>
-                <div class="text-green-100 text-sm space-y-1">
-                    <p>• 🎮 Chaque personnage peut avoir sa propre stratégie de trading</p>
-                    <p>• 🗂️ Organiser vos lots par serveur et spécialisation</p>
-                    <p>• 📊 Analyser les performances par personnage</p>
-                    <p>• 🔄 Basculer facilement entre vos différents traders</p>
-                </div>
-            </div>
+            <!-- Information importante - AVANT le formulaire -->
+            {% set character_info_content %}
+                <p>• 🎮 Chaque personnage peut avoir sa propre stratégie de trading</p>
+                <p>• 🗂️ Organiser vos lots par serveur et spécialisation</p>
+                <p>• 📊 Analyser les performances par personnage</p>
+                <p>• 🔄 Basculer facilement entre vos différents traders</p>
+            {% endset %}
+
+            {% include 'components/info_box.html.twig' with {
+                title: 'Pourquoi ajouter un personnage ?',
+                icon: 'ℹ️',
+                color: 'green',
+                content: character_info_content
+            } %}
 
             <!-- Formulaire principal -->
             {% set form_content %}
                 {{ form_start(form) }}
-                    <div class="space-y-6">
-                        <div>
-                            {{ form_label(form.name, null, {'label_attr': {'class': 'block text-white font-medium mb-2'}}) }}
-                            {{ form_widget(form.name, {'attr': {'class': 'w-full px-4 py-3 border border-gray-600 bg-gray-700 text-white rounded-lg focus:outline-none focus:border-green-500 focus:ring-2 focus:ring-green-500 focus:ring-opacity-20', 'placeholder': 'ex: Kama-Hunter, Trading-Master...'}}) }}
-                            {{ form_errors(form.name) }}
-                            <div class="form-help">🎮 Nom exact de votre personnage Dofus</div>
-                        </div>
-
-                        <div>
-                            {{ form_label(form.server, null, {'label_attr': {'class': 'block text-white font-medium mb-2'}}) }}
-                            {{ form_widget(form.server, {'attr': {'class': 'w-full px-4 py-3 border border-gray-600 bg-gray-700 text-white rounded-lg focus:outline-none focus:border-green-500 focus:ring-2 focus:ring-green-500 focus:ring-opacity-20'}}) }}
-                            {{ form_errors(form.server) }}
-                            <div class="form-help">🌍 Serveur sur lequel joue ce personnage</div>
-                        </div>
-
-                        <div>
-                            {{ form_label(form.classe, null, {'label_attr': {'class': 'block text-white font-medium mb-2'}}) }}
-                            {{ form_widget(form.classe, {'attr': {'class': 'w-full px-4 py-3 border border-gray-600 bg-gray-700 text-white rounded-lg focus:outline-none focus:border-green-500 focus:ring-2 focus:ring-green-500 focus:ring-opacity-20'}}) }}
-                            {{ form_errors(form.classe) }}
-                            <div class="form-help">⚔️ Classe de votre personnage</div>
-                        </div>
+                
+                <div class="space-y-6">
+                    <div>
+                        {{ form_label(form.name, null, {'label_attr': {'class': 'block text-white font-medium mb-2'}}) }}
+                        {{ form_widget(form.name, {'attr': {'class': 'w-full px-4 py-3 border border-gray-600 bg-gray-700 text-white rounded-lg focus:outline-none focus:border-green-500 focus:ring-2 focus:ring-green-500 focus:ring-opacity-20', 'placeholder': 'ex: Kama-Hunter, Trading-Master...'}}) }}
+                        {{ form_errors(form.name) }}
+                        <div class="form-help">🎮 Nom exact de votre personnage Dofus</div>
                     </div>
 
-                    <!-- Informations supplémentaires -->
-                    <div class="mt-6 bg-gradient-to-r from-blue-600 to-purple-600 rounded-lg p-4">
-                        <h4 class="text-white font-semibold mb-2 flex items-center">
-                            <span class="mr-2">🚀</span>
-                            Après la création
-                        </h4>
-                        <div class="text-blue-100 text-sm space-y-1">
-                            <p>1. ✅ Le personnage sera ajouté au profil "{{ profile.name }}"</p>
-                            <p>2. 🎯 Il sera automatiquement sélectionné comme personnage actif</p>
-                            <p>3. 📦 Vous pourrez commencer à ajouter des lots de trading</p>
-                            <p>4. 👁️ Configurer des surveillances de marché</p>
-                        </div>
+                    <div>
+                        {{ form_label(form.server, null, {'label_attr': {'class': 'block text-white font-medium mb-2'}}) }}
+                        {{ form_widget(form.server, {'attr': {'class': 'w-full px-4 py-3 border border-gray-600 bg-gray-700 text-white rounded-lg focus:outline-none focus:border-green-500 focus:ring-2 focus:ring-green-500 focus:ring-opacity-20'}}) }}
+                        {{ form_errors(form.server) }}
+                        <div class="form-help">🌍 Serveur sur lequel joue ce personnage</div>
                     </div>
 
-                    <!-- Actions -->
-                    <div class="mt-8">
-                        {% include 'components/action_buttons.html.twig' with {
-                            submit_text: 'Créer le personnage',
-                            submit_icon: '👤',
-                            submit_color: 'success',
-                            cancel_url: path('app_profile_index'),
-                            cancel_icon: '❌'
-                        } %}
+                    <div>
+                        {{ form_label(form.classe, null, {'label_attr': {'class': 'block text-white font-medium mb-2'}}) }}
+                        {{ form_widget(form.classe, {'attr': {'class': 'w-full px-4 py-3 border border-gray-600 bg-gray-700 text-white rounded-lg focus:outline-none focus:border-green-500 focus:ring-2 focus:ring-green-500 focus:ring-opacity-20'}}) }}
+                        {{ form_errors(form.classe) }}
+                        <div class="form-help">⚔️ Classe de votre personnage</div>
                     </div>
+                </div>
+
+                <!-- Informations sur ce qui se passera après -->
+                {% set next_steps_content %}
+                    <p>1. ✅ Le personnage sera ajouté au profil "{{ profile.name }}"</p>
+                    <p>2. 🎯 Il sera automatiquement sélectionné comme personnage actif</p>
+                    <p>3. 📦 Vous pourrez commencer à ajouter des lots de trading</p>
+                    <p>4. 👁️ Configurer des surveillances de marché</p>
+                {% endset %}
+
+                <div class="mt-6">
+                    {% include 'components/info_box.html.twig' with {
+                        title: 'Après la création',
+                        icon: '🚀',
+                        color: 'blue',
+                        content: next_steps_content
+                    } %}
+                </div>
+
+                <!-- Actions -->
+                <div class="mt-8">
+                    {% include 'components/action_buttons.html.twig' with {
+                        submit_text: 'Créer le personnage',
+                        submit_icon: '👤',
+                        submit_color: 'success',
+                        cancel_url: path('app_profile_index'),
+                        cancel_icon: '❌'
+                    } %}
+                </div>
+
                 {{ form_end(form) }}
             {% endset %}
 

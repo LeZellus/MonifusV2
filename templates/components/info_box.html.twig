@@ -1,0 +1,35 @@
+{# templates/components/info_box.html.twig #}
+{#
+Boîte d'information avec gradient et contenu
+Usage: {% include 'components/info_box.html.twig' with {
+    title: 'Titre de la boîte',
+    icon: '💡' (optionnel),
+    color: 'blue' (optionnel: blue, green, orange, purple, yellow),
+    content: content_block
+} %}
+#}
+
+{% set gradient_class = 'bg-gradient-to-r ' ~ (color_gradients[color|default('blue')] ?? 'from-blue-600 to-purple-600') %}
+
+{% set color_gradients = {
+    'blue': 'from-blue-600 to-purple-600',
+    'green': 'from-green-600 to-blue-600', 
+    'orange': 'from-orange-600 to-red-600',
+    'purple': 'from-purple-600 to-pink-600',
+    'yellow': 'from-yellow-600 to-orange-600',
+    'info': 'from-blue-600 to-indigo-600'
+} %}
+
+{% set text_color = color == 'green' ? 'text-green-100' : (color == 'orange' ? 'text-orange-100' : (color == 'purple' ? 'text-purple-100' : (color == 'yellow' ? 'text-yellow-100' : 'text-blue-100'))) %}
+
+<div class="{{ gradient_class }} rounded-lg p-4">
+    <h4 class="text-white font-semibold mb-2 flex items-center">
+        {% if icon is defined %}
+            <span class="mr-2">{{ icon }}</span>
+        {% endif %}
+        {{ title }}
+    </h4>
+    <div class="{{ text_color }} text-sm space-y-1">
+        {{ content|raw }}
+    </div>
+</div>
