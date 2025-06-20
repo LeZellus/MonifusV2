@@ -1,185 +1,205 @@
 {% extends 'base.html.twig' %}
 
-{% block title %}Dofus Trading V2 - Le tracker de trading moderne{% endblock %}
+{% block title %}Monifus - Le tracker de commerce moderne{% endblock %}
 
-{% block navbar %}
-    <nav class="bg-gray-800 border-b border-gray-700">
-        <div class="container mx-auto px-4">
-            <div class="flex justify-between items-center py-4">
-                <div class="flex items-center space-x-3">
-                    <div class="w-10 h-10 bg-gradient-to-br from-blue-500 to-purple-600 rounded-lg flex items-center justify-center">
-                        <span class="text-white font-bold text-lg">DT</span>
-                    </div>
-                    <h1 class="text-white text-xl font-bold">Dofus Trading V2</h1>
-                </div>
-                
-                <div class="flex items-center space-x-4">
-                    <a href="{{ path('app_login') }}" class="text-gray-300 hover:text-white transition-colors">Connexion</a>
-                    <a href="{{ path('app_register') }}" 
-                       class="bg-gradient-to-r from-blue-600 to-purple-600 hover:from-blue-700 hover:to-purple-700 text-white font-bold py-2 px-4 rounded-lg transition-all duration-200 transform hover:scale-105">
-                        S'inscrire
-                    </a>
-                </div>
-            </div>
-        </div>
-    </nav>
+{% block stylesheets %}
+    {{ parent() }}
+    <style>
+        .bg-dofus-pattern {
+            background-image: 
+                radial-gradient(circle at 25% 25%, rgba(59, 130, 246, 0.1) 0%, transparent 50%),
+                radial-gradient(circle at 75% 75%, rgba(168, 85, 247, 0.1) 0%, transparent 50%),
+                linear-gradient(135deg, rgba(30, 41, 59, 0.8) 0%, rgba(15, 23, 42, 0.9) 100%);
+        }
+        .logo-glow {
+            filter: drop-shadow(0 0 20px rgba(251, 191, 36, 0.4)) drop-shadow(0 0 40px rgba(251, 191, 36, 0.2));
+        }
+        .float-animation {
+            animation: float 6s ease-in-out infinite;
+        }
+        @keyframes float {
+            0%, 100% { transform: translateY(0px); }
+            50% { transform: translateY(-10px); }
+        }
+        .pulse-magic {
+            animation: pulse-magic 2s infinite;
+        }
+        @keyframes pulse-magic {
+            0%, 100% { filter: drop-shadow(0 0 20px rgba(251, 191, 36, 0.4)) drop-shadow(0 0 40px rgba(251, 191, 36, 0.2)); }
+            50% { filter: drop-shadow(0 0 30px rgba(251, 191, 36, 0.6)) drop-shadow(0 0 60px rgba(251, 191, 36, 0.4)); }
+        }
+    </style>
 {% endblock %}
 
 {% block body %}
-    <!-- Hero Section -->
-    <div class="bg-gradient-to-br from-gray-900 via-blue-900 to-purple-900 relative overflow-hidden">
-        <div class="absolute inset-0 bg-black bg-opacity-30"></div>
+    <!-- Hero Section avec ambiance Dofus -->
+    <div class="relative min-h-screen bg-dofus-pattern overflow-hidden">
+        <!-- Éléments décoratifs flottants -->
+        <div class="absolute top-20 left-10 w-8 h-8 bg-amber-400 rounded-full opacity-60 float-animation"></div>
+        <div class="absolute top-40 right-20 w-6 h-6 bg-blue-400 rounded-full opacity-40 float-animation" style="animation-delay: -2s;"></div>
+        <div class="absolute bottom-40 left-1/4 w-4 h-4 bg-purple-400 rounded-full opacity-50 float-animation" style="animation-delay: -4s;"></div>
+        
         <div class="container mx-auto px-4 py-20 relative z-10">
-            <div class="text-center max-w-4xl mx-auto">
-                <div class="text-6xl mb-6">💰</div>
-                <h1 class="text-5xl md:text-6xl font-bold text-white mb-6 leading-tight">
-                    Le Trading Dofus
-                    <span class="bg-gradient-to-r from-blue-400 to-purple-400 bg-clip-text text-transparent">
+            <div class="text-center max-w-5xl mx-auto">
+                <!-- Logo géant avec effet magique -->
+                <div class="mb-8 flex justify-center">
+                    <div class="logo-glow pulse-magic float-animation">
+                        <img src="{{ asset('uploads/logo.svg') }}" alt="Logo Monifus" class="w-32 h-32 object-contain">
+                    </div>
+                </div>
+
+                <h1 class="text-6xl md:text-7xl font-bold text-white mb-6 leading-tight">
+                    Le commerce Dofus
+                    <span class="block bg-gradient-to-r from-amber-400 via-yellow-500 to-orange-600 bg-clip-text text-transparent">
                         Nouvelle Génération
                     </span>
                 </h1>
-                <p class="text-xl text-gray-300 mb-8 leading-relaxed">
-                    Transformez votre approche du trading avec l'outil le plus avancé de la communauté.
+                
+                <p class="text-xl text-gray-300 mb-8 leading-relaxed max-w-3xl mx-auto font-medium">
+                    Transformez votre approche du commerce avec l'outil le plus avancé de la communauté.
                     Trackez, analysez et optimisez vos profits comme jamais auparavant.
                 </p>
                 
-                <div class="flex flex-col sm:flex-row gap-4 justify-center items-center">
-                    <a href="{{ path('app_register') }}" 
-                       class="bg-gradient-to-r from-green-600 to-blue-600 hover:from-green-700 hover:to-blue-700 text-white font-bold py-4 px-8 rounded-xl text-lg transition-all duration-200 transform hover:scale-105 shadow-xl flex items-center">
-                        <span class="text-2xl mr-3">🚀</span>
+                <div class="flex flex-col sm:flex-row gap-6 justify-center items-center mb-12">
+                    <a href="{{ path('app_register') }}" class="bg-gradient-to-r from-amber-500 to-orange-600 hover:from-amber-600 hover:to-orange-700 text-white font-bold py-4 px-8 rounded-xl text-lg transition-all duration-200 transform hover:scale-105 shadow-2xl flex items-center logo-glow">
+                        <span class="text-3xl mr-3">🚀</span>
                         Commencer gratuitement
                     </a>
-                    <a href="#features" 
-                       class="bg-gray-800 bg-opacity-50 hover:bg-opacity-70 text-white font-medium py-4 px-8 rounded-xl text-lg transition-all duration-200 border border-gray-600 hover:border-gray-500">
+                    <a href="#fonctionnalites" class="bg-gray-800/70 hover:bg-gray-800 text-white font-medium py-4 px-8 rounded-xl text-lg transition-all duration-200 border border-gray-600 hover:border-amber-500/50 backdrop-blur-sm">
                         Découvrir les fonctionnalités
                     </a>
                 </div>
                 
-                <div class="flex justify-center items-center space-x-8 mt-12 text-gray-400">
+                <!-- Stats avec thème Dofus -->
+                <div class="flex justify-center items-center space-x-12 text-gray-400">
                     <div class="text-center">
-                        <div class="text-2xl font-bold text-blue-400">{{ users_count }}</div>
-                        <div class="text-sm">Traders actifs</div>
+                        <div class="text-3xl font-bold text-amber-400">{{ users_count }}</div>
+                        <div class="text-sm">Utilisateurs actifs</div>
                     </div>
                     <div class="text-center">
-                        <div class="text-2xl font-bold text-green-400">{{ servers_count }}</div>
+                        <div class="text-3xl font-bold text-blue-400">{{ servers_count }}</div>
                         <div class="text-sm">Serveurs supportés</div>
                     </div>
                     <div class="text-center">
-                        <div class="text-2xl font-bold text-purple-400">100%</div>
+                        <div class="text-3xl font-bold text-purple-400">100%</div>
                         <div class="text-sm">Gratuit</div>
+                    </div>
+                    <div class="text-center">
+                        <div class="text-3xl font-bold text-green-400">{{ formatted_kamas }}</div>
+                        <div class="text-sm">Kamas trackés</div>
                     </div>
                 </div>
             </div>
         </div>
     </div>
 
-    <!-- Features Section -->
-    <section id="features" class="py-20 bg-gray-900">
+    <!-- Section Fonctionnalités avec cartes thématiques -->
+    <section id="fonctionnalites" class="py-20 bg-gray-800/50">
         <div class="container mx-auto px-4">
             <div class="text-center mb-16">
-                <h2 class="text-4xl font-bold text-white mb-4">Pourquoi choisir Dofus Trading V2 ?</h2>
+                <h2 class="text-5xl font-bold text-white mb-4">Pourquoi choisir Monifus ?</h2>
                 <p class="text-xl text-gray-400">Les outils dont vous avez besoin pour dominer l'économie de Dofus</p>
             </div>
 
             <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
-                <!-- Feature 1 -->
-                <div class="bg-gray-800 rounded-xl p-6 hover:bg-gray-750 transition-all duration-200 border border-gray-700 hover:border-gray-600">
-                    <div class="text-4xl mb-4">📦</div>
-                    <h3 class="text-xl font-bold text-white mb-3">Gestion Intelligente des Lots</h3>
-                    <p class="text-gray-400 mb-4">
+                <!-- Gestion Intelligente des Lots -->
+                <div class="bg-gradient-to-br from-gray-800 to-gray-900 rounded-xl p-6 hover:from-gray-750 hover:to-gray-850 transition-all duration-300 border border-amber-500/20 hover:border-amber-500/50 hover:scale-105">
+                    <div class="text-5xl mb-4 text-center">📦</div>
+                    <h3 class="text-xl font-bold text-amber-400 mb-3 text-center">Gestion Intelligente des Lots</h3>
+                    <p class="text-gray-300 mb-4 text-center">
                         Trackez vos achats, définissez vos prix cibles et suivez vos ventes en temps réel. 
                         Ventes partielles supportées pour une flexibilité maximale.
                     </p>
-                    <div class="bg-gradient-to-r from-green-600 to-blue-600 rounded-lg p-3">
-                        <div class="text-green-100 text-sm">
-                            ✓ Suivi profit/perte en temps réel<br>
-                            ✓ Calculs automatiques de rentabilité<br>
-                            ✓ Historique complet des transactions
+                    <div class="bg-gradient-to-r from-amber-600/20 to-orange-600/20 rounded-lg p-4 border border-amber-500/30">
+                        <div class="text-amber-100 text-sm space-y-1">
+                            <div>✓ Suivi profit/perte en temps réel</div>
+                            <div>✓ Calculs automatiques de rentabilité</div>
+                            <div>✓ Historique complet des transactions</div>
                         </div>
                     </div>
                 </div>
 
-                <!-- Feature 2 -->
-                <div class="bg-gray-800 rounded-xl p-6 hover:bg-gray-750 transition-all duration-200 border border-gray-700 hover:border-gray-600">
-                    <div class="text-4xl mb-4">👁️</div>
-                    <h3 class="text-xl font-bold text-white mb-3">Surveillance du Marché</h3>
-                    <p class="text-gray-400 mb-4">
+                <!-- Surveillance du Marché -->
+                <div class="bg-gradient-to-br from-gray-800 to-gray-900 rounded-xl p-6 hover:from-gray-750 hover:to-gray-850 transition-all duration-300 border border-blue-500/20 hover:border-blue-500/50 hover:scale-105">
+                    <div class="text-5xl mb-4 text-center">👁️</div>
+                    <h3 class="text-xl font-bold text-blue-400 mb-3 text-center">Surveillance du Marché</h3>
+                    <p class="text-gray-300 mb-4 text-center">
                         Observez l'évolution des prix sur vos serveurs. Identifiez les tendances et 
                         les opportunités avant vos concurrents.
                     </p>
-                    <div class="bg-gradient-to-r from-orange-600 to-red-600 rounded-lg p-3">
-                        <div class="text-orange-100 text-sm">
-                            ✓ Tracking prix achat/vente<br>
-                            ✓ Alertes sur les fluctuations<br>
-                            ✓ Analyse des tendances marché
+                    <div class="bg-gradient-to-r from-blue-600/20 to-cyan-600/20 rounded-lg p-4 border border-blue-500/30">
+                        <div class="text-blue-100 text-sm space-y-1">
+                            <div>✓ Tracking prix achat/vente</div>
+                            <div>✓ Alertes sur les fluctuations</div>
+                            <div>✓ Analyse des tendances marché</div>
                         </div>
                     </div>
                 </div>
 
-                <!-- Feature 3 -->
-                <div class="bg-gray-800 rounded-xl p-6 hover:bg-gray-750 transition-all duration-200 border border-gray-700 hover:border-gray-600">
-                    <div class="text-4xl mb-4">📊</div>
-                    <h3 class="text-xl font-bold text-white mb-3">Analytics Avancées</h3>
-                    <p class="text-gray-400 mb-4">
+                <!-- Analytics Avancées -->
+                <div class="bg-gradient-to-br from-gray-800 to-gray-900 rounded-xl p-6 hover:from-gray-750 hover:to-gray-850 transition-all duration-300 border border-purple-500/20 hover:border-purple-500/50 hover:scale-105">
+                    <div class="text-5xl mb-4 text-center">📊</div>
+                    <h3 class="text-xl font-bold text-purple-400 mb-3 text-center">Analytics Avancées</h3>
+                    <p class="text-gray-300 mb-4 text-center">
                         Dashboards détaillés, métriques de performance et rapports exportables 
                         pour optimiser votre stratégie.
                     </p>
-                    <div class="bg-gradient-to-r from-purple-600 to-pink-600 rounded-lg p-3">
-                        <div class="text-purple-100 text-sm">
-                            ✓ ROI et ratios de performance<br>
-                            ✓ Top items les plus rentables<br>
-                            ✓ Exports CSV détaillés
+                    <div class="bg-gradient-to-r from-purple-600/20 to-pink-600/20 rounded-lg p-4 border border-purple-500/30">
+                        <div class="text-purple-100 text-sm space-y-1">
+                            <div>✓ ROI et ratios de performance</div>
+                            <div>✓ Top items les plus rentables</div>
+                            <div>✓ Exports CSV détaillés</div>
                         </div>
                     </div>
                 </div>
 
-                <!-- Feature 4 -->
-                <div class="bg-gray-800 rounded-xl p-6 hover:bg-gray-750 transition-all duration-200 border border-gray-700 hover:border-gray-600">
-                    <div class="text-4xl mb-4">👥</div>
-                    <h3 class="text-xl font-bold text-white mb-3">Multi-Personnages</h3>
-                    <p class="text-gray-400 mb-4">
+                <!-- Multi-Personnages -->
+                <div class="bg-gradient-to-br from-gray-800 to-gray-900 rounded-xl p-6 hover:from-gray-750 hover:to-gray-850 transition-all duration-300 border border-green-500/20 hover:border-green-500/50 hover:scale-105">
+                    <div class="text-5xl mb-4 text-center">👥</div>
+                    <h3 class="text-xl font-bold text-green-400 mb-3 text-center">Multi-Personnages</h3>
+                    <p class="text-gray-300 mb-4 text-center">
                         Gérez plusieurs personnages et serveurs dans un seul outil. 
-                        Basculez instantanément entre vos différents traders.
+                        Basculez instantanément entre vos différents profils.
                     </p>
-                    <div class="bg-gradient-to-r from-blue-600 to-indigo-600 rounded-lg p-3">
-                        <div class="text-blue-100 text-sm">
-                            ✓ Profils de trading séparés<br>
-                            ✓ Sélection rapide de personnage<br>
-                            ✓ Stats individuelles par trader
+                    <div class="bg-gradient-to-r from-green-600/20 to-emerald-600/20 rounded-lg p-4 border border-green-500/30">
+                        <div class="text-green-100 text-sm space-y-1">
+                            <div>✓ Profils de commerce séparés</div>
+                            <div>✓ Sélection rapide de personnage</div>
+                            <div>✓ Stats individuelles par personnage</div>
                         </div>
                     </div>
                 </div>
 
-                <!-- Feature 5 -->
-                <div class="bg-gray-800 rounded-xl p-6 hover:bg-gray-750 transition-all duration-200 border border-gray-700 hover:border-gray-600">
-                    <div class="text-4xl mb-4">💾</div>
-                    <h3 class="text-xl font-bold text-white mb-3">Sauvegarde Sécurisée</h3>
-                    <p class="text-gray-400 mb-4">
+                <!-- Sauvegarde Sécurisée -->
+                <div class="bg-gradient-to-br from-gray-800 to-gray-900 rounded-xl p-6 hover:from-gray-750 hover:to-gray-850 transition-all duration-300 border border-cyan-500/20 hover:border-cyan-500/50 hover:scale-105">
+                    <div class="text-5xl mb-4 text-center">💾</div>
+                    <h3 class="text-xl font-bold text-cyan-400 mb-3 text-center">Sauvegarde Sécurisée</h3>
+                    <p class="text-gray-300 mb-4 text-center">
                         Vos données sont en sécurité avec nos sauvegardes automatiques 
                         et la possibilité d'export complet.
                     </p>
-                    <div class="bg-gradient-to-r from-teal-600 to-green-600 rounded-lg p-3">
-                        <div class="text-teal-100 text-sm">
-                            ✓ Backup automatique quotidien<br>
-                            ✓ Export JSON de toutes vos données<br>
-                            ✓ Conformité RGPD
+                    <div class="bg-gradient-to-r from-cyan-600/20 to-teal-600/20 rounded-lg p-4 border border-cyan-500/30">
+                        <div class="text-cyan-100 text-sm space-y-1">
+                            <div>✓ Backup automatique quotidien</div>
+                            <div>✓ Export JSON de toutes vos données</div>
+                            <div>✓ Conformité RGPD</div>
                         </div>
                     </div>
                 </div>
 
-                <!-- Feature 6 -->
-                <div class="bg-gray-800 rounded-xl p-6 hover:bg-gray-750 transition-all duration-200 border border-gray-700 hover:border-gray-600">
-                    <div class="text-4xl mb-4">📱</div>
-                    <h3 class="text-xl font-bold text-white mb-3">Interface Moderne</h3>
-                    <p class="text-gray-400 mb-4">
+                <!-- Interface Moderne -->
+                <div class="bg-gradient-to-br from-gray-800 to-gray-900 rounded-xl p-6 hover:from-gray-750 hover:to-gray-850 transition-all duration-300 border border-yellow-500/20 hover:border-yellow-500/50 hover:scale-105">
+                    <div class="text-5xl mb-4 text-center">📱</div>
+                    <h3 class="text-xl font-bold text-yellow-400 mb-3 text-center">Interface Moderne</h3>
+                    <p class="text-gray-300 mb-4 text-center">
                         Design responsive et intuitif. Accédez à vos données depuis 
                         n'importe quel appareil, desktop ou mobile.
                     </p>
-                    <div class="bg-gradient-to-r from-yellow-600 to-orange-600 rounded-lg p-3">
-                        <div class="text-yellow-100 text-sm">
-                            ✓ Responsive design<br>
-                            ✓ Navigation mobile optimisée<br>
-                            ✓ Mode sombre par défaut
+                    <div class="bg-gradient-to-r from-yellow-600/20 to-amber-600/20 rounded-lg p-4 border border-yellow-500/30">
+                        <div class="text-yellow-100 text-sm space-y-1">
+                            <div>✓ Responsive design</div>
+                            <div>✓ Navigation mobile optimisée</div>
+                            <div>✓ Mode sombre par défaut</div>
                         </div>
                     </div>
                 </div>
@@ -187,152 +207,140 @@
         </div>
     </section>
 
-    <!-- Screenshot Section -->
-    <section class="py-20 bg-gray-800">
-        <div class="container mx-auto px-4">
-            <div class="text-center mb-16">
-                <h2 class="text-4xl font-bold text-white mb-4">Interface Moderne et Intuitive</h2>
-                <p class="text-xl text-gray-400">Découvrez l'expérience utilisateur nouvelle génération</p>
-            </div>
-
-            <div class="grid grid-cols-1 lg:grid-cols-2 gap-12 items-center">
-                <div>
-                    <div class="bg-gradient-to-br from-gray-700 to-gray-800 rounded-xl p-8 border border-gray-600">
-                        <div class="bg-gray-900 rounded-lg p-4 mb-4">
-                            <div class="flex items-center space-x-2 mb-3">
-                                <div class="w-3 h-3 bg-red-500 rounded-full"></div>
-                                <div class="w-3 h-3 bg-yellow-500 rounded-full"></div>
-                                <div class="w-3 h-3 bg-green-500 rounded-full"></div>
-                            </div>
-                            <div class="space-y-2">
-                                <div class="h-3 bg-gradient-to-r from-blue-600 to-purple-600 rounded w-3/4"></div>
-                                <div class="h-3 bg-gray-700 rounded w-1/2"></div>
-                                <div class="h-3 bg-gray-700 rounded w-2/3"></div>
-                            </div>
-                        </div>
-                        <div class="text-center text-gray-400 text-sm">Aperçu du dashboard</div>
-                    </div>
-                </div>
-
-                <div class="space-y-6">
-                    <div class="flex items-center space-x-4">
-                        <div class="w-12 h-12 bg-gradient-to-br from-green-500 to-blue-500 rounded-lg flex items-center justify-center">
-                            <span class="text-white text-2xl">⚡</span>
-                        </div>
-                        <div>
-                            <h3 class="text-white text-lg font-bold">Performance Ultra-Rapide</h3>
-                            <p class="text-gray-400">Interface réactive construite avec les dernières technologies</p>
-                        </div>
-                    </div>
-
-                    <div class="flex items-center space-x-4">
-                        <div class="w-12 h-12 bg-gradient-to-br from-purple-500 to-pink-500 rounded-lg flex items-center justify-center">
-                            <span class="text-white text-2xl">🎨</span>
-                        </div>
-                        <div>
-                            <h3 class="text-white text-lg font-bold">Design Soigné</h3>
-                            <p class="text-gray-400">Chaque détail pensé pour une expérience optimale</p>
-                        </div>
-                    </div>
-
-                    <div class="flex items-center space-x-4">
-                        <div class="w-12 h-12 bg-gradient-to-br from-orange-500 to-red-500 rounded-lg flex items-center justify-center">
-                            <span class="text-white text-2xl">📊</span>
-                        </div>
-                        <div>
-                            <h3 class="text-white text-lg font-bold">Visualisation Claire</h3>
-                            <p class="text-gray-400">Tableaux de bord et graphiques faciles à comprendre</p>
-                        </div>
-                    </div>
-                </div>
-            </div>
-        </div>
-    </section>
-
-    <!-- Social Proof Section -->
-    <section class="py-20 bg-gradient-to-r from-blue-900 to-purple-900">
+    <!-- Section Témoignages avec personnages de Dofus -->
+    <section class="py-20 bg-gradient-to-r from-blue-900/50 to-purple-900/50 backdrop-blur-sm">
         <div class="container mx-auto px-4">
             <div class="text-center mb-16">
                 <h2 class="text-4xl font-bold text-white mb-4">Rejoint par la Communauté</h2>
-                <p class="text-xl text-blue-200">Des traders de tous niveaux nous font confiance</p>
+                <p class="text-xl text-blue-200">Des utilisateurs de tous niveaux nous font confiance</p>
             </div>
 
             <div class="grid grid-cols-1 md:grid-cols-3 gap-8">
-                <div class="bg-white bg-opacity-10 rounded-xl p-6 backdrop-blur">
+                <!-- Trader Débutant -->
+                <div class="bg-white/10 rounded-xl p-6 backdrop-blur border border-amber-500/30 hover:border-amber-400/50 transition-all duration-300">
                     <div class="text-center mb-4">
-                        <div class="text-3xl mb-2">💰</div>
-                        <h3 class="text-white font-bold">Traders Débutants</h3>
+                        <div class="text-4xl mb-3">💰</div>
+                        <div class="flex items-center justify-center space-x-2">
+                            <h3 class="text-amber-400 font-bold">Baboulefifou</h3>
+                        </div>
                     </div>
-                    <p class="text-blue-100 text-center italic">
-                        "Enfin un outil qui m'aide à comprendre mes profits réels. 
-                        L'interface est super intuitive !"
+                    <p class="text-blue-100 text-center italic text-sm leading-relaxed">
+                        "Merci pour le site, qui est franchement top"
                     </p>
                 </div>
 
-                <div class="bg-white bg-opacity-10 rounded-xl p-6 backdrop-blur">
+                <!-- Trader Expert -->
+                <div class="bg-white/10 rounded-xl p-6 backdrop-blur border border-blue-500/30 hover:border-blue-400/50 transition-all duration-300">
                     <div class="text-center mb-4">
-                        <div class="text-3xl mb-2">🏆</div>
-                        <h3 class="text-white font-bold">Traders Experts</h3>
+                        <div class="text-4xl mb-3">🏆</div>
+                        <div class="flex items-center justify-center space-x-2">
+                            <h3 class="text-blue-400 font-bold">Jundaï</h3>
+                        </div>
                     </div>
-                    <p class="text-blue-100 text-center italic">
-                        "Les analytics avancées et l'export CSV me font gagner des heures. 
-                        Un must-have !"
+                    <p class="text-blue-100 text-center italic text-sm leading-relaxed">
+                        "Merci pour l'outil, c'est hyper pratique !"
                     </p>
                 </div>
 
-                <div class="bg-white bg-opacity-10 rounded-xl p-6 backdrop-blur">
+                <!-- Trader Multi-Personnages -->
+                <div class="bg-white/10 rounded-xl p-6 backdrop-blur border border-purple-500/30 hover:border-purple-400/50 transition-all duration-300">
                     <div class="text-center mb-4">
-                        <div class="text-3xl mb-2">👥</div>
-                        <h3 class="text-white font-bold">Guildes</h3>
+                        <div class="text-4xl mb-3">⚔️</div>
+                        <div class="flex items-center justify-center space-x-2">
+                            <h3 class="text-purple-400 font-bold">Dream</h3>
+                        </div>
                     </div>
-                    <p class="text-blue-100 text-center italic">
-                        "Parfait pour organiser le trading de guilde. 
-                        Chaque membre peut gérer ses personnages !"
+                    <p class="text-blue-100 text-center italic text-sm leading-relaxed">
+                        "Merci pour l’outil! Il est très utile"
                     </p>
+                </div>
+            </div>
+
+            <!-- Stats communautaires -->
+            <div class="mt-16 text-center">
+                <div class="grid grid-cols-2 md:grid-cols-4 gap-8 max-w-2xl mx-auto">
+                    <div>
+                        <div class="text-3xl font-bold text-white">{{ users_count }}</div>
+                        <div class="text-blue-200 text-sm">Utilisateurs actifs</div>
+                    </div>
+                    <div>
+                        <div class="text-3xl font-bold text-green-400">{{ formatted_kamas }}</div>
+                        <div class="text-blue-200 text-sm">Kamas trackés</div>
+                    </div>
+                    <div>
+                        <div class="text-3xl font-bold text-purple-400">{{ formatted_lots }}</div>
+                        <div class="text-blue-200 text-sm">Lots gérés</div>
+                    </div>
+                    <div>
+                        <div class="text-3xl font-bold text-orange-400">{{ servers_count }}</div>
+                        <div class="text-blue-200 text-sm">Serveurs</div>
+                    </div>
                 </div>
             </div>
         </div>
     </section>
 
-    <!-- CTA Final -->
-    <section class="py-20 bg-gray-900">
-        <div class="container mx-auto px-4 text-center">
-            <div class="max-w-3xl mx-auto">
-                <h2 class="text-4xl font-bold text-white mb-6">
-                    Prêt à Révolutionner Votre Trading ?
+    <!-- CTA Final avec ambiance épique -->
+    <section class="py-20 bg-gray-900 relative overflow-hidden">
+        <!-- Effets de particules -->
+        <div class="absolute inset-0">
+            <div class="absolute top-10 left-10 w-2 h-2 bg-amber-400 rounded-full opacity-60 float-animation"></div>
+            <div class="absolute top-20 right-20 w-3 h-3 bg-blue-400 rounded-full opacity-40 float-animation" style="animation-delay: -1s;"></div>
+            <div class="absolute bottom-20 left-1/3 w-2 h-2 bg-purple-400 rounded-full opacity-50 float-animation" style="animation-delay: -3s;"></div>
+            <div class="absolute bottom-10 right-1/4 w-2 h-2 bg-green-400 rounded-full opacity-45 float-animation" style="animation-delay: -2s;"></div>
+        </div>
+
+        <div class="container mx-auto px-4 text-center relative z-10">
+            <div class="max-w-4xl mx-auto">
+                <h2 class="text-5xl font-bold text-white mb-6">
+                    Prêt à Révolutionner Votre Commerce ?
                 </h2>
-                <p class="text-xl text-gray-400 mb-8">
-                    Rejoignez {{ users_count }} traders qui optimisent déjà leurs profits avec Dofus Trading V2.
+                <p class="text-xl text-gray-300 mb-8">
+                    Rejoignez {{ users_count }} utilisateurs qui optimisent déjà leurs profits avec Monifus.
                     Inscription gratuite, aucune carte bancaire requise.
                 </p>
                 
-                <div class="flex flex-col sm:flex-row gap-4 justify-center items-center mb-8">
-                    <a href="{{ path('app_register') }}" 
-                       class="bg-gradient-to-r from-green-600 to-blue-600 hover:from-green-700 hover:to-blue-700 text-white font-bold py-4 px-8 rounded-xl text-lg transition-all duration-200 transform hover:scale-105 shadow-xl flex items-center">
-                        <span class="text-2xl mr-3">🚀</span>
+                <div class="flex flex-col sm:flex-row gap-6 justify-center items-center mb-8">
+                    <a href="{{ path('app_register') }}" class="bg-gradient-to-r from-amber-500 to-orange-600 hover:from-amber-600 hover:to-orange-700 text-white font-bold py-4 px-8 rounded-xl text-lg transition-all duration-200 transform hover:scale-105 shadow-2xl flex items-center logo-glow">
+                        <span class="text-3xl mr-3">🚀</span>
                         Créer mon compte gratuit
                     </a>
-                    <a href="{{ path('app_login') }}" 
-                       class="text-gray-300 hover:text-white transition-colors">
+                    <a href="{{ path('app_login') }}" class="text-amber-400 hover:text-amber-300 transition-colors text-lg font-medium">
                         Déjà inscrit ? Se connecter
                     </a>
                 </div>
 
-                <div class="flex justify-center items-center space-x-6 text-gray-500 text-sm">
+                <div class="flex justify-center items-center space-x-8 text-gray-500 text-sm">
                     <div class="flex items-center">
-                        <span class="text-green-400 mr-2">✓</span>
+                        <span class="text-amber-400 mr-2">✓</span>
                         Gratuit à vie
                     </div>
                     <div class="flex items-center">
-                        <span class="text-green-400 mr-2">✓</span>
+                        <span class="text-blue-400 mr-2">✓</span>
                         Aucune publicité
                     </div>
                     <div class="flex items-center">
-                        <span class="text-green-400 mr-2">✓</span>
+                        <span class="text-purple-400 mr-2">✓</span>
                         Support communautaire
                     </div>
                 </div>
             </div>
         </div>
     </section>
+
+    <!-- Footer avec style Dofus -->
+    <footer class="bg-gray-800/90 border-t border-amber-500/20 py-8">
+        <div class="container mx-auto px-4 text-center">
+            <div class="flex justify-center items-center space-x-4 mb-4">
+                <div class="w-8 h-8 logo-glow">
+                    <img src="{{ asset('uploads/logo.svg') }}" alt="Logo Monifus" class="w-full h-full object-contain">
+                </div>
+                <span class="text-white font-bold">Monifus</span>
+            </div>
+            <p class="text-gray-400 text-sm">
+                Créé par un passionné, pour la communauté Dofus. 
+                <span class="text-amber-400">Que vos profits se multiplient !</span>
+            </p>
+        </div>
+    </footer>
 {% endblock %}

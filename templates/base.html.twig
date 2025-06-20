@@ -3,10 +3,26 @@
     <head>
         <meta charset="UTF-8">
         <title>{% block title %}Monifus !{% endblock %}</title>
-        <link rel="icon" href="data:image/svg+xml,<svg xmlns=%22http://www.w3.org/2000/svg%22 viewBox=%220 0 128 128%22><text y=%221.2em%22 font-size=%2296%22>⚫️</text><text y=%221.3em%22 x=%220.2em%22 font-size=%2276%22 fill=%22%23fff%22>sf</text></svg>">
         <link rel="preconnect" href="https://fonts.googleapis.com">
         <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
         <link href="https://fonts.googleapis.com/css2?family=Jost:ital,wght@0,100..900;1,100..900&display=swap" rel="stylesheet">
+
+        <meta name="title" content="Monifus | Le Moniteur Dofus" />
+        <meta name="description" content="Monifus est un fansite regroupant divers outils pour les joueurs de Dofus." />
+        <link rel="icon" href="{{ asset('uploads/logo.ico') }}" type="image/x-icon" />
+
+        <!-- Open Graph / Facebook -->
+        <meta property="og:type" content="website" />
+        <meta property="og:url" content="https://monifus.fr/" />
+        <meta property="og:title" content="Monifus | Le Moniteur Dofus" />
+        <meta property="og:description" content="Monifus est un fansite regroupant divers outils pour les joueurs de Dofus." />
+
+        <!-- Twitter -->
+        <meta property="twitter:card" content="summary_large_image" />
+        <meta property="twitter:url" content="https://monifus.fr/" />
+        <meta property="twitter:title" content="Monifus | Le Moniteur Dofus" />
+        <meta property="twitter:description" content="Monifus est un fansite regroupant divers outils pour les joueurs de Dofus." />
+
         {% block stylesheets %}
             <link rel="stylesheet" href="{{ asset('styles/app.css') }}">
         {% endblock %}
