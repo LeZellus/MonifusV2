@@ -1,0 +1,53 @@
+{% extends 'base.html.twig' %}
+
+{% block title %}Documentation - Monifus{% endblock %}
+
+{% block body %}
+    <div class="wrapper-container">
+        <div class="grid grid-cols-1 lg:grid-cols-4 gap-8">
+            <!-- Sidebar -->
+            <div class="wrapper-background">
+                {% include 'docs/_sidebar.html.twig' %}
+            </div>
+            
+            <!-- Contenu principal -->
+            <div class="lg:col-span-3 space-y-8">
+                <!-- En-tête documentation -->
+                <div class="wrapper-background text-center">
+                    <div class="text-5xl mb-4">📚</div>
+                    <h1 class="text-white text-3xl font-bold mb-4">Documentation Monifus</h1>
+                    <p class="text-gray-400 text-lg">Apprenez à utiliser votre tracker de trading Dofus</p>
+                </div>
+
+                <!-- Liens rapides -->
+                <div class="wrapper-background">
+                    <h2 class="text-white text-xl font-bold mb-4">🔗 Liens rapides</h2>
+                    <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+                        <a href="{{ path('app_docs_getting_started') }}" 
+                           class="bg-gradient-to-r from-green-600 to-blue-600 p-4 rounded-lg hover:from-green-700 hover:to-blue-700 transition-all">
+                            <h3 class="text-white font-bold mb-2">🚀 Premier pas</h3>
+                            <p class="text-green-100 text-sm">Commencez votre première session de trading</p>
+                        </a>
+                        
+                        <a href="{{ path('app_docs_trading_guide') }}" 
+                           class="bg-gradient-to-r from-orange-600 to-red-600 p-4 rounded-lg hover:from-orange-700 hover:to-red-700 transition-all">
+                            <h3 class="text-white font-bold mb-2">📊 Guide Trading</h3>
+                            <p class="text-orange-100 text-sm">Apprenez les stratégies de trading efficaces</p>
+                        </a>
+                        
+                        <a href="{{ path('app_docs_faq') }}" 
+                           class="bg-gradient-to-r from-purple-600 to-pink-600 p-4 rounded-lg hover:from-purple-700 hover:to-pink-700 transition-all">
+                            <h3 class="text-white font-bold mb-2">❓ FAQ</h3>
+                            <p class="text-purple-100 text-sm">Réponses aux questions fréquentes</p>
+                        </a>
+                        
+                        <div class="bg-gray-700 p-4 rounded-lg opacity-50">
+                            <h3 class="text-white font-bold mb-2">👁️ Market Watch</h3>
+                            <p class="text-gray-300 text-sm">Bientôt disponible...</p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+{% endblock %}

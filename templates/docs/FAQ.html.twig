@@ -1,0 +1,142 @@
+{% extends 'base.html.twig' %}
+
+{% block title %}FAQ - Documentation{% endblock %}
+
+{% block body %}
+    <div class="wrapper-container">
+        <div class="grid grid-cols-1 lg:grid-cols-4 gap-8">
+            <!-- Sidebar -->
+            <div class="wrapper-background">
+                {% include 'docs/_sidebar.html.twig' %}
+            </div>
+            
+            <!-- Contenu principal -->
+            <div class="lg:col-span-3 wrapper-background">
+                <h1 class="text-white text-3xl font-bold mb-6">❓ Questions Fréquentes</h1>
+                
+                <div class="prose prose-invert max-w-none space-y-6">
+                    <p class="text-gray-300 text-lg">
+                        Retrouvez les réponses aux questions les plus courantes sur Monifus.
+                    </p>
+                    
+                    <!-- FAQ Items avec accordéon simple -->
+                    <div class="space-y-4" data-controller="faq-accordion">
+                        
+                        <!-- Question 1 -->
+                        <div class="bg-gray-700 rounded-lg overflow-hidden">
+                            <button class="w-full px-6 py-4 text-left flex justify-between items-center hover:bg-gray-600 transition-colors"
+                                    data-action="click->faq-accordion#toggle"
+                                    data-target="q1">
+                                <span class="text-white font-semibold">🤔 Comment créer mon premier profil de trading ?</span>
+                                <span class="text-gray-400 transform transition-transform" data-faq-accordion-target="icon">▼</span>
+                            </button>
+                            <div class="px-6 pb-4 hidden" data-faq-accordion-target="content" data-question="q1">
+                                <div class="text-gray-300 space-y-2">
+                                    <p>1. Cliquez sur "Profils" dans le menu principal</p>
+                                    <p>2. Sélectionnez "Nouveau Profil"</p>
+                                    <p>3. Donnez un nom à votre profil (ex: "Trading Principal")</p>
+                                    <p>4. Ajoutez vos personnages Dofus au profil</p>
+                                    {% if app.user %}
+                                        <div class="mt-3">
+                                            <a href="{{ path('app_profile_new') }}" class="btn btn-primary btn-sm">Créer un profil</a>
+                                        </div>
+                                    {% endif %}
+                                </div>
+                            </div>
+                        </div>
+                        
+                        <!-- Question 2 -->
+                        <div class="bg-gray-700 rounded-lg overflow-hidden">
+                            <button class="w-full px-6 py-4 text-left flex justify-between items-center hover:bg-gray-600 transition-colors"
+                                    data-action="click->faq-accordion#toggle"
+                                    data-target="q2">
+                                <span class="text-white font-semibold">💰 Comment calculer mes profits réels ?</span>
+                                <span class="text-gray-400 transform transition-transform" data-faq-accordion-target="icon">▼</span>
+                            </button>
+                            <div class="px-6 pb-4 hidden" data-faq-accordion-target="content" data-question="q2">
+                                <div class="text-gray-300 space-y-2">
+                                    <p><strong>Profit par lot :</strong> Prix de vente - Prix d'achat</p>
+                                    <p><strong>Profit total :</strong> Profit par lot × Nombre de lots</p>
+                                    <p><strong>ROI :</strong> (Profit / Investissement) × 100</p>
+                                    <p class="text-green-400">✅ Monifus calcule automatiquement ces métriques pour vous !</p>
+                                </div>
+                            </div>
+                        </div>
+                        
+                        <!-- Question 3 -->
+                        <div class="bg-gray-700 rounded-lg overflow-hidden">
+                            <button class="w-full px-6 py-4 text-left flex justify-between items-center hover:bg-gray-600 transition-colors"
+                                    data-action="click->faq-accordion#toggle"
+                                    data-target="q3">
+                                <span class="text-white font-semibold">📊 À quelle fréquence observer les prix ?</span>
+                                <span class="text-gray-400 transform transition-transform" data-faq-accordion-target="icon">▼</span>
+                            </button>
+                            <div class="px-6 pb-4 hidden" data-faq-accordion-target="content" data-question="q3">
+                                <div class="text-gray-300 space-y-2">
+                                    <p><strong>Ressources courantes :</strong> 1-2 fois par jour</p>
+                                    <p><strong>Items rares :</strong> 2-3 fois par semaine</p>
+                                    <p><strong>Périodes d'events :</strong> Plus fréquemment (les prix fluctuent)</p>
+                                    <p class="text-blue-400">💡 L'important est la régularité, pas la fréquence !</p>
+                                </div>
+                            </div>
+                        </div>
+                        
+                        <!-- Question 4 -->
+                        <div class="bg-gray-700 rounded-lg overflow-hidden">
+                            <button class="w-full px-6 py-4 text-left flex justify-between items-center hover:bg-gray-600 transition-colors"
+                                    data-action="click->faq-accordion#toggle"
+                                    data-target="q4">
+                                <span class="text-white font-semibold">❌ J'ai un bug, que faire ?</span>
+                                <span class="text-gray-400 transform transition-transform" data-faq-accordion-target="icon">▼</span>
+                            </button>
+                            <div class="px-6 pb-4 hidden" data-faq-accordion-target="content" data-question="q4">
+                                <div class="text-gray-300 space-y-2">
+                                    <p>1. <strong>Rafraîchissez la page</strong> (F5 ou Ctrl+R)</p>
+                                    <p>2. <strong>Videz le cache</strong> de votre navigateur</p>
+                                    <p>3. <strong>Vérifiez votre connexion</strong> internet</p>
+                                    <p>4. Si le problème persiste, exportez vos données via "Sauvegarde"</p>
+                                    <p class="text-orange-400">🔧 La plupart des problèmes se résolvent avec un simple refresh !</p>
+                                </div>
+                            </div>
+                        </div>
+                        
+                        <!-- Question 5 -->
+                        <div class="bg-gray-700 rounded-lg overflow-hidden">
+                            <button class="w-full px-6 py-4 text-left flex justify-between items-center hover:bg-gray-600 transition-colors"
+                                    data-action="click->faq-accordion#toggle"
+                                    data-target="q5">
+                                <span class="text-white font-semibold">💾 Mes données sont-elles sauvegardées ?</span>
+                                <span class="text-gray-400 transform transition-transform" data-faq-accordion-target="icon">▼</span>
+                            </button>
+                            <div class="px-6 pb-4 hidden" data-faq-accordion-target="content" data-question="q5">
+                                <div class="text-gray-300 space-y-2">
+                                    <p><strong>✅ Sauvegarde automatique :</strong> Toutes vos données sont sauvegardées en temps réel</p>
+                                    <p><strong>📥 Export personnel :</strong> Vous pouvez exporter vos données en JSON</p>
+                                    <p><strong>🔒 Sécurité :</strong> Données chiffrées et accès sécurisé par mot de passe</p>
+                                    {% if app.user %}
+                                        <div class="mt-3">
+                                            <a href="{{ path('app_backup_index') }}" class="btn btn-secondary btn-sm">Gérer mes sauvegardes</a>
+                                        </div>
+                                    {% endif %}
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <!-- Navigation -->
+                    <div class="flex justify-between items-center pt-8 border-t border-gray-700">
+                        <a href="{{ path('app_docs_trading_guide') }}" 
+                           class="btn btn-secondary">
+                            ← Guide Trading
+                        </a>
+                        
+                        <a href="{{ path('app_docs_index') }}" 
+                           class="btn btn-primary">
+                            Documentation →
+                        </a>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+{% endblock %}

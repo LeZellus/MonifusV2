@@ -1,0 +1,90 @@
+{% extends 'base.html.twig' %}
+
+{% block title %}Guide Trading - Documentation{% endblock %}
+
+{% block body %}
+    <div class="wrapper-container">
+        <div class="grid grid-cols-1 lg:grid-cols-4 gap-8">
+            <!-- Sidebar -->
+            <div class="wrapper-background">
+                {% include 'docs/_sidebar.html.twig' %}
+            </div>
+            
+            <!-- Contenu principal -->
+            <div class="lg:col-span-3 wrapper-background">
+                <h1 class="text-white text-3xl font-bold mb-6">📊 Guide du Trading</h1>
+                
+                <div class="prose prose-invert max-w-none space-y-6">
+                    <!-- Intro -->
+                    <p class="text-gray-300 text-lg">
+                        Apprenez les bases du trading efficace avec Monifus et maximisez vos profits.
+                    </p>
+                    
+                    <!-- Section 1 -->
+                    <div class="bg-green-600 bg-opacity-20 border-l-4 border-green-500 rounded-lg p-6">
+                        <h2 class="text-white text-xl font-bold mb-4">💰 Créer votre premier lot</h2>
+                        <div class="space-y-3 text-green-100">
+                            <p><strong>1. Choisissez un item</strong> - Commencez par des ressources populaires</p>
+                            <p><strong>2. Définissez vos prix</strong> - Prix d'achat réel + marge souhaitée</p>
+                            <p><strong>3. Configurez la quantité</strong> - Nombre de lots à trader</p>
+                        </div>
+                        {% if app.user %}
+                            <div class="mt-4">
+                                <a href="{{ path('app_lot_new') }}" class="btn btn-success">
+                                    ➕ Créer un lot maintenant
+                                </a>
+                            </div>
+                        {% endif %}
+                    </div>
+                    
+                    <!-- Section 2 -->
+                    <div class="bg-orange-600 bg-opacity-20 border-l-4 border-orange-500 rounded-lg p-6">
+                        <h2 class="text-white text-xl font-bold mb-4">👁️ Surveiller les prix</h2>
+                        <div class="space-y-3 text-orange-100">
+                            <p><strong>Observez régulièrement</strong> - Notez les prix sur l'HDV de votre serveur</p>
+                            <p><strong>Analysez les tendances</strong> - Identifiez les créneaux les plus rentables</p>
+                            <p><strong>Ajustez vos stratégies</strong> - Adaptez vos prix selon les fluctuations</p>
+                        </div>
+                        {% if app.user %}
+                            <div class="mt-4">
+                                <a href="{{ path('app_market_watch_new') }}" class="btn btn-warning">
+                                    📊 Nouvelle observation
+                                </a>
+                            </div>
+                        {% endif %}
+                    </div>
+                    
+                    <!-- Section 3 -->
+                    <div class="bg-purple-600 bg-opacity-20 border-l-4 border-purple-500 rounded-lg p-6">
+                        <h2 class="text-white text-xl font-bold mb-4">📈 Optimiser vos profits</h2>
+                        <div class="space-y-3 text-purple-100">
+                            <p><strong>Suivez vos performances</strong> - Utilisez les analytics pour identifier les items les plus rentables</p>
+                            <p><strong>Diversifiez votre portefeuille</strong> - Ne misez pas tout sur un seul type d'item</p>
+                            <p><strong>Exportez vos données</strong> - Gardez un historique de vos meilleures stratégies</p>
+                        </div>
+                        {% if app.user %}
+                            <div class="mt-4">
+                                <a href="{{ path('app_analytics_index') }}" class="btn btn-purple">
+                                    📊 Voir mes analytics
+                                </a>
+                            </div>
+                        {% endif %}
+                    </div>
+                    
+                    <!-- Navigation entre pages -->
+                    <div class="flex justify-between items-center pt-8 border-t border-gray-700">
+                        <a href="{{ path('app_docs_getting_started') }}" 
+                           class="btn btn-secondary">
+                            ← Premier pas
+                        </a>
+                        
+                        <a href="{{ path('app_docs_faq') }}" 
+                           class="btn btn-primary">
+                            FAQ →
+                        </a>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+{% endblock %}

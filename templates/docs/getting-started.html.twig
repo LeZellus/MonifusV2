@@ -1,0 +1,62 @@
+{% extends 'base.html.twig' %}
+
+{% block title %}Premier pas - Documentation{% endblock %}
+
+{% block body %}
+    <div class="wrapper-container">
+        <div class="grid grid-cols-1 lg:grid-cols-4 gap-8">
+            <!-- Sidebar -->
+            <div class="wrapper-background">
+                {% include 'docs/_sidebar.html.twig' %}
+            </div>
+            
+            <!-- Contenu principal -->
+            <div class="lg:col-span-3 wrapper-background">
+                <h1 class="text-white text-3xl font-bold mb-6">🚀 Premier pas avec Monifus</h1>
+                
+                <div class="prose prose-invert max-w-none">
+                    <p class="text-gray-300 text-lg mb-6">
+                        Bienvenue ! Ce guide vous accompagne pour commencer le trading sur Dofus avec Monifus.
+                    </p>
+                    
+                    <!-- Étape 1 -->
+                    <div class="bg-blue-600 bg-opacity-20 border-l-4 border-blue-500 rounded-lg p-4 mb-6">
+                        <h2 class="text-white text-xl font-bold mb-3">📝 Étape 1 : Créer votre profil</h2>
+                        <p class="text-blue-100 mb-4">
+                            Un profil regroupe vos personnages et organise votre activité de trading.
+                        </p>
+                        {% if app.user %}
+                            <a href="{{ path('app_profile_index') }}" class="btn btn-primary">
+                                Gérer mes profils
+                            </a>
+                        {% else %}
+                            <a href="{{ path('app_register') }}" class="btn btn-primary">
+                                Créer un compte
+                            </a>
+                        {% endif %}
+                    </div>
+                    
+                    <!-- Test : On verra les autres étapes plus tard -->
+                    <div class="bg-gray-700 rounded-lg p-4">
+                        <p class="text-gray-400 text-sm">
+                            📍 <strong>Prochaines étapes</strong> - Ajouter un personnage, créer vos premiers lots...
+                        </p>
+                    </div>
+                    
+                    <!-- Navigation -->
+                    <div class="flex justify-between items-center pt-8 border-t border-gray-700">
+                        <a href="{{ path('app_docs_index') }}" 
+                           class="btn btn-secondary">
+                            ← Documentation
+                        </a>
+                        
+                        <a href="{{ path('app_docs_trading_guide') }}" 
+                           class="btn btn-primary">
+                            Guide Trading →
+                        </a>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+{% endblock %}
