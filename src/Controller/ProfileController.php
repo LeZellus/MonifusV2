@@ -130,7 +130,7 @@ class ProfileController extends AbstractController
     }
 
     // FIX : Remettre la méthode GET et POST
-    #[Route('/switch/{id}', name: 'app_profile_switch', methods: ['GET'])]  // <- Remettre GET seulement
+    #[Route('/switch/{id}', name: 'app_profile_switch')]
     public function switchProfile(
         TradingProfile $profile,
         CharacterSelectionService $characterService
@@ -145,12 +145,12 @@ class ProfileController extends AbstractController
         if ($characters->count() > 0) {
             $firstCharacter = $characters->first();
             $characterService->setSelectedCharacter($firstCharacter);
-            $message = "Profil '{$profile->getName()}' activé avec le personnage {$firstCharacter->getName()}";
+            $this->addFlash('success', "Profil '{$profile->getName()}' activé avec le personnage {$firstCharacter->getName()}");
         } else {
-            $message = "Profil '{$profile->getName()}' activé. Ajoutez un personnage pour commencer !";
+            // Pas de personnage dans ce profil, on peut quand même le sélectionner
+            $this->addFlash('info', "Profil '{$profile->getName()}' activé. Ajoutez un personnage pour commencer !");
         }
 
-        $this->addFlash('success', $message);
         return $this->redirectToRoute('app_profile_index');
     }
 
