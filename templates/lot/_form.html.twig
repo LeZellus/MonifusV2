@@ -50,41 +50,25 @@
                 <div class="form-grid">
                     <!-- Item avec autocomplétion ou lecture seule -->
                     {% if is_edit %}
-                        <div class="md:col-span-2">
-                            <label class="form-label">Item sélectionné</label>
-                            <div class="w-full px-4 py-3 border border-gray-600 bg-gray-700 text-white rounded-lg flex items-center justify-between">
-                                <div class="flex items-center space-x-3">
-                                    <div class="w-10 h-10 bg-gradient-to-br from-blue-500 to-purple-600 rounded-lg flex items-center justify-center text-white font-bold">
-                                        {{ lot.item.name|first|upper }}
-                                    </div>
-                                    <div>
-                                        {% include 'components/item_display.html.twig' with {item: lot.item} %}
-                                    </div>
-                                </div>
-                                <div class="bg-gray-600 text-gray-300 px-3 py-1 rounded-full text-sm flex items-center">
-                                    <span class="mr-1">🔒</span>
-                                    Fixé
-                                </div>
-                            </div>
-                            {{ form_widget(form.item, {'attr': {'style': 'display: none;'}}) }}
-                            {{ form_errors(form.item) }}
-                            <div class="form-help">💡 L'item ne peut pas être modifié après création</div>
-                        </div>
+                        {% include 'components/autocomplete_field.html.twig' with {
+                            form: form,
+                            search_field: 'itemSearch',
+                            hidden_field: 'item',
+                            is_readonly: true,
+                            current_item: lot.item,
+                            label: 'Item sélectionné',
+                            readonly_help: '💡 L\'item ne peut pas être modifié après création'
+                        } %}
                     {% else %}
-                        <div class="md:col-span-2 relative" data-controller="autocomplete" data-autocomplete-url-value="{{ path('api_items_search') }}">
-                            {{ form_label(form.itemSearch, null, {'label_attr': {'class': 'form-label'}}) }}
-                            {{ form_widget(form.itemSearch, {'attr': {'class': 'form-input-lg', 'placeholder': 'Tapez pour rechercher un item...', 'data-autocomplete-target': 'input', 'data-action': 'input->autocomplete#search'}}) }}
-                            
-                            <div data-autocomplete-target="results" 
-                                data-action="click->autocomplete#selectItem"
-                                class="absolute z-10 w-full bg-gray-800 border border-gray-600 rounded-md shadow-lg hidden max-h-60 overflow-y-auto mt-1">
-                            </div>
-
-                            {{ form_widget(form.item, {'attr': {'style': 'display: none;', 'data-autocomplete-target': 'hiddenId'}}) }}
-                            {{ form_errors(form.item) }}
-                            
-                            <div class="form-help">🔍 Tapez pour rechercher et sélectionner un item</div>
-                        </div>
+                        {% include 'components/autocomplete_field.html.twig' with {
+                            form: form,
+                            search_field: 'itemSearch', 
+                            hidden_field: 'item',
+                            api_url: path('api_items_search'),
+                            label: 'Rechercher un item',
+                            placeholder: 'Tapez pour rechercher un item...',
+                            help_text: '🔍 Tapez pour rechercher et sélectionner un item'
+                        } %}
                     {% endif %}
 
                     <!-- Configuration du lot -->

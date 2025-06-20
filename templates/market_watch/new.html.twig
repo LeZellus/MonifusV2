@@ -43,25 +43,16 @@
                 {{ form_start(form) }}
                     <div class="space-y-6">
                         <!-- Ressource avec autocomplétion -->
-                        <div class="relative" data-controller="autocomplete" data-autocomplete-url-value="{{ path('api_items_search_resources') }}">
-                            <!-- Label -->
-                            {{ form_label(form.itemSearch, null, {'label_attr': {'class': 'block text-white font-medium mb-2'}}) }}
-                            
-                            <!-- Champ de recherche -->
-                            {{ form_widget(form.itemSearch, {'attr': {'class': 'w-full px-4 py-3 border border-gray-600 bg-gray-700 text-white rounded-lg focus:outline-none focus:border-orange-500 focus:ring-2 focus:ring-orange-500 focus:ring-opacity-20', 'placeholder': 'Tapez pour rechercher une ressource...', 'data-autocomplete-target': 'input', 'data-action': 'input->autocomplete#search'}}) }}
-                            
-                            <!-- Zone des résultats d'autocomplétion -->
-                            <div data-autocomplete-target="results" 
-                                data-action="click->autocomplete#selectItem"
-                                class="absolute z-10 w-full bg-gray-800 border border-gray-600 rounded-md shadow-lg hidden max-h-60 overflow-y-auto mt-1">
-                            </div>
-
-                            <!-- Select caché pour l'item sélectionné -->
-                            {{ form_widget(form.item, {'attr': {'style': 'display: none;', 'data-autocomplete-target': 'hiddenId'}}) }}
-                            {{ form_errors(form.item) }}
-                            
-                            <div class="form-help">🔍 Recherche filtrée sur les ressources</div>
-                        </div>
+                        {% include 'components/autocomplete_field.html.twig' with {
+                            form: form,
+                            search_field: 'itemSearch',
+                            hidden_field: 'item', 
+                            api_url: path('api_items_search_resources'),
+                            container_class: '',
+                            label: 'Rechercher une ressource',
+                            placeholder: 'Tapez pour rechercher une ressource...',
+                            help_text: '🔍 Recherche filtrée sur les ressources'
+                        } %}
 
                         <!-- Date d'observation -->
                         <div>
