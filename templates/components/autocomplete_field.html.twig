@@ -31,8 +31,6 @@ Usage: {% include 'components/autocomplete_field.html.twig' with {
                 Fixé
             </div>
         </div>
-        {{ form_widget(attribute(form, hidden_field), {'attr': {'style': 'display: none;'}}) }}
-        {{ form_errors(attribute(form, hidden_field)) }}
         <div class="form-help">{{ readonly_help|default('L\'item ne peut pas être modifié') }}</div>
     </div>
 {% else %}

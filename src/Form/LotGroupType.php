@@ -3,8 +3,10 @@
 namespace App\Form;
 
 use App\Entity\LotGroup;
+use App\Entity\Item;
 use App\Enum\LotStatus;
 use App\Enum\SaleUnit;
+use Symfony\Bridge\Doctrine\Form\Type\EntityType;
 use Symfony\Component\Form\AbstractType;
 use Symfony\Component\Form\Extension\Core\Type\EnumType;
 use Symfony\Component\Form\Extension\Core\Type\HiddenType;
@@ -19,8 +21,11 @@ class LotGroupType extends AbstractType
     {
         $isEdit = $options['is_edit'] ?? false;
         
-        // Champ de recherche uniquement pour la création
-        if (!$isEdit) {
+        if ($isEdit) {
+            // En mode édition, on affiche juste l'item actuel (read-only via template)
+            // Pas besoin de champ dans le formulaire car l'item ne peut pas être modifié
+        } else {
+            // En mode création, champ de recherche + champ caché
             $builder->add('itemSearch', TextType::class, [
                 'label' => 'Rechercher un item',
                 'mapped' => false,

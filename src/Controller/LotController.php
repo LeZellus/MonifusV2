@@ -3,6 +3,7 @@
 namespace App\Controller;
 
 use App\Entity\LotGroup;
+use App\Entity\Item;  // ← Import manquant
 use App\Form\LotGroupType;
 use App\Repository\LotGroupRepository;
 use App\Service\CharacterSelectionService;

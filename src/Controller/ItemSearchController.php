@@ -22,7 +22,7 @@ class ItemSearchController extends AbstractController
             return $this->json(['items' => []]);
         }
         
-        // Requête optimisée : seulement id, name, level
+        // Requête optimisée avec toutes les infos
         $items = $itemRepository->createQueryBuilder('i')
             ->select('i.id, i.name, i.level, i.itemType')
             ->where('i.name LIKE :query')
@@ -33,10 +33,13 @@ class ItemSearchController extends AbstractController
             ->getArrayResult();
         
         $itemsData = array_map(function($item) {
+            $typeLabel = $this->getTypeLabel($item['itemType']);
+            
             return [
                 'id' => $item['id'],
                 'name' => $item['name'],
-                'level' => $item['level'] ?? '',
+                'level' => $item['level'] ?? null,
+                'type' => $typeLabel,
                 'display' => $item['name'] . ($item['level'] ? ' (Niv.' . $item['level'] . ')' : '')
             ];
         }, $items);
@@ -51,9 +54,7 @@ class ItemSearchController extends AbstractController
         $limit = min((int) $request->query->get('limit', 20), 50);
         
         if (strlen($query) < 2) {
-            return $this->json(['items' => []], 200, [
-                'Cache-Control' => 'public, max-age=300'
-            ]);
+            return $this->json(['items' => []]);
         }
         
         $items = $itemRepository->createQueryBuilder('i')
@@ -71,14 +72,26 @@ class ItemSearchController extends AbstractController
             return [
                 'id' => $item['id'],
                 'name' => $item['name'],
-                'level' => $item['level'],
-                'type' => $item['itemType'] ?? 'Ressource'
+                'level' => $item['level'] ?? null,
+                'type' => 'Ressource',
+                'display' => $item['name'] . ($item['level'] ? ' (Niv.' . $item['level'] . ')' : '')
             ];
         }, $items);
         
-        return $this->json(['items' => $itemsData], 200, [
-            'Cache-Control' => 'public, max-age=60',
-            'Content-Type' => 'application/json'
-        ]);
+        return $this->json(['items' => $itemsData]);
+    }
+    
+    private function getTypeLabel(?string $itemType): string
+    {
+        if (!$itemType) {
+            return 'Divers';
+        }
+        
+        return match($itemType) {
+            'Resource' => 'Ressource',
+            'Equipment' => 'Équipement', 
+            'Consumable' => 'Consommable',
+            default => 'Divers'
+        };
     }
 }
