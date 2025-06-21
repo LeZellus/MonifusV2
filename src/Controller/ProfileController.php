@@ -12,7 +12,7 @@ use Doctrine\ORM\EntityManagerInterface;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
-use Symfony\Component\HttpFoundation\RequestStack; // AJOUT
+use Symfony\Component\HttpFoundation\RequestStack;
 use Symfony\Component\Routing\Attribute\Route;
 use Symfony\Component\Security\Http\Attribute\IsGranted;
 
@@ -20,7 +20,6 @@ use Symfony\Component\Security\Http\Attribute\IsGranted;
 #[IsGranted('ROLE_USER')]
 class ProfileController extends AbstractController
 {
-    // AJOUT du constructeur pour RequestStack
     public function __construct(
         private RequestStack $requestStack
     ) {
@@ -32,66 +31,10 @@ class ProfileController extends AbstractController
         CharacterSelectionService $characterService
     ): Response {
         $profiles = $repository->findBy(['user' => $this->getUser()]);
-        $selectedCharacter = $characterService->getSelectedCharacter($this->getUser());
-        $allCharacters = $characterService->getUserCharacters($this->getUser());
         
-        // NOUVEAU : Récupérer le profil sélectionné depuis la session
-        $session = $this->requestStack->getSession();
-        $selectedProfileId = $session->get('selected_profile_id');
-        $selectedProfile = null;
-        
-        // Trouver le profil sélectionné
-        if ($selectedProfileId) {
-            foreach ($profiles as $profile) {
-                if ($profile->getId() === $selectedProfileId) {
-                    $selectedProfile = $profile;
-                    break;
-                }
-            }
-        }
-        
-        // Si pas de profil en session ou profil introuvable, utiliser celui du personnage ou le premier
-        if (!$selectedProfile) {
-            if ($selectedCharacter) {
-                $selectedProfile = $selectedCharacter->getTradingProfile();
-                // Sauvegarder en session pour la prochaine fois
-                $session->set('selected_profile_id', $selectedProfile->getId());
-            } else {
-                $selectedProfile = $profiles[0] ?? null;
-                if ($selectedProfile) {
-                    $session->set('selected_profile_id', $selectedProfile->getId());
-                }
-            }
-        }
-        
-        // Code des stats (inchangé)
-        foreach ($profiles as $profile) {
-            foreach ($profile->getDofusCharacters() as $character) {
-                $lotsCount = $character->getLotGroups()->count();
-                $watchesCount = $character->getMarketWatches()->count();
-                $soldLotsCount = 0;
-                $availableLotsCount = 0;
-                
-                foreach ($character->getLotGroups() as $lot) {
-                    if ($lot->getStatus()->value === 'sold') {
-                        $soldLotsCount++;
-                    } else {
-                        $availableLotsCount++;
-                    }
-                }
-                
-                $character->tempLotsCount = $lotsCount;
-                $character->tempWatchesCount = $watchesCount;
-                $character->tempSoldLotsCount = $soldLotsCount;
-                $character->tempAvailableLotsCount = $availableLotsCount;
-            }
-        }
-        
+        // Plus besoin de toute la logique complexe - le ProfileSelectorService via Twig Extension s'en charge
         return $this->render('profile/index.html.twig', [
-            'profiles' => $profiles,
-            'selectedCharacter' => $selectedCharacter,
-            'selectedProfile' => $selectedProfile, // NOUVEAU
-            'characters' => $allCharacters,
+            'profiles' => $profiles
         ]);
     }
 
@@ -123,7 +66,6 @@ class ProfileController extends AbstractController
         EntityManagerInterface $em,
         CharacterSelectionService $characterService
     ): Response {
-        // Vérifier que le profil appartient à l'utilisateur
         if ($profile->getUser() !== $this->getUser()) {
             throw $this->createAccessDeniedException();
         }
@@ -137,7 +79,6 @@ class ProfileController extends AbstractController
             $em->persist($character);
             $em->flush();
             
-            // Auto-sélectionner le personnage nouvellement créé
             $characterService->setSelectedCharacter($character);
             
             $this->addFlash('success', 'Personnage ajouté et sélectionné avec succès !');
@@ -154,9 +95,8 @@ class ProfileController extends AbstractController
     public function selectCharacter(
         DofusCharacter $character,
         CharacterSelectionService $characterService,
-        Request $request  // AJOUTER ce paramètre
+        Request $request
     ): Response {
-        // Vérifier que le personnage appartient à l'utilisateur
         if ($character->getTradingProfile()->getUser() !== $this->getUser()) {
             throw $this->createAccessDeniedException();
         }
@@ -164,13 +104,11 @@ class ProfileController extends AbstractController
         $characterService->setSelectedCharacter($character);
         $this->addFlash('success', "Personnage {$character->getName()} sélectionné !");
 
-        // Revenir sur la page précédente au lieu de app_profile_index
         $referer = $request->headers->get('referer');
         if ($referer) {
             return $this->redirect($referer);
         }
         
-        // Fallback
         return $this->redirectToRoute('app_profile_index');
     }
 
@@ -180,20 +118,19 @@ class ProfileController extends AbstractController
         CharacterSelectionService $characterService,
         Request $request
     ): Response {
-        // Vérifier que le profil appartient à l'utilisateur
         if ($profile->getUser() !== $this->getUser()) {
             throw $this->createAccessDeniedException();
         }
 
         $session = $this->requestStack->getSession();
         
-        // TOUJOURS nettoyer la sélection de personnage d'abord
+        // Nettoyer la sélection de personnage
         $session->remove('selected_character_id');
         
-        // Puis sauvegarder le nouveau profil
+        // Sauvegarder le nouveau profil
         $session->set('selected_profile_id', $profile->getId());
 
-        // Sélectionner le premier personnage de ce profil s'il existe
+        // Sélectionner le premier personnage de ce profil
         $characters = $profile->getDofusCharacters();
         if ($characters->count() > 0) {
             $firstCharacter = $characters->first();
@@ -203,13 +140,11 @@ class ProfileController extends AbstractController
             $this->addFlash('info', "Profil '{$profile->getName()}' activé. Ajoutez un personnage pour commencer !");
         }
 
-        // Utiliser le referer pour revenir sur la page précédente
         $referer = $request->headers->get('referer');
         if ($referer) {
             return $this->redirect($referer);
         }
 
-        // Fallback
         return $this->redirectToRoute('app_profile_index');
     }
     
@@ -219,7 +154,6 @@ class ProfileController extends AbstractController
         Request $request,
         EntityManagerInterface $em
     ): Response {
-        // Vérifier que le profil appartient à l'utilisateur
         if ($profile->getUser() !== $this->getUser()) {
             throw $this->createAccessDeniedException();
         }
@@ -240,65 +174,51 @@ class ProfileController extends AbstractController
         ]);
     }
 
-    #[Route('/{id}/delete', name: 'app_profile_delete', methods: ['POST'])]
-    public function deleteProfile(
+    #[Route('/{id}/delete', name: 'app_profile_delete')]
+    public function delete(
         TradingProfile $profile,
-        EntityManagerInterface $em
+        EntityManagerInterface $em,
+        Request $request
     ): Response {
-        // Vérifier que le profil appartient à l'utilisateur
         if ($profile->getUser() !== $this->getUser()) {
             throw $this->createAccessDeniedException();
         }
 
-        $profileName = $profile->getName();
-        
-        // Supprimer tous les personnages et leurs données associées
-        foreach ($profile->getDofusCharacters() as $character) {
-            $em->remove($character);
+        // Nettoyer la session si c'était le profil actif
+        $session = $this->requestStack->getSession();
+        if ($session->get('selected_profile_id') === $profile->getId()) {
+            $session->remove('selected_profile_id');
+            $session->remove('selected_character_id');
         }
-        
+
         $em->remove($profile);
         $em->flush();
 
-        $this->addFlash('success', "Profil '{$profileName}' supprimé avec succès.");
+        $this->addFlash('success', 'Profil supprimé avec succès !');
         return $this->redirectToRoute('app_profile_index');
     }
 
-    #[Route('/character/{id}/delete', name: 'app_profile_character_delete', methods: ['POST'])]
+    #[Route('/character/{id}/delete', name: 'app_profile_character_delete')]
     public function deleteCharacter(
         DofusCharacter $character,
         EntityManagerInterface $em,
         CharacterSelectionService $characterService
     ): Response {
-        // Vérifier que le personnage appartient à l'utilisateur
         if ($character->getTradingProfile()->getUser() !== $this->getUser()) {
             throw $this->createAccessDeniedException();
         }
 
-        $characterName = $character->getName();
+        // Si c'était le personnage sélectionné, le réinitialiser
         $selectedCharacter = $characterService->getSelectedCharacter($this->getUser());
-        
-        // Si on supprime le personnage actif, désélectionner
         if ($selectedCharacter && $selectedCharacter->getId() === $character->getId()) {
-            // Sélectionner un autre personnage du même profil ou null
-            $otherCharacters = $character->getTradingProfile()->getDofusCharacters();
-            $newSelected = null;
-            foreach ($otherCharacters as $otherChar) {
-                if ($otherChar->getId() !== $character->getId()) {
-                    $newSelected = $otherChar;
-                    break;
-                }
-            }
-            
-            if ($newSelected) {
-                $characterService->setSelectedCharacter($newSelected);
-            }
+            $session = $this->requestStack->getSession();
+            $session->remove('selected_character_id');
         }
-        
+
         $em->remove($character);
         $em->flush();
 
-        $this->addFlash('success', "Personnage '{$characterName}' supprimé avec succès.");
+        $this->addFlash('success', 'Personnage supprimé avec succès !');
         return $this->redirectToRoute('app_profile_index');
     }
 }

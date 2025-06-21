@@ -36,6 +36,8 @@
         {% include 'components/main_navbar.html.twig' with {
             'title': block('title')
         } %}
+        
+        {% include 'components/profile_selector.html.twig' %}
 
         {% block body %}{% endblock %}
 
