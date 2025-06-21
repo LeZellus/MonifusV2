@@ -16,31 +16,109 @@
                 
                 <div class="prose prose-invert max-w-none">
                     <p class="text-gray-300 text-lg mb-6">
-                        Bienvenue ! Ce guide vous accompagne pour commencer le trading sur Dofus avec Monifus.
+                        Bienvenue ! Ce guide vous accompagne pour démarrer efficacement le trading sur Dofus avec Monifus.
                     </p>
                     
-                    <!-- Étape 1 -->
-                    <div class="bg-blue-600 bg-opacity-20 border-l-4 border-blue-500 rounded-lg p-4 mb-6">
+                    <!-- Étape 1 : Créer le profil -->
+                    <div class="bg-blue-600 bg-opacity-20 border-l-4 border-blue-500 rounded-lg p-6 mb-6">
                         <h2 class="text-white text-xl font-bold mb-3">📝 Étape 1 : Créer votre profil</h2>
                         <p class="text-blue-100 mb-4">
-                            Un profil regroupe vos personnages et organise votre activité de trading.
+                            Un profil regroupe vos personnages et organise votre activité de trading. Vous pouvez avoir plusieurs profils pour différentes stratégies.
                         </p>
+                        <div class="space-y-2 text-blue-100">
+                            <p>• <strong>Nom du profil :</strong> Choisissez un nom explicite (ex: "Trading Principal", "Serveur Julith")</p>
+                            <p>• <strong>Capital initial :</strong> Définissez votre budget de départ pour suivre vos gains</p>
+                            <p>• <strong>Objectifs :</strong> Fixez-vous un objectif de profit mensuel</p>
+                        </div>
                         {% if app.user %}
-                            <a href="{{ path('app_profile_index') }}" class="btn btn-primary">
+                            <a href="{{ path('app_profile_index') }}" class="btn btn-primary mt-4 inline-block">
                                 Gérer mes profils
                             </a>
                         {% else %}
-                            <a href="{{ path('app_register') }}" class="btn btn-primary">
+                            <a href="{{ path('app_register') }}" class="btn btn-primary mt-4 inline-block">
                                 Créer un compte
                             </a>
                         {% endif %}
                     </div>
                     
-                    <!-- Test : On verra les autres étapes plus tard -->
-                    <div class="bg-gray-700 rounded-lg p-4">
-                        <p class="text-gray-400 text-sm">
-                            📍 <strong>Prochaines étapes</strong> - Ajouter un personnage, créer vos premiers lots...
+                    <!-- Étape 2 : Ajouter un personnage -->
+                    <div class="bg-green-600 bg-opacity-20 border-l-4 border-green-500 rounded-lg p-6 mb-6">
+                        <h2 class="text-white text-xl font-bold mb-3">👤 Étape 2 : Ajouter vos personnages</h2>
+                        <p class="text-green-100 mb-4">
+                            Associez vos personnages Dofus à votre profil pour organiser vos sessions de trading.
                         </p>
+                        <div class="space-y-2 text-green-100">
+                            <p>• <strong>Nom du personnage :</strong> Le nom exact de votre perso en jeu</p>
+                            <p>• <strong>Serveur :</strong> Important pour les prix et l'économie locale</p>
+                            <p>• <strong>Classe :</strong> Optionnel, pour l'organisation</p>
+                        </div>
+                        {% if app.user %}
+                            <a href="{{ path('app_character_new') }}" class="btn btn-success mt-4 inline-block">
+                                Ajouter un personnage
+                            </a>
+                        {% endif %}
+                    </div>
+                    
+                    <!-- Étape 3 : Premier lot -->
+                    <div class="bg-purple-600 bg-opacity-20 border-l-4 border-purple-500 rounded-lg p-6 mb-6">
+                        <h2 class="text-white text-xl font-bold mb-3">💰 Étape 3 : Créer votre premier lot</h2>
+                        <p class="text-purple-100 mb-4">
+                            Commencez par un item simple et populaire pour vous familiariser avec l'interface.
+                        </p>
+                        <div class="space-y-2 text-purple-100">
+                            <p>• <strong>Items recommandés :</strong> Ressources de base (Blé, Orge, Lin, Frêne...)</p>
+                            <p>• <strong>Prix d'achat :</strong> Le prix que vous avez réellement payé</p>
+                            <p>• <strong>Prix de vente :</strong> Votre prix de vente souhaité (avec marge)</p>
+                            <p>• <strong>Quantité :</strong> Combien d'unités de cet item vous tradez</p>
+                        </div>
+                        {% if app.user %}
+                            <a href="{{ path('app_lot_new') }}" class="btn btn-purple mt-4 inline-block">
+                                Créer mon premier lot
+                            </a>
+                        {% endif %}
+                    </div>
+                    
+                    <!-- Étape 4 : Suivre ses profits -->
+                    <div class="bg-orange-600 bg-opacity-20 border-l-4 border-orange-500 rounded-lg p-6 mb-6">
+                        <h2 class="text-white text-xl font-bold mb-3">📊 Étape 4 : Suivre vos performances</h2>
+                        <p class="text-orange-100 mb-4">
+                            Consultez régulièrement vos statistiques pour optimiser votre stratégie.
+                        </p>
+                        <div class="space-y-2 text-orange-100">
+                            <p>• <strong>Dashboard :</strong> Vue d'ensemble de vos profits et lots actifs</p>
+                            <p>• <strong>Analytics :</strong> Graphiques détaillés de vos performances</p>
+                            <p>• <strong>Market Watch :</strong> Surveillez les prix de vos items favoris</p>
+                        </div>
+                        {% if app.user %}
+                            <a href="{{ path('app_trading_dashboard') }}" class="btn btn-warning mt-4 inline-block">
+                                Voir mon dashboard
+                            </a>
+                        {% endif %}
+                    </div>
+                    
+                    <!-- Conseils de démarrage -->
+                    <div class="bg-gray-700 rounded-lg p-6 mb-6">
+                        <h2 class="text-white text-xl font-bold mb-3">💡 Conseils pour bien commencer</h2>
+                        <div class="grid grid-cols-1 md:grid-cols-2 gap-4 text-gray-300">
+                            <div>
+                                <h3 class="text-green-400 font-semibold mb-2">✅ À faire</h3>
+                                <ul class="space-y-1 text-sm">
+                                    <li>• Commencer petit avec des items populaires</li>
+                                    <li>• Noter tous vos achats/ventes</li>
+                                    <li>• Surveiller les prix régulièrement</li>
+                                    <li>• Fixer des objectifs réalistes</li>
+                                </ul>
+                            </div>
+                            <div>
+                                <h3 class="text-red-400 font-semibold mb-2">❌ À éviter</h3>
+                                <ul class="space-y-1 text-sm">
+                                    <li>• Investir tout son capital d'un coup</li>
+                                    <li>• Trader des items trop rares/chers</li>
+                                    <li>• Négliger la mise à jour des prix</li>
+                                    <li>• Oublier de marquer les lots vendus</li>
+                                </ul>
+                            </div>
+                        </div>
                     </div>
                     
                     <!-- Navigation -->

@@ -19,7 +19,7 @@
                         Retrouvez les réponses aux questions les plus courantes sur Monifus.
                     </p>
                     
-                    <!-- FAQ Items avec accordéon simple -->
+                    <!-- FAQ Items avec accordéon -->
                     <div class="space-y-4" data-controller="faq-accordion">
                         
                         <!-- Question 1 -->
@@ -35,12 +35,8 @@
                                     <p>1. Cliquez sur "Profils" dans le menu principal</p>
                                     <p>2. Sélectionnez "Nouveau Profil"</p>
                                     <p>3. Donnez un nom à votre profil (ex: "Trading Principal")</p>
-                                    <p>4. Ajoutez vos personnages Dofus au profil</p>
-                                    {% if app.user %}
-                                        <div class="mt-3">
-                                            <a href="{{ path('app_profile_new') }}" class="btn btn-primary btn-sm">Créer un profil</a>
-                                        </div>
-                                    {% endif %}
+                                    <p>4. Définissez votre capital de départ pour suivre vos gains</p>
+                                    <p class="text-blue-400">💡 Vous pouvez créer plusieurs profils pour différentes stratégies !</p>
                                 </div>
                             </div>
                         </div>
@@ -50,15 +46,17 @@
                             <button class="w-full px-6 py-4 text-left flex justify-between items-center hover:bg-gray-600 transition-colors"
                                     data-action="click->faq-accordion#toggle"
                                     data-target="q2">
-                                <span class="text-white font-semibold">💰 Comment calculer mes profits réels ?</span>
+                                <span class="text-white font-semibold">💰 Quels items sont les plus rentables pour débuter ?</span>
                                 <span class="text-gray-400 transform transition-transform" data-faq-accordion-target="icon">▼</span>
                             </button>
                             <div class="px-6 pb-4 hidden" data-faq-accordion-target="content" data-question="q2">
                                 <div class="text-gray-300 space-y-2">
-                                    <p><strong>Profit par lot :</strong> Prix de vente - Prix d'achat</p>
-                                    <p><strong>Profit total :</strong> Profit par lot × Nombre de lots</p>
-                                    <p><strong>ROI :</strong> (Profit / Investissement) × 100</p>
-                                    <p class="text-green-400">✅ Monifus calcule automatiquement ces métriques pour vous !</p>
+                                    <p><strong>📦 Items recommandés pour débuter :</strong></p>
+                                    <p>• <strong>Ressources de base :</strong> Blé, Orge, Avoine (forte demande)</p>
+                                    <p>• <strong>Bois :</strong> Frêne, Châtaignier, Noyer (populaires)</p>
+                                    <p>• <strong>Minerais :</strong> Fer, Cuivre (toujours recherchés)</p>
+                                    <p>• <strong>Évitez :</strong> Items trop rares ou trop chers au début</p>
+                                    <p class="text-green-400">✅ Privilégiez les items avec un turn-over rapide !</p>
                                 </div>
                             </div>
                         </div>
@@ -68,15 +66,18 @@
                             <button class="w-full px-6 py-4 text-left flex justify-between items-center hover:bg-gray-600 transition-colors"
                                     data-action="click->faq-accordion#toggle"
                                     data-target="q3">
-                                <span class="text-white font-semibold">📊 À quelle fréquence observer les prix ?</span>
+                                <span class="text-white font-semibold">📊 Comment calculer ma marge de profit ?</span>
                                 <span class="text-gray-400 transform transition-transform" data-faq-accordion-target="icon">▼</span>
                             </button>
                             <div class="px-6 pb-4 hidden" data-faq-accordion-target="content" data-question="q3">
                                 <div class="text-gray-300 space-y-2">
-                                    <p><strong>Ressources courantes :</strong> 1-2 fois par jour</p>
-                                    <p><strong>Items rares :</strong> 2-3 fois par semaine</p>
-                                    <p><strong>Périodes d'events :</strong> Plus fréquemment (les prix fluctuent)</p>
-                                    <p class="text-blue-400">💡 L'important est la régularité, pas la fréquence !</p>
+                                    <p><strong>💡 Formule simple :</strong></p>
+                                    <p>• <strong>Marge % =</strong> (Prix de vente - Prix d'achat) / Prix d'achat × 100</p>
+                                    <p>• <strong>Exemple :</strong> Acheté 100k, vendu 130k → (130-100)/100 = 30% de marge</p>
+                                    <p><strong>🎯 Marges recommandées :</strong></p>
+                                    <p>• Débutant : 15-25% (sécurisé)</p>
+                                    <p>• Intermédiaire : 25-40% (équilibré)</p>
+                                    <p>• Avancé : 40%+ (risqué mais rentable)</p>
                                 </div>
                             </div>
                         </div>
@@ -86,12 +87,12 @@
                             <button class="w-full px-6 py-4 text-left flex justify-between items-center hover:bg-gray-600 transition-colors"
                                     data-action="click->faq-accordion#toggle"
                                     data-target="q4">
-                                <span class="text-white font-semibold">❌ J'ai un bug, que faire ?</span>
+                                <span class="text-white font-semibold">🔧 Que faire si l'application bug ?</span>
                                 <span class="text-gray-400 transform transition-transform" data-faq-accordion-target="icon">▼</span>
                             </button>
                             <div class="px-6 pb-4 hidden" data-faq-accordion-target="content" data-question="q4">
                                 <div class="text-gray-300 space-y-2">
-                                    <p>1. <strong>Rafraîchissez la page</strong> (F5 ou Ctrl+R)</p>
+                                    <p>1. <strong>Actualisez la page</strong> (F5 ou Ctrl+R)</p>
                                     <p>2. <strong>Videz le cache</strong> de votre navigateur</p>
                                     <p>3. <strong>Vérifiez votre connexion</strong> internet</p>
                                     <p>4. Si le problème persiste, exportez vos données via "Sauvegarde"</p>
@@ -112,7 +113,7 @@
                                 <div class="text-gray-300 space-y-2">
                                     <p><strong>✅ Sauvegarde automatique :</strong> Toutes vos données sont sauvegardées en temps réel</p>
                                     <p><strong>📥 Export personnel :</strong> Vous pouvez exporter vos données en JSON</p>
-                                    <p><strong>🔒 Sécurité :</strong> Données chiffrées et accès sécurisé par mot de passe</p>
+                                    <p><strong>🔒 Sécurité :</strong> Données chiffrées et accès sécurisé</p>
                                     {% if app.user %}
                                         <div class="mt-3">
                                             <a href="{{ path('app_backup_index') }}" class="btn btn-secondary btn-sm">Gérer mes sauvegardes</a>
@@ -120,6 +121,165 @@
                                     {% endif %}
                                 </div>
                             </div>
+                        </div>
+                        
+                        <!-- Question 6 -->
+                        <div class="bg-gray-700 rounded-lg overflow-hidden">
+                            <button class="w-full px-6 py-4 text-left flex justify-between items-center hover:bg-gray-600 transition-colors"
+                                    data-action="click->faq-accordion#toggle"
+                                    data-target="q6">
+                                <span class="text-white font-semibold">🎯 Comment fixer mes objectifs de profit ?</span>
+                                <span class="text-gray-400 transform transition-transform" data-faq-accordion-target="icon">▼</span>
+                            </button>
+                            <div class="px-6 pb-4 hidden" data-faq-accordion-target="content" data-question="q6">
+                                <div class="text-gray-300 space-y-2">
+                                    <p><strong>🏁 Objectifs SMART recommandés :</strong></p>
+                                    <p>• <strong>Hebdomadaire :</strong> 5-10% de votre capital (débutant)</p>
+                                    <p>• <strong>Mensuel :</strong> 20-50% de croissance (intermédiaire)</p>
+                                    <p>• <strong>Temps de trading :</strong> 1-2h par jour maximum</p>
+                                    <p><strong>⚠️ Important :</strong> Ne risquez jamais plus de 10% de votre capital sur un seul trade</p>
+                                </div>
+                            </div>
+                        </div>
+                        
+                        <!-- Question 7 -->
+                        <div class="bg-gray-700 rounded-lg overflow-hidden">
+                            <button class="w-full px-6 py-4 text-left flex justify-between items-center hover:bg-gray-600 transition-colors"
+                                    data-action="click->faq-accordion#toggle"
+                                    data-target="q7">
+                                <span class="text-white font-semibold">📱 Puis-je utiliser Monifus sur mobile ?</span>
+                                <span class="text-gray-400 transform transition-transform" data-faq-accordion-target="icon">▼</span>
+                            </button>
+                            <div class="px-6 pb-4 hidden" data-faq-accordion-target="content" data-question="q7">
+                                <div class="text-gray-300 space-y-2">
+                                    <p><strong>📱 Interface responsive :</strong> Monifus s'adapte automatiquement à votre écran</p>
+                                    <p><strong>✅ Compatible :</strong> Tous navigateurs mobiles (Chrome, Safari, Firefox)</p>
+                                    <p><strong>🔥 Fonctionnalités mobiles :</strong></p>
+                                    <p>• Ajouter des lots rapidement</p>
+                                    <p>• Consulter vos profits en déplacement</p>
+                                    <p>• Mettre à jour les prix depuis l'HDV</p>
+                                </div>
+                            </div>
+                        </div>
+                        
+                        <!-- Question 8 -->
+                        <div class="bg-gray-700 rounded-lg overflow-hidden">
+                            <button class="w-full px-6 py-4 text-left flex justify-between items-center hover:bg-gray-600 transition-colors"
+                                    data-action="click->faq-accordion#toggle"
+                                    data-target="q8">
+                                <span class="text-white font-semibold">📦 Comment bien gérer mes lots de trading ?</span>
+                                <span class="text-gray-400 transform transition-transform" data-faq-accordion-target="icon">▼</span>
+                            </button>
+                            <div class="px-6 pb-4 hidden" data-faq-accordion-target="content" data-question="q8">
+                                <div class="text-gray-300 space-y-2">
+                                    <p><strong>✅ Bonnes pratiques :</strong></p>
+                                    <p>• Mettez à jour le statut dès qu'un lot est vendu</p>
+                                    <p>• Surveillez vos lots "dormants" (plus de 30 jours)</p>
+                                    <p>• Ajustez les prix selon l'évolution du marché</p>
+                                    <p>• Diversifiez vos lots pour réduire les risques</p>
+                                    <p class="text-blue-400">💡 Utilisez les filtres pour organiser vos lots par rentabilité !</p>
+                                </div>
+                            </div>
+                        </div>
+                        
+                        <!-- Question 9 -->
+                        <div class="bg-gray-700 rounded-lg overflow-hidden">
+                            <button class="w-full px-6 py-4 text-left flex justify-between items-center hover:bg-gray-600 transition-colors"
+                                    data-action="click->faq-accordion#toggle"
+                                    data-target="q9">
+                                <span class="text-white font-semibold">🤝 Puis-je partager mes données avec d'autres joueurs ?</span>
+                                <span class="text-gray-400 transform transition-transform" data-faq-accordion-target="icon">▼</span>
+                            </button>
+                            <div class="px-6 pb-4 hidden" data-faq-accordion-target="content" data-question="q9">
+                                <div class="text-gray-300 space-y-2">
+                                    <p><strong>🔒 Vos données sont privées</strong> par défaut pour protéger vos stratégies</p>
+                                    <p><strong>📊 Options de partage :</strong></p>
+                                    <p>• Export de vos statistiques générales (sans détails sensibles)</p>
+                                    <p>• Partage d'observations de prix via Market Watch</p>
+                                    <p>• Screenshots de vos performances pour motiver vos amis !</p>
+                                    <p class="text-yellow-400">💡 Conseil : Gardez vos meilleures stratégies secrètes !</p>
+                                </div>
+                            </div>
+                        </div>
+                        
+                        <!-- Question 10 -->
+                        <div class="bg-gray-700 rounded-lg overflow-hidden">
+                            <button class="w-full px-6 py-4 text-left flex justify-between items-center hover:bg-gray-600 transition-colors"
+                                    data-action="click->faq-accordion#toggle"
+                                    data-target="q10">
+                                <span class="text-white font-semibold">⚠️ Que faire si mes lots ne se vendent pas ?</span>
+                                <span class="text-gray-400 transform transition-transform" data-faq-accordion-target="icon">▼</span>
+                            </button>
+                            <div class="px-6 pb-4 hidden" data-faq-accordion-target="content" data-question="q10">
+                                <div class="text-gray-300 space-y-2">
+                                    <p><strong>🔍 Diagnostic :</strong></p>
+                                    <p>• Vérifiez si vos prix sont compétitifs sur l'HDV</p>
+                                    <p>• Consultez le Market Watch pour voir l'évolution</p>
+                                    <p>• Analysez la demande (item toujours populaire ?)</p>
+                                    <p><strong>💡 Solutions :</strong></p>
+                                    <p>• Baissez le prix de 10-15% pour écouler rapidement</p>
+                                    <p>• Changez l'unité de vente (x10 au lieu de x100)</p>
+                                    <p>• Attendez un événement qui relance la demande</p>
+                                    <p class="text-orange-400">⏰ Parfois il faut juste être patient !</p>
+                                </div>
+                            </div>
+                        </div>
+                        
+                        <!-- Question 11 -->
+                        <div class="bg-gray-700 rounded-lg overflow-hidden">
+                            <button class="w-full px-6 py-4 text-left flex justify-between items-center hover:bg-gray-600 transition-colors"
+                                    data-action="click->faq-accordion#toggle"
+                                    data-target="q11">
+                                <span class="text-white font-semibold">📊 Comment interpréter mes Analytics ?</span>
+                                <span class="text-gray-400 transform transition-transform" data-faq-accordion-target="icon">▼</span>
+                            </button>
+                            <div class="px-6 pb-4 hidden" data-faq-accordion-target="content" data-question="q11">
+                                <div class="text-gray-300 space-y-2">
+                                    <p><strong>🎯 Métriques prioritaires :</strong></p>
+                                    <p>• <strong>ROI :</strong> Votre rentabilité (visez +30% minimum)</p>
+                                    <p>• <strong>Taux de succès :</strong> % de lots vendus avec profit (visez +70%)</p>
+                                    <p>• <strong>Temps de vente :</strong> Rapidité d'écoulement des stocks</p>
+                                    <p><strong>📈 Tendances importantes :</strong></p>
+                                    <p>• Progression régulière > pics isolés</p>
+                                    <p>• Diversification des profits par item</p>
+                                    <p class="text-blue-400">💡 Consultez vos Analytics au moins une fois par semaine !</p>
+                                </div>
+                            </div>
+                        </div>
+                        
+                        <!-- Question 12 -->
+                        <div class="bg-gray-700 rounded-lg overflow-hidden">
+                            <button class="w-full px-6 py-4 text-left flex justify-between items-center hover:bg-gray-600 transition-colors"
+                                    data-action="click->faq-accordion#toggle"
+                                    data-target="q12">
+                                <span class="text-white font-semibold">📈 Mes profits stagnent, que faire ?</span>
+                                <span class="text-gray-400 transform transition-transform" data-faq-accordion-target="icon">▼</span>
+                            </button>
+                            <div class="px-6 pb-4 hidden" data-faq-accordion-target="content" data-question="q12">
+                                <div class="text-gray-300 space-y-2">
+                                    <p><strong>🔍 Diagnostic via Analytics :</strong></p>
+                                    <p>• Identifiez vos items les moins rentables</p>
+                                    <p>• Vérifiez si vous diversifiez assez</p>
+                                    <p>• Analysez les temps de vente trop longs</p>
+                                    <p><strong>💡 Actions correctives :</strong></p>
+                                    <p>• Éliminez les items peu performants</p>
+                                    <p>• Testez de nouveaux créneaux de marché</p>
+                                    <p>• Ajustez vos marges selon les Analytics</p>
+                                    <p>• Augmentez la fréquence de trading</p>
+                                    <p class="text-green-400">🚀 Les Analytics vous donnent la roadmap pour progresser !</p>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <!-- Section d'aide supplémentaire -->
+                    <div class="bg-blue-600 bg-opacity-20 border-l-4 border-blue-500 rounded-lg p-6 mt-8">
+                        <h2 class="text-white text-xl font-bold mb-3">🆘 Besoin d'aide supplémentaire ?</h2>
+                        <p class="text-blue-100 mb-4">Votre question n'est pas dans cette liste ?</p>
+                        <div class="space-y-2 text-blue-100">
+                            <p>• Consultez le <a href="{{ path('app_docs_trading_guide') }}" class="text-blue-300 hover:text-blue-200 underline">Guide Trading</a> pour des stratégies avancées</p>
+                            <p>• Relisez les <a href="{{ path('app_docs_getting_started') }}" class="text-blue-300 hover:text-blue-200 underline">Premier pas</a> si vous débutez</p>
+                            <p>• Contactez le support via le formulaire de contact</p>
                         </div>
                     </div>
                     

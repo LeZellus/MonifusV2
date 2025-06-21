@@ -12,21 +12,30 @@
             
             <!-- Contenu principal -->
             <div class="lg:col-span-3 wrapper-background">
-                <h1 class="text-white text-3xl font-bold mb-6">📊 Guide du Trading</h1>
+                <h1 class="text-white text-3xl font-bold mb-6">📊 Guide du Trading Avancé</h1>
                 
                 <div class="prose prose-invert max-w-none space-y-6">
                     <!-- Intro -->
                     <p class="text-gray-300 text-lg">
-                        Apprenez les bases du trading efficace avec Monifus et maximisez vos profits.
+                        Apprenez les stratégies avancées pour maximiser vos profits et devenir un trader efficace sur Dofus.
                     </p>
                     
-                    <!-- Section 1 -->
+                    <!-- Section 1 : Créer un lot optimisé -->
                     <div class="bg-green-600 bg-opacity-20 border-l-4 border-green-500 rounded-lg p-6">
-                        <h2 class="text-white text-xl font-bold mb-4">💰 Créer votre premier lot</h2>
-                        <div class="space-y-3 text-green-100">
-                            <p><strong>1. Choisissez un item</strong> - Commencez par des ressources populaires</p>
-                            <p><strong>2. Définissez vos prix</strong> - Prix d'achat réel + marge souhaitée</p>
-                            <p><strong>3. Configurez la quantité</strong> - Nombre de lots à trader</p>
+                        <h2 class="text-white text-xl font-bold mb-4">💰 Créer un lot optimisé</h2>
+                        <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+                            <div class="space-y-3 text-green-100">
+                                <h3 class="text-green-300 font-semibold">🎯 Choix de l'item</h3>
+                                <p>• <strong>Analysez la demande :</strong> Items utilisés dans les recettes populaires</p>
+                                <p>• <strong>Vérifiez le volume :</strong> Préférez les items avec beaucoup de transactions</p>
+                                <p>• <strong>Évitez la concurrence :</strong> Trop de vendeurs = profits réduits</p>
+                            </div>
+                            <div class="space-y-3 text-green-100">
+                                <h3 class="text-green-300 font-semibold">💡 Stratégie de prix</h3>
+                                <p>• <strong>Prix d'achat :</strong> Toujours noter le prix réel payé</p>
+                                <p>• <strong>Marge cible :</strong> 20-30% minimum pour couvrir les risques</p>
+                                <p>• <strong>Prix de vente :</strong> Légèrement sous le prix marché actuel</p>
+                            </div>
                         </div>
                         {% if app.user %}
                             <div class="mt-4">
@@ -37,13 +46,26 @@
                         {% endif %}
                     </div>
                     
-                    <!-- Section 2 -->
+                    <!-- Section 2 : Market Watch -->
                     <div class="bg-orange-600 bg-opacity-20 border-l-4 border-orange-500 rounded-lg p-6">
-                        <h2 class="text-white text-xl font-bold mb-4">👁️ Surveiller les prix</h2>
-                        <div class="space-y-3 text-orange-100">
-                            <p><strong>Observez régulièrement</strong> - Notez les prix sur l'HDV de votre serveur</p>
-                            <p><strong>Analysez les tendances</strong> - Identifiez les créneaux les plus rentables</p>
-                            <p><strong>Ajustez vos stratégies</strong> - Adaptez vos prix selon les fluctuations</p>
+                        <h2 class="text-white text-xl font-bold mb-4">👁️ Maîtriser le Market Watch</h2>
+                        <div class="space-y-4 text-orange-100">
+                            <div>
+                                <h3 class="text-orange-300 font-semibold mb-2">📈 Suivre les tendances</h3>
+                                <p>Le Market Watch vous permet de surveiller l'évolution des prix en temps réel. Utilisez-le pour :</p>
+                                <ul class="list-disc list-inside space-y-1 ml-4">
+                                    <li>Identifier les items en hausse de prix</li>
+                                    <li>Détecter les opportunités d'achat</li>
+                                    <li>Ajuster vos prix de vente</li>
+                                    <li>Planifier vos prochains investissements</li>
+                                </ul>
+                            </div>
+                            <div>
+                                <h3 class="text-orange-300 font-semibold mb-2">⏰ Fréquence de mise à jour</h3>
+                                <p>• <strong>Quotidien :</strong> Items à rotation rapide (consommables)</p>
+                                <p>• <strong>Hebdomadaire :</strong> Équipements et ressources stables</p>
+                                <p>• <strong>Événements :</strong> Surveillez les maj et événements spéciaux</p>
+                            </div>
                         </div>
                         {% if app.user %}
                             <div class="mt-4">
@@ -54,21 +76,163 @@
                         {% endif %}
                     </div>
                     
-                    <!-- Section 3 -->
+                    <!-- Section 3 : Stratégies avancées -->
                     <div class="bg-purple-600 bg-opacity-20 border-l-4 border-purple-500 rounded-lg p-6">
-                        <h2 class="text-white text-xl font-bold mb-4">📈 Optimiser vos profits</h2>
-                        <div class="space-y-3 text-purple-100">
-                            <p><strong>Suivez vos performances</strong> - Utilisez les analytics pour identifier les items les plus rentables</p>
-                            <p><strong>Diversifiez votre portefeuille</strong> - Ne misez pas tout sur un seul type d'item</p>
-                            <p><strong>Exportez vos données</strong> - Gardez un historique de vos meilleures stratégies</p>
+                        <h2 class="text-white text-xl font-bold mb-4">🧠 Stratégies avancées</h2>
+                        <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+                            <div class="space-y-3 text-purple-100">
+                                <h3 class="text-purple-300 font-semibold">🎪 Trading événementiel</h3>
+                                <p>• <strong>Avant l'événement :</strong> Stockez les items qui seront demandés</p>
+                                <p>• <strong>Pendant l'événement :</strong> Vendez rapidement au prix fort</p>
+                                <p>• <strong>Après l'événement :</strong> Rachetez à bas prix pour le suivant</p>
+                            </div>
+                            <div class="space-y-3 text-purple-100">
+                                <h3 class="text-purple-300 font-semibold">📦 Trading en lot</h3>
+                                <p>• <strong>Achats groupés :</strong> Négociez des remises sur de gros volumes</p>
+                                <p>• <strong>Ventes échelonnées :</strong> Vendez par petites quantités</p>
+                                <p>• <strong>Stock tampon :</strong> Gardez toujours une réserve stratégique</p>
+                            </div>
+                        </div>
+                        <div class="mt-4 p-4 bg-purple-800 bg-opacity-30 rounded-lg">
+                            <h3 class="text-purple-300 font-semibold mb-2">💎 Trading haute valeur</h3>
+                            <p class="text-purple-100">Pour les items coûteux (>1M kamas) : patience, recherche approfondie, et marges plus importantes (50%+) pour compenser les risques.</p>
+                        </div>
+                    </div>
+                    
+                    <!-- Section 4 : Analytics et optimisation -->
+                    <div class="bg-blue-600 bg-opacity-20 border-l-4 border-blue-500 rounded-lg p-6">
+                        <h2 class="text-white text-xl font-bold mb-4">📈 Optimiser avec les Analytics</h2>
+                        <div class="space-y-4 text-blue-100">
+                            <div>
+                                <h3 class="text-blue-300 font-semibold mb-2">📊 Métriques clés à suivre</h3>
+                                <div class="grid grid-cols-1 md:grid-cols-3 gap-4">
+                                    <div class="bg-blue-800 bg-opacity-30 p-3 rounded">
+                                        <h4 class="font-semibold text-blue-200">ROI (Return on Investment)</h4>
+                                        <p class="text-sm">Profit / Capital investi × 100</p>
+                                    </div>
+                                    <div class="bg-blue-800 bg-opacity-30 p-3 rounded">
+                                        <h4 class="font-semibold text-blue-200">Taux de rotation</h4>
+                                        <p class="text-sm">Fréquence de vente de vos lots</p>
+                                    </div>
+                                    <div class="bg-blue-800 bg-opacity-30 p-3 rounded">
+                                        <h4 class="font-semibold text-blue-200">Items les plus rentables</h4>
+                                        <p class="text-sm">Concentrez vos efforts dessus</p>
+                                    </div>
+                                </div>
+                            </div>
+                            <div>
+                                <h3 class="text-blue-300 font-semibold mb-2">🎯 Actions d'optimisation</h3>
+                                <p>• <strong>Éliminez</strong> les items peu rentables de votre portefeuille</p>
+                                <p>• <strong>Augmentez</strong> la part des items performants</p>
+                                <p>• <strong>Testez</strong> de nouveaux créneaux avec de petites sommes</p>
+                                <p>• <strong>Ajustez</strong> vos marges selon les performances</p>
+                            </div>
                         </div>
                         {% if app.user %}
                             <div class="mt-4">
-                                <a href="{{ path('app_analytics_index') }}" class="btn btn-purple">
+                                <a href="{{ path('app_analytics_index') }}" class="btn btn-info">
                                     📊 Voir mes analytics
                                 </a>
                             </div>
                         {% endif %}
+                    </div>
+                    
+                    <!-- Section 5 : Gestion des risques -->
+                    <div class="bg-red-600 bg-opacity-20 border-l-4 border-red-500 rounded-lg p-6">
+                        <h2 class="text-white text-xl font-bold mb-4">⚠️ Gestion des risques</h2>
+                        <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+                            <div class="space-y-3 text-red-100">
+                                <h3 class="text-red-300 font-semibold">🛡️ Règles de sécurité</h3>
+                                <p>• <strong>Règle des 10% :</strong> Max 10% du capital sur un seul trade</p>
+                                <p>• <strong>Diversification :</strong> 5-10 items différents minimum</p>
+                                <p>• <strong>Capital d'urgence :</strong> Gardez 20% en liquide</p>
+                                <p>• <strong>Stop-loss mental :</strong> Fixez vos limites de perte</p>
+                            </div>
+                            <div class="space-y-3 text-red-100">
+                                <h3 class="text-red-300 font-semibold">🚨 Signaux d'alarme</h3>
+                                <p>• <strong>Baisse soudaine :</strong> Item qui ne se vend plus</p>
+                                <p>• <strong>Concurrence accrue :</strong> Trop de vendeurs au même prix</p>
+                                <p>• <strong>Changement de méta :</strong> Nerf/buff d'items ou sorts</p>
+                                <p>• <strong>Saturation du marché :</strong> Offre > demande</p>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <!-- Section 6 : Conseils de pro -->
+                    <div class="bg-yellow-600 bg-opacity-20 border-l-4 border-yellow-500 rounded-lg p-6">
+                        <h2 class="text-white text-xl font-bold mb-4">🏆 Conseils de traders expérimentés</h2>
+                        <div class="space-y-4 text-yellow-100">
+                            <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+                                <div class="bg-yellow-800 bg-opacity-30 p-4 rounded-lg">
+                                    <h3 class="text-yellow-300 font-semibold mb-2">⏰ Timing optimal</h3>
+                                    <p>• <strong>18h-22h :</strong> Heures de pointe, plus d'acheteurs</p>
+                                    <p>• <strong>Weekend :</strong> Période idéale pour vendre</p>
+                                    <p>• <strong>Fin de mois :</strong> Les joueurs renouvellent leurs abos</p>
+                                </div>
+                                <div class="bg-yellow-800 bg-opacity-30 p-4 rounded-lg">
+                                    <h3 class="text-yellow-300 font-semibold mb-2">🎭 Psychologie de vente</h3>
+                                    <p>• <strong>Prix psychologiques :</strong> 99k au lieu de 100k</p>
+                                    <p>• <strong>Quantités attractives :</strong> Lots ronds (x10, x100)</p>
+                                    <p>• <strong>Positionnement :</strong> Soyez le moins cher visible</p>
+                                </div>
+                            </div>
+                            <div class="bg-yellow-800 bg-opacity-30 p-4 rounded-lg">
+                                <h3 class="text-yellow-300 font-semibold mb-2">🤝 Réseau et information</h3>
+                                <p>• <strong>Discord communautaires :</strong> Restez informé des tendances</p>
+                                <p>• <strong>Suivez les streamers :</strong> Ils influencent les prix</p>
+                                <p>• <strong>Changelog Ankama :</strong> Anticipez les changements</p>
+                                <p>• <strong>Calendrier événements :</strong> Préparez-vous à l'avance</p>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <!-- Checklist du trader -->
+                    <div class="bg-gray-700 rounded-lg p-6">
+                        <h2 class="text-white text-xl font-bold mb-4">✅ Checklist du trader quotidien</h2>
+                        <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+                            <div>
+                                <h3 class="text-green-400 font-semibold mb-3">🌅 Routine matinale</h3>
+                                <div class="space-y-2 text-gray-300">
+                                    <label class="flex items-center">
+                                        <input type="checkbox" class="mr-2" disabled>
+                                        Vérifier les lots vendus pendant la nuit
+                                    </label>
+                                    <label class="flex items-center">
+                                        <input type="checkbox" class="mr-2" disabled>
+                                        Mettre à jour les prix d'observation
+                                    </label>
+                                    <label class="flex items-center">
+                                        <input type="checkbox" class="mr-2" disabled>
+                                        Consulter le changelog et les news
+                                    </label>
+                                    <label class="flex items-center">
+                                        <input type="checkbox" class="mr-2" disabled>
+                                        Planifier les achats de la journée
+                                    </label>
+                                </div>
+                            </div>
+                            <div>
+                                <h3 class="text-orange-400 font-semibold mb-3">🌆 Routine du soir</h3>
+                                <div class="space-y-2 text-gray-300">
+                                    <label class="flex items-center">
+                                        <input type="checkbox" class="mr-2" disabled>
+                                        Noter tous les achats/ventes du jour
+                                    </label>
+                                    <label class="flex items-center">
+                                        <input type="checkbox" class="mr-2" disabled>
+                                        Analyser les performances
+                                    </label>
+                                    <label class="flex items-center">
+                                        <input type="checkbox" class="mr-2" disabled>
+                                        Mettre à jour les lots à renouveler
+                                    </label>
+                                    <label class="flex items-center">
+                                        <input type="checkbox" class="mr-2" disabled>
+                                        Exporter une sauvegarde
+                                    </label>
+                                </div>
+                            </div>
+                        </div>
                     </div>
                     
                     <!-- Navigation entre pages -->

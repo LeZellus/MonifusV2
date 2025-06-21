@@ -1,0 +1,338 @@
+{% extends 'base.html.twig' %}
+
+{% block title %}Analytics - Documentation{% endblock %}
+
+{% block body %}
+    <div class="wrapper-container">
+        <div class="grid grid-cols-1 lg:grid-cols-4 gap-8">
+            <!-- Sidebar -->
+            <div class="wrapper-background">
+                {% include 'docs/_sidebar.html.twig' %}
+            </div>
+            
+            <!-- Contenu principal -->
+            <div class="lg:col-span-3 wrapper-background">
+                <h1 class="text-white text-3xl font-bold mb-6">📊 Analytics - Analysez vos performances</h1>
+                
+                <div class="prose prose-invert max-w-none space-y-6">
+                    <!-- Intro -->
+                    <p class="text-gray-300 text-lg">
+                        Les Analytics vous donnent une vision claire de vos performances de trading pour optimiser vos stratégies et maximiser vos profits.
+                    </p>
+                    
+                    <!-- Section 1 : Vue d'ensemble -->
+                    <div class="bg-blue-600 bg-opacity-20 border-l-4 border-blue-500 rounded-lg p-6">
+                        <h2 class="text-white text-xl font-bold mb-4">📈 Vue d'ensemble des Analytics</h2>
+                        <div class="space-y-4 text-blue-100">
+                            <p>Les Analytics transforment vos données de trading en insights actionables :</p>
+                            <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+                                <div class="bg-blue-800 bg-opacity-30 p-4 rounded-lg">
+                                    <h3 class="text-blue-300 font-semibold mb-2">📊 Métriques principales</h3>
+                                    <p>• <strong>Profit total :</strong> Gains nets sur la période</p>
+                                    <p>• <strong>ROI :</strong> Retour sur investissement</p>
+                                    <p>• <strong>Capital investi :</strong> Somme totale investie</p>
+                                    <p>• <strong>Nombre de trades :</strong> Volume d'activité</p>
+                                </div>
+                                <div class="bg-blue-800 bg-opacity-30 p-4 rounded-lg">
+                                    <h3 class="text-blue-300 font-semibold mb-2">📅 Analyses temporelles</h3>
+                                    <p>• <strong>Évolution quotidienne :</strong> Tendances jour par jour</p>
+                                    <p>• <strong>Performance mensuelle :</strong> Cycles de trading</p>
+                                    <p>• <strong>Comparaisons :</strong> Mois vs mois, semaine vs semaine</p>
+                                    <p>• <strong>Saisonnalité :</strong> Patterns récurrents</p>
+                                </div>
+                            </div>
+                        </div>
+                        {% if app.user %}
+                            <div class="mt-4">
+                                <a href="{{ path('app_analytics_index') }}" class="btn btn-info">
+                                    📊 Voir mes analytics
+                                </a>
+                            </div>
+                        {% endif %}
+                    </div>
+                    
+                    <!-- Section 2 : Graphiques et visualisations -->
+                    <div class="bg-green-600 bg-opacity-20 border-l-4 border-green-500 rounded-lg p-6">
+                        <h2 class="text-white text-xl font-bold mb-4">📈 Graphiques et visualisations</h2>
+                        <div class="space-y-4 text-green-100">
+                            <h3 class="text-green-300 font-semibold mb-3">📊 Types de graphiques disponibles</h3>
+                            <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+                                <div>
+                                    <h4 class="text-green-300 font-semibold mb-2">📈 Graphique de profits</h4>
+                                    <p>Visualisez l'évolution de vos gains dans le temps :</p>
+                                    <ul class="list-disc list-inside space-y-1 ml-4">
+                                        <li>Courbe de profit cumulé</li>
+                                        <li>Profits par jour/semaine/mois</li>
+                                        <li>Tendances haussières/baissières</li>
+                                        <li>Identification des pics de performance</li>
+                                    </ul>
+                                </div>
+                                <div>
+                                    <h4 class="text-green-300 font-semibold mb-2">🎯 Analyse par items</h4>
+                                    <p>Identifiez vos items les plus rentables :</p>
+                                    <ul class="list-disc list-inside space-y-1 ml-4">
+                                        <li>Top 10 des items les plus profitables</li>
+                                        <li>Répartition des profits par catégorie</li>
+                                        <li>Taux de rotation par item</li>
+                                        <li>Marges moyennes par type d'item</li>
+                                    </ul>
+                                </div>
+                            </div>
+                            <div class="bg-green-800 bg-opacity-30 p-4 rounded-lg">
+                                <h4 class="text-green-300 font-semibold mb-2">📊 Dashboard interactif</h4>
+                                <p>Interface moderne avec :</p>
+                                <div class="grid grid-cols-1 md:grid-cols-3 gap-4 mt-3">
+                                    <div class="text-center">
+                                        <div class="text-2xl mb-1">🔍</div>
+                                        <div class="font-semibold">Filtres avancés</div>
+                                        <div class="text-sm">Par date, item, personnage</div>
+                                    </div>
+                                    <div class="text-center">
+                                        <div class="text-2xl mb-1">📱</div>
+                                        <div class="font-semibold">Responsive</div>
+                                        <div class="text-sm">Adapté mobile/desktop</div>
+                                    </div>
+                                    <div class="text-center">
+                                        <div class="text-2xl mb-1">📤</div>
+                                        <div class="font-semibold">Export</div>
+                                        <div class="text-sm">PDF, Excel, images</div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <!-- Section 3 : KPIs et métriques -->
+                    <div class="bg-purple-600 bg-opacity-20 border-l-4 border-purple-500 rounded-lg p-6">
+                        <h2 class="text-white text-xl font-bold mb-4">🎯 KPIs et métriques clés</h2>
+                        <div class="space-y-4 text-purple-100">
+                            <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+                                <div>
+                                    <h3 class="text-purple-300 font-semibold mb-3">💰 Métriques financières</h3>
+                                    <div class="space-y-2">
+                                        <p>• <strong>Profit brut :</strong> Gains avant déduction des coûts</p>
+                                        <p>• <strong>Profit net :</strong> Gains réels après tous les coûts</p>
+                                        <p>• <strong>ROI moyen :</strong> Rentabilité moyenne par trade</p>
+                                        <p>• <strong>Capital utilisé :</strong> % de budget investi</p>
+                                        <p>• <strong>Profit par kama investi :</strong> Efficacité du capital</p>
+                                    </div>
+                                </div>
+                                <div>
+                                    <h3 class="text-purple-300 font-semibold mb-3">⚡ Métriques opérationnelles</h3>
+                                    <div class="space-y-2">
+                                        <p>• <strong>Taux de succès :</strong> % de lots vendus avec profit</p>
+                                        <p>• <strong>Temps moyen de vente :</strong> Durée entre création et vente</p>
+                                        <p>• <strong>Volume de trading :</strong> Nombre de transactions</p>
+                                        <p>• <strong>Diversification :</strong> Nombre d'items différents</p>
+                                        <p>• <strong>Régularité :</strong> Constance dans les profits</p>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="bg-purple-800 bg-opacity-30 p-4 rounded-lg">
+                                <h3 class="text-purple-300 font-semibold mb-2">🏆 Benchmarks de performance</h3>
+                                <div class="grid grid-cols-1 md:grid-cols-3 gap-4">
+                                    <div class="text-center p-3 bg-green-600 bg-opacity-30 rounded">
+                                        <div class="text-green-400 font-bold">Excellent</div>
+                                        <div class="text-sm">ROI > 50%</div>
+                                        <div class="text-sm">Taux succès > 80%</div>
+                                    </div>
+                                    <div class="text-center p-3 bg-yellow-600 bg-opacity-30 rounded">
+                                        <div class="text-yellow-400 font-bold">Bon</div>
+                                        <div class="text-sm">ROI 25-50%</div>
+                                        <div class="text-sm">Taux succès 60-80%</div>
+                                    </div>
+                                    <div class="text-center p-3 bg-red-600 bg-opacity-30 rounded">
+                                        <div class="text-red-400 font-bold">À améliorer</div>
+                                        <div class="text-sm">ROI < 25%</div>
+                                        <div class="text-sm">Taux succès < 60%</div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <!-- Section 4 : Analyses prédictives -->
+                    <div class="bg-orange-600 bg-opacity-20 border-l-4 border-orange-500 rounded-lg p-6">
+                        <h2 class="text-white text-xl font-bold mb-4">🔮 Analyses prédictives et recommandations</h2>
+                        <div class="space-y-4 text-orange-100">
+                            <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+                                <div>
+                                    <h3 class="text-orange-300 font-semibold mb-3">🎯 Recommandations automatiques</h3>
+                                    <div class="space-y-2">
+                                        <p>• <strong>Items à privilégier :</strong> Basé sur vos performances</p>
+                                        <p>• <strong>Prix optimaux :</strong> Suggère les meilleures marges</p>
+                                        <p>• <strong>Timing de vente :</strong> Meilleurs moments pour vendre</p>
+                                        <p>• <strong>Diversification :</strong> Nouveaux items à essayer</p>
+                                    </div>
+                                </div>
+                                <div>
+                                    <h3 class="text-orange-300 font-semibold mb-3">📊 Projections</h3>
+                                    <div class="space-y-2">
+                                        <p>• <strong>Profit mensuel estimé :</strong> Basé sur la tendance actuelle</p>
+                                        <p>• <strong>Objectifs atteignables :</strong> Cibles réalistes</p>
+                                        <p>• <strong>Temps pour objectif :</strong> Durée estimée</p>
+                                        <p>• <strong>Scénarios :</strong> Optimiste, réaliste, pessimiste</p>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="bg-orange-800 bg-opacity-30 p-4 rounded-lg">
+                                <h3 class="text-orange-300 font-semibold mb-2">🚨 Alertes intelligentes</h3>
+                                <p>Le système vous prévient automatiquement :</p>
+                                <div class="grid grid-cols-1 md:grid-cols-2 gap-4 mt-3">
+                                    <div>
+                                        <h4 class="font-semibold text-red-400">⚠️ Alertes de risque</h4>
+                                        <p class="text-sm">• Baisse soudaine de performance</p>
+                                        <p class="text-sm">• Lots qui stagnent trop longtemps</p>
+                                        <p class="text-sm">• Concentration excessive sur un item</p>
+                                    </div>
+                                    <div>
+                                        <h4 class="font-semibold text-green-400">💡 Opportunités</h4>
+                                        <p class="text-sm">• Items en forte progression</p>
+                                        <p class="text-sm">• Créneaux de marché inexploités</p>
+                                        <p class="text-sm">• Moments favorables pour trader</p>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <!-- Section 5 : Rapports et exports -->
+                    <div class="bg-yellow-600 bg-opacity-20 border-l-4 border-yellow-500 rounded-lg p-6">
+                        <h2 class="text-white text-xl font-bold mb-4">📋 Rapports et exports</h2>
+                        <div class="space-y-4 text-yellow-100">
+                            <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+                                <div>
+                                    <h3 class="text-yellow-300 font-semibold mb-3">📄 Types de rapports</h3>
+                                    <div class="space-y-2">
+                                        <p>• <strong>Rapport hebdomadaire :</strong> Synthèse de la semaine</p>
+                                        <p>• <strong>Rapport mensuel :</strong> Bilan complet du mois</p>
+                                        <p>• <strong>Rapport annuel :</strong> Vue d'ensemble de l'année</p>
+                                        <p>• <strong>Rapport personnalisé :</strong> Période au choix</p>
+                                    </div>
+                                </div>
+                                <div>
+                                    <h3 class="text-yellow-300 font-semibold mb-3">📤 Formats d'export</h3>
+                                    <div class="space-y-2">
+                                        <p>• <strong>PDF :</strong> Rapport professionnel imprimable</p>
+                                        <p>• <strong>Excel :</strong> Données détaillées analysables</p>
+                                        <p>• <strong>CSV :</strong> Données brutes pour autres outils</p>
+                                        <p>• <strong>Images :</strong> Graphiques haute résolution</p>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="bg-yellow-800 bg-opacity-30 p-4 rounded-lg">
+                                <h3 class="text-yellow-300 font-semibold mb-3">🔄 Automatisation</h3>
+                                <div class="grid grid-cols-1 md:grid-cols-3 gap-4">
+                                    <div class="text-center p-3 bg-blue-600 bg-opacity-30 rounded">
+                                        <div class="text-2xl mb-2">📧</div>
+                                        <div class="font-semibold">Email automatique</div>
+                                        <div class="text-sm">Rapports envoyés régulièrement</div>
+                                    </div>
+                                    <div class="text-center p-3 bg-green-600 bg-opacity-30 rounded">
+                                        <div class="text-2xl mb-2">🔔</div>
+                                        <div class="font-semibold">Notifications</div>
+                                        <div class="text-sm">Alertes en temps réel</div>
+                                    </div>
+                                    <div class="text-center p-3 bg-purple-600 bg-opacity-30 rounded">
+                                        <div class="text-2xl mb-2">📊</div>
+                                        <div class="font-semibold">Dashboard live</div>
+                                        <div class="text-sm">Mise à jour continue</div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <!-- Section 6 : Conseils d'utilisation -->
+                    <div class="bg-red-600 bg-opacity-20 border-l-4 border-red-500 rounded-lg p-6">
+                        <h2 class="text-white text-xl font-bold mb-4">💡 Conseils pour optimiser l'utilisation des Analytics</h2>
+                        <div class="space-y-4 text-red-100">
+                            <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+                                <div>
+                                    <h3 class="text-red-300 font-semibold mb-3">📊 Bonnes pratiques</h3>
+                                    <div class="space-y-2">
+                                        <p>• <strong>Consultez régulièrement :</strong> Au moins une fois par semaine</p>
+                                        <p>• <strong>Analysez les tendances :</strong> Pas seulement les chiffres</p>
+                                        <p>• <strong>Comparez les périodes :</strong> Identifiez les patterns</p>
+                                        <p>• <strong>Agissez sur les insights :</strong> Données → décisions</p>
+                                    </div>
+                                </div>
+                                <div>
+                                    <h3 class="text-red-300 font-semibold mb-3">🎯 Focus sur l'important</h3>
+                                    <div class="space-y-2">
+                                        <p>• <strong>ROI avant volume :</strong> Privilégiez la rentabilité</p>
+                                        <p>• <strong>Tendances long terme :</strong> Ignorez les fluctuations</p>
+                                        <p>• <strong>Top performers :</strong> Concentrez-vous dessus</p>
+                                        <p>• <strong>Amélioration continue :</strong> Petit pas réguliers</p>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="bg-red-800 bg-opacity-30 p-4 rounded-lg">
+                                <h3 class="text-red-300 font-semibold mb-3">⚠️ Pièges à éviter</h3>
+                                <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+                                    <div>
+                                        <h4 class="font-semibold text-orange-400">🚫 À ne pas faire</h4>
+                                        <div class="space-y-1 text-sm">
+                                            <p>× Changer de stratégie à chaque baisse</p>
+                                            <p>× Se focaliser uniquement sur le profit total</p>
+                                            <p>× Ignorer les métriques de risque</p>
+                                            <p>× Comparer avec d'autres sans contexte</p>
+                                        </div>
+                                    </div>
+                                    <div>
+                                        <h4 class="font-semibold text-green-400">✅ À privilégier</h4>
+                                        <div class="space-y-1 text-sm">
+                                            <p>✓ Analyser sur le long terme</p>
+                                            <p>✓ Équilibrer profit et stabilité</p>
+                                            <p>✓ Utiliser plusieurs métriques</p>
+                                            <p>✓ Tester avant de généraliser</p>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <!-- Ressources complémentaires -->
+                    <div class="bg-indigo-600 bg-opacity-20 border-l-4 border-indigo-500 rounded-lg p-6">
+                        <h2 class="text-white text-xl font-bold mb-4">📚 Ressources complémentaires</h2>
+                        <div class="space-y-4 text-indigo-100">
+                            <p>Pour tirer le maximum de vos Analytics :</p>
+                            <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+                                <div class="space-y-2">
+                                    <h3 class="text-indigo-300 font-semibold">📖 Documentation connexe</h3>
+                                    <p>• <a href="{{ path('app_docs_lots') }}" class="text-indigo-300 hover:text-indigo-200 underline">Gestion des Lots</a> - Optimisez vos trades</p>
+                                    <p>• <a href="{{ path('app_docs_trading_guide') }}" class="text-indigo-300 hover:text-indigo-200 underline">Guide Trading</a> - Stratégies avancées</p>
+                                    <p>• <a href="{{ path('app_docs_market_watch') }}" class="text-indigo-300 hover:text-indigo-200 underline">Market Watch</a> - Surveillance des prix</p>
+                                </div>
+                                <div class="space-y-2">
+                                    <h3 class="text-indigo-300 font-semibold">🛠️ Outils pratiques</h3>
+                                    {% if app.user %}
+                                        <p>• <a href="{{ path('app_analytics_index') }}" class="text-indigo-300 hover:text-indigo-200 underline">Dashboard Analytics</a> - Vos performances</p>
+                                        <p>• <a href="{{ path('app_trading_dashboard') }}" class="text-indigo-300 hover:text-indigo-200 underline">Dashboard Trading</a> - Vue d'ensemble</p>
+                                        <p>• <a href="{{ path('app_lot_index') }}" class="text-indigo-300 hover:text-indigo-200 underline">Mes lots</a> - Gérer votre portefeuille</p>
+                                    {% else %}
+                                        <p>• Connectez-vous pour accéder aux Analytics</p>
+                                    {% endif %}
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <!-- Navigation -->
+                    <div class="flex justify-between items-center pt-8 border-t border-gray-700">
+                        <a href="{{ path('app_docs_lots') }}" 
+                           class="btn btn-secondary">
+                            ← Gestion des Lots
+                        </a>
+                        
+                        <a href="{{ path('app_docs_faq') }}" 
+                           class="btn btn-primary">
+                            FAQ →
+                        </a>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+{% endblock %}

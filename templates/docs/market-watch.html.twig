@@ -1,0 +1,329 @@
+{% extends 'base.html.twig' %}
+
+{% block title %}Market Watch - Documentation{% endblock %}
+
+{% block body %}
+    <div class="wrapper-container">
+        <div class="grid grid-cols-1 lg:grid-cols-4 gap-8">
+            <!-- Sidebar -->
+            <div class="wrapper-background">
+                {% include 'docs/_sidebar.html.twig' %}
+            </div>
+            
+            <!-- Contenu principal -->
+            <div class="lg:col-span-3 wrapper-background">
+                <h1 class="text-white text-3xl font-bold mb-6">👁️ Market Watch - Surveillance des prix</h1>
+                
+                <div class="prose prose-invert max-w-none space-y-6">
+                    <!-- Intro -->
+                    <p class="text-gray-300 text-lg">
+                        Le Market Watch vous permet de surveiller l'évolution des prix des items sur l'hôtel de vente et d'identifier les meilleures opportunités de trading.
+                    </p>
+                    
+                    <!-- Section 1 : Qu'est-ce que le Market Watch -->
+                    <div class="bg-blue-600 bg-opacity-20 border-l-4 border-blue-500 rounded-lg p-6">
+                        <h2 class="text-white text-xl font-bold mb-4">🤔 Qu'est-ce que le Market Watch ?</h2>
+                        <div class="space-y-4 text-blue-100">
+                            <p>Le Market Watch est votre outil de surveillance des prix du marché. Il vous permet de :</p>
+                            <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+                                <div class="bg-blue-800 bg-opacity-30 p-4 rounded-lg">
+                                    <h3 class="text-blue-300 font-semibold mb-2">📊 Suivre les tendances</h3>
+                                    <p>Observez l'évolution des prix dans le temps pour anticiper les fluctuations</p>
+                                </div>
+                                <div class="bg-blue-800 bg-opacity-30 p-4 rounded-lg">
+                                    <h3 class="text-blue-300 font-semibold mb-2">💰 Identifier les opportunités</h3>
+                                    <p>Détectez quand acheter ou vendre pour maximiser vos profits</p>
+                                </div>
+                                <div class="bg-blue-800 bg-opacity-30 p-4 rounded-lg">
+                                    <h3 class="text-blue-300 font-semibold mb-2">⏰ Optimiser le timing</h3>
+                                    <p>Trouvez les meilleurs moments pour vos transactions</p>
+                                </div>
+                                <div class="bg-blue-800 bg-opacity-30 p-4 rounded-lg">
+                                    <h3 class="text-blue-300 font-semibold mb-2">📈 Planifier vos trades</h3>
+                                    <p>Préparez vos stratégies en fonction des données historiques</p>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <!-- Section 2 : Comment créer une observation -->
+                    <div class="bg-green-600 bg-opacity-20 border-l-4 border-green-500 rounded-lg p-6">
+                        <h2 class="text-white text-xl font-bold mb-4">➕ Créer une nouvelle observation</h2>
+                        <div class="space-y-4 text-green-100">
+                            <h3 class="text-green-300 font-semibold mb-3">📝 Étapes pour observer un item</h3>
+                            <div class="space-y-3">
+                                <div class="flex items-start space-x-3">
+                                    <span class="bg-green-500 text-white rounded-full w-6 h-6 flex items-center justify-center text-sm font-bold">1</span>
+                                    <div>
+                                        <p><strong>Recherchez l'item</strong> - Utilisez la barre de recherche pour trouver l'item à observer</p>
+                                    </div>
+                                </div>
+                                <div class="flex items-start space-x-3">
+                                    <span class="bg-green-500 text-white rounded-full w-6 h-6 flex items-center justify-center text-sm font-bold">2</span>
+                                    <div>
+                                        <p><strong>Notez les prix</strong> - Relevez les prix sur l'HDV de votre serveur :</p>
+                                        <ul class="list-disc list-inside ml-4 space-y-1">
+                                            <li><strong>Prix x1 :</strong> Prix pour 1 unité</li>
+                                            <li><strong>Prix x10 :</strong> Prix pour 10 unités (souvent avec remise)</li>
+                                            <li><strong>Prix x100 :</strong> Prix pour 100 unités (remise plus importante)</li>
+                                        </ul>
+                                    </div>
+                                </div>
+                                <div class="flex items-start space-x-3">
+                                    <span class="bg-green-500 text-white rounded-full w-6 h-6 flex items-center justify-center text-sm font-bold">3</span>
+                                    <div>
+                                        <p><strong>Sauvegardez l'observation</strong> - L'observation est automatiquement datée et horodatée</p>
+                                    </div>
+                                </div>
+                            </div>
+                            {% if app.user %}
+                                <div class="mt-4">
+                                    <a href="{{ path('app_market_watch_new') }}" class="btn btn-success">
+                                        ➕ Créer ma première observation
+                                    </a>
+                                </div>
+                            {% endif %}
+                        </div>
+                    </div>
+                    
+                    <!-- Section 3 : Comprendre les données -->
+                    <div class="bg-purple-600 bg-opacity-20 border-l-4 border-purple-500 rounded-lg p-6">
+                        <h2 class="text-white text-xl font-bold mb-4">📊 Comprendre les données de prix</h2>
+                        <div class="space-y-4 text-purple-100">
+                            <div class="grid grid-cols-1 md:grid-cols-3 gap-4">
+                                <div class="bg-purple-800 bg-opacity-30 p-4 rounded-lg text-center">
+                                    <div class="text-green-400 text-2xl font-bold mb-2">Prix x1</div>
+                                    <div class="text-sm">Prix unitaire</div>
+                                    <div class="text-xs text-purple-300 mt-2">Base de calcul pour les marges</div>
+                                </div>
+                                <div class="bg-purple-800 bg-opacity-30 p-4 rounded-lg text-center">
+                                    <div class="text-blue-400 text-2xl font-bold mb-2">Prix x10</div>
+                                    <div class="text-sm">Prix pour 10 unités</div>
+                                    <div class="text-xs text-purple-300 mt-2">Souvent plus avantageux</div>
+                                </div>
+                                <div class="bg-purple-800 bg-opacity-30 p-4 rounded-lg text-center">
+                                    <div class="text-orange-400 text-2xl font-bold mb-2">Prix x100</div>
+                                    <div class="text-sm">Prix pour 100 unités</div>
+                                    <div class="text-xs text-purple-300 mt-2">Meilleur prix unitaire</div>
+                                </div>
+                            </div>
+                            <div class="bg-purple-800 bg-opacity-30 p-4 rounded-lg">
+                                <h3 class="text-purple-300 font-semibold mb-2">💡 Conseils d'interprétation</h3>
+                                <p>• <strong>Écart de prix :</strong> Plus l'écart entre x1 et x100 est important, plus il y a d'opportunités</p>
+                                <p>• <strong>Évolution temporelle :</strong> Comparez avec vos observations précédentes</p>
+                                <p>• <strong>Tendances :</strong> Identifiez si les prix montent, descendent ou stagnent</p>
+                                <p>• <strong>Opportunités :</strong> Achetez en x100 et revendez en x1 pour maximiser les profits</p>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <!-- Section 4 : Stratégies d'observation -->
+                    <div class="bg-orange-600 bg-opacity-20 border-l-4 border-orange-500 rounded-lg p-6">
+                        <h2 class="text-white text-xl font-bold mb-4">🎯 Stratégies d'observation efficaces</h2>
+                        <div class="space-y-4 text-orange-100">
+                            <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+                                <div>
+                                    <h3 class="text-orange-300 font-semibold mb-3">⏰ Fréquence d'observation</h3>
+                                    <div class="space-y-2">
+                                        <p>• <strong>Items volatils :</strong> Quotidienne (consommables, événements)</p>
+                                        <p>• <strong>Ressources stables :</strong> 2-3 fois par semaine</p>
+                                        <p>• <strong>Équipements :</strong> Hebdomadaire</p>
+                                        <p>• <strong>Items saisonniers :</strong> Avant/pendant/après événements</p>
+                                    </div>
+                                </div>
+                                <div>
+                                    <h3 class="text-orange-300 font-semibold mb-3">🎪 Moments clés</h3>
+                                    <div class="space-y-2">
+                                        <p>• <strong>Mises à jour :</strong> Surveillez après chaque patch</p>
+                                        <p>• <strong>Événements :</strong> Avant, pendant et après</p>
+                                        <p>• <strong>Weekends :</strong> Plus d'activité = prix différents</p>
+                                        <p>• <strong>Fin de mois :</strong> Renouvellement des abos</p>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="bg-orange-800 bg-opacity-30 p-4 rounded-lg">
+                                <h3 class="text-orange-300 font-semibold mb-2">📋 Checklist d'observation</h3>
+                                <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+                                    <div>
+                                        <h4 class="font-semibold mb-2">🔍 Avant d'observer</h4>
+                                        <p>• Vérifiez l'heure (heures de pointe vs calmes)</p>
+                                        <p>• Notez les événements en cours</p>
+                                        <p>• Consultez les news/changements récents</p>
+                                    </div>
+                                    <div>
+                                        <h4 class="font-semibold mb-2">✍️ Pendant l'observation</h4>
+                                        <p>• Notez tous les prix disponibles</p>
+                                        <p>• Observez la quantité disponible</p>
+                                        <p>• Regardez la concurrence</p>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                        {% if app.user %}
+                            <div class="mt-4">
+                                <a href="{{ path('app_market_watch_index') }}" class="btn btn-warning">
+                                    👁️ Voir mes observations
+                                </a>
+                            </div>
+                        {% endif %}
+                    </div>
+                    
+                    <!-- Section 5 : Exemples pratiques -->
+                    <div class="bg-yellow-600 bg-opacity-20 border-l-4 border-yellow-500 rounded-lg p-6">
+                        <h2 class="text-white text-xl font-bold mb-4">💡 Exemples pratiques d'utilisation</h2>
+                        <div class="space-y-4 text-yellow-100">
+                            <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+                                <div class="bg-yellow-800 bg-opacity-30 p-4 rounded-lg">
+                                    <h3 class="text-yellow-300 font-semibold mb-3">📈 Cas d'usage : Blé</h3>
+                                    <div class="space-y-2 text-sm">
+                                        <p><strong>Lundi :</strong> x1 = 2k, x10 = 18k, x100 = 170k</p>
+                                        <p><strong>Mercredi :</strong> x1 = 2.2k, x10 = 20k, x100 = 185k</p>
+                                        <p><strong>Vendredi :</strong> x1 = 2.5k, x10 = 22k, x100 = 200k</p>
+                                        <p class="text-green-400"><strong>📊 Analyse :</strong> Tendance haussière (+25% en une semaine)</p>
+                                        <p class="text-green-400"><strong>💰 Action :</strong> Vendre maintenant ou attendre la stabilisation</p>
+                                    </div>
+                                </div>
+                                <div class="bg-yellow-800 bg-opacity-30 p-4 rounded-lg">
+                                    <h3 class="text-yellow-300 font-semibold mb-3">📉 Cas d'usage : Minerai de Fer</h3>
+                                    <div class="space-y-2 text-sm">
+                                        <p><strong>Lundi :</strong> x1 = 5k, x10 = 45k, x100 = 400k</p>
+                                        <p><strong>Mercredi :</strong> x1 = 4.5k, x10 = 42k, x100 = 380k</p>
+                                        <p><strong>Vendredi :</strong> x1 = 4k, x10 = 38k, x100 = 350k</p>
+                                        <p class="text-red-400"><strong>📊 Analyse :</strong> Tendance baissière (-20% en une semaine)</p>
+                                        <p class="text-red-400"><strong>💰 Action :</strong> Attendre le plancher pour acheter</p>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="bg-yellow-800 bg-opacity-30 p-4 rounded-lg">
+                                <h3 class="text-yellow-300 font-semibold mb-2">🎪 Cas spécial : Événement Temporis</h3>
+                                <p class="mb-3">L'annonce d'un nouveau Temporis fait exploser le prix des ressources de craft :</p>
+                                <div class="grid grid-cols-1 md:grid-cols-3 gap-4 text-sm">
+                                    <div>
+                                        <p><strong>Avant annonce :</strong></p>
+                                        <p>Lin x1 = 1.5k</p>
+                                    </div>
+                                    <div>
+                                        <p><strong>Jour J :</strong></p>
+                                        <p>Lin x1 = 4k (+167%)</p>
+                                    </div>
+                                    <div>
+                                        <p><strong>1 semaine après :</strong></p>
+                                        <p>Lin x1 = 2.2k (stabilisation)</p>
+                                    </div>
+                                </div>
+                                <p class="text-green-400 mt-3"><strong>💎 Leçon :</strong> Anticipez les événements en stockant à l'avance !</p>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <!-- Section 6 : Erreurs à éviter -->
+                    <div class="bg-red-600 bg-opacity-20 border-l-4 border-red-500 rounded-lg p-6">
+                        <h2 class="text-white text-xl font-bold mb-4">❌ Erreurs courantes à éviter</h2>
+                        <div class="space-y-4 text-red-100">
+                            <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+                                <div>
+                                    <h3 class="text-red-300 font-semibold mb-3">🚫 Erreurs de débutant</h3>
+                                    <div class="space-y-2">
+                                        <p>• <strong>Observer trop peu :</strong> Une fois par mois n'est pas suffisant</p>
+                                        <p>• <strong>Ne noter qu'un seul prix :</strong> x1, x10 ET x100 sont importants</p>
+                                        <p>• <strong>Ignorer les événements :</strong> Ils changent drastiquement les prix</p>
+                                        <p>• <strong>Ne pas dater :</strong> Sans chronologie, pas d'analyse possible</p>
+                                    </div>
+                                </div>
+                                <div>
+                                    <h3 class="text-red-300 font-semibold mb-3">⚠️ Pièges avancés</h3>
+                                    <div class="space-y-2">
+                                        <p>• <strong>Biais de confirmation :</strong> Ne voir que ce qui confirme vos idées</p>
+                                        <p>• <strong>Sur-optimisation :</strong> Trop analyser au lieu d'agir</p>
+                                        <p>• <strong>Observations isolées :</strong> Un prix = anecdote, une tendance = donnée</p>
+                                        <p>• <strong>Négliger la saisonnalité :</strong> Certains items suivent des cycles</p>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="bg-red-800 bg-opacity-30 p-4 rounded-lg">
+                                <h3 class="text-red-300 font-semibold mb-2">🎯 Règles d'or du Market Watch</h3>
+                                <p>• <strong>Consistance :</strong> Mieux vaut observer régulièrement que parfaitement</p>
+                                <p>• <strong>Contexte :</strong> Toujours noter les conditions (événements, heure, etc.)</p>
+                                <p>• <strong>Patience :</strong> Les tendances se confirment sur plusieurs observations</p>
+                                <p>• <strong>Action :</strong> L'observation sans action ne génère pas de profit</p>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <!-- Section 7 : Intégration avec le trading -->
+                    <div class="bg-gray-600 bg-opacity-20 border-l-4 border-gray-500 rounded-lg p-6">
+                        <h2 class="text-white text-xl font-bold mb-4">🔗 Intégrer Market Watch dans votre stratégie</h2>
+                        <div class="space-y-4 text-gray-200">
+                            <div class="grid grid-cols-1 md:grid-cols-3 gap-4">
+                                <div class="bg-gray-700 p-4 rounded-lg text-center">
+                                    <div class="text-2xl mb-2">📊</div>
+                                    <h3 class="font-semibold mb-2">Observer</h3>
+                                    <p class="text-sm">Surveillez les prix régulièrement</p>
+                                </div>
+                                <div class="bg-gray-700 p-4 rounded-lg text-center">
+                                    <div class="text-2xl mb-2">🧠</div>
+                                    <h3 class="font-semibold mb-2">Analyser</h3>
+                                    <p class="text-sm">Identifiez les tendances et opportunités</p>
+                                </div>
+                                <div class="bg-gray-700 p-4 rounded-lg text-center">
+                                    <div class="text-2xl mb-2">💰</div>
+                                    <h3 class="font-semibold mb-2">Agir</h3>
+                                    <p class="text-sm">Créez vos lots au bon moment</p>
+                                </div>
+                            </div>
+                            <div class="bg-gray-700 p-4 rounded-lg">
+                                <h3 class="text-gray-300 font-semibold mb-3">🔄 Workflow recommandé</h3>
+                                <div class="space-y-2 text-sm">
+                                    <p><strong>1. Observation matinale :</strong> Vérifiez vos items surveillés (10 min)</p>
+                                    <p><strong>2. Analyse des tendances :</strong> Comparez avec vos données précédentes (5 min)</p>
+                                    <p><strong>3. Décisions de trading :</strong> Créez/modifiez vos lots selon les observations (15 min)</p>
+                                    <p><strong>4. Planification :</strong> Préparez les prochaines observations (5 min)</p>
+                                </div>
+                                <p class="text-green-400 mt-3"><strong>⏱️ Total :</strong> 35 minutes par jour pour une stratégie optimisée !</p>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <!-- Ressources utiles -->
+                    <div class="bg-indigo-600 bg-opacity-20 border-l-4 border-indigo-500 rounded-lg p-6">
+                        <h2 class="text-white text-xl font-bold mb-4">📚 Ressources complémentaires</h2>
+                        <div class="space-y-4 text-indigo-100">
+                            <p>Pour aller plus loin dans votre maîtrise du Market Watch :</p>
+                            <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+                                <div class="space-y-2">
+                                    <h3 class="text-indigo-300 font-semibold">📖 Documentation connexe</h3>
+                                    <p>• <a href="{{ path('app_docs_trading_guide') }}" class="text-indigo-300 hover:text-indigo-200 underline">Guide Trading Avancé</a> - Stratégies complètes</p>
+                                    <p>• <a href="{{ path('app_docs_getting_started') }}" class="text-indigo-300 hover:text-indigo-200 underline">Premier pas</a> - Bases du trading</p>
+                                    <p>• <a href="{{ path('app_docs_faq') }}" class="text-indigo-300 hover:text-indigo-200 underline">FAQ</a> - Questions fréquentes</p>
+                                </div>
+                                <div class="space-y-2">
+                                    <h3 class="text-indigo-300 font-semibold">🛠️ Outils pratiques</h3>
+                                    {% if app.user %}
+                                        <p>• <a href="{{ path('app_market_watch_index') }}" class="text-indigo-300 hover:text-indigo-200 underline">Mes observations</a> - Gérer vos surveillances</p>
+                                        <p>• <a href="{{ path('app_analytics_index') }}" class="text-indigo-300 hover:text-indigo-200 underline">Analytics</a> - Analyser vos performances</p>
+                                        <p>• <a href="{{ path('app_lot_index') }}" class="text-indigo-300 hover:text-indigo-200 underline">Mes lots</a> - Gérer votre portefeuille</p>
+                                    {% else %}
+                                        <p>• Connectez-vous pour accéder aux outils</p>
+                                    {% endif %}
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <!-- Navigation -->
+                    <div class="flex justify-between items-center pt-8 border-t border-gray-700">
+                        <a href="{{ path('app_docs_trading_guide') }}" 
+                           class="btn btn-secondary">
+                            ← Guide Trading
+                        </a>
+                        
+                        <a href="{{ path('app_docs_lots') }}" 
+                           class="btn btn-primary">
+                            Gestion des lots →
+                        </a>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+{% endblock %}

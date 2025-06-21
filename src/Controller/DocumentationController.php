@@ -27,6 +27,24 @@ class DocumentationController extends AbstractController
         return $this->render('docs/trading-guide.html.twig');
     }
 
+    #[Route('/market-watch', name: 'app_docs_market_watch')]
+    public function marketWatch(): Response
+    {
+        return $this->render('docs/market-watch.html.twig');
+    }
+
+    #[Route('/lots', name: 'app_docs_lots')]
+    public function lots(): Response
+    {
+        return $this->render('docs/lots.html.twig');
+    }
+
+    #[Route('/analytics', name: 'app_docs_analytics')]
+    public function analytics(): Response
+    {
+        return $this->render('docs/analytics.html.twig');
+    }
+
     #[Route('/faq', name: 'app_docs_faq')]
     public function faq(): Response
     {
