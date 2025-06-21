@@ -26,82 +26,10 @@ class MarketWatchController extends AbstractController
         $selectedCharacter = $characterService->getSelectedCharacter($this->getUser());
         $characters = $characterService->getUserCharacters($this->getUser());
 
-        $itemsData = [];
-        if ($selectedCharacter) {
-            // Récupérer toutes les observations pour ce personnage
-            $observations = $marketWatchRepository->createQueryBuilder('mw')
-                ->select('mw', 'i')
-                ->join('mw.item', 'i')
-                ->where('mw.dofusCharacter = :character')
-                ->setParameter('character', $selectedCharacter)
-                ->orderBy('mw.observedAt', 'DESC')
-                ->getQuery()
-                ->getResult();
-
-            // Grouper par item et calculer les moyennes
-            $itemsGrouped = [];
-            foreach ($observations as $observation) {
-                $itemId = $observation->getItem()->getId();
-                
-                if (!isset($itemsGrouped[$itemId])) {
-                    $itemsGrouped[$itemId] = [
-                        'item' => $observation->getItem(),
-                        'observations' => [],
-                        'latest_date' => $observation->getObservedAt(),
-                        'oldest_date' => $observation->getObservedAt()
-                    ];
-                }
-                
-                $itemsGrouped[$itemId]['observations'][] = $observation;
-                
-                // Mettre à jour les dates
-                if ($observation->getObservedAt() > $itemsGrouped[$itemId]['latest_date']) {
-                    $itemsGrouped[$itemId]['latest_date'] = $observation->getObservedAt();
-                }
-                if ($observation->getObservedAt() < $itemsGrouped[$itemId]['oldest_date']) {
-                    $itemsGrouped[$itemId]['oldest_date'] = $observation->getObservedAt();
-                }
-            }
-
-            // Calculer les moyennes pour chaque item
-            foreach ($itemsGrouped as $itemId => $data) {
-                $pricesUnit = [];
-                $prices10 = [];
-                $prices100 = [];
-                
-                foreach ($data['observations'] as $obs) {
-                    if ($obs->getPricePerUnit() !== null) {
-                        $pricesUnit[] = $obs->getPricePerUnit();
-                    }
-                    if ($obs->getPricePer10() !== null) {
-                        $prices10[] = $obs->getPricePer10();
-                    }
-                    if ($obs->getPricePer100() !== null) {
-                        $prices100[] = $obs->getPricePer100();
-                    }
-                }
-                
-                $trackingPeriod = $data['latest_date']->diff($data['oldest_date'])->days;
-                
-                $itemsData[] = [
-                    'item' => $data['item'],
-                    'observation_count' => count($data['observations']),
-                    'latest_date' => $data['latest_date'],
-                    'tracking_period_days' => $trackingPeriod,
-                    'avg_price_unit' => !empty($pricesUnit) ? round(array_sum($pricesUnit) / count($pricesUnit)) : null,
-                    'avg_price_10' => !empty($prices10) ? round(array_sum($prices10) / count($prices10)) : null,
-                    'avg_price_100' => !empty($prices100) ? round(array_sum($prices100) / count($prices100)) : null,
-                    'price_unit_count' => count($pricesUnit),
-                    'price_10_count' => count($prices10),
-                    'price_100_count' => count($prices100)
-                ];
-            }
-
-            // Trier par date de dernière observation (plus récent en premier)
-            usort($itemsData, function($a, $b) {
-                return $b['latest_date'] <=> $a['latest_date'];
-            });
-        }
+        // Une seule ligne pour récupérer toutes les données avec stats
+        $itemsData = $selectedCharacter 
+            ? $marketWatchRepository->getItemsDataWithStats($selectedCharacter)
+            : [];
 
         return $this->render('market_watch/index.html.twig', [
             'items_data' => $itemsData,
@@ -114,7 +42,7 @@ class MarketWatchController extends AbstractController
     public function new(
         Request $request, 
         EntityManagerInterface $em,
-        ItemRepository $itemRepository,  // ← Ajouter cette ligne
+        ItemRepository $itemRepository,
         CharacterSelectionService $characterService
     ): Response {
         $selectedCharacter = $characterService->getSelectedCharacter($this->getUser());
@@ -125,29 +53,20 @@ class MarketWatchController extends AbstractController
         }
 
         $marketWatch = new MarketWatch();
-        
-        // Créer le formulaire avec l'option is_edit = false
-        $form = $this->createForm(MarketWatchType::class, $marketWatch, [
-            'is_edit' => false
-        ]);
+        $form = $this->createForm(MarketWatchType::class, $marketWatch, ['is_edit' => false]);
 
         $form->handleRequest($request);
         if ($form->isSubmitted() && $form->isValid()) {
-            
-            // Récupérer l'item sélectionné via l'autocomplete
             $itemId = $form->get('item')->getData();
-            if ($itemId) {
-                $item = $itemRepository->find($itemId);
-                if ($item) {
-                    $marketWatch->setItem($item);
-                    $marketWatch->setDofusCharacter($selectedCharacter);
-                    
-                    $em->persist($marketWatch);
-                    $em->flush();
+            if ($itemId && $item = $itemRepository->find($itemId)) {
+                $marketWatch->setItem($item);
+                $marketWatch->setDofusCharacter($selectedCharacter);
+                
+                $em->persist($marketWatch);
+                $em->flush();
 
-                    $this->addFlash('success', 'Observation de prix ajoutée avec succès !');
-                    return $this->redirectToRoute('app_market_watch_index');
-                }
+                $this->addFlash('success', 'Observation de prix ajoutée avec succès !');
+                return $this->redirectToRoute('app_market_watch_index');
             }
             
             $this->addFlash('error', 'Veuillez sélectionner une ressource valide.');
@@ -168,20 +87,15 @@ class MarketWatchController extends AbstractController
     ): Response {
         $selectedCharacter = $characterService->getSelectedCharacter($this->getUser());
 
-        // Vérifier que l'observation appartient au personnage sélectionné
         if ($marketWatch->getDofusCharacter() !== $selectedCharacter) {
             throw $this->createAccessDeniedException();
         }
 
-        // Créer le formulaire avec l'option is_edit = true
-        $form = $this->createForm(MarketWatchType::class, $marketWatch, [
-            'is_edit' => true
-        ]);
+        $form = $this->createForm(MarketWatchType::class, $marketWatch, ['is_edit' => true]);
 
         $form->handleRequest($request);
         if ($form->isSubmitted() && $form->isValid()) {
             $em->flush();
-
             $this->addFlash('success', 'Observation modifiée avec succès !');
             return $this->redirectToRoute('app_market_watch_index');
         }
@@ -200,7 +114,6 @@ class MarketWatchController extends AbstractController
     ): Response {
         $selectedCharacter = $characterService->getSelectedCharacter($this->getUser());
 
-        // Vérifier que l'observation appartient au personnage sélectionné
         if ($marketWatch->getDofusCharacter() !== $selectedCharacter) {
             throw $this->createAccessDeniedException();
         }
@@ -225,15 +138,8 @@ class MarketWatchController extends AbstractController
             return $this->redirectToRoute('app_market_watch_index');
         }
 
-        // Récupérer l'historique des prix pour cet item
-        $priceHistory = $marketWatchRepository->createQueryBuilder('mw')
-            ->where('mw.dofusCharacter = :character')
-            ->andWhere('mw.item = :itemId')
-            ->setParameter('character', $selectedCharacter)
-            ->setParameter('itemId', $itemId)
-            ->orderBy('mw.observedAt', 'DESC')
-            ->getQuery()
-            ->getResult();
+        // Une seule ligne pour récupérer l'historique
+        $priceHistory = $marketWatchRepository->findPriceHistoryForItem($selectedCharacter, $itemId);
 
         if (empty($priceHistory)) {
             $this->addFlash('warning', 'Aucun historique de prix pour cet item.');
@@ -241,32 +147,9 @@ class MarketWatchController extends AbstractController
         }
 
         $item = $priceHistory[0]->getItem();
-
-        // Calculer les moyennes pour affichage
-        $pricesUnit = [];
-        $prices10 = [];
-        $prices100 = [];
         
-        foreach ($priceHistory as $obs) {
-            if ($obs->getPricePerUnit() !== null) {
-                $pricesUnit[] = $obs->getPricePerUnit();
-            }
-            if ($obs->getPricePer10() !== null) {
-                $prices10[] = $obs->getPricePer10();
-            }
-            if ($obs->getPricePer100() !== null) {
-                $prices100[] = $obs->getPricePer100();
-            }
-        }
-
-        $averages = [
-            'avg_price_unit' => !empty($pricesUnit) ? round(array_sum($pricesUnit) / count($pricesUnit)) : null,
-            'avg_price_10' => !empty($prices10) ? round(array_sum($prices10) / count($prices10)) : null,
-            'avg_price_100' => !empty($prices100) ? round(array_sum($prices100) / count($prices100)) : null,
-            'price_unit_count' => count($pricesUnit),
-            'price_10_count' => count($prices10),
-            'price_100_count' => count($prices100)
-        ];
+        // Une seule ligne pour calculer les moyennes
+        $averages = $marketWatchRepository->calculatePriceAverages($priceHistory);
 
         return $this->render('market_watch/history.html.twig', [
             'item' => $item,
