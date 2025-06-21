@@ -18,10 +18,10 @@ Usage: {% include 'components/profit_display.html.twig' with {
         {{ (total_profit / 1000)|number_format(0, ',', ' ') }}k
     </div>
 {% else %}
-    <div class="profit-{{ total_profit >= 0 ? 'positive' : 'negative' }} font-medium">
+    <div class="text-white font-medium">
         {{ (total_profit / 1000)|number_format(0, ',', ' ') }}k
     </div>
-    <div class="profit-{{ total_profit >= 0 ? 'positive' : 'negative' }} text-sm">
+    <div class="profit-{{ total_profit >= 0 ? 'positive' : 'negative' }} text-xs">
         ({{ profit_percent|number_format(1) }}%)
     </div>
 {% endif %}

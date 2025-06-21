@@ -84,7 +84,7 @@
 
             <!-- Tableau des ventes -->
             {% include 'components/data_table.html.twig' with {
-                headers: ['Date Vente', 'Item', 'Personnage', 'Quantité', 'Prix Réel', 'Prix Attendu', 'Profit Total', 'Performance', 'Notes'],
+                headers: ['Date Vente', 'Item', 'Quantité', 'Prix Réel', 'Prix Attendu', 'Profit Total', 'Performance', 'Notes'],
                 rows: sales,
                 row_template: 'sales_history/_table_row.html.twig',
                 empty_message: 'Aucune vente enregistrée',

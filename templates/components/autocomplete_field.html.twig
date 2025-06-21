@@ -40,12 +40,15 @@ Usage: {% include 'components/autocomplete_field.html.twig' with {
          data-autocomplete-url-value="{{ api_url }}">
         
         {{ form_label(attribute(form, search_field), label, {'label_attr': {'class': 'form-label'}}) }}
-        {{ form_widget(attribute(form, search_field), {'attr': {
-            'class': 'form-input-lg', 
-            'placeholder': placeholder|default('Tapez pour rechercher...'), 
-            'data-autocomplete-target': 'input', 
-            'data-action': 'input->autocomplete#search'
-        }}) }}
+        {{ form_widget(attribute(form, search_field), {
+            'attr': {
+                'class': 'form-input-lg', 
+                'placeholder': placeholder|default('Tapez pour rechercher...'), 
+                'data-autocomplete-target': 'input', 
+                'data-action': 'input->autocomplete#search',
+                'autocomplete': 'off'
+            }
+        }) }}
         
         <div data-autocomplete-target="results" 
              data-action="click->autocomplete#selectItem"

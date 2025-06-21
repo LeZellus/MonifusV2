@@ -6,16 +6,7 @@ export default class extends Controller {
 
     connect() {
         this.timeout = null
-        this.createResultsContainer()
-    }
-
-    createResultsContainer() {
-        if (!this.hasResultsTarget) {
-            const results = document.createElement('div')
-            results.className = 'autocomplete-results hidden absolute z-10 w-full bg-gray-800 border border-gray-600 rounded-lg shadow-xl max-h-60 overflow-y-auto mt-1'
-            results.setAttribute('data-autocomplete-target', 'results')
-            this.inputTarget.parentNode.appendChild(results)
-        }
+        // Pas besoin de createResultsContainer car la div existe déjà dans le template
     }
 
     search() {
@@ -23,8 +14,10 @@ export default class extends Controller {
         
         const query = this.inputTarget.value.trim()
         
+        // Arrêter si moins de 2 caractères
         if (query.length < 2) {
             this.hideResults()
+            this.clearHiddenField() // Nettoyer la sélection précédente
             return
         }
 
@@ -55,7 +48,7 @@ export default class extends Controller {
             return
         }
 
-        const html = items.map((item, index) => {
+        const html = items.map((item) => {
             const avatarBg = this.getAvatarColor(item.name)
             const typeIcon = this.getTypeIcon(item.type)
             
@@ -113,7 +106,7 @@ export default class extends Controller {
     highlightMatch(text, query) {
         if (!query) return text
         
-        const regex = new RegExp(`(${query})`, 'gi')
+        const regex = new RegExp(`(${query.replace(/[.*+?^${}()|[\]\\]/g, '\\$&')})`, 'gi')
         return text.replace(regex, '<span class="bg-blue-600 text-blue-100 px-1 rounded">$1</span>')
     }
 
@@ -157,10 +150,15 @@ export default class extends Controller {
         this.inputTarget.value = itemName
         this.hideResults()
         
+        // Animation de feedback
         itemElement.style.transform = 'scale(0.95)'
         setTimeout(() => {
             itemElement.style.transform = 'scale(1)'
         }, 150)
+    }
+
+    clearHiddenField() {
+        this.hiddenIdTarget.value = ''
     }
 
     showResults() {
@@ -183,5 +181,10 @@ export default class extends Controller {
             this.resultsTarget.classList.add('hidden')
             this.resultsTarget.style.transition = ''
         }, 150)
+    }
+
+    // Nettoyer en cas de déconnexion
+    disconnect() {
+        clearTimeout(this.timeout)
     }
 }

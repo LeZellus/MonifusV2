@@ -12,6 +12,7 @@ use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\Routing\Attribute\Route;
 use Symfony\Component\Security\Http\Attribute\IsGranted;
+use App\Repository\ItemRepository;
 
 #[Route('/market-watch')]
 #[IsGranted('ROLE_USER')]
@@ -113,12 +114,13 @@ class MarketWatchController extends AbstractController
     public function new(
         Request $request, 
         EntityManagerInterface $em,
+        ItemRepository $itemRepository,  // ← Ajouter cette ligne
         CharacterSelectionService $characterService
     ): Response {
         $selectedCharacter = $characterService->getSelectedCharacter($this->getUser());
-        
+
         if (!$selectedCharacter) {
-            $this->addFlash('error', 'Aucun personnage sélectionné. Créez d\'abord un personnage.');
+            $this->addFlash('warning', 'Créez d\'abord un personnage.');
             return $this->redirectToRoute('app_profile_index');
         }
 
@@ -131,12 +133,24 @@ class MarketWatchController extends AbstractController
 
         $form->handleRequest($request);
         if ($form->isSubmitted() && $form->isValid()) {
-            $marketWatch->setDofusCharacter($selectedCharacter);
-            $em->persist($marketWatch);
-            $em->flush();
+            
+            // Récupérer l'item sélectionné via l'autocomplete
+            $itemId = $form->get('item')->getData();
+            if ($itemId) {
+                $item = $itemRepository->find($itemId);
+                if ($item) {
+                    $marketWatch->setItem($item);
+                    $marketWatch->setDofusCharacter($selectedCharacter);
+                    
+                    $em->persist($marketWatch);
+                    $em->flush();
 
-            $this->addFlash('success', 'Observation de prix ajoutée avec succès !');
-            return $this->redirectToRoute('app_market_watch_index');
+                    $this->addFlash('success', 'Observation de prix ajoutée avec succès !');
+                    return $this->redirectToRoute('app_market_watch_index');
+                }
+            }
+            
+            $this->addFlash('error', 'Veuillez sélectionner une ressource valide.');
         }
 
         return $this->render('market_watch/new.html.twig', [

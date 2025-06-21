@@ -10,6 +10,7 @@ use Symfony\Component\Form\Extension\Core\Type\DateTimeType;
 use Symfony\Component\Form\Extension\Core\Type\IntegerType;
 use Symfony\Component\Form\Extension\Core\Type\TextareaType;
 use Symfony\Component\Form\Extension\Core\Type\TextType;
+use Symfony\Component\Form\Extension\Core\Type\HiddenType;
 use Symfony\Component\Form\FormBuilderInterface;
 use Symfony\Component\OptionsResolver\OptionsResolver;
 use Symfony\Component\Validator\Constraints\Callback;
@@ -21,8 +22,11 @@ class MarketWatchType extends AbstractType
     {
         $isEdit = $options['is_edit'] ?? false;
         
-        // Champ de recherche uniquement pour la création
-        if (!$isEdit) {
+        if ($isEdit) {
+            // En mode édition, on affiche juste l'item actuel (read-only via template)
+            // Pas besoin de champ dans le formulaire car l'item ne peut pas être modifié
+        } else {
+            // En mode création, champ de recherche + champ caché
             $builder->add('itemSearch', TextType::class, [
                 'label' => 'Rechercher une ressource',
                 'mapped' => false,
@@ -33,18 +37,17 @@ class MarketWatchType extends AbstractType
                     'data-action' => 'input->autocomplete#search'
                 ]
             ]);
+            
+            // Champ caché pour stocker l'ID de l'item sélectionné
+            $builder->add('item', HiddenType::class, [
+                'mapped' => false,
+                'attr' => [
+                    'data-autocomplete-target' => 'hiddenId'
+                ]
+            ]);
         }
         
         $builder
-            ->add('item', EntityType::class, [
-                'class' => Item::class,
-                'choice_label' => 'name',
-                'label' => $isEdit ? 'Ressource observée' : 'Ressource sélectionnée',
-                'attr' => array_merge(
-                    ['class' => 'form-input'],
-                    !$isEdit ? ['data-autocomplete-target' => 'hiddenId', 'style' => 'display: none;'] : []
-                )
-            ])
             ->add('observedAt', DateTimeType::class, [
                 'widget' => 'single_text',
                 'label' => 'Date d\'observation',

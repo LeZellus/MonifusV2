@@ -13,9 +13,9 @@ Usage: {% include 'components/price_display.html.twig' with {
 
 {% set formatted_price = price|number_format(0, ',', ' ') %}
 {% set size_class = (size|default('normal')) == 'small' ? 'text-sm' : ((size|default('normal')) == 'large' ? 'text-xl' : 'text-base') %}
-{% set color_class = 'text-' ~ (color|default('gray')) ~ '-400' %}
+{% set color_class = 'text-' ~ (color|default('lime')) ~ '-500' %}
 
-<span class="{{ size_class }} {{ color_class }} font-medium">
+<span class="text-white font-medium">
     {% if prefix is defined %}{{ prefix }}{% endif %}{{ formatted_price }}{% if suffix is defined %}{{ suffix }}{% endif %}
     {% if show_kamas|default(true) %} kamas{% endif %}
 </span>

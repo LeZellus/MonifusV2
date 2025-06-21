@@ -9,7 +9,7 @@ Usage: {% include 'components/item_display.html.twig' with {
 #}
 
 {% set content %}
-    <div class="text-white font-medium">{{ item.name }}</div>
+    <div class="text-amber-500 font-medium">{{ item.name }}</div>
     {% if mode|default('full') != 'compact' and item.level %}
         <div class="text-gray-400 text-sm">Niv.{{ item.level }}</div>
     {% endif %}

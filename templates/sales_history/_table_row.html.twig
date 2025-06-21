@@ -6,15 +6,11 @@
 {% set performanceTotal = performancePerLot * quantitySold %}
 
 <tr class="table-row">
-    <td class="table-cell">
-        {{ item.soldAt|date('d/m/Y H:i') }}
+    <td class="table-cell text-white">
+        {{ item.soldAt|date('d/m/Y') }}
     </td>
     <td class="table-cell">
         {% include 'components/item_display.html.twig' with {item: lotGroup.item} %}
-    </td>
-    <td class="table-cell">
-        <div class="text-white">{{ lotGroup.dofusCharacter.name }}</div>
-        <div class="text-gray-400 text-sm">{{ lotGroup.dofusCharacter.server.name }}</div>
     </td>
     <td class="table-cell">
         <div class="text-white font-medium">{{ quantitySold }} lots</div>
@@ -23,14 +19,12 @@
     <td class="table-cell">
         {% include 'components/price_display.html.twig' with {
             price: item.actualSellPrice,
-            color: 'green'
         } %}
         <div class="text-gray-400 text-sm">par lot</div>
     </td>
     <td class="table-cell">
         {% include 'components/price_display.html.twig' with {
             price: lotGroup.sellPricePerLot,
-            color: 'orange'
         } %}
         <div class="text-gray-400 text-sm">par lot</div>
     </td>
@@ -56,7 +50,7 @@
     </td>
     <td class="table-cell">
         {% if item.notes %}
-            <div class="truncate" title="{{ item.notes }}">
+            <div class="truncate text-gray-500" title="{{ item.notes }}">
                 {{ item.notes|slice(0, 30) }}{{ item.notes|length > 30 ? '...' : '' }}
             </div>
         {% else %}
