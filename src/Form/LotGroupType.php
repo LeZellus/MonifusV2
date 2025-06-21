@@ -59,8 +59,9 @@ class LotGroupType extends AbstractType
                 'attr' => ['class' => 'form-input']
             ])
             ->add('sellPricePerLot', IntegerType::class, [
-                'label' => 'Prix de vente par lot (kamas)',
-                'attr' => ['class' => 'form-input']
+                'required' => false,
+                'label' => 'Prix de vente par lot (optionnel)',
+                'attr' => ['class' => 'form-input', 'placeholder' => 'À définir lors de la vente']
             ])
             ->add('status', EnumType::class, [
                 'class' => LotStatus::class,

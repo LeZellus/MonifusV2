@@ -10,7 +10,7 @@ use Doctrine\Migrations\AbstractMigration;
 /**
  * Auto-generated Migration: Please modify to your needs!
  */
-final class Version20250620173647 extends AbstractMigration
+final class Version20250621030319 extends AbstractMigration
 {
     public function getDescription(): string
     {
@@ -21,7 +21,7 @@ final class Version20250620173647 extends AbstractMigration
     {
         // this up() migration is auto-generated, please modify it to your needs
         $this->addSql(<<<'SQL'
-            ALTER TABLE user ADD discord_username VARCHAR(100) DEFAULT NULL
+            ALTER TABLE lot_group CHANGE sell_price_per_lot sell_price_per_lot BIGINT DEFAULT NULL
         SQL);
     }
 
@@ -29,7 +29,7 @@ final class Version20250620173647 extends AbstractMigration
     {
         // this down() migration is auto-generated, please modify it to your needs
         $this->addSql(<<<'SQL'
-            ALTER TABLE user DROP discord_username
+            ALTER TABLE lot_group CHANGE sell_price_per_lot sell_price_per_lot BIGINT NOT NULL
         SQL);
     }
 }

@@ -24,7 +24,7 @@ class LotGroup
     #[ORM\Column(type: 'bigint')]
     private ?int $buyPricePerLot = null;
 
-    #[ORM\Column(type: 'bigint')]
+    #[ORM\Column(type: 'bigint', nullable: true)]
     private ?int $sellPricePerLot = null;
 
     #[ORM\Column(enumType: LotStatus::class)]
@@ -105,7 +105,7 @@ class LotGroup
         return $this->sellPricePerLot;
     }
 
-    public function setSellPricePerLot(int $sellPricePerLot): static
+    public function setSellPricePerLot(?int $sellPricePerLot): static
     {
         $this->sellPricePerLot = $sellPricePerLot;
 
