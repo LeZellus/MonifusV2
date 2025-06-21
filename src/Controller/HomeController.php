@@ -2,7 +2,6 @@
 
 namespace App\Controller;
 
-use App\Entity\User;
 use App\Repository\UserRepository;
 use App\Repository\ClasseRepository;
 use App\Repository\ServerRepository;
@@ -14,26 +13,28 @@ use Symfony\Component\Routing\Attribute\Route;
 
 class HomeController extends AbstractController
 {
+    public function __construct(
+        private readonly UserRepository $userRepository,
+        private readonly ClasseRepository $classeRepository,
+        private readonly ServerRepository $serverRepository,
+        private readonly LotGroupRepository $lotGroupRepository,
+        private readonly LotUnitRepository $lotUnitRepository
+    ) {
+    }
+
     #[Route('/', name: 'app_home')]
-    public function index(
-        UserRepository $userRepository,
-        ClasseRepository $classeRepository,
-        ServerRepository $serverRepository,
-        LotGroupRepository $lotGroupRepository,
-        LotUnitRepository $lotUnitRepository
-    ): Response {
-        // Redirection si utilisateur connecté
+    public function index(): Response
+    {
         if ($this->getUser()) {
             return $this->redirectToRoute('app_trading_dashboard');
         }
 
-        // Calculer les vraies statistiques
-        $stats = $this->calculateRealStats($lotGroupRepository, $lotUnitRepository);
+        $stats = $this->calculateGlobalStats();
 
         return $this->render('home/index.html.twig', [
-            'users_count' => $userRepository->count([]),
-            'classes_count' => $classeRepository->count([]),
-            'servers_count' => $serverRepository->count([]),
+            'users_count' => $this->userRepository->count([]),
+            'classes_count' => $this->classeRepository->count([]),
+            'servers_count' => $this->serverRepository->count([]),
             'total_kamas_tracked' => $stats['total_kamas_tracked'],
             'total_lots_managed' => $stats['total_lots_managed'],
             'formatted_kamas' => $stats['formatted_kamas'],
@@ -41,75 +42,43 @@ class HomeController extends AbstractController
         ]);
     }
 
-    private function calculateRealStats(
-        LotGroupRepository $lotGroupRepository,
-        LotUnitRepository $lotUnitRepository
-    ): array {
-        // 1. Calculer le total des kamas investis (lots disponibles)
-        $totalInvested = $lotGroupRepository->createQueryBuilder('lg')
-            ->select('SUM(lg.buyPricePerLot * lg.lotSize)')
-            ->where('lg.status = :available')
-            ->setParameter('available', \App\Enum\LotStatus::AVAILABLE)
-            ->getQuery()
-            ->getSingleScalarResult() ?? 0;
+    private function calculateGlobalStats(): array
+    {
+        // Une seule requête pour récupérer toutes les stats des lots
+        $lotStats = $this->lotGroupRepository->getGlobalStatistics();
+        
+        // Une seule requête pour les profits réalisés
+        $totalProfitsRealized = $this->lotUnitRepository->getTotalRealizedProfits();
 
-        // 2. Calculer le total des profits réalisés (ventes)
-        $totalProfitsRealized = $lotUnitRepository->createQueryBuilder('lu')
-            ->select('SUM((lu.actualSellPrice - lg.buyPricePerLot) * lu.quantitySold)')
-            ->join('lu.lotGroup', 'lg')
-            ->getQuery()
-            ->getSingleScalarResult() ?? 0;
-
-        // 3. Calculer le potentiel profit des lots disponibles
-        $totalPotentialProfit = $lotGroupRepository->createQueryBuilder('lg')
-            ->select('SUM((lg.sellPricePerLot - lg.buyPricePerLot) * lg.lotSize)')
-            ->where('lg.status = :available')
-            ->setParameter('available', \App\Enum\LotStatus::AVAILABLE)
-            ->getQuery()
-            ->getSingleScalarResult() ?? 0;
-
-        // Total des kamas "trackés" = investi + profits réalisés + potentiel
-        $totalKamasTracked = $totalInvested + $totalProfitsRealized + $totalPotentialProfit;
-
-        // 4. Compter le nombre total de lots (disponibles + vendus)
-        $totalLotsManaged = $lotGroupRepository->createQueryBuilder('lg')
-            ->select('SUM(lg.lotSize)')
-            ->getQuery()
-            ->getSingleScalarResult() ?? 0;
-
-        // Formatage pour l'affichage
-        $formattedKamas = $this->formatKamas($totalKamasTracked);
-        $formattedLots = $this->formatNumber($totalLotsManaged);
+        // Calcul du total des kamas trackés
+        $totalKamasTracked = $lotStats['total_invested'] 
+                           + $totalProfitsRealized 
+                           + $lotStats['total_potential_profit'];
 
         return [
             'total_kamas_tracked' => $totalKamasTracked,
-            'total_lots_managed' => $totalLotsManaged,
-            'formatted_kamas' => $formattedKamas,
-            'formatted_lots' => $formattedLots,
+            'total_lots_managed' => $lotStats['total_lots_managed'],
+            'formatted_kamas' => $this->formatKamas($totalKamasTracked),
+            'formatted_lots' => $this->formatNumber($lotStats['total_lots_managed']),
         ];
     }
 
     private function formatKamas(int $amount): string
     {
-        if ($amount >= 1000000000) { // 1 milliard+
-            return number_format($amount / 1000000000, 1) . 'B';
-        } elseif ($amount >= 1000000) { // 1 million+
-            return number_format($amount / 1000000, 1) . 'M';
-        } elseif ($amount >= 1000) { // 1 millier+
-            return number_format($amount / 1000, 1) . 'K';
-        }
-        
-        return number_format($amount);
+        return match (true) {
+            $amount >= 1_000_000_000 => number_format($amount / 1_000_000_000, 1) . 'B',
+            $amount >= 1_000_000 => number_format($amount / 1_000_000, 1) . 'M',
+            $amount >= 1_000 => number_format($amount / 1_000, 1) . 'K',
+            default => number_format($amount)
+        };
     }
 
     private function formatNumber(int $number): string
     {
-        if ($number >= 1000000) {
-            return number_format($number / 1000000, 1) . 'M';
-        } elseif ($number >= 1000) {
-            return number_format($number / 1000, 1) . 'K';
-        }
-        
-        return number_format($number);
+        return match (true) {
+            $number >= 1_000_000 => number_format($number / 1_000_000, 1) . 'M',
+            $number >= 1_000 => number_format($number / 1_000, 1) . 'K',
+            default => number_format($number)
+        };
     }
 }

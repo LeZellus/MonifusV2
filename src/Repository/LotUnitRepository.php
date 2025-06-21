@@ -1,16 +1,14 @@
 <?php
 
+// src/Repository/LotUnitRepository.php
 namespace App\Repository;
 
 use App\Entity\LotUnit;
-use Doctrine\Bundle\DoctrineBundle\Repository\ServiceEntityRepository;
-use Doctrine\Persistence\ManagerRegistry;
 use App\Entity\User;
 use App\Entity\DofusCharacter;
+use Doctrine\Bundle\DoctrineBundle\Repository\ServiceEntityRepository;
+use Doctrine\Persistence\ManagerRegistry;
 
-/**
- * @extends ServiceEntityRepository<LotUnit>
- */
 class LotUnitRepository extends ServiceEntityRepository
 {
     public function __construct(ManagerRegistry $registry)
@@ -18,9 +16,7 @@ class LotUnitRepository extends ServiceEntityRepository
         parent::__construct($registry, LotUnit::class);
     }
 
-    /**
-     * Recherche les ventes avec filtres
-     */
+    // Méthodes existantes...
     public function findSalesWithFilters(
         User $user, 
         ?DofusCharacter $character = null, 
@@ -34,13 +30,11 @@ class LotUnitRepository extends ServiceEntityRepository
             ->where('tp.user = :user')
             ->setParameter('user', $user);
 
-        // Filtre par personnage
         if ($character) {
             $qb->andWhere('c = :character')
             ->setParameter('character', $character);
         }
 
-        // Filtre par période
         if ($period && $period !== 'all') {
             $date = new \DateTime();
             $date->modify("-{$period} days");
@@ -53,9 +47,6 @@ class LotUnitRepository extends ServiceEntityRepository
                 ->getResult();
     }
 
-    /**
-     * Calcule les statistiques des ventes
-     */
     public function calculateSalesStats(array $sales): array
     {
         $totalRealizedProfit = 0;
@@ -74,5 +65,15 @@ class LotUnitRepository extends ServiceEntityRepository
             'total_expected_profit' => $totalExpectedProfit,
             'profit_difference' => $totalRealizedProfit - $totalExpectedProfit
         ];
+    }
+
+    // NOUVELLE MÉTHODE POUR HOMECONTROLLER
+    public function getTotalRealizedProfits(): int
+    {
+        return (int) ($this->createQueryBuilder('lu')
+            ->select('SUM((lu.actualSellPrice - lg.buyPricePerLot) * lu.quantitySold)')
+            ->join('lu.lotGroup', 'lg')
+            ->getQuery()
+            ->getSingleScalarResult() ?? 0);
     }
 }
