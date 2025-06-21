@@ -1,0 +1,82 @@
+{% extends 'base.html.twig' %}
+
+{% block title %}Importer des Données{% endblock %}
+
+{% block body %}
+    <div class="wrapper-container">
+        <div class="max-w-2xl mx-auto">
+            <div class="wrapper-background">
+                <div class="flex items-center mb-6">
+                    <span class="text-2xl mr-3">📤</span>
+                    <h2 class="text-white text-2xl font-bold">Importer mes données</h2>
+                </div>
+
+                <form action="{{ path('app_backup_import_process') }}" method="post" enctype="multipart/form-data" 
+                      class="space-y-6">
+                    
+                    <div>
+                        <label for="backup_file" class="block text-white font-medium mb-3">
+                            Sélectionnez votre fichier de sauvegarde
+                        </label>
+                        <input type="file" 
+                               id="backup_file" 
+                               name="backup_file" 
+                               accept=".json"
+                               required
+                               class="w-full px-4 py-3 bg-gray-700 border border-gray-600 rounded-lg text-white focus:ring-2 focus:ring-blue-500 focus:border-transparent">
+                        <p class="text-gray-400 text-sm mt-2">
+                            Formats acceptés : JSON uniquement (max 10MB)
+                        </p>
+                    </div>
+
+                    <div class="bg-amber-600/20 border border-amber-500/50 rounded-lg p-4">
+                        <div class="flex items-center mb-2">
+                            <span class="text-amber-400 mr-2">⚠️</span>
+                            <h4 class="text-amber-300 font-medium">Attention</h4>
+                        </div>
+                        <div class="text-amber-200 text-sm space-y-1">
+                            <p>• L'import va créer de <strong>nouvelles</strong> données</p>
+                            <p>• Vos données existantes ne seront pas supprimées</p>
+                            <p>• Des doublons peuvent être créés si vous importez plusieurs fois</p>
+                            <p>• Certains éléments peuvent ne pas être importés si les items/serveurs n'existent plus</p>
+                        </div>
+                    </div>
+
+                    <div class="flex space-x-4">
+                        <button type="submit" 
+                                class="bg-green-600 hover:bg-green-700 text-white px-6 py-3 rounded-lg transition-colors flex items-center">
+                            <span class="mr-2">📤</span>
+                            Importer les données
+                        </button>
+                        <a href="{{ path('app_backup_index') }}" 
+                           class="bg-gray-600 hover:bg-gray-700 text-white px-6 py-3 rounded-lg transition-colors">
+                            Annuler
+                        </a>
+                    </div>
+                </form>
+            </div>
+
+            <!-- Guide d'import -->
+            <div class="wrapper-background mt-6">
+                <h3 class="text-white text-lg font-semibold mb-4 flex items-center">
+                    <span class="mr-2">📋</span>
+                    Guide d'import
+                </h3>
+                <div class="text-gray-300 space-y-3 text-sm">
+                    <div>
+                        <h4 class="text-white font-medium">1. Préparez votre fichier</h4>
+                        <p class="text-gray-400">Utilisez un fichier JSON exporté depuis cette application</p>
+                    </div>
+                    <div>
+                        <h4 class="text-white font-medium">2. Vérifiez la compatibilité</h4>
+                        <p class="text-gray-400">Les items et serveurs doivent exister dans la base de données</p>
+                    </div>
+                    <div>
+                        <h4 class="text-white font-medium">3. Sauvegardez avant</h4>
+                        <p class="text-gray-400">Exportez vos données actuelles en cas de problème</p>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+{% endblock %}

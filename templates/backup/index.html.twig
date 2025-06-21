@@ -35,7 +35,7 @@
             </div>
 
             <!-- Actions de sauvegarde -->
-            <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+             <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
                 <!-- Export des données -->
                 <div class="wrapper-background">
                     <div class="flex items-center mb-4">
@@ -52,29 +52,23 @@
                     </a>
                 </div>
 
-                <!-- Info RGPD -->
+                <!-- Import des données -->
                 <div class="wrapper-background">
                     <div class="flex items-center mb-4">
-                        <span class="text-2xl mr-3">🔒</span>
-                        <h3 class="text-white text-lg font-semibold">Vos données</h3>
+                        <span class="text-2xl mr-3">📤</span>
+                        <h3 class="text-white text-lg font-semibold">Importer mes données</h3>
                     </div>
-                    <div class="text-gray-300 space-y-2 text-sm">
-                        <p><strong>Données stockées :</strong></p>
-                        <ul class="list-disc list-inside space-y-1 text-gray-400">
-                            <li>Informations de profil et personnages</li>
-                            <li>Historique de trading et prix</li>
-                            <li>Préférences et paramètres</li>
-                        </ul>
-                        <p class="mt-4"><strong>Sécurité :</strong></p>
-                        <ul class="list-disc list-inside space-y-1 text-gray-400">
-                            <li>Données chiffrées en base</li>
-                            <li>Accès sécurisé par authentification</li>
-                            <li>Sauvegarde régulière</li>
-                        </ul>
-                    </div>
+                    <p class="text-gray-300 mb-4">
+                        Restaurez vos données depuis un fichier de sauvegarde JSON.
+                        Idéal pour migrer ou récupérer vos données.
+                    </p>
+                    <a href="{{ path('app_backup_import') }}" 
+                       class="bg-green-600 hover:bg-green-700 text-white px-6 py-3 rounded-lg transition-colors inline-block">
+                        📤 Importer des données
+                    </a>
                 </div>
             </div>
-
+            
             <!-- Conseils de sauvegarde -->
             {% set backup_tips_content %}
                 <p>• Exportez vos données régulièrement (1 fois par mois)</p>

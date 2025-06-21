@@ -36,8 +36,11 @@
         {% include 'components/main_navbar.html.twig' with {
             'title': block('title')
         } %}
+
+        {% if app.user %}
+            {% include 'components/profile_selector.html.twig' %}
+        {% endif %}
         
-        {% include 'components/profile_selector.html.twig' %}
 
         {% block body %}{% endblock %}
 
