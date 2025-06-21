@@ -26,10 +26,14 @@
                     </div>
                     <div>
                         <div class="text-gray-400 text-sm">Prix prévu</div>
-                        {% include 'components/price_display.html.twig' with {
-                            price: lot_group.sellPricePerLot,
-                            color: 'green'
-                        } %}
+                        {% if lot_group.sellPricePerLot %}
+                            {% include 'components/price_display.html.twig' with {
+                                price: lot_group.sellPricePerLot,
+                                color: 'green'
+                            } %}
+                        {% else %}
+                            <span class="text-gray-500 italic">Non défini</span>
+                        {% endif %}
                         <div class="text-gray-400 text-sm">par lot de {{ lot_group.saleUnit.value }}</div>
                     </div>
                 </div>
@@ -69,7 +73,11 @@
                     }) }}
                     {{ form_errors(form.actualSellPrice) }}
                     <div class="form-help">
-                        Prix prévu : {{ (lot_group.sellPricePerLot / 1000)|number_format(0, ',', ' ') }}k
+                        {% if lot_group.sellPricePerLot %}
+                            Prix prévu : {{ (lot_group.sellPricePerLot / 1000)|number_format(0, ',', ' ') }}k
+                        {% else %}
+                            Aucun prix prévu - définissez le prix réel de vente
+                        {% endif %}
                     </div>
                 </div>
 

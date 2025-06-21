@@ -19,11 +19,10 @@ class ItemSearchController extends AbstractController
         $limit = min((int) $request->query->get('limit', 20), 50);
         
         if (strlen($query) < 2) {
-            return $this->json(['items' => []], 200, [
-                'Cache-Control' => 'public, max-age=300'
-            ]);
+            return $this->json(['items' => []]);
         }
         
+        // Requête optimisée : seulement id, name, level
         $items = $itemRepository->createQueryBuilder('i')
             ->select('i.id, i.name, i.level, i.itemType')
             ->where('i.name LIKE :query')
@@ -37,15 +36,12 @@ class ItemSearchController extends AbstractController
             return [
                 'id' => $item['id'],
                 'name' => $item['name'],
-                'level' => $item['level'],
-                'type' => $item['itemType']
+                'level' => $item['level'] ?? '',
+                'display' => $item['name'] . ($item['level'] ? ' (Niv.' . $item['level'] . ')' : '')
             ];
         }, $items);
         
-        return $this->json(['items' => $itemsData], 200, [
-            'Cache-Control' => 'public, max-age=60',
-            'Content-Type' => 'application/json'
-        ]);
+        return $this->json(['items' => $itemsData]);
     }
 
     #[Route('/search/resources', name: 'api_items_search_resources', methods: ['GET'])]

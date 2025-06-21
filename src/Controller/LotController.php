@@ -43,33 +43,38 @@ class LotController extends AbstractController
     }
 
     #[Route('/new', name: 'app_lot_new')]
-    public function new(
-        Request $request, 
-        EntityManagerInterface $em,
-        CharacterSelectionService $characterService
-    ): Response {
+    public function new(Request $request, EntityManagerInterface $em, CharacterSelectionService $characterService): Response
+    {
         $selectedCharacter = $characterService->getSelectedCharacter($this->getUser());
         
         if (!$selectedCharacter) {
-            $this->addFlash('error', 'Aucun personnage sélectionné. Créez d\'abord un personnage.');
+            $this->addFlash('error', 'Aucun personnage sélectionné.');
             return $this->redirectToRoute('app_profile_index');
         }
 
         $lotGroup = new LotGroup();
-        
-        // Créer le formulaire avec l'option is_edit = false (par défaut)
-        $form = $this->createForm(LotGroupType::class, $lotGroup, [
-            'is_edit' => false
-        ]);
+        $form = $this->createForm(LotGroupType::class, $lotGroup, ['is_edit' => false]);
 
         $form->handleRequest($request);
         if ($form->isSubmitted() && $form->isValid()) {
-            $lotGroup->setDofusCharacter($selectedCharacter);
-            $em->persist($lotGroup);
-            $em->flush();
+            // Récupérer l'item depuis l'ID caché
+            $itemId = $form->get('item')->getData();
+            
+            if ($itemId) {
+                $item = $em->getRepository(Item::class)->find($itemId);
+                if ($item) {
+                    $lotGroup->setItem($item);
+                    $lotGroup->setDofusCharacter($selectedCharacter);
+                    
+                    $em->persist($lotGroup);
+                    $em->flush();
 
-            $this->addFlash('success', 'Lot ajouté avec succès !');
-            return $this->redirectToRoute('app_lot_index');
+                    $this->addFlash('success', 'Lot ajouté avec succès !');
+                    return $this->redirectToRoute('app_lot_index');
+                }
+            }
+            
+            $this->addFlash('error', 'Veuillez sélectionner un item valide.');
         }
 
         return $this->render('lot/new.html.twig', [

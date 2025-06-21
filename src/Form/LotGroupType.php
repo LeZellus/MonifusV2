@@ -3,12 +3,11 @@
 namespace App\Form;
 
 use App\Entity\LotGroup;
-use App\Entity\Item;
 use App\Enum\LotStatus;
 use App\Enum\SaleUnit;
-use Symfony\Bridge\Doctrine\Form\Type\EntityType;
 use Symfony\Component\Form\AbstractType;
 use Symfony\Component\Form\Extension\Core\Type\EnumType;
+use Symfony\Component\Form\Extension\Core\Type\HiddenType;
 use Symfony\Component\Form\Extension\Core\Type\IntegerType;
 use Symfony\Component\Form\Extension\Core\Type\TextType;
 use Symfony\Component\Form\FormBuilderInterface;
@@ -32,18 +31,17 @@ class LotGroupType extends AbstractType
                     'data-action' => 'input->autocomplete#search'
                 ]
             ]);
+            
+            // Champ caché pour stocker l'ID de l'item sélectionné
+            $builder->add('item', HiddenType::class, [
+                'mapped' => false,
+                'attr' => [
+                    'data-autocomplete-target' => 'hiddenId'
+                ]
+            ]);
         }
         
         $builder
-            ->add('item', EntityType::class, [
-                'class' => Item::class,
-                'choice_label' => 'name',
-                'label' => 'Item',
-                'attr' => array_merge(
-                    ['class' => 'form-input'],
-                    !$isEdit ? ['data-autocomplete-target' => 'hiddenId', 'style' => 'display: none;'] : []
-                )
-            ])
             ->add('saleUnit', EnumType::class, [
                 'class' => SaleUnit::class,
                 'choice_label' => fn(SaleUnit $choice) => $choice->getLabel(),
@@ -82,6 +80,7 @@ class LotGroupType extends AbstractType
         $resolver->setDefaults([
             'data_class' => LotGroup::class,
             'is_edit' => false,
+            'current_item' => null,
         ]);
     }
 }

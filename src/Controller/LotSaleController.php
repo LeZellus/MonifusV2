@@ -41,7 +41,8 @@ class LotSaleController extends AbstractController
         $lotUnit = new LotUnit();
         $lotUnit->setLotGroup($lotGroup);
         $lotUnit->setSoldAt(new \DateTime());
-        $lotUnit->setActualSellPrice($lotGroup->getSellPricePerLot());
+        $defaultSellPrice = $lotGroup->getSellPricePerLot() ?? $lotGroup->getBuyPricePerLot();
+        $lotUnit->setActualSellPrice($defaultSellPrice);
 
         // Formulaire avec quantité
         $form = $this->createForm(LotUnitType::class, $lotUnit, [
@@ -54,6 +55,7 @@ class LotSaleController extends AbstractController
         $form->handleRequest($request);
         if ($form->isSubmitted() && $form->isValid()) {
             $quantitySold = $form->get('quantitySold')->getData();
+            $actualSellPrice = $lotUnit->getActualSellPrice();
             $remainingQuantity = $lotGroup->getLotSize() - $quantitySold;
 
             if ($remainingQuantity < 0) {
@@ -62,6 +64,11 @@ class LotSaleController extends AbstractController
                     'form' => $form,
                     'lot_group' => $lotGroup,
                 ]);
+            }
+
+            // ⚡ NOUVEAU : Mettre à jour le prix de vente du lot si pas encore défini
+            if ($lotGroup->getSellPricePerLot() === null) {
+                $lotGroup->setSellPricePerLot($actualSellPrice);
             }
 
             // Enregistrer la vente avec la quantité
