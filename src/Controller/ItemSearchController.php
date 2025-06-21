@@ -23,14 +23,7 @@ class ItemSearchController extends AbstractController
         }
         
         try {
-            $items = $itemRepository->createQueryBuilder('i')
-                ->select('i.id, i.name, i.level, i.itemType')
-                ->where('i.name LIKE :query')
-                ->setParameter('query', '%' . $query . '%')
-                ->setMaxResults($limit)
-                ->orderBy('i.name', 'ASC')
-                ->getQuery()
-                ->getArrayResult();
+            $items = $itemRepository->searchByName($query, $limit);
             
             $itemsData = array_map(function($item) {
                 $typeLabel = $this->getTypeLabel($item['itemType']);
@@ -61,16 +54,7 @@ class ItemSearchController extends AbstractController
         }
         
         try {
-            $items = $itemRepository->createQueryBuilder('i')
-                ->select('i.id, i.name, i.level, i.itemType')
-                ->where('i.name LIKE :query')
-                ->andWhere('i.itemType = :resourceType OR i.itemType IS NULL')
-                ->setParameter('query', '%' . $query . '%')
-                ->setParameter('resourceType', ItemType::RESOURCE->value)
-                ->setMaxResults($limit)
-                ->orderBy('i.name', 'ASC')
-                ->getQuery()
-                ->getArrayResult();
+            $items = $itemRepository->searchByName($query, $limit);
             
             $itemsData = array_map(function($item) {
                 return [

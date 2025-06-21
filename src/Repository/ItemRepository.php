@@ -16,28 +16,29 @@ class ItemRepository extends ServiceEntityRepository
         parent::__construct($registry, Item::class);
     }
 
-    //    /**
-    //     * @return Item[] Returns an array of Item objects
-    //     */
-    //    public function findByExampleField($value): array
-    //    {
-    //        return $this->createQueryBuilder('i')
-    //            ->andWhere('i.exampleField = :val')
-    //            ->setParameter('val', $value)
-    //            ->orderBy('i.id', 'ASC')
-    //            ->setMaxResults(10)
-    //            ->getQuery()
-    //            ->getResult()
-    //        ;
-    //    }
+    public function searchByName(string $query, int $limit = 20): array
+{
+    return $this->createQueryBuilder('i')
+        ->select('i.id, i.name, i.level, i.itemType')
+        ->where('i.name LIKE :query')
+        ->setParameter('query', '%' . $query . '%')
+        ->setMaxResults($limit)
+        ->orderBy('i.name', 'ASC')
+        ->getQuery()
+        ->getArrayResult();
+}
 
-    //    public function findOneBySomeField($value): ?Item
-    //    {
-    //        return $this->createQueryBuilder('i')
-    //            ->andWhere('i.exampleField = :val')
-    //            ->setParameter('val', $value)
-    //            ->getQuery()
-    //            ->getOneOrNullResult()
-    //        ;
-    //    }
+    public function searchResourcesByName(string $query, int $limit = 20): array
+    {
+        return $this->createQueryBuilder('i')
+            ->select('i.id, i.name, i.level, i.itemType')
+            ->where('i.name LIKE :query')
+            ->andWhere('i.itemType = :resourceType OR i.itemType IS NULL')
+            ->setParameter('query', '%' . $query . '%')
+            ->setParameter('resourceType', ItemType::RESOURCE->value)
+            ->setMaxResults($limit)
+            ->orderBy('i.name', 'ASC')
+            ->getQuery()
+            ->getArrayResult();
+    }
 }
