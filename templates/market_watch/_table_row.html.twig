@@ -52,7 +52,13 @@
         </div>
     </td>
     <td class="table-cell">
-        <a href="{{ path('app_market_watch_history', {itemId: item.item.id}) }}" 
-           class="text-blue-400 hover:text-blue-300">Voir historique</a>
+        <div class="action-group">
+            <a href="{{ path('app_market_watch_history', {itemId: item.item.id}) }}" 
+            class="text-blue-400 hover:text-blue-300">Voir historique</a>
+            <form action="{{ path('app_market_watch_delete_all_for_item', {itemId: item.item.id}) }}" method="post" 
+                onsubmit="return confirm('Supprimer toutes les observations de {{ item.item.name }} ?')" class="inline">
+                <button type="submit" class="text-red-400 hover:text-red-300">Supprimer</button>
+            </form>
+        </div>
     </td>
 </tr>

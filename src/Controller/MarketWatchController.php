@@ -125,6 +125,36 @@ class MarketWatchController extends AbstractController
         return $this->redirectToRoute('app_market_watch_index');
     }
 
+    #[Route('/item/{itemId}/delete-all', name: 'app_market_watch_delete_all_for_item', methods: ['POST'])]
+    public function deleteAllForItem(
+        int $itemId,
+        MarketWatchRepository $marketWatchRepository,
+        CharacterSelectionService $characterService,
+        EntityManagerInterface $em
+    ): Response {
+        $selectedCharacter = $characterService->getSelectedCharacter($this->getUser());
+        
+        if (!$selectedCharacter) {
+            $this->addFlash('error', 'Aucun personnage sélectionné.');
+            return $this->redirectToRoute('app_market_watch_index');
+        }
+
+        $observations = $marketWatchRepository->findPriceHistoryForItem($selectedCharacter, $itemId);
+        
+        if (empty($observations)) {
+            $this->addFlash('warning', 'Aucune observation à supprimer.');
+            return $this->redirectToRoute('app_market_watch_index');
+        }
+
+        foreach ($observations as $observation) {
+            $em->remove($observation);
+        }
+        $em->flush();
+
+        $this->addFlash('success', count($observations) . ' observation(s) supprimée(s) pour ' . $observations[0]->getItem()->getName());
+        return $this->redirectToRoute('app_market_watch_index');
+    }
+
     #[Route('/item/{itemId}/history', name: 'app_market_watch_history')]
     public function itemHistory(
         int $itemId,

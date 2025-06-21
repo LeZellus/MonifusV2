@@ -81,8 +81,13 @@
                         </div>
                         <div class="flex space-x-2">
                             <a href="{{ path('app_market_watch_edit', {id: observation.id}) }}" 
-                               class="text-blue-400 hover:text-blue-300 text-sm">Modifier</a>
+                            class="text-blue-400 hover:text-blue-300">Modifier</a>
+                            <form action="{{ path('app_market_watch_delete', {id: observation.id}) }}" method="post" 
+                                onsubmit="return confirm('Supprimer cette observation ?')" class="inline">
+                                <button type="submit" class="text-red-400 hover:text-red-300">Supprimer</button>
+                            </form>
                         </div>
+                        
                     </div>
 
                     <!-- Prix observés -->
