@@ -3,7 +3,7 @@
 namespace App\Controller;
 
 use App\Entity\LotGroup;
-use App\Entity\Item;  // ← Import manquant
+use App\Entity\Item;
 use App\Form\LotGroupType;
 use App\Repository\LotGroupRepository;
 use App\Service\CharacterSelectionService;
@@ -28,12 +28,7 @@ class LotController extends AbstractController
 
         $lots = [];
         if ($selectedCharacter) {
-            $lots = $lotRepository->createQueryBuilder('lg')
-                ->where('lg.dofusCharacter = :character')
-                ->setParameter('character', $selectedCharacter)
-                ->orderBy('lg.createdAt', 'DESC')
-                ->getQuery()
-                ->getResult();
+            $lots = $lotRepository->findByCharacterWithItems($selectedCharacter);
         }
 
         return $this->render('lot/index.html.twig', [
@@ -44,8 +39,11 @@ class LotController extends AbstractController
     }
 
     #[Route('/new', name: 'app_lot_new')]
-    public function new(Request $request, EntityManagerInterface $em, CharacterSelectionService $characterService): Response
-    {
+    public function new(
+        Request $request, 
+        EntityManagerInterface $em, 
+        CharacterSelectionService $characterService
+    ): Response {
         $selectedCharacter = $characterService->getSelectedCharacter($this->getUser());
         
         if (!$selectedCharacter) {
@@ -58,7 +56,6 @@ class LotController extends AbstractController
 
         $form->handleRequest($request);
         if ($form->isSubmitted() && $form->isValid()) {
-            // Récupérer l'item depuis l'ID caché
             $itemId = $form->get('item')->getData();
             
             if ($itemId) {
@@ -86,22 +83,25 @@ class LotController extends AbstractController
 
     #[Route('/{id}/edit', name: 'app_lot_edit')]
     public function edit(
-        LotGroup $lotGroup, 
+        int $id,
         Request $request, 
         EntityManagerInterface $em,
-        CharacterSelectionService $characterService
+        CharacterSelectionService $characterService,
+        LotGroupRepository $lotRepository
     ): Response {
         $selectedCharacter = $characterService->getSelectedCharacter($this->getUser());
-
-        // Vérifier que le lot appartient au personnage sélectionné
-        if ($lotGroup->getDofusCharacter() !== $selectedCharacter) {
+        
+        if (!$selectedCharacter) {
             throw $this->createAccessDeniedException();
         }
 
-        // Créer le formulaire avec l'option is_edit = true
-        $form = $this->createForm(LotGroupType::class, $lotGroup, [
-            'is_edit' => true
-        ]);
+        $lotGroup = $lotRepository->findOneByIdAndCharacter($id, $selectedCharacter);
+        
+        if (!$lotGroup) {
+            throw $this->createNotFoundException();
+        }
+
+        $form = $this->createForm(LotGroupType::class, $lotGroup, ['is_edit' => true]);
 
         $form->handleRequest($request);
         if ($form->isSubmitted() && $form->isValid()) {
@@ -119,15 +119,21 @@ class LotController extends AbstractController
 
     #[Route('/{id}/delete', name: 'app_lot_delete', methods: ['POST'])]
     public function delete(
-        LotGroup $lotGroup, 
+        int $id,
         EntityManagerInterface $em,
-        CharacterSelectionService $characterService
+        CharacterSelectionService $characterService,
+        LotGroupRepository $lotRepository
     ): Response {
         $selectedCharacter = $characterService->getSelectedCharacter($this->getUser());
-
-        // Vérifier que le lot appartient au personnage sélectionné
-        if ($lotGroup->getDofusCharacter() !== $selectedCharacter) {
+        
+        if (!$selectedCharacter) {
             throw $this->createAccessDeniedException();
+        }
+
+        $lotGroup = $lotRepository->findOneByIdAndCharacter($id, $selectedCharacter);
+        
+        if (!$lotGroup) {
+            throw $this->createNotFoundException();
         }
 
         $em->remove($lotGroup);
