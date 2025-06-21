@@ -10,7 +10,10 @@
         {{ item.soldAt|date('d/m/Y') }}
     </td>
     <td class="table-cell">
-        {% include 'components/item_display.html.twig' with {item: lotGroup.item} %}
+        {% include 'components/item_display.html.twig' with {
+            item: lotGroup.item,
+            mode: 'compact',
+        } %}
     </td>
     <td class="table-cell">
         <div class="text-white font-medium">{{ quantitySold }} lots</div>
@@ -18,13 +21,16 @@
     </td>
     <td class="table-cell">
         {% include 'components/price_display.html.twig' with {
-            price: item.actualSellPrice,
+            price: lotGroup.sellPricePerLot,
+            color: 'white'
         } %}
         <div class="text-gray-400 text-sm">par lot</div>
     </td>
+    
     <td class="table-cell">
         {% include 'components/price_display.html.twig' with {
-            price: lotGroup.sellPricePerLot,
+            price: item.actualSellPrice,
+            color: 'white'
         } %}
         <div class="text-gray-400 text-sm">par lot</div>
     </td>
@@ -35,17 +41,22 @@
             quantity: item.quantitySold
         } %}
     </td>
-    <td class="table-cell">
+    <td class="table-cell">        
         {% if performanceTotal == 0 %}
-            <span class="status-badge bg-gray-600 text-gray-300">Conforme</span>
+            {% include 'components/badge.html.twig' with {
+                text: 'Moyen',
+                color: 'yellow',
+            } %}
         {% elseif performanceTotal > 0 %}
-            <span class="status-badge bg-green-600 text-green-100">
-                +{{ (performanceTotal / 1000)|number_format(0, ',', ' ') }}k
-            </span>
+            {% include 'components/badge.html.twig' with {
+                text: '+' ~ (performanceTotal / 1000)|number_format(0, ',', ' ') ~ 'k',
+                color: 'green',
+            } %}
         {% else %}
-            <span class="status-badge bg-red-600 text-red-100">
-                {{ (performanceTotal / 1000)|number_format(0, ',', ' ') }}k
-            </span>
+            {% include 'components/badge.html.twig' with {
+                text: (performanceTotal / 1000)|number_format(0, ',', ' ') ~ 'k',
+                color: 'red',
+            } %}
         {% endif %}
     </td>
     <td class="table-cell">

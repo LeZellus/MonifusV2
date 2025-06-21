@@ -1,0 +1,12 @@
+{# components/badge.html.twig #}
+{#
+Badge générique réutilisable
+Usage: {% include 'components/badge.html.twig' with {
+    text: 'Texte du badge',
+    color: 'orange'   // Couleur de texte Tailwind (sans 'text-')
+} %}
+#}
+
+<span class="status-badge bg-{{ color }}-600 text-{{ color }}-100 px-1.5 py-0.5 text-xs">
+    {{ text|raw }}
+</span>

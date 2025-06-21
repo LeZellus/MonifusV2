@@ -22,7 +22,10 @@
                     <div class="flex-1">
                         <div class="flex items-center space-x-2 mb-1">
                             <h3 class="text-white font-bold text-lg">{{ selectedCharacter.name }}</h3>
-                            <span class="bg-green-600 text-green-100 px-2 py-1 rounded-full text-xs font-medium">ACTIF</span>
+                            {% include 'components/badge.html.twig' with {
+                                text: 'Actif',
+                                color: 'green'
+                            } %}
                         </div>
                         <div class="flex items-center space-x-3 text-sm text-gray-300 mb-2">
                             <span class="flex items-center space-x-1">
@@ -69,7 +72,9 @@
                     <div class="grid grid-cols-2 md:grid-cols-3 gap-2">
                         {% for character in currentProfileCharacters %}
                             {% if character.id != selectedCharacter.id %}
-                                <button onclick="window.location.href='{{ path('app_character_select', {id: character.id}) }}'"
+                                <button data-controller="character-selector" 
+                                        data-action="click->character-selector#selectCharacter"
+                                        data-character-id="{{ character.id }}"
                                         class="bg-gray-700 hover:bg-gray-600 rounded-lg p-2 text-left transition-colors group">
                                     <div class="flex items-center space-x-2">
                                         <div class="w-8 h-8 rounded overflow-hidden">

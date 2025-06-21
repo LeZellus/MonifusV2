@@ -9,7 +9,8 @@
         {% if item.avg_price_unit %}
             {% include 'components/price_display.html.twig' with {
                 price: item.avg_price_unit,
-                show_kamas: false
+                show_kamas: false,
+                color: 'white'
             } %}
             <div class="text-gray-500 text-xs">{{ item.price_unit_count }} obs</div>
         {% else %}
@@ -20,7 +21,8 @@
         {% if item.avg_price_10 %}
             {% include 'components/price_display.html.twig' with {
                 price: item.avg_price_10,
-                show_kamas: false
+                show_kamas: false,
+                color: 'white'
             } %}
             <div class="text-gray-500 text-xs">{{ item.price_10_count }} obs</div>
         {% else %}
@@ -31,7 +33,8 @@
         {% if item.avg_price_100 %}
             {% include 'components/price_display.html.twig' with {
                 price: item.avg_price_100,
-                show_kamas: false
+                show_kamas: false,
+                color: 'white'
             } %}
             <div class="text-gray-500 text-xs">{{ item.price_100_count }} obs</div>
         {% else %}

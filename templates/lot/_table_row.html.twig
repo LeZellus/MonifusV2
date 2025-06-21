@@ -9,6 +9,7 @@
     <td class="table-cell">
         {% include 'components/price_display.html.twig' with {
             price: item.buyPricePerLot,
+            color: 'white'
         } %}
         <div class="text-gray-400 text-sm">par lot</div>
     </td>
@@ -18,13 +19,14 @@
             {% set lastSale = item.lotUnits|last %}
             {% include 'components/price_display.html.twig' with {
                 price: lastSale.actualSellPrice,
+                color: 'white'
             } %}
             <div class="text-gray-400 text-sm">prix réel</div>
         {% elseif item.sellPricePerLot %}
             {# Sinon afficher le prix prévu #}
             {% include 'components/price_display.html.twig' with {
                 price: item.sellPricePerLot,
-                color: 'lime'
+                color: 'yellow'
             } %}
             <div class="text-gray-400 text-sm">par lot</div>
         {% else %}
@@ -39,13 +41,15 @@
             {% include 'components/profit_display.html.twig' with {
                 buy_price: item.buyPricePerLot,
                 sell_price: lastSale.actualSellPrice,
-                quantity: lastSale.quantitySold
+                quantity: lastSale.quantitySold,
+                color: 'white'
             } %}
         {% elseif item.sellPricePerLot %}
             {% include 'components/profit_display.html.twig' with {
                 buy_price: item.buyPricePerLot,
                 sell_price: item.sellPricePerLot,
-                quantity: item.lotSize
+                quantity: item.lotSize,
+                color: 'white'
             } %}
         {% else %}
             <span class="text-gray-500">-</span>
