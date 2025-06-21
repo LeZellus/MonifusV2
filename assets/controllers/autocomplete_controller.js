@@ -36,6 +36,11 @@ export default class extends Controller {
     async performSearch(query) {
         try {
             const response = await fetch(`${this.urlValue}?q=${encodeURIComponent(query)}`)
+            
+            if (!response.ok) {
+                throw new Error(`HTTP ${response.status}`)
+            }
+            
             const data = await response.json()
             this.displayResults(data.items, query)
         } catch (error) {
@@ -57,12 +62,10 @@ export default class extends Controller {
             return `
                 <div class="autocomplete-item group" data-id="${item.id}" data-action="click->autocomplete#selectItem">
                     <div class="flex items-center space-x-3">
-                        <!-- Avatar avec initiale -->
                         <div class="w-10 h-10 ${avatarBg} rounded-lg flex items-center justify-center text-white font-bold text-sm shadow-sm">
                             ${item.name.charAt(0).toUpperCase()}
                         </div>
                         
-                        <!-- Info item -->
                         <div class="flex-1 min-w-0">
                             <div class="font-medium text-white truncate group-hover:text-blue-300 transition-colors">
                                 ${this.highlightMatch(item.name, query)}
@@ -70,7 +73,6 @@ export default class extends Controller {
                             ${item.level ? `<div class="text-gray-400 text-sm">Niveau ${item.level}</div>` : ''}
                         </div>
                         
-                        <!-- Type badge -->
                         ${item.type ? `
                             <div class="text-xs text-gray-300 bg-gray-700 px-2 py-1 rounded-full flex items-center space-x-1">
                                 <span>${typeIcon}</span>
@@ -127,7 +129,6 @@ export default class extends Controller {
             'bg-gradient-to-br from-teal-500 to-teal-600'
         ]
         
-        // Hash simple du nom pour avoir une couleur consistente
         let hash = 0
         for (let i = 0; i < name.length; i++) {
             hash = name.charCodeAt(i) + ((hash << 5) - hash)
@@ -156,7 +157,6 @@ export default class extends Controller {
         this.inputTarget.value = itemName
         this.hideResults()
         
-        // Animation de sélection
         itemElement.style.transform = 'scale(0.95)'
         setTimeout(() => {
             itemElement.style.transform = 'scale(1)'
@@ -165,7 +165,6 @@ export default class extends Controller {
 
     showResults() {
         this.resultsTarget.classList.remove('hidden')
-        // Animation d'apparition
         this.resultsTarget.style.opacity = '0'
         this.resultsTarget.style.transform = 'translateY(-10px)'
         

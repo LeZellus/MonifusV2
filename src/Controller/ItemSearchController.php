@@ -22,29 +22,32 @@ class ItemSearchController extends AbstractController
             return $this->json(['items' => []]);
         }
         
-        // Requête optimisée avec toutes les infos
-        $items = $itemRepository->createQueryBuilder('i')
-            ->select('i.id, i.name, i.level, i.itemType')
-            ->where('i.name LIKE :query')
-            ->setParameter('query', '%' . $query . '%')
-            ->setMaxResults($limit)
-            ->orderBy('i.name', 'ASC')
-            ->getQuery()
-            ->getArrayResult();
-        
-        $itemsData = array_map(function($item) {
-            $typeLabel = $this->getTypeLabel($item['itemType']);
+        try {
+            $items = $itemRepository->createQueryBuilder('i')
+                ->select('i.id, i.name, i.level, i.itemType')
+                ->where('i.name LIKE :query')
+                ->setParameter('query', '%' . $query . '%')
+                ->setMaxResults($limit)
+                ->orderBy('i.name', 'ASC')
+                ->getQuery()
+                ->getArrayResult();
             
-            return [
-                'id' => $item['id'],
-                'name' => $item['name'],
-                'level' => $item['level'] ?? null,
-                'type' => $typeLabel,
-                'display' => $item['name'] . ($item['level'] ? ' (Niv.' . $item['level'] . ')' : '')
-            ];
-        }, $items);
-        
-        return $this->json(['items' => $itemsData]);
+            $itemsData = array_map(function($item) {
+                $typeLabel = $this->getTypeLabel($item['itemType']);
+                
+                return [
+                    'id' => $item['id'],
+                    'name' => $item['name'],
+                    'level' => $item['level'] ?? null,
+                    'type' => $typeLabel,
+                    'display' => $item['name'] . ($item['level'] ? ' (Niv.' . $item['level'] . ')' : '')
+                ];
+            }, $items);
+            
+            return $this->json(['items' => $itemsData]);
+        } catch (\Exception $e) {
+            return $this->json(['items' => []], 500);
+        }
     }
 
     #[Route('/search/resources', name: 'api_items_search_resources', methods: ['GET'])]
@@ -57,41 +60,60 @@ class ItemSearchController extends AbstractController
             return $this->json(['items' => []]);
         }
         
-        $items = $itemRepository->createQueryBuilder('i')
-            ->select('i.id, i.name, i.level, i.itemType')
-            ->where('i.name LIKE :query')
-            ->andWhere('i.itemType = :resourceType OR i.itemType IS NULL')
-            ->setParameter('query', '%' . $query . '%')
-            ->setParameter('resourceType', ItemType::RESOURCE)
-            ->setMaxResults($limit)
-            ->orderBy('i.name', 'ASC')
-            ->getQuery()
-            ->getArrayResult();
-        
-        $itemsData = array_map(function($item) {
-            return [
-                'id' => $item['id'],
-                'name' => $item['name'],
-                'level' => $item['level'] ?? null,
-                'type' => 'Ressource',
-                'display' => $item['name'] . ($item['level'] ? ' (Niv.' . $item['level'] . ')' : '')
-            ];
-        }, $items);
-        
-        return $this->json(['items' => $itemsData]);
+        try {
+            $items = $itemRepository->createQueryBuilder('i')
+                ->select('i.id, i.name, i.level, i.itemType')
+                ->where('i.name LIKE :query')
+                ->andWhere('i.itemType = :resourceType OR i.itemType IS NULL')
+                ->setParameter('query', '%' . $query . '%')
+                ->setParameter('resourceType', ItemType::RESOURCE->value)
+                ->setMaxResults($limit)
+                ->orderBy('i.name', 'ASC')
+                ->getQuery()
+                ->getArrayResult();
+            
+            $itemsData = array_map(function($item) {
+                return [
+                    'id' => $item['id'],
+                    'name' => $item['name'],
+                    'level' => $item['level'] ?? null,
+                    'type' => 'Ressource',
+                    'display' => $item['name'] . ($item['level'] ? ' (Niv.' . $item['level'] . ')' : '')
+                ];
+            }, $items);
+            
+            return $this->json(['items' => $itemsData]);
+        } catch (\Exception $e) {
+            return $this->json(['items' => []], 500);
+        }
     }
     
-    private function getTypeLabel(?string $itemType): string
+    private function getTypeLabel($itemType): string
     {
         if (!$itemType) {
             return 'Divers';
         }
         
-        return match($itemType) {
-            'Resource' => 'Ressource',
-            'Equipment' => 'Équipement', 
-            'Consumable' => 'Consommable',
-            default => 'Divers'
-        };
+        // Si c'est une string (valeur de l'enum en base)
+        if (is_string($itemType)) {
+            return match($itemType) {
+                'Resource' => 'Ressource',
+                'Equipment' => 'Équipement', 
+                'Consumable' => 'Consommable',
+                default => 'Divers'
+            };
+        }
+        
+        // Si c'est l'enum ItemType directement
+        if ($itemType instanceof ItemType) {
+            return match($itemType) {
+                ItemType::RESOURCE => 'Ressource',
+                ItemType::EQUIPMENT => 'Équipement',
+                ItemType::CONSUMABLE => 'Consommable',
+                default => 'Divers'
+            };
+        }
+        
+        return 'Divers';
     }
 }

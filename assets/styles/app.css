@@ -287,6 +287,8 @@ body {
     @apply absolute z-10 w-full bg-gray-800 border border-gray-600 rounded-lg shadow-xl max-h-60 overflow-y-auto mt-1;
     backdrop-filter: blur(10px);
     box-shadow: 0 20px 25px -5px rgba(0, 0, 0, 0.1), 0 10px 10px -5px rgba(0, 0, 0, 0.04);
+    animation: autocomplete-appear 0.2s ease-out;
+    overflow-x: hidden;
 }
 
 .autocomplete-item {
@@ -296,17 +298,13 @@ body {
 
 .autocomplete-item:hover {
     background: linear-gradient(90deg, rgba(59, 130, 246, 0.1), rgba(147, 51, 234, 0.1));
-    transform: translateX(2px);
 }
 
 .autocomplete-item:active {
-    transform: scale(0.98) translateX(2px);
+    transform: scale(0.98);
 }
 
 /* Animation pour les résultats */
-.autocomplete-results {
-    animation: autocomplete-appear 0.2s ease-out;
-}
 
 @keyframes autocomplete-appear {
     from {
