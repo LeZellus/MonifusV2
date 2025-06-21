@@ -4,15 +4,6 @@
 
 {% block body %}
     <div class="wrapper-container">
-        {% include 'components/section_header.html.twig' with {
-            type: 'character',
-            character: character,
-            action_title: 'Historique des Prix',
-            action_description: 'Consulter les évolutions de prix',
-            color: 'orange',
-            icon: '📈'
-        } %}
-
         <!-- Statistiques rapides -->
         <div class="grid grid-cols-1 md:grid-cols-4 gap-4">
             {% include 'components/stats_card.html.twig' with {
@@ -23,33 +14,21 @@
             
             {% include 'components/stats_card.html.twig' with {
                 title: 'Moyenne x1',
-                value: averages.avg_price_unit ? include('components/price_display.html.twig', {
-                    price: averages.avg_price_unit,
-                    color: 'green',
-                    show_kamas: false
-                }) : '-',
+                value: averages.avg_price_unit ? (averages.avg_price_unit / 1000)|number_format(0) ~ 'K' : '-',
                 subtitle: averages.price_unit_count > 0 ? '(' ~ averages.price_unit_count ~ ' obs)' : null,
                 color: 'green'
             } %}
             
             {% include 'components/stats_card.html.twig' with {
                 title: 'Moyenne x10',
-                value: averages.avg_price_10 ? include('components/price_display.html.twig', {
-                    price: averages.avg_price_10,
-                    color: 'blue',
-                    show_kamas: false
-                }) : '-',
+                value: averages.avg_price_10 ? (averages.avg_price_10 / 1000)|number_format(0) ~ 'K' : '-',
                 subtitle: averages.price_10_count > 0 ? '(' ~ averages.price_10_count ~ ' obs)' : null,
                 color: 'blue'
             } %}
             
             {% include 'components/stats_card.html.twig' with {
                 title: 'Moyenne x100',
-                value: averages.avg_price_100 ? include('components/price_display.html.twig', {
-                    price: averages.avg_price_100,
-                    color: 'purple',
-                    show_kamas: false
-                }) : '-',
+                value: averages.avg_price_100 ? (averages.avg_price_100 / 1000)|number_format(0) ~ 'K' : '-',
                 subtitle: averages.price_100_count > 0 ? '(' ~ averages.price_100_count ~ ' obs)' : null,
                 color: 'purple'
             } %}
@@ -108,22 +87,20 @@
 
                     <!-- Prix observés -->
                     <div class="grid grid-cols-1 md:grid-cols-3 gap-4 mb-4">
+                        <!-- Prix x1 -->
                         <div class="bg-gray-700 rounded-lg p-3">
                             <div class="text-gray-400 text-sm mb-1">Prix x1</div>
                             {% if observation.pricePerUnit %}
-                                {% include 'components/price_display.html.twig' with {
-                                    price: observation.pricePerUnit,
-                                    size: 'large',
-                                    color: 'white',
-                                    show_kamas: false
-                                } %}
+                                <div class="text-green-400 font-bold text-lg">
+                                    {{ (observation.pricePerUnit / 1000)|number_format(0) }}K
+                                </div>
                                 {% if not loop.last %}
                                     {% set prevObservation = price_history[loop.index] %}
                                     {% if prevObservation.pricePerUnit %}
                                         {% set diff = observation.pricePerUnit - prevObservation.pricePerUnit %}
                                         {% if diff != 0 %}
                                             <div class="text-{{ diff > 0 ? 'red' : 'green' }}-400 text-xs">
-                                                {{ diff > 0 ? '↗' : '↘' }} {{ (diff / 1000)|number_format(0, ',', ' ') }}k
+                                                {{ diff > 0 ? '↗' : '↘' }} {{ (diff / 1000)|number_format(0) }}K
                                             </div>
                                         {% endif %}
                                     {% endif %}
@@ -133,22 +110,20 @@
                             {% endif %}
                         </div>
 
+                        <!-- Prix x10 -->
                         <div class="bg-gray-700 rounded-lg p-3">
                             <div class="text-gray-400 text-sm mb-1">Prix x10</div>
                             {% if observation.pricePer10 %}
-                                {% include 'components/price_display.html.twig' with {
-                                    price: observation.pricePer10,
-                                    size: 'large',
-                                    color: 'white',
-                                    show_kamas: true
-                                } %}
+                                <div class="text-blue-400 font-bold text-lg">
+                                    {{ (observation.pricePer10 / 1000)|number_format(0) }}K
+                                </div>
                                 {% if not loop.last %}
                                     {% set prevObservation = price_history[loop.index] %}
                                     {% if prevObservation.pricePer10 %}
                                         {% set diff = observation.pricePer10 - prevObservation.pricePer10 %}
                                         {% if diff != 0 %}
                                             <div class="text-{{ diff > 0 ? 'red' : 'green' }}-400 text-xs">
-                                                {{ diff > 0 ? '↗' : '↘' }} {{ (diff / 1000)|number_format(0, ',', ' ') }}k
+                                                {{ diff > 0 ? '↗' : '↘' }} {{ (diff / 1000)|number_format(0) }}K
                                             </div>
                                         {% endif %}
                                     {% endif %}
@@ -158,22 +133,20 @@
                             {% endif %}
                         </div>
 
+                        <!-- Prix x100 -->
                         <div class="bg-gray-700 rounded-lg p-3">
                             <div class="text-gray-400 text-sm mb-1">Prix x100</div>
                             {% if observation.pricePer100 %}
-                                {% include 'components/price_display.html.twig' with {
-                                    price: observation.pricePer100,
-                                    size: 'large',
-                                    color: 'white',
-                                    show_kamas: true
-                                } %}
+                                <div class="text-purple-400 font-bold text-lg">
+                                    {{ (observation.pricePer100 / 1000)|number_format(0) }}K
+                                </div>
                                 {% if not loop.last %}
                                     {% set prevObservation = price_history[loop.index] %}
                                     {% if prevObservation.pricePer100 %}
                                         {% set diff = observation.pricePer100 - prevObservation.pricePer100 %}
                                         {% if diff != 0 %}
                                             <div class="text-{{ diff > 0 ? 'red' : 'green' }}-400 text-xs">
-                                                {{ diff > 0 ? '↗' : '↘' }} {{ (diff / 1000)|number_format(0, ',', ' ') }}k
+                                                {{ diff > 0 ? '↗' : '↘' }} {{ (diff / 1000)|number_format(0) }}K
                                             </div>
                                         {% endif %}
                                     {% endif %}
