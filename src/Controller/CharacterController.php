@@ -54,4 +54,29 @@ class CharacterController extends AbstractController
         return $this->redirectToRoute('app_profile_index');
     }
 
+    #[Route('/character/{id}/edit', name: 'app_profile_character_edit')]
+    public function editCharacter(
+        DofusCharacter $character, 
+        Request $request, 
+        EntityManagerInterface $em
+    ): Response {
+        if ($character->getTradingProfile()->getUser() !== $this->getUser()) {
+            throw $this->createAccessDeniedException();
+        }
+
+        $form = $this->createForm(DofusCharacterType::class, $character);
+        
+        $form->handleRequest($request);
+        if ($form->isSubmitted() && $form->isValid()) {
+            $em->flush();
+            $this->addFlash('success', 'Personnage modifié avec succès !');
+            return $this->redirectToRoute('app_profile_index');
+        }
+
+        return $this->render('profile/character_edit.html.twig', [
+            'form' => $form,
+            'character' => $character,
+        ]);
+    }
+
 }
