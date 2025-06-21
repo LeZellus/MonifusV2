@@ -92,7 +92,7 @@
             {# Liste des personnages du profil actuel #}
             {% set profileCharacters = selectorData.currentProfile.dofusCharacters %}
             {% if profileCharacters|length > 0 %}
-                <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-3">
+                <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
                     {% for character in profileCharacters %}
                         <form method="post" action="{{ path('app_profile_character_select', {id: character.id}) }}" data-turbo="true">
                             <button type="submit" class="w-full p-3 bg-gray-800/70 border border-gray-600/50 rounded-lg text-left hover:bg-gray-700 transition-colors

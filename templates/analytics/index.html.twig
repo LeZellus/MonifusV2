@@ -4,92 +4,287 @@
 
 {% block body %}
     <div class="wrapper-container">
-        <!-- Statistiques globales -->
-        <div class="stats-grid">
-            {% include 'components/stats_card.html.twig' with {
-                title: 'Investi',
-                value: (stats.global.investedAmount / 1000000)|number_format(1) ~ 'M',
-                subtitle: stats.global.availableLots ~ ' lots disponibles',
-                icon: '💰',
-                color: 'orange'
-            } %}
-            {% include 'components/stats_card.html.twig' with {
-                title: 'Profit Réalisé',
-                value: (stats.global.realizedProfit / 1000000)|number_format(1) ~ 'M',
-                subtitle: stats.global.soldLots ~ ' lots vendus',
-                icon: '✅',
-                color: 'green'
-            } %}
-            {% include 'components/stats_card.html.twig' with {
-                title: 'Profit Potentiel',
-                value: (stats.global.potentialProfit / 1000000)|number_format(1) ~ 'M',
-                subtitle: 'Si tout vendu au prix cible',
-                icon: '🎯',
-                color: 'blue'
-            } %}
-            {% include 'components/stats_card.html.twig' with {
-                title: 'Total Lots',
-                value: stats.global.totalLots,
-                subtitle: stats.charactersCount ~ ' personnages',
-                icon: '📊',
-                color: 'purple'
-            } %}
-        </div>
+        {% if stats and (selectedCharacter or stats.global.totalLots > 0) %}
+            <div class="grid gap-4">
+                <!-- Statistiques principales -->
+                <div class="grid md:grid-cols-2 md:grid-cols-2 gap-4">
+                    {% include 'components/stats_card.html.twig' with {
+                        title: 'Investi',
+                        value: (stats.global.investedAmount / 1000000)|number_format(1) ~ 'M',
+                        subtitle: stats.global.availableLots ~ ' lots disponibles',
+                        icon: '💰',
+                        color: 'orange'
+                    } %}
+                    {% include 'components/stats_card.html.twig' with {
+                        title: 'Profit Réalisé',
+                        value: (stats.global.realizedProfit / 1000000)|number_format(1) ~ 'M',
+                        subtitle: stats.global.soldLots ~ ' lots vendus',
+                        icon: '✅',
+                        color: 'green'
+                    } %}
+                    {% include 'components/stats_card.html.twig' with {
+                        title: 'Profit Potentiel',
+                        value: (stats.global.potentialProfit / 1000000)|number_format(1) ~ 'M',
+                        subtitle: 'Si tout vendu au prix cible',
+                        icon: '🎯',
+                        color: 'blue'
+                    } %}
+                    {% include 'components/stats_card.html.twig' with {
+                        title: 'Total Lots',
+                        value: stats.global.totalLots,
+                        subtitle: stats.charactersCount ~ ' personnages',
+                        icon: '📊',
+                        color: 'purple'
+                    } %}
+                </div>
 
-        <!-- Top items rentables -->
-        <div class="stats-grid-2">
-            <div class="wrapper-background">
-                <h3 class="text-white text-xl font-semibold mb-4">🏆 Top Items Rentables</h3>
-                {% if stats.topItems|length > 0 %}
+                <!-- Métriques avancées avec plus de détails -->
+                {% if stats.global.totalLots > 0 %}
+                    <div class="grid md:grid-cols-2 md:grid-cols-2 gap-4">
+                        {% include 'components/stats_card.html.twig' with {
+                            title: 'Taux de vente',
+                            value: ((stats.global.soldLots / stats.global.totalLots) * 100)|number_format(1) ~ '%',
+                            subtitle: stats.global.soldLots ~ ' / ' ~ stats.global.totalLots,
+                            icon: '📈',
+                            color: 'blue'
+                        } %}
+                        
+                        {% set totalProfit = stats.global.realizedProfit + stats.global.potentialProfit %}
+                        {% set roi = stats.global.investedAmount > 0 ? (totalProfit / stats.global.investedAmount * 100) : 0 %}
+                        {% include 'components/stats_card.html.twig' with {
+                            title: 'ROI Total',
+                            value: roi|number_format(1) ~ '%',
+                            subtitle: 'Retour sur investissement',
+                            icon: '💹',
+                            color: roi >= 20 ? 'green' : (roi >= 5 ? 'orange' : 'red')
+                        } %}
+                        
+                        {% set avgProfitPerLot = stats.global.soldLots > 0 ? (stats.global.realizedProfit / stats.global.soldLots) : 0 %}
+                        {% include 'components/stats_card.html.twig' with {
+                            title: 'Profit moyen/lot',
+                            value: (avgProfitPerLot / 1000)|number_format(0) ~ 'K',
+                            subtitle: 'Par lot vendu',
+                            icon: '💎',
+                            color: 'green'
+                        } %}
+                        
+                        {% include 'components/stats_card.html.twig' with {
+                            title: 'Lots par personnage',
+                            value: (stats.global.totalLots / stats.charactersCount)|number_format(1),
+                            subtitle: 'Répartition moyenne',
+                            icon: '⚖️',
+                            color: 'purple'
+                        } %}
+                    </div>
+                {% endif %}
+            </div>
+
+            <!-- Performance temporelle (si disponible) -->
+            {% if stats.weeklyData is defined %}
+                {% set weekly_content %}
+                    <div class="grid grid-cols-2 md:grid-cols-4 gap-4">
+                        {% include 'components/stats_card.html.twig' with {
+                            title: 'Cette semaine',
+                            value: (stats.weeklyData.profit / 1000000)|number_format(1) ~ 'M',
+                            subtitle: stats.weeklyData.sales ~ ' ventes',
+                            icon: '📅',
+                            color: 'blue'
+                        } %}
+                        {% include 'components/stats_card.html.twig' with {
+                            title: 'Ce mois',
+                            value: (stats.monthlyData.profit / 1000000)|number_format(1) ~ 'M',
+                            subtitle: stats.monthlyData.sales ~ ' ventes',
+                            icon: '📆',
+                            color: 'green'
+                        } %}
+                        {% include 'components/stats_card.html.twig' with {
+                            title: 'Meilleur jour',
+                            value: (stats.bestDay.profit / 1000)|number_format(0) ~ 'K',
+                            subtitle: stats.bestDay.date|date('d/m'),
+                            icon: '🏆',
+                            color: 'yellow'
+                        } %}
+                        {% include 'components/stats_card.html.twig' with {
+                            title: 'Trend 7j',
+                            value: stats.weekTrend > 0 ? '+' ~ stats.weekTrend|number_format(1) ~ '%' : stats.weekTrend|number_format(1) ~ '%',
+                            subtitle: 'vs semaine précédente',
+                            icon: stats.weekTrend > 0 ? '📈' : '📉',
+                            color: stats.weekTrend > 0 ? 'green' : 'red'
+                        } %}
+                    </div>
+                {% endset %}
+
+                {% include 'components/form_section.html.twig' with {
+                    title: 'Performance temporelle',
+                    icon: '⏱️',
+                    color: 'blue',
+                    content: weekly_content
+                } %}
+            {% endif %}
+
+            <!-- Analyse par serveur/personnage -->
+            {% if stats.characterBreakdown is defined %}
+                {% set character_content %}
+                    <div class="space-y-3">
+                        {% for char in stats.characterBreakdown %}
+                            <div class="flex justify-between items-center p-4 bg-gray-700 rounded-lg">
+                                <div class="flex items-center space-x-3">
+                                    <img src="/classes{{ asset(char.classe.imgUrl) }}" alt="{{ char.classe.name }}" class="w-8 h-8 rounded">
+                                    <div>
+                                        <div class="text-white font-medium">{{ char.name }}</div>
+                                        <div class="text-gray-400 text-sm">{{ char.server }} • {{ char.activeLots }} lots actifs</div>
+                                    </div>
+                                </div>
+                                <div class="text-right">
+                                    <div class="text-green-400 font-bold">{{ (char.totalProfit / 1000)|number_format(0) }}K</div>
+                                    <div class="text-gray-400 text-sm">ROI: {{ char.roi|number_format(1) }}%</div>
+                                </div>
+                            </div>
+                        {% endfor %}
+                    </div>
+                {% endset %}
+
+                {% include 'components/form_section.html.twig' with {
+                    title: 'Performance par personnage',
+                    icon: '👥',
+                    color: 'purple',
+                    content: character_content
+                } %}
+            {% endif %}
+
+            <!-- Top items rentables (version améliorée) -->
+            {% if stats.topItems|length > 0 %}
+                {% set top_items_content %}
                     <div class="space-y-3">
                         {% for item in stats.topItems %}
                             {% set profit = item.totalProfit %}
+                            {% set avgProfitPerItem = item.lotsCount > 0 ? (profit / item.lotsCount) : 0 %}
                             <div class="flex justify-between items-center p-4 bg-gray-700 rounded-lg">
                                 <div>
                                     <div class="text-white font-medium">{{ item.itemName }}</div>
-                                    <div class="text-gray-400 text-sm">{{ item.lotsCount }} lots</div>
+                                    <div class="text-gray-400 text-sm">
+                                        {{ item.lotsCount }} lots • 
+                                        {{ (avgProfitPerItem / 1000)|number_format(0) }}K/lot
+                                    </div>
                                 </div>
                                 <div class="text-right">
                                     <div class="text-{{ profit >= 0 ? 'green' : 'red' }}-400 font-bold">
                                         {{ (profit / 1000000)|number_format(1) }}M
                                     </div>
+                                    {% if item.roi is defined %}
+                                        <div class="text-gray-400 text-sm">ROI: {{ item.roi|number_format(1) }}%</div>
+                                    {% endif %}
                                 </div>
                             </div>
                         {% endfor %}
                     </div>
-                {% else %}
-                    <p class="text-gray-400">Aucun item tradé pour le moment</p>
-                {% endif %}
-            </div>
-        </div>
+                {% endset %}
 
-        <!-- Ratios et métriques -->
-        {% if stats.global.totalLots > 0 %}
-            <div class="wrapper-background">
-                <h3 class="page-title">📊 Métriques Clés</h3>
-                <div class="stats-grid-3">
-                    <div class="text-center">
-                        <div class="stats-value-primary">
-                            {{ ((stats.global.soldLots / stats.global.totalLots) * 100)|number_format(1) }}%
-                        </div>
-                        <div class="stats-subtitle">Taux de vente</div>
+                {% include 'components/form_section.html.twig' with {
+                    title: 'Top Items Rentables',
+                    icon: '🏆',
+                    color: 'green',
+                    content: top_items_content
+                } %}
+            {% endif %}
+
+            <!-- Statistiques de marché et surveillance -->
+            {% if stats.marketData is defined %}
+                {% set market_content %}
+                    <div class="grid grid-cols-2 md:grid-cols-3 gap-4">
+                        {% include 'components/stats_card.html.twig' with {
+                            title: 'Items surveillés',
+                            value: stats.marketData.watchedItems,
+                            subtitle: stats.marketData.activeWatches ~ ' observations actives',
+                            icon: '👁️',
+                            color: 'orange'
+                        } %}
+                        {% include 'components/stats_card.html.twig' with {
+                            title: 'Prix mis à jour',
+                            value: stats.marketData.recentUpdates,
+                            subtitle: 'Dernières 24h',
+                            icon: '🔄',
+                            color: 'blue'
+                        } %}
+                        {% include 'components/stats_card.html.twig' with {
+                            title: 'Opportunités',
+                            value: stats.marketData.opportunities,
+                            subtitle: 'Prix favorables détectés',
+                            icon: '💡',
+                            color: 'yellow'
+                        } %}
                     </div>
-                    <div class="text-center">
-                        <div class="stats-value-success">
-                            {% set totalProfit = stats.global.realizedProfit + stats.global.potentialProfit %}
-                            {% set roi = stats.global.investedAmount > 0 ? (totalProfit / stats.global.investedAmount * 100) : 0 %}
-                            {{ roi|number_format(1) }}%
+                {% endset %}
+
+                {% include 'components/form_section.html.twig' with {
+                    title: 'Surveillance du marché',
+                    icon: '📊',
+                    color: 'orange',
+                    content: market_content
+                } %}
+            {% endif %}
+
+            <!-- Actions rapides avec recommendations -->
+            {% set actions_content %}
+                <div class="grid grid-cols-1 md:grid-cols-3 gap-4">
+                    <a href="{{ path('app_lot_new') }}" class="btn btn-primary text-center">
+                        <div class="text-lg mb-1">📦</div>
+                        <div>Nouveau lot</div>
+                        <div class="text-xs mt-1 opacity-75">
+                            {% if stats.recommendations.suggestedItems is defined %}
+                                Suggestion: {{ stats.recommendations.suggestedItems|first }}
+                            {% endif %}
                         </div>
-                        <div class="stats-subtitle">ROI Total</div>
-                    </div>
-                    <div class="text-center">
-                        <div class="stats-value-warning">
-                            {{ (stats.global.totalLots / stats.charactersCount)|number_format(1) }}
+                    </a>
+                    <a href="{{ path('app_market_watch_new') }}" class="btn btn-warning text-center">
+                        <div class="text-lg mb-1">👁️</div>
+                        <div>Surveillance prix</div>
+                        <div class="text-xs mt-1 opacity-75">
+                            {{ stats.marketData.watchedItems ?? 0 }} items suivis
                         </div>
-                        <div class="stats-subtitle">Lots par personnage</div>
-                    </div>
+                    </a>
+                    <a href="{{ path('app_sales_history_index') }}" class="btn btn-success text-center">
+                        <div class="text-lg mb-1">💰</div>
+                        <div>Historique ventes</div>
+                        <div class="text-xs mt-1 opacity-75">
+                            {{ stats.global.soldLots }} ventes réalisées
+                        </div>
+                    </a>
                 </div>
-            </div>
+            {% endset %}
+
+            {% include 'components/form_section.html.twig' with {
+                title: 'Actions rapides',
+                icon: '⚡',
+                color: 'yellow',
+                content: actions_content
+            } %}
+
+        {% else %}
+            <!-- États vides... -->
+            {% if selectedCharacter %}
+                {% include 'components/empty_state.html.twig' with {
+                    type: 'no_data',
+                    icon: '📊',
+                    title: 'Pas encore de données analytics',
+                    message: 'Commencez à trader avec {character} pour voir vos performances !',
+                    character_name: selectedCharacter.name,
+                    action: {
+                        url: path('app_lot_new'),
+                        text: 'Créer mon premier lot',
+                        icon: '📦'
+                    }
+                } %}
+            {% else %}
+                {% include 'components/empty_state.html.twig' with {
+                    type: 'no_character',
+                    action: {
+                        url: path('app_profile_index'),
+                        text: 'Sélectionner un personnage',
+                        icon: '👥'
+                    }
+                } %}
+            {% endif %}
         {% endif %}
     </div>
 {% endblock %}

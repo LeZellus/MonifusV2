@@ -11,7 +11,7 @@ body {
    LAYOUT CLASSES (existantes)
    ============================================ */
 .wrapper-container {
-    @apply container grid mx-auto p-4 gap-8 mt-4;
+    @apply container grid mx-auto p-4 gap-8;
 }
 
 .wrapper-background {

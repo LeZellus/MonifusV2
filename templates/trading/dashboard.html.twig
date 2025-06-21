@@ -4,44 +4,6 @@
 
 {% block body %}
 <div class="wrapper-container">
-    {{ include("components/app_auth.html.twig") }}
-
-    <!-- Étape 1: Sélection du personnage -->
-    {% if stats.charactersCount == 0 %}
-        <div class="bg-gradient-to-r from-blue-600 to-purple-600 rounded-lg p-4 text-center">
-            <h2 class="text-white text-2xl font-bold">🚀 Commencez votre aventure trading !</h2>
-            <p class="text-white mb-6">Créez votre premier profil et personnage pour débuter</p>
-            <a href="{{ path('app_profile_index') }}" 
-                class="bg-white text-blue-600 font-bold px-8 py-3 rounded-lg hover:bg-gray-100 transition-colors">
-                Créer mon profil
-            </a>
-        </div>
-    {% else %}
-        <!-- Personnage actif -->
-        <div class="wrapper-background">
-            <div class="flex items-center justify-between">
-                <div>
-                    <h2 class="text-white text-lg font-semibold mb-1">👤 Trading avec</h2>
-                    {% if stats.charactersCount > 0 %}
-                        <div class="flex items-center space-x-3">
-                            <div class="w-10 h-10 bg-blue-500 rounded-full flex items-center justify-center">
-                                <span class="text-white font-bold">?</span>
-                            </div>
-                            <div>
-                                <div class="text-blue-400 font-medium">Personnage sélectionné</div>
-                                <div class="text-gray-400 text-sm">Gérez la sélection dans les profils</div>
-                            </div>
-                        </div>
-                    {% endif %}
-                </div>
-                <a href="{{ path('app_profile_index') }}" 
-                    class="bg-blue-600 hover:bg-blue-700 text-white px-4 py-2 rounded-lg transition-colors">
-                    Gérer personnages
-                </a>
-            </div>
-        </div>
-    {% endif %}
-
     <!-- Statistiques globales -->
     <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">
         {% include 'components/stats_card.html.twig' with {
