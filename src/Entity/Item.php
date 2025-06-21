@@ -37,13 +37,13 @@ class Item
     /**
      * @var Collection<int, LotGroup>
      */
-    #[ORM\OneToMany(targetEntity: LotGroup::class, mappedBy: 'item')]
+    #[ORM\OneToMany(targetEntity: LotGroup::class, mappedBy: 'item', fetch: 'EXTRA_LAZY')]
     private Collection $lotGroups;
 
     /**
      * @var Collection<int, ItemCustomField>
      */
-    #[ORM\OneToMany(targetEntity: ItemCustomField::class, mappedBy: 'item')]
+    #[ORM\OneToMany(targetEntity: ItemCustomField::class, mappedBy: 'item', fetch: 'EXTRA_LAZY')]
     private Collection $itemCustomFields;
 
     public function __construct()

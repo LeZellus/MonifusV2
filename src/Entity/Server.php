@@ -24,7 +24,7 @@ class Server
     /**
      * @var Collection<int, DofusCharacter>
      */
-    #[ORM\OneToMany(targetEntity: DofusCharacter::class, mappedBy: 'server')]
+    #[ORM\OneToMany(targetEntity: DofusCharacter::class, mappedBy: 'server', fetch: 'EXTRA_LAZY')]
     private Collection $dofusCharacters;
 
     public function __construct()

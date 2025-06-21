@@ -63,7 +63,7 @@ class LotGroup
     /**
      * @var Collection<int, LotUnit>
      */
-    #[ORM\OneToMany(targetEntity: LotUnit::class, mappedBy: 'lotGroup', cascade: ['remove'])]
+    #[ORM\OneToMany(targetEntity: LotUnit::class, mappedBy: 'lotGroup', cascade: ['remove'], fetch: 'EXTRA_LAZY')]
     private Collection $lotUnits;
 
     public function __construct()

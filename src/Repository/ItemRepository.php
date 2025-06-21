@@ -17,16 +17,16 @@ class ItemRepository extends ServiceEntityRepository
     }
 
     public function searchByName(string $query, int $limit = 20): array
-{
-    return $this->createQueryBuilder('i')
-        ->select('i.id, i.name, i.level, i.itemType')
-        ->where('i.name LIKE :query')
-        ->setParameter('query', '%' . $query . '%')
-        ->setMaxResults($limit)
-        ->orderBy('i.name', 'ASC')
-        ->getQuery()
-        ->getArrayResult();
-}
+    {
+        return $this->createQueryBuilder('i')
+            ->select('i.id, i.name, i.level, i.itemType')
+            ->where('i.name LIKE :query')
+            ->setParameter('query', '%' . $query . '%')
+            ->setMaxResults($limit)
+            ->orderBy('i.name', 'ASC')
+            ->getQuery()
+            ->getArrayResult(); // ✅ Déjà optimisé avec arrayResult
+    }
 
     public function searchResourcesByName(string $query, int $limit = 20): array
     {

@@ -53,13 +53,13 @@ class DofusCharacter
     /**
      * @var Collection<int, LotGroup>
      */
-    #[ORM\OneToMany(targetEntity: LotGroup::class, mappedBy: 'dofusCharacter', cascade: ['remove'])]
+    #[ORM\OneToMany(targetEntity: LotGroup::class, mappedBy: 'dofusCharacter', cascade: ['remove'], fetch: 'EXTRA_LAZY')]
     private Collection $lotGroups;
 
     /**
      * @var Collection<int, MarketWatch>
      */
-    #[ORM\OneToMany(targetEntity: MarketWatch::class, mappedBy: 'dofusCharacter', cascade: ['remove'])]
+    #[ORM\OneToMany(targetEntity: MarketWatch::class, mappedBy: 'dofusCharacter', cascade: ['remove'], fetch: 'EXTRA_LAZY')]
     private Collection $marketWatches;
 
     public function __construct()

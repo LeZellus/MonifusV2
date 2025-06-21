@@ -49,7 +49,7 @@ class TradingProfile
     /**
      * @var Collection<int, DofusCharacter>
      */
-    #[ORM\OneToMany(targetEntity: DofusCharacter::class, mappedBy: 'tradingProfile', cascade: ['remove'])]
+    #[ORM\OneToMany(targetEntity: DofusCharacter::class, mappedBy: 'tradingProfile', cascade: ['remove'], fetch: 'EXTRA_LAZY')]
     private Collection $dofusCharacters;
 
     public function __construct()
