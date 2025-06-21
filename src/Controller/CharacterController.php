@@ -32,13 +32,26 @@ class CharacterController extends AbstractController
 
         if (!$character) {
             $this->addFlash('error', 'Personnage non trouvé');
-            return $this->redirectToRoute('app_lot_index');
+            
+            // Utiliser referer au lieu de redirection fixe
+            $referer = $request->headers->get('referer');
+            if ($referer) {
+                return $this->redirect($referer);
+            }
+            return $this->redirectToRoute('app_profile_index');
         }
 
         $characterService->setSelectedCharacter($character);
         $this->addFlash('success', "Personnage {$character->getName()} sélectionné");
 
-        // Turbo redirige automatiquement via le formulaire
-        return $this->redirectToRoute('app_lot_index');
+        // Revenir sur la page précédente au lieu de app_lot_index
+        $referer = $request->headers->get('referer');
+        if ($referer) {
+            return $this->redirect($referer);
+        }
+        
+        // Fallback
+        return $this->redirectToRoute('app_profile_index');
     }
+
 }

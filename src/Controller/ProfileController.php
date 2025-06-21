@@ -153,7 +153,8 @@ class ProfileController extends AbstractController
     #[Route('/character/{id}/select', name: 'app_profile_character_select')]
     public function selectCharacter(
         DofusCharacter $character,
-        CharacterSelectionService $characterService
+        CharacterSelectionService $characterService,
+        Request $request  // AJOUTER ce paramètre
     ): Response {
         // Vérifier que le personnage appartient à l'utilisateur
         if ($character->getTradingProfile()->getUser() !== $this->getUser()) {
@@ -162,14 +163,22 @@ class ProfileController extends AbstractController
 
         $characterService->setSelectedCharacter($character);
         $this->addFlash('success', "Personnage {$character->getName()} sélectionné !");
+
+        // Revenir sur la page précédente au lieu de app_profile_index
+        $referer = $request->headers->get('referer');
+        if ($referer) {
+            return $this->redirect($referer);
+        }
         
+        // Fallback
         return $this->redirectToRoute('app_profile_index');
     }
 
     #[Route('/switch/{id}', name: 'app_profile_switch')]
     public function switchProfile(
         TradingProfile $profile,
-        CharacterSelectionService $characterService
+        CharacterSelectionService $characterService,
+        Request $request
     ): Response {
         // Vérifier que le profil appartient à l'utilisateur
         if ($profile->getUser() !== $this->getUser()) {
@@ -194,9 +203,16 @@ class ProfileController extends AbstractController
             $this->addFlash('info', "Profil '{$profile->getName()}' activé. Ajoutez un personnage pour commencer !");
         }
 
+        // Utiliser le referer pour revenir sur la page précédente
+        $referer = $request->headers->get('referer');
+        if ($referer) {
+            return $this->redirect($referer);
+        }
+
+        // Fallback
         return $this->redirectToRoute('app_profile_index');
     }
-
+    
     #[Route('/{id}/edit', name: 'app_profile_edit')]
     public function edit(
         TradingProfile $profile,
