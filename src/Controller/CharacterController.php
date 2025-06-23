@@ -79,4 +79,38 @@ class CharacterController extends AbstractController
         ]);
     }
 
+    // Uniquement pour la documentation ou avoir le lien dispo quelques part
+    #[Route('/character/add', name: 'app_character_add')]
+    public function addCharacter(
+        TradingProfileRepository $repository,
+        CharacterSelectionService $characterService
+    ): Response {
+        $profiles = $repository->findBy(['user' => $this->getUser()]);
+        
+        // Aucun profil ? Créer un profil d'abord
+        if (empty($profiles)) {
+            $this->addFlash('info', 'Créez d\'abord un profil pour organiser vos personnages.');
+            return $this->redirectToRoute('app_profile_new');
+        }
+        
+        // Un seul profil ? Créer le personnage directement
+        if (count($profiles) === 1) {
+            return $this->redirectToRoute('app_profile_character_new', [
+                'id' => $profiles[0]->getId()
+            ]);
+        }
+        
+        // Plusieurs profils ? Utiliser le profil courant
+        $selectedCharacter = $characterService->getSelectedCharacter($this->getUser());
+        if ($selectedCharacter) {
+            return $this->redirectToRoute('app_profile_character_new', [
+                'id' => $selectedCharacter->getTradingProfile()->getId()
+            ]);
+        }
+        
+        // Fallback : profil par défaut (le premier)
+        return $this->redirectToRoute('app_profile_character_new', [
+            'id' => $profiles[0]->getId()
+        ]);
+    }
 }
