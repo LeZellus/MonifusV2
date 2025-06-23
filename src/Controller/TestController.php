@@ -3,6 +3,7 @@
 namespace App\Controller;
 
 use App\Repository\DofusCharacterRepository;
+use App\Repository\LotGroupRepository;
 use Doctrine\ORM\EntityManagerInterface;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\HttpFoundation\Response;
@@ -103,5 +104,104 @@ class TestController extends AbstractController
             'character_results' => $results,
             'note' => 'Test limité à 3 personnages pour éviter l\'explosion mémoire'
         ]);
+    }
+
+    #[Route('/api/test/lotgroup-performance', name: 'api_test_lotgroup')]
+    public function testLotGroupPerformance(
+        DofusCharacterRepository $characterRepo,
+        LotGroupRepository $lotGroupRepo,
+        EntityManagerInterface $em
+    ): Response {
+        try {
+            $character = $characterRepo->find(1);
+            
+            if (!$character) {
+                return $this->json(['error' => 'Personnage ID 1 non trouvé']);
+            }
+            
+            // Activer le debug SQL
+            $logger = new \Doctrine\DBAL\Logging\DebugStack();
+            $em->getConnection()->getConfiguration()->setSQLLogger($logger);
+            
+            // Test 1: Méthode optimisée (on sait que ça marche)
+            $startTime = microtime(true);
+            $lots = $lotGroupRepo->findByCharacterOptimized($character);
+            $optimizedTime = (microtime(true) - $startTime) * 1000;
+            
+            // Test 2: Analytics simple SEULEMENT
+            $analyticsStartTime = microtime(true);
+            $analytics = $lotGroupRepo->getCharacterAnalytics($character);
+            $analyticsTime = (microtime(true) - $analyticsStartTime) * 1000;
+            
+            return $this->json([
+                'status' => '✅ SUCCESS - Toutes les méthodes OK',
+                'character_name' => $character->getName(),
+                'results' => [
+                    'findByCharacterOptimized' => [
+                        'time_ms' => round($optimizedTime, 2),
+                        'lots_found' => count($lots),
+                        'first_item' => count($lots) > 0 ? $lots[0]->getItem()->getName() : null
+                    ],
+                    'getCharacterAnalytics' => [
+                        'time_ms' => round($analyticsTime, 2),
+                        'total_lots' => $analytics['totalLots'],
+                        'total_investment' => $analytics['totalInvestment']
+                    ]
+                ],
+                'performance_summary' => [
+                    'total_queries' => count($logger->queries),
+                    'optimized_vs_N+1' => 'Optimisé évite ' . (count($lots) + 1) . ' requêtes!',
+                    'sql_queries' => array_slice(array_map(fn($q) => $q['sql'], $logger->queries), 0, 5)
+                ]
+            ]);
+            
+        } catch (\Exception $e) {
+            return $this->json([
+                'status' => '❌ ERROR',
+                'error' => $e->getMessage(),
+                'line' => $e->getLine(),
+                'file' => basename($e->getFile())
+            ]);
+        }
+    }
+
+
+    #[Route('/api/test/simple-lotgroup', name: 'api_test_simple_lotgroup')]
+    public function testSimpleLotGroup(
+        LotGroupRepository $lotGroupRepo,
+        DofusCharacterRepository $characterRepo
+    ): Response {
+        try {
+            // Prendre le premier personnage
+            $character = $characterRepo->createQueryBuilder('c')
+                ->setMaxResults(1)
+                ->getQuery()
+                ->getOneOrNullResult();
+            
+            if (!$character) {
+                return $this->json(['error' => 'Aucun personnage trouvé']);
+            }
+            
+            // Test de la méthode optimisée seule
+            $startTime = microtime(true);
+            $results = $lotGroupRepo->findByCharacterOptimized($character);
+            $time = (microtime(true) - $startTime) * 1000;
+            
+            return $this->json([
+                'status' => '✅ Success',
+                'character' => $character->getName(),
+                'lots_found' => count($results),
+                'execution_time_ms' => round($time, 2),
+                'first_lot_item' => count($results) > 0 ? $results[0]->getItem()->getName() : 'Aucun lot'
+            ]);
+            
+        } catch (\Exception $e) {
+            return $this->json([
+                'status' => '❌ Error',
+                'error' => $e->getMessage(),
+                'line' => $e->getLine(),
+                'file' => basename($e->getFile())
+            ]);
+        }
     }
 }
