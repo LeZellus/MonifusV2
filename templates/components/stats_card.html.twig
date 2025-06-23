@@ -1,11 +1,10 @@
 {# templates/components/stats_card.html.twig #}
 {#
-Composant réutilisable pour afficher des cartes de statistiques
+Composant pour afficher des cartes de statistiques
 Usage: {% include 'components/stats_card.html.twig' with {
     title: 'Titre',
-    value: '42M',
-    price: 1500000 (optionnel - pour utiliser price_display),
-    price_color: 'green' (optionnel - couleur du prix),
+    value: '42' ou 1500000,
+    unit: 'K' ou 'kamas' ou null,
     subtitle: 'Description optionnelle',
     icon: '💰' (optionnel),
     color: 'blue' (optionnel: blue, green, orange, red, purple, yellow),
@@ -16,6 +15,18 @@ Usage: {% include 'components/stats_card.html.twig' with {
 {% set color_class = 'text-' ~ (color|default('blue')) ~ '-400' %}
 {% set value_size = (size|default('normal')) == 'large' ? 'text-3xl' : 'text-2xl' %}
 
+{# Formatage simple des valeurs #}
+{% set formatted_value = value %}
+{% set auto_unit = unit is defined ? unit : null %}
+
+{# Auto-formatage seulement si la valeur est un entier >= 1000 #}
+{% if value is not empty and value is not null %}
+    {% if value is same as(value|round) and value >= 1000 %}
+        {% set formatted_value = (value / 1000)|number_format(0, ',', ' ') %}
+        {% set auto_unit = unit is defined ? unit : 'K' %}
+    {% endif %}
+{% endif %}
+
 <div class="wrapper-background text-center">
     <h3 class="text-white text-lg font-semibold mb-2 flex items-center justify-center">
         {% if icon is defined %}
@@ -24,20 +35,9 @@ Usage: {% include 'components/stats_card.html.twig' with {
         {{ title }}
     </h3>
     
-    {% if price is defined %}
-        {# Utilise price_display pour les prix #}
-        <div class="{{ value_size }} font-bold">
-            {% include 'components/price_display.html.twig' with {
-                price: price,
-                size: size|default('normal') == 'large' ? 'large' : 'normal',
-                color: price_color|default(color|default('blue')),
-                show_kamas: true
-            } %}
-        </div>
-    {% else %}
-        {# Affichage normal pour les autres valeurs #}
-        <p class="{{ color_class }} {{ value_size }} font-bold">{{ value }}</p>
-    {% endif %}
+    <p class="{{ color_class }} {{ value_size }} font-bold">
+        {{ formatted_value }}{% if auto_unit %} {{ auto_unit }}{% endif %}
+    </p>
     
     {% if subtitle is defined %}
         <p class="text-gray-400 text-sm">{{ subtitle }}</p>

@@ -1,0 +1,39 @@
+{% extends 'base.html.twig' %}
+
+{% block title %}Modifier {{ character.name }}{% endblock %}
+
+{% block body %}
+    <div class="wrapper-container">
+        {% include 'profile/_form.html.twig' with {
+            form: form,
+            icon: '✏️',
+            page_title: 'Modifier ' ~ character.name,
+            page_description: 'Modifiez les informations de votre personnage Dofus.',
+            form_title: 'Informations du personnage',
+            form_icon: '👤',
+            form_color: 'blue',
+            form_fields: [
+                {
+                    name: 'name',
+                    placeholder: 'Nom du personnage en jeu',
+                    help_text: '📝 Le nom exact de votre personnage',
+                    focus_color: 'blue'
+                },
+                {
+                    name: 'server',
+                    help_text: '🌍 Serveur où évolue ce personnage',
+                    focus_color: 'blue'
+                },
+                {
+                    name: 'classe',
+                    help_text: '⚔️ Classe de votre personnage',
+                    focus_color: 'blue'
+                }
+            ],
+            submit_text: 'Mettre à jour',
+            submit_icon: '💾',
+            submit_color: 'primary',
+            cancel_url: path('app_profile_index')
+        } %}
+    </div>
+{% endblock %}

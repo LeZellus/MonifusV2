@@ -3,6 +3,9 @@
 {% block title %}Historique des Ventes{% endblock %}
 
 {% block body %}
+
+{% include 'components/profile_selector.html.twig' %}
+
     <div class="wrapper-container">
         {% if selectedCharacter %}
             <!-- Statistiques des ventes -->

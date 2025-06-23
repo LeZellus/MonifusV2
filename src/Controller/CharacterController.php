@@ -9,6 +9,9 @@ use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\Routing\Attribute\Route;
 use Symfony\Component\Security\Http\Attribute\IsGranted;
 use App\Repository\DofusCharacterRepository;
+use App\Entity\DofusCharacter;
+use App\Form\DofusCharacterType;
+use Doctrine\ORM\EntityManagerInterface;
 
 #[Route('/character')]
 #[IsGranted('ROLE_USER')]
@@ -54,7 +57,7 @@ class CharacterController extends AbstractController
         return $this->redirectToRoute('app_profile_index');
     }
 
-    #[Route('/character/{id}/edit', name: 'app_profile_character_edit')]
+    #[Route('/{id}/edit', name: 'app_profile_character_edit')]
     public function editCharacter(
         DofusCharacter $character, 
         Request $request, 

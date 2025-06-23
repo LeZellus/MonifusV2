@@ -22,14 +22,8 @@
                 color: 'white'
             } %}
             <div class="text-gray-400 text-sm">prix réel</div>
-        {% elseif item.sellPricePerLot %}
-            {# Sinon afficher le prix prévu #}
-            {% include 'components/price_display.html.twig' with {
-                price: item.sellPricePerLot,
-                color: 'yellow'
-            } %}
-            <div class="text-gray-400 text-sm">par lot</div>
         {% else %}
+            {# Sinon, toujours "À définir" #}
             <span class="text-gray-500 italic">À définir</span>
             <div class="text-gray-400 text-sm">lors de la vente</div>
         {% endif %}

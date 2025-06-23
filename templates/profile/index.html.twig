@@ -3,6 +3,9 @@
 {% block title %}Mes Profils de Trading{% endblock %}
 
 {% block body %}
+
+    {% include 'components/profile_selector.html.twig' %}
+
     <div class="wrapper-container">
         <!-- Section additionnelle pour la gestion des profils (optionnel) -->
         {% if selectorData.currentProfile %}

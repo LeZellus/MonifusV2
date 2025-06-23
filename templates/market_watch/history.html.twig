@@ -14,26 +14,26 @@
             
             {% include 'components/stats_card.html.twig' with {
                 title: 'Moyenne x1',
-                price: averages.avg_price_unit ?: null,
-                price_color: 'green',
-                subtitle: averages.price_unit_count > 0 ? '(' ~ averages.price_unit_count ~ ' obs)' : null,
-                color: 'green'
+                value: averages.avg_price_unit,
+                unit: 'kamas',
+                color: 'green',
+                subtitle: averages.price_unit_count > 0 ? '(' ~ averages.price_unit_count ~ ' obs)' : null
             } %}
             
             {% include 'components/stats_card.html.twig' with {
                 title: 'Moyenne x10',
-                price: averages.avg_price_10 ?: null,
-                price_color: 'blue',
-                subtitle: averages.price_10_count > 0 ? '(' ~ averages.price_10_count ~ ' obs)' : null,
-                color: 'blue'
+                value: averages.avg_price_10,
+                unit: 'kamas',
+                color: 'blue',
+                subtitle: averages.price_10_count > 0 ? '(' ~ averages.price_10_count ~ ' obs)' : null
             } %}
             
             {% include 'components/stats_card.html.twig' with {
                 title: 'Moyenne x100',
-                price: averages.avg_price_100 ?: null,
-                price_color: 'purple',
-                subtitle: averages.price_100_count > 0 ? '(' ~ averages.price_100_count ~ ' obs)' : null,
-                color: 'purple'
+                value: averages.avg_price_100,
+                unit: 'kamas',
+                color: 'purple',
+                subtitle: averages.price_100_count > 0 ? '(' ~ averages.price_100_count ~ ' obs)' : null
             } %}
         </div>
 

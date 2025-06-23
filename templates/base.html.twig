@@ -37,11 +37,6 @@
             'title': block('title')
         } %}
 
-        {% if app.user %}
-            {% include 'components/profile_selector.html.twig' %}
-        {% endif %}
-        
-
         {% block body %}{% endblock %}
 
         <!-- Navigation mobile -->

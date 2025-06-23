@@ -3,6 +3,9 @@
 {% block title %}Mes Lots de Trading{% endblock %}
 
 {% block body %}
+
+{% include 'components/profile_selector.html.twig' %}
+
     <div class="wrapper-container">
         {% if selectedCharacter %}
             <div class="flex justify-between items-center">

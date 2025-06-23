@@ -1,5 +1,5 @@
 {# templates/components/profile_selector.html.twig #}
-
+{% if app.user %}
 <div class="profile-selector wrapper-container">
     <div>
         {% if selectorData.currentProfile %}
@@ -190,3 +190,4 @@
         {% endif %}
     </div>
 </div>
+{% endif %}

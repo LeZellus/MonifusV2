@@ -1,21 +1,30 @@
 {# templates/components/price_display.html.twig #}
 {#
-Affichage cohérent des prix Dofus avec texte kamas
+Affichage simplifié des prix
 Usage: {% include 'components/price_display.html.twig' with {
     price: 1500000,
     size: 'normal' (optional: small, normal, large),
-    color: 'white' (optional: white, green, blue, purple, red, yellow),
-    show_kamas: true (optional, default: true),
-    prefix: '' (optional, ex: '+', '-'),
-    suffix: '' (optional, ex: ' par lot')
+    color: 'green' (optional: white, green, blue, purple, red, yellow),
+    unit: 'kamas' (optional: 'kamas', 'K', ou null pour auto)
 } %}
 #}
 
-{% set formatted_price = price|number_format(0, ',', ' ') %}
-{% set size_class = (size|default('normal')) == 'small' ? 'text-sm' : ((size|default('normal')) == 'large' ? 'text-xl' : 'text-base') %}
-{% set color_class = (color|default('lime')) == 'white' ? 'text-white' : 'text-' ~ (color|default('lime')) ~ '-500' %}
+{% set size_class = (size|default('normal')) == 'small' ? 'text-sm' : 
+                   ((size|default('normal')) == 'large' ? 'text-xl' : 'text-base') %}
+{% set color_class = color|default('green') == 'white' ? 'text-white' : 'text-' ~ (color|default('green')) ~ '-400' %}
+
+{# Auto-formatage selon la valeur #}
+{% if price >= 1000000 %}
+    {% set formatted = (price / 1000000)|number_format(1, ',', ' ') %}
+    {% set auto_unit = unit|default('M') %}
+{% elseif price >= 1000 %}
+    {% set formatted = (price / 1000)|number_format(0, ',', ' ') %}
+    {% set auto_unit = unit|default('K') %}
+{% else %}
+    {% set formatted = price|number_format(0, ',', ' ') %}
+    {% set auto_unit = unit|default('') %}
+{% endif %}
 
 <span class="{{ color_class }} {{ size_class }} font-medium">
-    {% if prefix is defined %}{{ prefix }}{% endif %}{{ formatted_price }}{% if suffix is defined %}{{ suffix }}{% endif %}
-    {% if show_kamas|default(true) %} kamas{% endif %}
+    {{ formatted }}{% if auto_unit %} {{ auto_unit }}{% endif %}
 </span>
