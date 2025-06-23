@@ -3,6 +3,9 @@
 {% block title %}Analytics Trading{% endblock %}
 
 {% block body %}
+
+{% include 'components/profile_selector.html.twig' %}
+
     <div class="wrapper-container">
         {% if stats and (selectedCharacter or stats.global.totalLots > 0) %}
             <div class="grid gap-4">

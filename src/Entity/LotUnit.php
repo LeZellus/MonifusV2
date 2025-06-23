@@ -19,7 +19,7 @@ class LotUnit
     #[ORM\Column(nullable: true)]
     private ?\DateTime $soldAt = null;
 
-    #[ORM\Column(nullable: true)]
+    #[ORM\Column(type: 'bigint', nullable: true)]
     private ?int $actualSellPrice = null;
 
     #[ORM\Column]
