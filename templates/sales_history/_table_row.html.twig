@@ -68,4 +68,16 @@
             <span class="text-gray-500">-</span>
         {% endif %}
     </td>
+
+    <td class="table-cell">
+        <div class="action-group">
+            <form action="{{ path('app_lot_unit_cancel', {id: item.id}) }}" method="post" 
+                  onsubmit="return confirm('Annuler cette vente de {{ item.quantitySold }} lots ?\\n\\nCela restaurera {{ item.quantitySold }} lots dans le stock disponible.')" 
+                  class="inline">
+                <button type="submit" class="text-orange-400 hover:text-orange-300 text-sm">
+                    🔄 Annuler
+                </button>
+            </form>
+        </div>
+    </td>
 </tr>

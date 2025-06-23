@@ -65,19 +65,27 @@ class LotGroupType extends AbstractType
                 'required' => false,
                 'label' => 'Prix de vente par lot (optionnel)',
                 'attr' => ['class' => 'form-input', 'placeholder' => 'À définir lors de la vente']
-            ])
-            ->add('status', EnumType::class, [
-                'class' => LotStatus::class,
-                'choice_label' => function(LotStatus $choice): string {
-                    return match($choice) {
-                        LotStatus::AVAILABLE => 'Disponible',
-                        LotStatus::SOLD => 'Vendu',
-                    };
-                },
-                'label' => 'Statut',
-                'data' => LotStatus::AVAILABLE,
-                'attr' => ['class' => 'form-input']
             ]);
+
+        // Configuration du champ status selon le mode
+        $statusConfig = [
+            'class' => LotStatus::class,
+            'choice_label' => function(LotStatus $choice): string {
+                return match($choice) {
+                    LotStatus::AVAILABLE => 'Disponible',
+                    LotStatus::SOLD => 'Vendu',
+                };
+            },
+            'label' => 'Statut',
+            'attr' => ['class' => 'form-input']
+        ];
+
+        // Seulement définir une valeur par défaut en mode création
+        if (!$isEdit) {
+            $statusConfig['data'] = LotStatus::AVAILABLE;
+        }
+
+        $builder->add('status', EnumType::class, $statusConfig);
     }
 
     public function configureOptions(OptionsResolver $resolver): void

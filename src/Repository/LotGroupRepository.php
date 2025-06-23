@@ -18,27 +18,21 @@ class LotGroupRepository extends ServiceEntityRepository
 
     // ===== MÉTHODES PRINCIPALES (OPTIMISÉES) =====
 
-    /**
-     * ✅ REMPLACE findByCharacterOrderedByDate ET findByCharacterWithItems
-     * Une seule méthode optimisée qui précharge tout
-     */
-    public function findByCharacterOptimized(DofusCharacter $character): array
+    public function findAvailableLotsByCharacter(DofusCharacter $character): array
     {
         return $this->createQueryBuilder('lg')
             ->select('lg', 'i', 'c')
             ->leftJoin('lg.item', 'i')
             ->leftJoin('lg.dofusCharacter', 'c')
             ->where('lg.dofusCharacter = :character')
+            ->andWhere('lg.status = :available')  // ← FILTRE IMPORTANT !
             ->setParameter('character', $character)
+            ->setParameter('available', LotStatus::AVAILABLE)
             ->orderBy('lg.createdAt', 'DESC')
             ->getQuery()
             ->getResult();
     }
 
-    /**
-     * ✅ REMPLACE getUserGlobalStats avec une approche plus simple
-     * Une seule requête avec GROUP BY au lieu de multiples requêtes
-     */
     public function getUserGlobalStats(User $user): array
     {
         $result = $this->createQueryBuilder('lg')
@@ -83,9 +77,6 @@ class LotGroupRepository extends ServiceEntityRepository
         return $stats;
     }
 
-    /**
-     * ✅ REMPLACE getGlobalStatistics (version simplifiée pour HomeController)
-     */
     public function getGlobalStatistics(): array
     {
         $result = $this->createQueryBuilder('lg')

@@ -435,3 +435,44 @@ body {
 #turbo-progress {
     transition: opacity 0.2s ease;
 }
+
+
+/* ============================================
+   TOGGLE CSS
+   ============================================ */
+
+.toggle-switch {
+    @apply relative inline-block w-12 h-6 bg-gray-600 rounded-full transition-colors duration-200 ease-in-out focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-2 focus:ring-offset-gray-800;
+}
+
+.toggle-switch.active {
+    @apply bg-green-500;
+}
+
+.toggle-slider {
+    @apply absolute left-1 top-1 w-4 h-4 bg-white rounded-full transition-transform duration-200 ease-in-out;
+}
+
+.toggle-switch.active .toggle-slider {
+    @apply transform translate-x-6;
+}
+
+.toggle-label {
+    @apply text-sm font-medium transition-colors duration-200;
+}
+
+.toggle-label-off {
+    @apply text-gray-400;
+}
+
+.toggle-label-off.active {
+    @apply text-white;
+}
+
+.toggle-label-on {
+    @apply text-gray-500;
+}
+
+.toggle-label-on.active {
+    @apply text-green-400;
+}

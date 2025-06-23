@@ -1,0 +1,51 @@
+{# templates/components/toggle_field.html.twig #}
+{#
+Usage: {% include 'components/toggle_field.html.twig' with {
+    form_field: form.status,
+    label: 'Statut du lot',
+    on_label: 'Vendu',
+    off_label: 'Disponible',
+    on_value: 'sold',
+    off_value: 'available',
+    help_text: 'Marquez comme vendu si déjà écoulé'
+} %}
+#}
+
+<div class="mb-6">
+    {{ form_label(form_field, label, {'label_attr': {'class': 'form-label'}}) }}
+    
+    <div class="mt-2">
+        <div class="relative inline-flex items-center" 
+             data-controller="toggle"
+             data-toggle-on-value-value="{{ on_value }}"
+             data-toggle-off-value-value="{{ off_value }}">
+             
+            {# Champ caché pour stocker la valeur #}
+            {{ form_widget(form_field, {
+                'attr': {
+                    'class': 'sr-only',
+                    'data-toggle-target': 'input'
+                }
+            }) }}
+            
+            {# Toggle visuel #}
+            <button type="button" 
+                    class="toggle-switch"
+                    data-action="click->toggle#switch">
+                <span class="toggle-slider"></span>
+            </button>
+            
+            {# Labels #}
+            <div class="ml-4 flex items-center space-x-4">
+                <span class="toggle-label toggle-label-off">{{ off_label }}</span>
+                <span class="toggle-label toggle-label-on">{{ on_label }}</span>
+            </div>
+        </div>
+        
+        {{ form_errors(form_field) }}
+        
+        {% if help_text is defined %}
+            <div class="form-help">{{ help_text }}</div>
+        {% endif %}
+    </div>
+</div>

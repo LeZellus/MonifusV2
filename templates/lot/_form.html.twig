@@ -148,10 +148,19 @@
 
             <!-- Statut -->
             <div class="md:col-span-2">
-                {{ form_label(form.status, null, {'label_attr': {'class': 'form-label'}}) }}
-                {{ form_widget(form.status, {'attr': {'class': 'form-input-lg'}}) }}
-                {{ form_errors(form.status) }}
-                <div class="form-help">📋 {{ is_edit ? 'Statut du lot' : 'Statut initial du lot' }}</div>
+                {% include 'components/toggle_field.html.twig' with {
+                    form_field: form.status,
+                    label: 'Statut du lot',
+                    on_label: 'Vendu',
+                    off_label: 'Disponible', 
+                    on_value: 'sold',
+                    off_value: 'available',
+                    help_text: is_edit ? 'Changez le statut si nécessaire' : 'Statut initial du lot'
+                } %}
+            </div>
+
+            <div class="text-white text-xs">
+                Valeur actuelle du statut : {{ form.status.vars.value }}
             </div>
         </div>
 

@@ -62,16 +62,48 @@
     </td>
     <td class="table-cell">
         <div class="action-group">
+            {# Action principale visible #}
             {% if item.status.value == 'available' %}
                 <a href="{{ path('app_lot_sell', {id: item.id}) }}" 
-                   class="text-green-400 hover:text-green-300">Vendre</a>
+                class="text-green-400 hover:text-green-300">
+                    Vendre
+                </a>
             {% endif %}
+            
             <a href="{{ path('app_lot_edit', {id: item.id}) }}" 
-               class="text-blue-400 hover:text-blue-300">Modifier</a>
-            <form action="{{ path('app_lot_delete', {id: item.id}) }}" method="post" 
-                  onsubmit="return confirm('Supprimer ce lot ?')" class="inline">
-                <button type="submit" class="text-red-400 hover:text-red-300">Supprimer</button>
-            </form>
+            class="text-blue-400 hover:text-blue-300">
+                Modifier
+            </a>
+            
+            {# Actions secondaires dans un menu compact #}
+            <div class="relative inline-block">
+                <button type="button" 
+                        class="text-gray-400 hover:text-white text-sm px-2 py-1 rounded"
+                        onclick="this.nextElementSibling.classList.toggle('hidden')">
+                    ⋯
+                </button>
+                
+                <div class="hidden absolute right-0 top-full mt-1 w-40 bg-gray-800 border border-gray-700 rounded-lg shadow-lg z-10 py-1">
+                    {% if item.lotUnits|length > 0 %}
+                        {% set lastSale = item.lotUnits|last %}
+                        <form action="{{ path('app_lot_unit_cancel', {id: lastSale.id}) }}" method="post" 
+                            onsubmit="return confirm('Annuler la vente de {{ lastSale.quantitySold }} lots ?')" 
+                            class="block">
+                            <button type="submit" class="w-full text-left px-3 py-2 text-orange-400 hover:bg-gray-700 text-sm">
+                                🔄 Annuler vente
+                            </button>
+                        </form>
+                    {% endif %}
+                    
+                    <form action="{{ path('app_lot_delete', {id: item.id}) }}" method="post" 
+                        onsubmit="return confirm('Supprimer ce lot définitivement ?')" 
+                        class="block">
+                        <button type="submit" class="w-full text-left px-3 py-2 text-red-400 hover:bg-gray-700 text-sm">
+                            🗑️ Supprimer
+                        </button>
+                    </form>
+                </div>
+            </div>
         </div>
     </td>
 </tr>

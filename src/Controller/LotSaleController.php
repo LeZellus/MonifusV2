@@ -98,4 +98,47 @@ class LotSaleController extends AbstractController
             'lot_group' => $lotGroup,
         ]);
     }
+
+    #[Route('/{id}/cancel', name: 'app_lot_unit_cancel', methods: ['POST'])]
+    public function cancelSale(
+        int $id,
+        EntityManagerInterface $em,
+        CharacterSelectionService $characterService
+    ): Response {
+        $selectedCharacter = $characterService->getSelectedCharacter($this->getUser());
+        
+        if (!$selectedCharacter) {
+            throw $this->createAccessDeniedException();
+        }
+
+        // Récupérer le LotUnit à annuler
+        $lotUnit = $em->getRepository(LotUnit::class)->find($id);
+        
+        if (!$lotUnit) {
+            throw $this->createNotFoundException('Vente non trouvée.');
+        }
+
+        $lotGroup = $lotUnit->getLotGroup();
+        
+        // Vérification de sécurité
+        if ($lotGroup->getDofusCharacter() !== $selectedCharacter) {
+            throw $this->createAccessDeniedException();
+        }
+
+        // ✅ Restaurer la quantité dans le lot
+        $quantityToRestore = $lotUnit->getQuantitySold();
+        $lotGroup->setLotSize($lotGroup->getLotSize() + $quantityToRestore);
+        
+        // ✅ Si le lot était SOLD, le remettre AVAILABLE
+        if ($lotGroup->getStatus() === LotStatus::SOLD) {
+            $lotGroup->setStatus(LotStatus::AVAILABLE);
+        }
+        
+        // ✅ Supprimer la vente
+        $em->remove($lotUnit);
+        $em->flush();
+
+        $this->addFlash('success', "Vente annulée ! {$quantityToRestore} lots restaurés.");
+        return $this->redirectToRoute('app_lot_index');
+    }
 }
