@@ -62,23 +62,7 @@ class TradingCalculatorService
 
     private function getGlobalStats(User $user): array
     {
-        return $this->lotGroupRepository->createQueryBuilder('lg')
-            ->select([
-                'COUNT(lg.id) as totalLots',
-                'SUM(CASE WHEN lg.status = :available THEN 1 ELSE 0 END) as availableLots',
-                'SUM(CASE WHEN lg.status = :sold THEN 1 ELSE 0 END) as soldLots',
-                'SUM(CASE WHEN lg.status = :available THEN lg.buyPricePerLot * lg.lotSize ELSE 0 END) as investedAmount',
-                'SUM(CASE WHEN lg.status = :sold THEN (lg.sellPricePerLot - lg.buyPricePerLot) * lg.lotSize ELSE 0 END) as realizedProfit',
-                'SUM(CASE WHEN lg.status = :available THEN (lg.sellPricePerLot - lg.buyPricePerLot) * lg.lotSize ELSE 0 END) as potentialProfit'
-            ])
-            ->join('lg.dofusCharacter', 'c')
-            ->join('c.tradingProfile', 'tp')
-            ->where('tp.user = :user')
-            ->setParameter('user', $user)
-            ->setParameter('available', LotStatus::AVAILABLE)
-            ->setParameter('sold', LotStatus::SOLD)
-            ->getQuery()
-            ->getOneOrNullResult() ?: $this->getEmptyStats()['global'];
+        return $this->lotGroupRepository->getUserGlobalStats($user);
     }
 
     private function getEnhancedTopItems(User $user): array

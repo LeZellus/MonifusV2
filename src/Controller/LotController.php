@@ -28,7 +28,7 @@ class LotController extends AbstractController
 
         $lots = [];
         if ($selectedCharacter) {
-            $lots = $lotRepository->findByCharacterWithItems($selectedCharacter);
+            $lots = $lotRepository->findByCharacterOptimized($selectedCharacter);
         }
 
         return $this->render('lot/index.html.twig', [

@@ -8,6 +8,7 @@ use App\Entity\DofusCharacter;
 use App\Enum\LotStatus;
 use Doctrine\Bundle\DoctrineBundle\Repository\ServiceEntityRepository;
 use Doctrine\Persistence\ManagerRegistry;
+use App\Entity\User;
 
 class LotGroupRepository extends ServiceEntityRepository
 {
@@ -212,5 +213,55 @@ class LotGroupRepository extends ServiceEntityRepository
         }
         
         return $results;
+    }
+
+    public function getUserGlobalStats(User $user): array
+    {
+        // Stats de base
+        $baseStats = $this->createQueryBuilder('lg')
+            ->select([
+                'COUNT(lg.id) as totalLots',
+                'SUM(lg.buyPricePerLot * lg.lotSize) as totalInvestment'
+            ])
+            ->leftJoin('lg.dofusCharacter', 'c')
+            ->leftJoin('c.tradingProfile', 'tp')
+            ->where('tp.user = :user')
+            ->setParameter('user', $user)
+            ->getQuery()
+            ->getSingleResult();
+
+        // Lots par statut (une requête pour tous)
+        $statusStats = $this->createQueryBuilder('lg')
+            ->select('lg.status, COUNT(lg.id) as count, SUM(lg.buyPricePerLot * lg.lotSize) as investment')
+            ->leftJoin('lg.dofusCharacter', 'c')
+            ->leftJoin('c.tradingProfile', 'tp')
+            ->where('tp.user = :user')
+            ->groupBy('lg.status')
+            ->setParameter('user', $user)
+            ->getQuery()
+            ->getArrayResult();
+
+        // Traitement des résultats
+        $availableLots = 0;
+        $soldLots = 0;
+        $investedAmount = 0;
+
+        foreach ($statusStats as $stat) {
+            if ($stat['status']->value === 'available') {
+                $availableLots = (int)$stat['count'];
+                $investedAmount = (int)$stat['investment'];
+            } elseif ($stat['status']->value === 'sold') {
+                $soldLots = (int)$stat['count'];
+            }
+        }
+
+        return [
+            'totalLots' => (int)($baseStats['totalLots'] ?? 0),
+            'availableLots' => $availableLots,
+            'soldLots' => $soldLots,
+            'investedAmount' => $investedAmount,
+            'realizedProfit' => 0, // À calculer avec LotUnit si besoin
+            'potentialProfit' => 0  // À calculer si besoin
+        ];
     }
 }
