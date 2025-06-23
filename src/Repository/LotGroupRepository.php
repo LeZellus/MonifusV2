@@ -1,14 +1,13 @@
 <?php
 
-// src/Repository/LotGroupRepository.php
 namespace App\Repository;
 
 use App\Entity\LotGroup;
 use App\Entity\DofusCharacter;
+use App\Entity\User;
 use App\Enum\LotStatus;
 use Doctrine\Bundle\DoctrineBundle\Repository\ServiceEntityRepository;
 use Doctrine\Persistence\ManagerRegistry;
-use App\Entity\User;
 
 class LotGroupRepository extends ServiceEntityRepository
 {
@@ -17,96 +16,16 @@ class LotGroupRepository extends ServiceEntityRepository
         parent::__construct($registry, LotGroup::class);
     }
 
-    // Méthodes existantes...
-    public function findByCharacterOrderedByDate(DofusCharacter $character): array
-    {
-        return $this->createQueryBuilder('lg')
-            ->where('lg.dofusCharacter = :character')
-            ->setParameter('character', $character)
-            ->orderBy('lg.createdAt', 'DESC')
-            ->getQuery()
-            ->getResult();
-    }
+    // ===== MÉTHODES PRINCIPALES (OPTIMISÉES) =====
 
-    public function findByCharacterWithItems(DofusCharacter $character): array
-    {
-        return $this->createQueryBuilder('lg')
-            ->leftJoin('lg.item', 'i')
-            ->addSelect('i')
-            ->where('lg.dofusCharacter = :character')
-            ->setParameter('character', $character)
-            ->orderBy('lg.createdAt', 'DESC')
-            ->getQuery()
-            ->getResult();
-    }
-
-    public function findOneByIdAndCharacter(int $id, DofusCharacter $character): ?LotGroup
-    {
-        return $this->createQueryBuilder('lg')
-            ->where('lg.id = :id')
-            ->andWhere('lg.dofusCharacter = :character')
-            ->setParameter('id', $id)
-            ->setParameter('character', $character)
-            ->getQuery()
-            ->getOneOrNullResult();
-    }
-
-    // NOUVELLES MÉTHODES POUR HOMECONTROLLER
-    public function getTotalInvestedAmount(): int
-    {
-        return (int) ($this->createQueryBuilder('lg')
-            ->select('SUM(lg.buyPricePerLot * lg.lotSize)')
-            ->where('lg.status = :available')
-            ->setParameter('available', LotStatus::AVAILABLE)
-            ->getQuery()
-            ->getSingleScalarResult() ?? 0);
-    }
-
-    public function getTotalPotentialProfit(): int
-    {
-        return (int) ($this->createQueryBuilder('lg')
-            ->select('SUM((lg.sellPricePerLot - lg.buyPricePerLot) * lg.lotSize)')
-            ->where('lg.status = :available')
-            ->setParameter('available', LotStatus::AVAILABLE)
-            ->getQuery()
-            ->getSingleScalarResult() ?? 0);
-    }
-
-    public function getTotalLotsManaged(): int
-    {
-        return (int) ($this->createQueryBuilder('lg')
-            ->select('SUM(lg.lotSize)')
-            ->getQuery()
-            ->getSingleScalarResult() ?? 0);
-    }
-
-    public function getGlobalStatistics(): array
-    {
-        $qb = $this->createQueryBuilder('lg');
-        
-        $result = $qb
-            ->select([
-                'SUM(CASE WHEN lg.status = :available THEN lg.buyPricePerLot * lg.lotSize ELSE 0 END) as totalInvested',
-                'SUM(CASE WHEN lg.status = :available THEN (lg.sellPricePerLot - lg.buyPricePerLot) * lg.lotSize ELSE 0 END) as totalPotentialProfit',
-                'SUM(lg.lotSize) as totalLotsManaged'
-            ])
-            ->setParameter('available', LotStatus::AVAILABLE)
-            ->getQuery()
-            ->getSingleResult();
-
-        return [
-            'total_invested' => (int) ($result['totalInvested'] ?? 0),
-            'total_potential_profit' => (int) ($result['totalPotentialProfit'] ?? 0),
-            'total_lots_managed' => (int) ($result['totalLotsManaged'] ?? 0)
-        ];
-    }
-
-    // ===== AJOUTEZ CES MÉTHODES À LA FIN DE VOTRE LotGroupRepository =====
-    
+    /**
+     * ✅ REMPLACE findByCharacterOrderedByDate ET findByCharacterWithItems
+     * Une seule méthode optimisée qui précharge tout
+     */
     public function findByCharacterOptimized(DofusCharacter $character): array
     {
         return $this->createQueryBuilder('lg')
-            ->select('lg', 'i', 'c') // Précharge les relations
+            ->select('lg', 'i', 'c')
             ->leftJoin('lg.item', 'i')
             ->leftJoin('lg.dofusCharacter', 'c')
             ->where('lg.dofusCharacter = :character')
@@ -117,7 +36,92 @@ class LotGroupRepository extends ServiceEntityRepository
     }
 
     /**
-     * Analytics en une seule requête (version compatible)
+     * ✅ REMPLACE getUserGlobalStats avec une approche plus simple
+     * Une seule requête avec GROUP BY au lieu de multiples requêtes
+     */
+    public function getUserGlobalStats(User $user): array
+    {
+        $result = $this->createQueryBuilder('lg')
+            ->select([
+                'COUNT(lg.id) as totalLots',
+                'SUM(lg.buyPricePerLot * lg.lotSize) as totalInvestment',
+                'lg.status'
+            ])
+            ->leftJoin('lg.dofusCharacter', 'c')
+            ->leftJoin('c.tradingProfile', 'tp')
+            ->where('tp.user = :user')
+            ->groupBy('lg.status')
+            ->setParameter('user', $user)
+            ->getQuery()
+            ->getArrayResult();
+
+        // Parser les résultats
+        $stats = [
+            'totalLots' => 0,
+            'availableLots' => 0,
+            'soldLots' => 0,
+            'investedAmount' => 0,
+            'realizedProfit' => 0,
+            'potentialProfit' => 0
+        ];
+
+        foreach ($result as $row) {
+            $status = $row['status']->value;
+            $count = (int)$row['totalLots'];
+            $investment = (int)$row['totalInvestment'];
+            
+            $stats['totalLots'] += $count;
+            
+            if ($status === 'available') {
+                $stats['availableLots'] = $count;
+                $stats['investedAmount'] = $investment;
+            } elseif ($status === 'sold') {
+                $stats['soldLots'] = $count;
+            }
+        }
+
+        return $stats;
+    }
+
+    /**
+     * ✅ REMPLACE getGlobalStatistics (version simplifiée pour HomeController)
+     */
+    public function getGlobalStatistics(): array
+    {
+        $result = $this->createQueryBuilder('lg')
+            ->select([
+                'SUM(lg.buyPricePerLot * lg.lotSize) as totalInvested',
+                'SUM(lg.lotSize) as totalLotsManaged'
+            ])
+            ->where('lg.status = :available')
+            ->setParameter('available', LotStatus::AVAILABLE)
+            ->getQuery()
+            ->getSingleResult();
+
+        return [
+            'total_invested' => (int)($result['totalInvested'] ?? 0),
+            'total_potential_profit' => 0, // À calculer si besoin
+            'total_lots_managed' => (int)($result['totalLotsManaged'] ?? 0)
+        ];
+    }
+
+    /**
+     * Recherche sécurisée par ID et personnage
+     */
+    public function findOneByIdAndCharacter(int $id, DofusCharacter $character): ?LotGroup
+    {
+        return $this->createQueryBuilder('lg')
+            ->where('lg.id = :id AND lg.dofusCharacter = :character')
+            ->setParameter('id', $id)
+            ->setParameter('character', $character)
+            ->getQuery()
+            ->getOneOrNullResult();
+    }
+
+    // ===== MÉTHODES UTILITAIRES =====
+
+    /**
+     * Analytics simples pour un personnage
      */
     public function getCharacterAnalytics(DofusCharacter $character): array
     {
@@ -127,141 +131,13 @@ class LotGroupRepository extends ServiceEntityRepository
                 'SUM(lg.buyPricePerLot * lg.lotSize) as totalInvestment'
             ])
             ->where('lg.dofusCharacter = :character')
-            ->setParameter('character', $character)  // ← Cette ligne MANQUE !
+            ->setParameter('character', $character)
             ->getQuery()
             ->getSingleResult();
             
         return [
             'totalLots' => (int)($result['totalLots'] ?? 0),
             'totalInvestment' => (int)($result['totalInvestment'] ?? 0)
-        ];
-    }
-
-    /**
-     * Analytics complémentaires (version corrigée)
-     */
-    public function getCharacterAnalyticsDetailed(DofusCharacter $character): array
-    {
-        // Stats de base
-        $baseStats = $this->getCharacterAnalytics($character);
-        
-        // Expected revenue (lots avec prix de vente)
-        $expectedRevenue = (int)($this->createQueryBuilder('lg')
-            ->select('SUM(lg.sellPricePerLot * lg.lotSize)')
-            ->where('lg.dofusCharacter = :character')
-            ->andWhere('lg.sellPricePerLot IS NOT NULL')
-            ->setParameter('character', $character)
-            ->getQuery()
-            ->getSingleScalarResult() ?? 0);
-        
-        // Expected profit
-        $expectedProfit = (int)($this->createQueryBuilder('lg')
-            ->select('SUM((lg.sellPricePerLot - lg.buyPricePerLot) * lg.lotSize)')
-            ->where('lg.dofusCharacter = :character')
-            ->andWhere('lg.sellPricePerLot IS NOT NULL')
-            ->setParameter('character', $character)
-            ->getQuery()
-            ->getSingleScalarResult() ?? 0);
-        
-        // Active lots
-        $activeLots = (int)($this->createQueryBuilder('lg')
-            ->select('COUNT(lg.id)')
-            ->where('lg.dofusCharacter = :character')
-            ->andWhere('lg.status = :available')
-            ->setParameter('character', $character)
-            ->setParameter('available', LotStatus::AVAILABLE)
-            ->getQuery()
-            ->getSingleScalarResult() ?? 0);
-        
-        return array_merge($baseStats, [
-            'expectedRevenue' => $expectedRevenue,
-            'expectedProfit' => $expectedProfit,
-            'activeLots' => $activeLots
-        ]);
-    }
-
-    /**
-     * Test pour comparer les performances
-     */
-    public function benchmarkMethods(DofusCharacter $character): array
-    {
-        $results = [];
-        
-        try {
-            // Test méthode ancienne vs nouvelle
-            $startTime = microtime(true);
-            $oldResults = $this->findByCharacterOrderedByDate($character);
-            $oldTime = (microtime(true) - $startTime) * 1000;
-            
-            $startTime = microtime(true);
-            $newResults = $this->findByCharacterOptimized($character);
-            $newTime = (microtime(true) - $startTime) * 1000;
-            
-            $results['findByCharacter'] = [
-                'old_method_ms' => round($oldTime, 2),
-                'new_method_ms' => round($newTime, 2),
-                'improvement_percent' => $oldTime > 0 ? round((($oldTime - $newTime) / $oldTime) * 100, 1) : 0,
-                'same_results' => count($oldResults) === count($newResults)
-            ];
-        } catch (\Exception $e) {
-            $results['findByCharacter'] = [
-                'error' => $e->getMessage(),
-                'old_method_ms' => 0,
-                'new_method_ms' => 0,
-                'improvement_percent' => 0
-            ];
-        }
-        
-        return $results;
-    }
-
-    public function getUserGlobalStats(User $user): array
-    {
-        // Stats de base
-        $baseStats = $this->createQueryBuilder('lg')
-            ->select([
-                'COUNT(lg.id) as totalLots',
-                'SUM(lg.buyPricePerLot * lg.lotSize) as totalInvestment'
-            ])
-            ->leftJoin('lg.dofusCharacter', 'c')
-            ->leftJoin('c.tradingProfile', 'tp')
-            ->where('tp.user = :user')
-            ->setParameter('user', $user)
-            ->getQuery()
-            ->getSingleResult();
-
-        // Lots par statut (une requête pour tous)
-        $statusStats = $this->createQueryBuilder('lg')
-            ->select('lg.status, COUNT(lg.id) as count, SUM(lg.buyPricePerLot * lg.lotSize) as investment')
-            ->leftJoin('lg.dofusCharacter', 'c')
-            ->leftJoin('c.tradingProfile', 'tp')
-            ->where('tp.user = :user')
-            ->groupBy('lg.status')
-            ->setParameter('user', $user)
-            ->getQuery()
-            ->getArrayResult();
-
-        // Traitement des résultats
-        $availableLots = 0;
-        $soldLots = 0;
-        $investedAmount = 0;
-
-        foreach ($statusStats as $stat) {
-            if ($stat['status']->value === 'available') {
-                $availableLots = (int)$stat['count'];
-                $investedAmount = (int)$stat['investment'];
-            } elseif ($stat['status']->value === 'sold') {
-                $soldLots = (int)$stat['count'];
-            }
-        }
-
-        return [
-            'totalLots' => (int)($baseStats['totalLots'] ?? 0),
-            'availableLots' => $availableLots,
-            'soldLots' => $soldLots,
-            'investedAmount' => $investedAmount,
-            'realizedProfit' => 0, // À calculer avec LotUnit si besoin
-            'potentialProfit' => 0  // À calculer si besoin
         ];
     }
 }
