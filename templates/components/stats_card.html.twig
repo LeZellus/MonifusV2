@@ -4,6 +4,8 @@ Composant réutilisable pour afficher des cartes de statistiques
 Usage: {% include 'components/stats_card.html.twig' with {
     title: 'Titre',
     value: '42M',
+    price: 1500000 (optionnel - pour utiliser price_display),
+    price_color: 'green' (optionnel - couleur du prix),
     subtitle: 'Description optionnelle',
     icon: '💰' (optionnel),
     color: 'blue' (optionnel: blue, green, orange, red, purple, yellow),
@@ -21,7 +23,22 @@ Usage: {% include 'components/stats_card.html.twig' with {
         {% endif %}
         {{ title }}
     </h3>
-    <p class="{{ color_class }} {{ value_size }} font-bold">{{ value }}</p>
+    
+    {% if price is defined %}
+        {# Utilise price_display pour les prix #}
+        <div class="{{ value_size }} font-bold">
+            {% include 'components/price_display.html.twig' with {
+                price: price,
+                size: size|default('normal') == 'large' ? 'large' : 'normal',
+                color: price_color|default(color|default('blue')),
+                show_kamas: true
+            } %}
+        </div>
+    {% else %}
+        {# Affichage normal pour les autres valeurs #}
+        <p class="{{ color_class }} {{ value_size }} font-bold">{{ value }}</p>
+    {% endif %}
+    
     {% if subtitle is defined %}
         <p class="text-gray-400 text-sm">{{ subtitle }}</p>
     {% endif %}
