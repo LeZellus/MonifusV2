@@ -196,4 +196,51 @@ class ChartDataService
             'datasets' => []
         ];
     }
+
+    /**
+     * Construit les données du graphique avec filtrage
+     */
+    public function buildChartData($observations, array $enabledTypes = ['x1', 'x10', 'x100']): array
+    {
+        $chartData = $this->processObservations($observations);
+        
+        return [
+            'datasets' => $this->buildFilteredDatasets($chartData, $enabledTypes),
+            'labels' => $chartData['labels'],
+            'options' => $this->getChartOptions()
+        ];
+    }
+
+    /**
+     * Construit uniquement les datasets demandés
+     */
+    private function buildFilteredDatasets(array $chartData, array $enabledTypes): array
+    {
+        $datasets = [];
+        $colors = [
+            'x1' => ['border' => '#10B981', 'background' => 'rgba(16, 185, 129, 0.1)'],
+            'x10' => ['border' => '#3B82F6', 'background' => 'rgba(59, 130, 246, 0.1)'],
+            'x100' => ['border' => '#8B5CF6', 'background' => 'rgba(139, 92, 246, 0.1)']
+        ];
+
+        // x1
+        if (in_array('x1', $enabledTypes) && $chartData['countX1'] > 0) {
+            $datasets[] = $this->createDataset('Prix x1 observé', $chartData['priceDataX1'], $colors['x1']);
+            $datasets[] = $this->createDataset('Moyenne mobile x1', $chartData['averageDataX1'], $colors['x1'], true);
+        }
+        
+        // x10
+        if (in_array('x10', $enabledTypes) && $chartData['countX10'] > 0) {
+            $datasets[] = $this->createDataset('Prix x10 observé', $chartData['priceDataX10'], $colors['x10']);
+            $datasets[] = $this->createDataset('Moyenne mobile x10', $chartData['averageDataX10'], $colors['x10'], true);
+        }
+        
+        // x100
+        if (in_array('x100', $enabledTypes) && $chartData['countX100'] > 0) {
+            $datasets[] = $this->createDataset('Prix x100 observé', $chartData['priceDataX100'], $colors['x100']);
+            $datasets[] = $this->createDataset('Moyenne mobile x100', $chartData['averageDataX100'], $colors['x100'], true);
+        }
+
+        return $datasets;
+    }
 }

@@ -191,4 +191,23 @@ class MarketWatchController extends AbstractController
             'chart_data' => $chartData,
         ]);
     }
+
+    public function history(Item $item, ChartDataService $chartService): Response
+    {
+        $priceHistory = $this->marketWatchRepository
+            ->findByItemOrderedByDate($item);
+            
+        $averages = $this->marketWatchRepository
+            ->getAveragesByItem($item);
+
+        // Générer les données complètes (tous types)
+        $chartData = $chartService->buildChartData($priceHistory);
+
+        return $this->render('market_watch/history.html.twig', [
+            'item' => $item,
+            'price_history' => $priceHistory,
+            'averages' => $averages,
+            'chart_data' => $chartData
+        ]);
+    }
 }
