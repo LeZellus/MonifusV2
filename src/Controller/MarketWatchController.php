@@ -161,7 +161,7 @@ class MarketWatchController extends AbstractController
         int $itemId,
         MarketWatchRepository $marketWatchRepository,
         CharacterSelectionService $characterService,
-        ChartDataService $chartDataService // Injection du service
+        ChartDataService $chartDataService
     ): Response {
         $selectedCharacter = $characterService->getSelectedCharacter($this->getUser());
         
@@ -180,8 +180,8 @@ class MarketWatchController extends AbstractController
         $item = $priceHistory[0]->getItem();
         $averages = $marketWatchRepository->calculatePriceAverages($priceHistory);
         
-        // Utilisation du service pour les données du graphique
-        $chartData = $chartDataService->prepareMarketWatchChartData($priceHistory);
+        // Génération des données COMPLÈTES (pas de filtrage côté PHP)
+        $chartData = $chartDataService->prepareMarketWatchChartData($priceHistory, 'all');
 
         return $this->render('market_watch/history.html.twig', [
             'item' => $item,

@@ -2,36 +2,80 @@
 
 namespace App\Service;
 
+use DateTime;
+
 class ChartDataService
 {
-    private const MAX_CHART_POINTS = 10;
+    private const MAX_CHART_POINTS = 50; // Augmenté pour les périodes courtes
     
     /**
-     * Prépare les données pour Chart.js à partir de l'historique des prix
+     * Prépare les données avec filtrage temporel
      */
-    public function prepareMarketWatchChartData(array $priceHistory): array
+    public function prepareMarketWatchChartData(array $priceHistory, ?string $period = null): array
     {
         if (empty($priceHistory)) {
             return $this->getEmptyChartData();
         }
 
-        // Tri par date croissante pour le graphique
+        // Tri par date croissante
         usort($priceHistory, fn($a, $b) => $a->getObservedAt() <=> $b->getObservedAt());
         
-        // Réduire les points si nécessaire
-        $priceHistory = $this->reduceDataPoints($priceHistory);
+        // Filtrage temporel
+        $filteredHistory = $this->filterByPeriod($priceHistory, $period);
         
-        // Extraction des données
-        $chartData = $this->extractPriceData($priceHistory);
+        // Réduction des points si nécessaire
+        $filteredHistory = $this->reduceDataPoints($filteredHistory);
+        
+        $chartData = $this->extractPriceData($filteredHistory);
         
         return [
             'labels' => $chartData['labels'],
-            'datasets' => $this->buildDatasets($chartData)
+            'datasets' => $this->buildDatasets($chartData),
+            'period' => $period,
+            'totalPoints' => count($priceHistory),
+            'displayedPoints' => count($filteredHistory)
         ];
     }
 
     /**
-     * Réduit le nombre de points si trop nombreux
+     * Filtre les observations selon la période
+     */
+    private function filterByPeriod(array $priceHistory, ?string $period): array
+    {
+        if (!$period || $period === 'all') {
+            return $priceHistory;
+        }
+
+        $now = new DateTime();
+        $cutoffDate = clone $now;
+
+        switch ($period) {
+            case '7d':
+                $cutoffDate->modify('-7 days');
+                break;
+            case '30d':
+                $cutoffDate->modify('-30 days');
+                break;
+            case '3m':
+                $cutoffDate->modify('-3 months');
+                break;
+            case '6m':
+                $cutoffDate->modify('-6 months');
+                break;
+            case '1y':
+                $cutoffDate->modify('-1 year');
+                break;
+            default:
+                return $priceHistory;
+        }
+
+        return array_filter($priceHistory, function($observation) use ($cutoffDate) {
+            return $observation->getObservedAt() >= $cutoffDate;
+        });
+    }
+
+    /**
+     * Réduit intelligemment le nombre de points
      */
     private function reduceDataPoints(array $priceHistory): array
     {
@@ -41,13 +85,27 @@ class ChartDataService
             return $priceHistory;
         }
 
-        $step = max(1, intval($totalObservations / self::MAX_CHART_POINTS));
-        return array_filter($priceHistory, fn($key) => $key % $step === 0, ARRAY_FILTER_USE_KEY);
+        // Algorithme amélioré : garde toujours le premier et le dernier
+        $step = max(1, intval($totalObservations / (self::MAX_CHART_POINTS - 2)));
+        $reducedHistory = [];
+        
+        // Premier point
+        $reducedHistory[] = $priceHistory[0];
+        
+        // Points intermédiaires
+        for ($i = $step; $i < $totalObservations - 1; $i += $step) {
+            $reducedHistory[] = $priceHistory[$i];
+        }
+        
+        // Dernier point (si différent du premier)
+        if ($totalObservations > 1) {
+            $reducedHistory[] = $priceHistory[$totalObservations - 1];
+        }
+        
+        return $reducedHistory;
     }
 
-    /**
-     * Extrait toutes les données de prix et calcule les moyennes mobiles
-     */
+    // ... reste des méthodes inchangées
     private function extractPriceData(array $priceHistory): array
     {
         $labels = [];
@@ -66,7 +124,6 @@ class ChartDataService
         $countX100 = 0;
         
         foreach ($priceHistory as $observation) {
-            // Format de date adaptatif
             $labels[] = $this->formatDateLabel($priceHistory, $observation);
             
             // Prix x1
@@ -111,52 +168,31 @@ class ChartDataService
         ];
     }
 
-    /**
-     * Construit les datasets pour Chart.js
-     */
     private function buildDatasets(array $chartData): array
     {
         $datasets = [];
         
-        // Configuration des couleurs
         $colors = [
             'x1' => ['border' => '#10B981', 'background' => 'rgba(16, 185, 129, 0.1)'],
             'x10' => ['border' => '#3B82F6', 'background' => 'rgba(59, 130, 246, 0.1)'],
             'x100' => ['border' => '#8B5CF6', 'background' => 'rgba(139, 92, 246, 0.1)']
         ];
 
-        // Prix observés
-        if ($chartData['countX1'] > 0) {
-            $datasets[] = $this->createDataset('Prix x1 observé', $chartData['priceDataX1'], $colors['x1']);
-        }
-        
-        if ($chartData['countX10'] > 0) {
-            $datasets[] = $this->createDataset('Prix x10 observé', $chartData['priceDataX10'], $colors['x10']);
-        }
-        
-        if ($chartData['countX100'] > 0) {
-            $datasets[] = $this->createDataset('Prix x100 observé', $chartData['priceDataX100'], $colors['x100']);
-        }
-
-        // Moyennes mobiles (en pointillés)
-        if ($chartData['countX1'] > 0) {
-            $datasets[] = $this->createDataset('Moyenne mobile x1', $chartData['averageDataX1'], $colors['x1'], true);
-        }
-        
-        if ($chartData['countX10'] > 0) {
-            $datasets[] = $this->createDataset('Moyenne mobile x10', $chartData['averageDataX10'], $colors['x10'], true);
-        }
-        
-        if ($chartData['countX100'] > 0) {
-            $datasets[] = $this->createDataset('Moyenne mobile x100', $chartData['averageDataX100'], $colors['x100'], true);
+        // Prix observés + moyennes
+        foreach (['x1', 'x10', 'x100'] as $type) {
+            $countKey = "count" . strtoupper($type);
+            if ($chartData[$countKey] > 0) {
+                $priceKey = "priceData" . strtoupper($type);
+                $avgKey = "averageData" . strtoupper($type);
+                
+                $datasets[] = $this->createDataset("Prix $type observé", $chartData[$priceKey], $colors[$type]);
+                $datasets[] = $this->createDataset("Moyenne mobile $type", $chartData[$avgKey], $colors[$type], true);
+            }
         }
 
         return $datasets;
     }
 
-    /**
-     * Crée un dataset individuel
-     */
     private function createDataset(string $label, array $data, array $colors, bool $isDashed = false): array
     {
         $dataset = [
@@ -176,9 +212,6 @@ class ChartDataService
         return $dataset;
     }
 
-    /**
-     * Formate le label de date selon le nombre total d'observations
-     */
     private function formatDateLabel(array $priceHistory, $observation): string
     {
         return count($priceHistory) > 7 
@@ -186,61 +219,14 @@ class ChartDataService
             : $observation->getObservedAt()->format('d/m/y');
     }
 
-    /**
-     * Retourne une structure vide pour les cas sans données
-     */
     private function getEmptyChartData(): array
     {
         return [
             'labels' => [],
-            'datasets' => []
+            'datasets' => [],
+            'period' => null,
+            'totalPoints' => 0,
+            'displayedPoints' => 0
         ];
-    }
-
-    /**
-     * Construit les données du graphique avec filtrage
-     */
-    public function buildChartData($observations, array $enabledTypes = ['x1', 'x10', 'x100']): array
-    {
-        $chartData = $this->processObservations($observations);
-        
-        return [
-            'datasets' => $this->buildFilteredDatasets($chartData, $enabledTypes),
-            'labels' => $chartData['labels'],
-            'options' => $this->getChartOptions()
-        ];
-    }
-
-    /**
-     * Construit uniquement les datasets demandés
-     */
-    private function buildFilteredDatasets(array $chartData, array $enabledTypes): array
-    {
-        $datasets = [];
-        $colors = [
-            'x1' => ['border' => '#10B981', 'background' => 'rgba(16, 185, 129, 0.1)'],
-            'x10' => ['border' => '#3B82F6', 'background' => 'rgba(59, 130, 246, 0.1)'],
-            'x100' => ['border' => '#8B5CF6', 'background' => 'rgba(139, 92, 246, 0.1)']
-        ];
-
-        // x1
-        if (in_array('x1', $enabledTypes) && $chartData['countX1'] > 0) {
-            $datasets[] = $this->createDataset('Prix x1 observé', $chartData['priceDataX1'], $colors['x1']);
-            $datasets[] = $this->createDataset('Moyenne mobile x1', $chartData['averageDataX1'], $colors['x1'], true);
-        }
-        
-        // x10
-        if (in_array('x10', $enabledTypes) && $chartData['countX10'] > 0) {
-            $datasets[] = $this->createDataset('Prix x10 observé', $chartData['priceDataX10'], $colors['x10']);
-            $datasets[] = $this->createDataset('Moyenne mobile x10', $chartData['averageDataX10'], $colors['x10'], true);
-        }
-        
-        // x100
-        if (in_array('x100', $enabledTypes) && $chartData['countX100'] > 0) {
-            $datasets[] = $this->createDataset('Prix x100 observé', $chartData['priceDataX100'], $colors['x100']);
-            $datasets[] = $this->createDataset('Moyenne mobile x100', $chartData['averageDataX100'], $colors['x100'], true);
-        }
-
-        return $datasets;
     }
 }

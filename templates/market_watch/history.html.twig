@@ -54,32 +54,65 @@
 
         <!-- Graphique d'évolution -->
         <div class="wrapper-background" data-controller="chart" data-chart-data-value="{{ chart_data|json_encode|e('html_attr') }}" data-chart-type-value="line">
-            <div class="flex justify-between items-center mb-4">
-                <h3 class="text-white text-xl font-bold">📈 Évolution des prix</h3>
+            <div class="flex flex-col space-y-4 mb-4">
+                <!-- Titre et boutons de filtre de courbes -->
+                <div class="flex justify-between items-center">
+                    <h3 class="text-white text-xl font-bold">📈 Évolution des prix</h3>
+                    
+                    <!-- Boutons de filtre de courbes -->
+                    <div class="flex space-x-2">
+                        <button 
+                            data-chart-target="filterBtn"
+                            data-filter="x1"
+                            data-action="click->chart#filterChart"
+                            class="active bg-green-600 hover:bg-green-700 text-white px-3 py-1 rounded text-sm transition-colors">
+                            x1
+                        </button>
+                        <button 
+                            data-chart-target="filterBtn"
+                            data-filter="x10"
+                            data-action="click->chart#filterChart"
+                            class="active bg-blue-600 hover:bg-blue-700 text-white px-3 py-1 rounded text-sm transition-colors">
+                            x10
+                        </button>
+                        <button 
+                            data-chart-target="filterBtn"
+                            data-filter="x100"
+                            data-action="click->chart#filterChart"
+                            class="active bg-purple-600 hover:bg-purple-700 text-white px-3 py-1 rounded text-sm transition-colors">
+                            x100
+                        </button>
+                    </div>
+                </div>
                 
-                <!-- Boutons de filtre -->
-                <div class="flex space-x-2">
-                    <button 
-                        data-chart-target="filterBtn"
-                        data-filter="x1"
-                        data-action="click->chart#filterChart"
-                        class="active bg-green-600 hover:bg-green-700 text-white px-3 py-1 rounded text-sm transition-colors">
-                        x1
-                    </button>
-                    <button 
-                        data-chart-target="filterBtn"
-                        data-filter="x10"
-                        data-action="click->chart#filterChart"
-                        class="active bg-blue-600 hover:bg-blue-700 text-white px-3 py-1 rounded text-sm transition-colors">
-                        x10
-                    </button>
-                    <button 
-                        data-chart-target="filterBtn"
-                        data-filter="x100"
-                        data-action="click->chart#filterChart"
-                        class="active bg-purple-600 hover:bg-purple-700 text-white px-3 py-1 rounded text-sm transition-colors">
-                        x100
-                    </button>
+                <!-- Boutons de période temporelle -->
+                <div class="flex justify-between items-center">
+                    <div class="flex space-x-2">
+                        {% set periods = [
+                            {value: '7d', label: '7j'},
+                            {value: '30d', label: '30j'},
+                            {value: '3m', label: '3m'},
+                            {value: '6m', label: '6m'},
+                            {value: '1y', label: '1an'},
+                            {value: 'all', label: 'Tout'}
+                        ] %}
+                        
+                        {% for period in periods %}
+                            <button 
+                                data-chart-target="periodBtn"
+                                data-period="{{ period.value }}"
+                                data-action="click->chart#filterPeriod"
+                                class="px-3 py-1 rounded text-sm transition-colors
+                                    {{ loop.last ? 'bg-orange-600 text-white' : 'bg-gray-700 text-gray-300 hover:bg-gray-600' }}">
+                                {{ period.label }}
+                            </button>
+                        {% endfor %}
+                    </div>
+                    
+                    <!-- Info sur les données affichées -->
+                    <span data-chart-target="pointsInfo" class="text-gray-400 text-sm">
+                        {{ chart_data.labels|length }} points
+                    </span>
                 </div>
             </div>
             
