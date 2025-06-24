@@ -58,4 +58,59 @@ class DofusApiService
             return [];
         }
     }
+
+    /**
+     * Récupérer un item spécifique par son ankamaId
+     */
+    public function fetchItem(int $ankamaId): ?array
+    {
+        try {
+            $url = "https://api.beta.dofusdb.fr/items/{$ankamaId}";
+            
+            $response = $this->client->request('GET', $url, [
+                'timeout' => 10
+            ]);
+
+            if ($response->getStatusCode() !== 200) {
+                return null;
+            }
+
+            return $response->toArray();
+
+        } catch (\Exception $e) {
+            return null;
+        }
+    }
+
+    /**
+     * Récupérer les types d'items depuis l'API
+     */
+    public function fetchItemTypes(): array
+    {
+        try {
+            $url = "https://api.beta.dofusdb.fr/item-types";
+            
+            $response = $this->client->request('GET', $url, [
+                'timeout' => 30
+            ]);
+
+            if ($response->getStatusCode() !== 200) {
+                return [];
+            }
+
+            $data = $response->toArray();
+            return $data['data'] ?? [];
+
+        } catch (\Exception $e) {
+            return [];
+        }
+    }
+
+    /**
+     * Exposer le client HTTP pour usages avancés
+     */
+    public function getClient(): HttpClientInterface
+    {
+        return $this->client;
+    }
 }
