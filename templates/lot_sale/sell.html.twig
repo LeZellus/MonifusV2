@@ -52,7 +52,7 @@
                     {{ form_label(form.quantitySold, null, {'label_attr': {'class': 'block text-white font-medium mb-2'}}) }}
                     {{ form_widget(form.quantitySold, {
                         'attr': {
-                            'data-sale-calculator-target': 'quantityInput',
+                            'data-centralized-calculator-target': 'quantityInput',
                             'data-action': 'input->sale-calculator#updatePreview'
                         }
                     }) }}
@@ -67,7 +67,7 @@
                     {{ form_label(form.actualSellPrice, null, {'label_attr': {'class': 'block text-white font-medium mb-2'}}) }}
                     {{ form_widget(form.actualSellPrice, {
                         'attr': {
-                            'data-sale-calculator-target': 'priceInput',
+                            'data-centralized-calculator-target': 'priceInput',
                             'data-action': 'input->sale-calculator#updatePreview'
                         }
                     }) }}
