@@ -20,34 +20,54 @@ class CharacterSelectionService
     public function getSelectedCharacter(User $user): ?DofusCharacter
     {
         $session = $this->requestStack->getSession();
+        $request = $this->requestStack->getCurrentRequest();
+        
         $characterId = $session->get('selected_character_id');
         $selectedProfileId = $session->get('selected_profile_id');
 
-        if (!$characterId) {
-            // Si un profil spécifique est sélectionné, chercher dans ce profil
-            if ($selectedProfileId) {
-                $firstCharacter = $this->getFirstCharacterForProfile($selectedProfileId, $user);
-                if ($firstCharacter) {
-                    $this->setSelectedCharacter($firstCharacter);
-                    return $firstCharacter;
-                }
-                // Le profil sélectionné est vide, retourner null
-                return null;
+        // Vérifier d'abord si le personnage en session existe
+        if ($characterId) {
+            $character = $this->findCharacterById($characterId, $user);
+            if ($character) {
+                return $character;
             }
-            
-            // Sinon auto-sélectionner le premier personnage de l'utilisateur
-            $firstCharacter = $this->getFirstCharacterForUser($user);
+            $session->remove('selected_character_id');
+        }
+
+        // Essayer le cookie
+        $lastCharacterId = $request ? $request->cookies->get("last_character_user_{$user->getId()}") : null;
+        
+        if ($lastCharacterId) {
+            $lastCharacter = $this->findCharacterById($lastCharacterId, $user);
+            if ($lastCharacter) {
+                $this->setSelectedCharacter($lastCharacter);
+                return $lastCharacter;
+            }
+        }
+
+        // Fallback : profil sélectionné
+        if ($selectedProfileId) {
+            $firstCharacter = $this->getFirstCharacterForProfile($selectedProfileId, $user);
             if ($firstCharacter) {
                 $this->setSelectedCharacter($firstCharacter);
-                // Sauvegarder aussi le profil correspondant
-                $session->set('selected_profile_id', $firstCharacter->getTradingProfile()->getId());
                 return $firstCharacter;
             }
             return null;
         }
+        
+        // Fallback final
+        $firstCharacter = $this->getFirstCharacterForUser($user);
+        if ($firstCharacter) {
+            $this->setSelectedCharacter($firstCharacter);
+            return $firstCharacter;
+        }
+        
+        return null;
+    }
 
-        // Vérifier que le personnage appartient à l'utilisateur
-        $character = $this->characterRepository->createQueryBuilder('c')
+    private function findCharacterById(int $characterId, User $user): ?DofusCharacter
+    {
+        return $this->characterRepository->createQueryBuilder('c')
             ->join('c.tradingProfile', 'tp')
             ->where('c.id = :id')
             ->andWhere('tp.user = :user')
@@ -55,39 +75,15 @@ class CharacterSelectionService
             ->setParameter('user', $user)
             ->getQuery()
             ->getOneOrNullResult();
-
-        if (!$character) {
-            // Le personnage n'existe plus ou n'appartient pas à l'utilisateur
-            $session->remove('selected_character_id');
-            
-            // Si un profil spécifique est sélectionné, chercher dans ce profil
-            if ($selectedProfileId) {
-                $firstCharacter = $this->getFirstCharacterForProfile($selectedProfileId, $user);
-                if ($firstCharacter) {
-                    $this->setSelectedCharacter($firstCharacter);
-                    return $firstCharacter;
-                }
-                return null;
-            }
-            
-            // Sinon chercher le premier personnage disponible
-            $firstCharacter = $this->getFirstCharacterForUser($user);
-            if ($firstCharacter) {
-                $this->setSelectedCharacter($firstCharacter);
-                $session->set('selected_profile_id', $firstCharacter->getTradingProfile()->getId());
-                return $firstCharacter;
-            }
-        }
-
-        return $character;
     }
 
     public function setSelectedCharacter(DofusCharacter $character): void
     {
         $session = $this->requestStack->getSession();
         $session->set('selected_character_id', $character->getId());
-        // Synchroniser le profil sélectionné
         $session->set('selected_profile_id', $character->getTradingProfile()->getId());
+        
+        // Le cookie sera géré automatiquement par l'EventSubscriber
     }
 
     public function getUserCharacters(User $user): array
