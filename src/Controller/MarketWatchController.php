@@ -13,6 +13,7 @@ use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\Routing\Attribute\Route;
 use Symfony\Component\Security\Http\Attribute\IsGranted;
 use App\Repository\ItemRepository;
+use App\Service\ChartDataService;
 
 #[Route('/market-watch')]
 #[IsGranted('ROLE_USER')]
@@ -159,7 +160,8 @@ class MarketWatchController extends AbstractController
     public function itemHistory(
         int $itemId,
         MarketWatchRepository $marketWatchRepository,
-        CharacterSelectionService $characterService
+        CharacterSelectionService $characterService,
+        ChartDataService $chartDataService // Injection du service
     ): Response {
         $selectedCharacter = $characterService->getSelectedCharacter($this->getUser());
         
@@ -168,7 +170,6 @@ class MarketWatchController extends AbstractController
             return $this->redirectToRoute('app_market_watch_index');
         }
 
-        // Une seule ligne pour récupérer l'historique
         $priceHistory = $marketWatchRepository->findPriceHistoryForItem($selectedCharacter, $itemId);
 
         if (empty($priceHistory)) {
@@ -177,15 +178,17 @@ class MarketWatchController extends AbstractController
         }
 
         $item = $priceHistory[0]->getItem();
-        
-        // Une seule ligne pour calculer les moyennes
         $averages = $marketWatchRepository->calculatePriceAverages($priceHistory);
+        
+        // Utilisation du service pour les données du graphique
+        $chartData = $chartDataService->prepareMarketWatchChartData($priceHistory);
 
         return $this->render('market_watch/history.html.twig', [
             'item' => $item,
             'price_history' => $priceHistory,
             'character' => $selectedCharacter,
             'averages' => $averages,
+            'chart_data' => $chartData,
         ]);
     }
 }

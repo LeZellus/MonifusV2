@@ -52,6 +52,18 @@
             content: analysis_tips_content
         } %}
 
+        <!-- Graphique d'évolution -->
+        <div class="wrapper-background">
+            <h3 class="text-white text-xl font-bold mb-4">📈 Évolution des prix</h3>
+            <div class="h-80">
+                <canvas 
+                    data-controller="chart"
+                    data-chart-data-value="{{ chart_data|json_encode|e('html_attr') }}"
+                    data-chart-type-value="line"
+                ></canvas>
+            </div>
+        </div>
+
         <!-- Actions -->
         <div class="flex justify-between items-center">
             <h3 class="text-white text-xl font-bold">Évolution des prix</h3>
