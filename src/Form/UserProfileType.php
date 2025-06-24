@@ -37,11 +37,6 @@ class UserProfileType extends AbstractType
                 'required' => false,
                 'attr' => ['class' => 'form-input', 'rows' => 3]
             ])
-            ->add('discordId', TextType::class, [
-                'label' => 'Discord ID',
-                'required' => false,
-                'attr' => ['class' => 'form-input']
-            ])
             ->add('youtubeUrl', UrlType::class, [
                 'label' => 'YouTube',
                 'required' => false,
