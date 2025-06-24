@@ -15,16 +15,22 @@ Usage: {% include 'components/stats_card.html.twig' with {
 {% set color_class = 'text-' ~ (color|default('blue')) ~ '-400' %}
 {% set value_size = (size|default('normal')) == 'large' ? 'text-3xl' : 'text-2xl' %}
 
-{# Formatage simple des valeurs #}
-{% set formatted_value = value %}
-{% set auto_unit = unit is defined ? unit : null %}
-
-{# Auto-formatage seulement si la valeur est un entier >= 1000 #}
-{% if value is not empty and value is not null %}
+{# Si unit est explicitement défini à 'kamas', afficher le prix complet #}
+{% if unit is defined and unit == 'kamas' %}
+    {% set formatted_value = value|number_format(0, ',', ' ') %}
+    {% set auto_unit = 'kamas' %}
+{# Sinon, formatage simple des valeurs avec auto-formatage #}
+{% elseif value is not empty and value is not null %}
     {% if value is same as(value|round) and value >= 1000 %}
         {% set formatted_value = (value / 1000)|number_format(0, ',', ' ') %}
         {% set auto_unit = unit is defined ? unit : 'K' %}
+    {% else %}
+        {% set formatted_value = value %}
+        {% set auto_unit = unit is defined ? unit : null %}
     {% endif %}
+{% else %}
+    {% set formatted_value = value %}
+    {% set auto_unit = unit is defined ? unit : null %}
 {% endif %}
 
 <div class="wrapper-background text-center">

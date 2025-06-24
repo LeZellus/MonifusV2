@@ -38,18 +38,38 @@
         </div>
 
         <!-- Conseils -->
-        {% set analysis_tips_content %}
-            <p>• 📈 Les flèches indiquent l'évolution par rapport à l'observation précédente</p>
-            <p>• 🔄 Ajoutez régulièrement de nouvelles observations pour suivre les tendances</p>
-            <p>• 💰 Utilisez ces données pour optimiser vos achats et ventes</p>
-            <p>• 📊 Plus vous avez de données, plus vos analyses seront précises</p>
+
+        {% set moyenne_mobile_content %}
+            <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+                <div>
+                    <h4 class="text-blue-300 font-semibold mb-2">🤔 Qu'est-ce que c'est ?</h4>
+                    <p>La <strong>moyenne mobile</strong> (courbes en pointillés) calcule la moyenne de tous les prix observés depuis le début.</p>
+                    <p class="mt-2">Elle lisse les variations et révèle la <strong>tendance générale</strong> des prix.</p>
+                </div>
+                <div>
+                    <h4 class="text-blue-300 font-semibold mb-2">📊 Comment l'utiliser ?</h4>
+                    <ul class="space-y-1">
+                        <li>• <strong>Prix au-dessus</strong> de la moyenne : marché plutôt <span class="text-red-400">cher</span></li>
+                        <li>• <strong>Prix en-dessous</strong> de la moyenne : marché plutôt <span class="text-green-400">favorable</span></li>
+                        <li>• <strong>Tendance montante</strong> : les prix augmentent globalement</li>
+                        <li>• <strong>Tendance descendante</strong> : les prix baissent globalement</li>
+                    </ul>
+                </div>
+            </div>
+            
+            <div class="bg-blue-800 bg-opacity-30 p-3 rounded-lg mt-3">
+                <p class="text-sm">
+                    <strong>💡 Conseil :</strong> Utilisez la moyenne mobile pour <strong>timing vos achats</strong>. 
+                    Quand le prix actuel est bien en-dessous de la moyenne, c'est souvent un bon moment pour acheter !
+                </p>
+            </div>
         {% endset %}
 
         {% include 'components/info_box.html.twig' with {
-            title: 'Analyser l\'évolution',
-            icon: '💡',
+            title: 'Comprendre la moyenne mobile',
+            icon: '📈',
             color: 'info',
-            content: analysis_tips_content
+            content: moyenne_mobile_content
         } %}
 
         <!-- Graphique d'évolution -->
@@ -121,6 +141,21 @@
             </div>
         </div>
 
+        <!-- Conseils -->
+        {% set analysis_tips_content %}
+            <p>• 📈 Les flèches indiquent l'évolution par rapport à l'observation précédente</p>
+            <p>• 🔄 Ajoutez régulièrement de nouvelles observations pour suivre les tendances</p>
+            <p>• 💰 Utilisez ces données pour optimiser vos achats et ventes</p>
+            <p>• 📊 Plus vous avez de données, plus vos analyses seront précises</p>
+        {% endset %}
+
+        {% include 'components/info_box.html.twig' with {
+            title: 'Analyser l\'évolution',
+            icon: '💡',
+            color: 'info',
+            content: analysis_tips_content
+        } %}
+
         <!-- Actions -->
         <div class="flex justify-between items-center">
             <h3 class="text-white text-xl font-bold">Évolution des prix</h3>
@@ -162,28 +197,37 @@
                         
                     </div>
 
-                    <!-- Prix observés -->
+                     <!-- Prix observés -->
                     <div class="grid grid-cols-1 md:grid-cols-3 gap-4">
                         <!-- Prix x1 -->
                         <div class="bg-gray-700 rounded-lg p-3">
                             <div class="text-gray-400 text-sm mb-1">Prix x1</div>
                             {% if observation.pricePerUnit %}
-                                <div class="text-green-400 font-bold text-lg">
-                                    {{ (observation.pricePerUnit / 1000)|number_format(0) }}K
-                                </div>
+                                {% include 'components/price_display.html.twig' with {
+                                    price: observation.pricePerUnit,
+                                    color: 'green',
+                                    size: 'large',
+                                    unit: 'kamas'
+                                } %}
                                 {% if not loop.last %}
-                                    {% set prevObservation = price_history[loop.index] %}
-                                    {% if prevObservation.pricePerUnit %}
-                                        {% set diff = observation.pricePerUnit - prevObservation.pricePerUnit %}
+                                    {% set nextObservation = price_history[loop.index0 + 1] %}
+                                    {% if nextObservation.pricePerUnit %}
+                                        {% set diff = observation.pricePerUnit - nextObservation.pricePerUnit %}
                                         {% if diff != 0 %}
-                                            <div class="text-{{ diff > 0 ? 'red' : 'green' }}-400 text-xs">
-                                                {{ diff > 0 ? '↗' : '↘' }} {{ (diff / 1000)|number_format(0) }}K
+                                            <div class="text-{{ diff > 0 ? 'red' : 'green' }}-400 text-xs mt-1">
+                                                {{ diff > 0 ? '↗' : '↘' }} 
+                                                {% include 'components/price_display.html.twig' with {
+                                                    price: diff|abs,
+                                                    color: diff > 0 ? 'red' : 'green',
+                                                    size: 'small',
+                                                    unit: 'kamas'
+                                                } %}
                                             </div>
                                         {% endif %}
                                     {% endif %}
                                 {% endif %}
                             {% else %}
-                                <div class="text-gray-500">Non observé</div>
+                                <div class="text-gray-500 text-lg">Non observé</div>
                             {% endif %}
                         </div>
 
@@ -191,22 +235,31 @@
                         <div class="bg-gray-700 rounded-lg p-3">
                             <div class="text-gray-400 text-sm mb-1">Prix x10</div>
                             {% if observation.pricePer10 %}
-                                <div class="text-blue-400 font-bold text-lg">
-                                    {{ (observation.pricePer10 / 1000)|number_format(0) }}K
-                                </div>
+                                {% include 'components/price_display.html.twig' with {
+                                    price: observation.pricePer10,
+                                    color: 'blue',
+                                    size: 'large',
+                                    unit: 'kamas'
+                                } %}
                                 {% if not loop.last %}
-                                    {% set prevObservation = price_history[loop.index] %}
-                                    {% if prevObservation.pricePer10 %}
-                                        {% set diff = observation.pricePer10 - prevObservation.pricePer10 %}
+                                    {% set nextObservation = price_history[loop.index0 + 1] %}
+                                    {% if nextObservation.pricePer10 %}
+                                        {% set diff = observation.pricePer10 - nextObservation.pricePer10 %}
                                         {% if diff != 0 %}
-                                            <div class="text-{{ diff > 0 ? 'red' : 'green' }}-400 text-xs">
-                                                {{ diff > 0 ? '↗' : '↘' }} {{ (diff / 1000)|number_format(0) }}K
+                                            <div class="text-{{ diff > 0 ? 'red' : 'green' }}-400 text-xs mt-1">
+                                                {{ diff > 0 ? '↗' : '↘' }} 
+                                                {% include 'components/price_display.html.twig' with {
+                                                    price: diff|abs,
+                                                    color: diff > 0 ? 'red' : 'green',
+                                                    size: 'small',
+                                                    unit: 'kamas'
+                                                } %}
                                             </div>
                                         {% endif %}
                                     {% endif %}
                                 {% endif %}
                             {% else %}
-                                <div class="text-gray-500">Non observé</div>
+                                <div class="text-gray-500 text-lg">Non observé</div>
                             {% endif %}
                         </div>
 
@@ -214,22 +267,31 @@
                         <div class="bg-gray-700 rounded-lg p-3">
                             <div class="text-gray-400 text-sm mb-1">Prix x100</div>
                             {% if observation.pricePer100 %}
-                                <div class="text-purple-400 font-bold text-lg">
-                                    {{ (observation.pricePer100 / 1000)|number_format(0) }}K
-                                </div>
+                                {% include 'components/price_display.html.twig' with {
+                                    price: observation.pricePer100,
+                                    color: 'purple',
+                                    size: 'large',
+                                    unit: 'kamas'
+                                } %}
                                 {% if not loop.last %}
-                                    {% set prevObservation = price_history[loop.index] %}
-                                    {% if prevObservation.pricePer100 %}
-                                        {% set diff = observation.pricePer100 - prevObservation.pricePer100 %}
+                                    {% set nextObservation = price_history[loop.index0 + 1] %}
+                                    {% if nextObservation.pricePer100 %}
+                                        {% set diff = observation.pricePer100 - nextObservation.pricePer100 %}
                                         {% if diff != 0 %}
-                                            <div class="text-{{ diff > 0 ? 'red' : 'green' }}-400 text-xs">
-                                                {{ diff > 0 ? '↗' : '↘' }} {{ (diff / 1000)|number_format(0) }}K
+                                            <div class="text-{{ diff > 0 ? 'red' : 'green' }}-400 text-xs mt-1">
+                                                {{ diff > 0 ? '↗' : '↘' }} 
+                                                {% include 'components/price_display.html.twig' with {
+                                                    price: diff|abs,
+                                                    color: diff > 0 ? 'red' : 'green',
+                                                    size: 'small',
+                                                    unit: 'kamas'
+                                                } %}
                                             </div>
                                         {% endif %}
                                     {% endif %}
                                 {% endif %}
                             {% else %}
-                                <div class="text-gray-500">Non observé</div>
+                                <div class="text-gray-500 text-lg">Non observé</div>
                             {% endif %}
                         </div>
                     </div>
