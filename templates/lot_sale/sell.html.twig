@@ -42,8 +42,8 @@
             <!-- Formulaire de vente -->
             <div class="wrapper-background" 
                  data-controller="centralized-calculator" data-centralized-calculator-mode-value="sale"
-                 data-sale-calculator-buy-price-value="{{ lot_group.buyPricePerLot }}"
-                 data-sale-calculator-total-stock-value="{{ lot_group.lotSize }}">
+                 data-centralized-calculator-buy-price-value="{{ lot_group.buyPricePerLot }}"
+                 data-centralized-calculator-total-stock-value="{{ lot_group.lotSize }}">
                 <h2 class="text-white text-xl font-semibold mb-4">💸 Enregistrer la vente</h2>
                 {{ form_start(form) }}
                 
@@ -53,7 +53,7 @@
                     {{ form_widget(form.quantitySold, {
                         'attr': {
                             'data-centralized-calculator-target': 'quantityInput',
-                            'data-action': 'input->sale-calculator#updatePreview'
+                            'data-action': 'input->centralized-calculator#updateCalculations'
                         }
                     }) }}
                     {{ form_errors(form.quantitySold) }}
@@ -68,7 +68,7 @@
                     {{ form_widget(form.actualSellPrice, {
                         'attr': {
                             'data-centralized-calculator-target': 'priceInput',
-                            'data-action': 'input->sale-calculator#updatePreview'
+                            'data-action': 'input->centralized-calculator#updateCalculations'
                         }
                     }) }}
                     {{ form_errors(form.actualSellPrice) }}
