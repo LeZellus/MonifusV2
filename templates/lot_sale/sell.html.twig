@@ -41,7 +41,7 @@
 
             <!-- Formulaire de vente -->
             <div class="wrapper-background" 
-                 data-controller="sale-calculator"
+                 data-controller="centralized-calculator" data-centralized-calculator-mode-value="sale"
                  data-sale-calculator-buy-price-value="{{ lot_group.buyPricePerLot }}"
                  data-sale-calculator-total-stock-value="{{ lot_group.lotSize }}">
                 <h2 class="text-white text-xl font-semibold mb-4">💸 Enregistrer la vente</h2>
@@ -92,21 +92,21 @@
                 </div>
 
                 <!-- Aperçu du profit (contrôlé par Stimulus) -->
-                <div data-sale-calculator-target="profitPreview" 
+                <div data-centralized-calculator-target="profitPreview" 
                      class="mb-6 p-4 bg-gray-700 rounded-lg" 
                      style="display: none;">
                     <div class="text-gray-400 text-sm mb-2">📊 Calcul de la vente</div>
                     <div class="grid grid-cols-2 gap-4">
                         <div>
                             <div class="text-white font-medium">Quantité</div>
-                            <div data-sale-calculator-target="quantityDisplay" class="text-blue-400"></div>
+                            <div data-centralized-calculator-target="quantityDisplay" class="text-blue-400"></div>
                         </div>
                         <div>
                             <div class="text-white font-medium">Profit total</div>
-                            <div data-sale-calculator-target="totalProfit" class="text-green-400"></div>
+                            <div data-centralized-calculator-target="totalProfit" class="text-green-400"></div>
                         </div>
                     </div>
-                    <div data-sale-calculator-target="remainingStock" class="text-yellow-400 text-sm mt-2"></div>
+                    <div data-centralized-calculator-target="remainingStock" class="text-yellow-400 text-sm mt-2"></div>
                 </div>
 
                 {% include 'components/action_buttons.html.twig' with {

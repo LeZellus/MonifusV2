@@ -35,7 +35,7 @@
         <div class="text-gray-400 text-sm">par lot</div>
     </td>
     <td class="table-cell">
-        {% include 'components/profit_display.html.twig' with {
+        {% include 'components/unified_profit_display.html.twig' with {
             buy_price: lotGroup.buyPricePerLot,
             sell_price: item.actualSellPrice,
             quantity: item.quantitySold

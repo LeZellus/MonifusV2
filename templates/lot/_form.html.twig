@@ -39,7 +39,7 @@
                 </div>
                 <div class="bg-gray-700 rounded-lg p-3 text-center">
                     <div class="text-gray-400 text-sm">Profit total</div>
-                    {% include 'components/profit_display.html.twig' with {
+                    {% include 'components/unified_profit_display.html.twig' with {
                         buy_price: lot.buyPricePerLot,
                         sell_price: lot.sellPricePerLot,
                         quantity: lot.lotSize
@@ -50,7 +50,7 @@
     {% endif %}
 
     <!-- Formulaire principal -->
-    <div class="wrapper-background" data-controller="profit-calculator">
+    <div class="wrapper-background" data-controller="centralized-calculator" data-centralized-calculator-mode-value="lot">
         {% include 'components/section_header.html.twig' with {
             type: 'form',
             title: is_edit ? 'Modifier les informations' : 'Informations du lot',
@@ -169,15 +169,15 @@
             <div class="stats-grid-3 text-center">
                 <div>
                     <div class="text-white font-medium">Investissement</div>
-                    <div data-profit-calculator-target="investment" class="text-red-400 font-bold">-</div>
+                    <div data-centralized-calculator-target="investment" class="text-red-400 font-bold">-</div>
                 </div>
                 <div>
                     <div class="text-white font-medium">Profit par lot</div>
-                    <div data-profit-calculator-target="profitPerLot" class="text-green-400 font-bold">-</div>
+                    <div data-centralized-calculator-target="profitPerLot" class="text-green-400 font-bold">-</div>
                 </div>
                 <div>
                     <div class="text-white font-medium">Profit total</div>
-                    <div data-profit-calculator-target="totalProfit" class="text-green-400 font-bold">-</div>
+                    <div data-centralized-calculator-target="totalProfit" class="text-green-400 font-bold">-</div>
                 </div>
             </div>
         {% endset %}

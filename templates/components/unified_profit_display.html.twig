@@ -1,0 +1,64 @@
+{# templates/components/unified_profit_display.html.twig #}
+{# 
+Template unifié pour l'affichage des profits - remplace profit_display.html.twig
+Usage: 
+  {% include 'components/unified_profit_display.html.twig' with {
+    buy_price: 1000,
+    sell_price: 1200, 
+    quantity: 100,
+    mode: 'detailed|compact|simple' (défaut: detailed)
+  } %}
+
+  OU avec entité LotGroup:
+  {% include 'components/unified_profit_display.html.twig' with {
+    lot_group: lotGroup,
+    mode: 'detailed'
+  } %}
+#}
+
+{# Détection du mode de calcul #}
+{% if lot_group is defined %}
+    {% set metrics = lot_metrics(lot_group) %}
+{% elseif lot_unit is defined %}
+    {% set metrics = sale_metrics(lot_unit) %}
+    {% set total_profit = metrics.realizedProfit %}
+    {% set roi = metrics.actualROI %}
+{% else %}
+    {% set total_profit = calculate_profit(sell_price, buy_price, quantity|default(1)) %}
+    {% set roi = calculate_roi(buy_price, sell_price) %}
+    {% set metrics = {
+        totalProfit: total_profit,
+        roi: roi,
+        investment: calculate_investment(buy_price, quantity|default(1))
+    } %}
+{% endif %}
+
+{# Variables finales #}
+{% set final_profit = metrics.totalProfit ?? total_profit %}
+{% set final_roi = metrics.roi ?? roi %}
+{% set profit_class = profit_class(final_profit) %}
+{% set display_mode = mode|default('detailed') %}
+
+{# Affichage selon le mode #}
+{% if display_mode == 'simple' %}
+    <span class="{{ profit_class }} font-medium">
+        {{ format_kamas(final_profit) }}
+    </span>
+
+{% elseif display_mode == 'compact' %}
+    <div class="{{ profit_class }} font-medium">
+        {{ format_kamas(final_profit) }}
+    </div>
+
+{% else %} {# detailed #}
+    <div class="profit-display">
+        <div class="text-white font-medium">
+            {{ format_kamas(final_profit) }}
+        </div>
+        {% if final_roi != 0 %}
+            <div class="{{ profit_class }} text-xs">
+                ({{ final_roi|number_format(1) }}%)
+            </div>
+        {% endif %}
+    </div>
+{% endif %}

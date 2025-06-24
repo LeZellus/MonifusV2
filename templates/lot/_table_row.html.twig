@@ -32,14 +32,14 @@
         {% if item.status.value == 'sold' and item.lotUnits|length > 0 %}
             {# Calculer le profit avec le prix réel #}
             {% set lastSale = item.lotUnits|last %}
-            {% include 'components/profit_display.html.twig' with {
+            {% include 'components/unified_profit_display.html.twig' with {
                 buy_price: item.buyPricePerLot,
                 sell_price: lastSale.actualSellPrice,
                 quantity: lastSale.quantitySold,
                 color: 'white'
             } %}
         {% elseif item.sellPricePerLot %}
-            {% include 'components/profit_display.html.twig' with {
+            {% include 'components/unified_profit_display.html.twig' with {
                 buy_price: item.buyPricePerLot,
                 sell_price: item.sellPricePerLot,
                 quantity: item.lotSize,
