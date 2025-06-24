@@ -33,6 +33,7 @@ class ItemSearchController extends AbstractController
                     'name' => $item['name'],
                     'level' => $item['level'] ?? null,
                     'type' => $typeLabel,
+                    'img_url' => $item['imgUrl'] ?? null, // Ajout du champ image
                     'display' => $item['name'] . ($item['level'] ? ' (Niv.' . $item['level'] . ')' : '')
                 ];
             }, $items);
@@ -62,6 +63,7 @@ class ItemSearchController extends AbstractController
                     'name' => $item['name'],
                     'level' => $item['level'] ?? null,
                     'type' => 'Ressource',
+                    'img_url' => $item['imgUrl'] ?? null, // Ajout du champ image
                     'display' => $item['name'] . ($item['level'] ? ' (Niv.' . $item['level'] . ')' : '')
                 ];
             }, $items);

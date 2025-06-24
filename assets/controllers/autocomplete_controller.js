@@ -52,11 +52,21 @@ export default class extends Controller {
             const avatarBg = this.getAvatarColor(item.name)
             const typeIcon = this.getTypeIcon(item.type)
             
+            // Utiliser l'image de l'item si disponible, sinon fallback sur l'initiale
+            const avatarContent = item.img_url 
+                ? `<img src="${item.img_url}" alt="${item.name}" class="w-full h-full object-cover rounded-lg" onerror="this.style.display='none'; this.nextElementSibling.style.display='flex';">
+                <div class="w-full h-full ${avatarBg} rounded-lg flex items-center justify-center text-white font-bold text-sm shadow-sm" style="display: none;">
+                    ${item.name.charAt(0).toUpperCase()}
+                </div>`
+                : `<div class="w-full h-full ${avatarBg} rounded-lg flex items-center justify-center text-white font-bold text-sm shadow-sm">
+                    ${item.name.charAt(0).toUpperCase()}
+                </div>`
+            
             return `
                 <div class="autocomplete-item group" data-id="${item.id}" data-action="click->autocomplete#selectItem">
                     <div class="flex items-center space-x-3">
-                        <div class="w-10 h-10 ${avatarBg} rounded-lg flex items-center justify-center text-white font-bold text-sm shadow-sm">
-                            ${item.name.charAt(0).toUpperCase()}
+                        <div class="w-10 h-10 rounded-lg overflow-hidden flex-shrink-0">
+                            ${avatarContent}
                         </div>
                         
                         <div class="flex-1 min-w-0">
