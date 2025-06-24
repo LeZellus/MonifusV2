@@ -35,6 +35,7 @@ class LotGroupRepository extends ServiceEntityRepository
 
     public function getUserGlobalStats(User $user): array
     {
+        // Requête principale pour les stats de base
         $result = $this->createQueryBuilder('lg')
             ->select([
                 'COUNT(lg.id) as totalLots',
@@ -49,14 +50,39 @@ class LotGroupRepository extends ServiceEntityRepository
             ->getQuery()
             ->getArrayResult();
 
+        // Requête séparée pour le profit potentiel (lots disponibles)
+        $potentialProfitResult = $this->createQueryBuilder('lg')
+            ->select('SUM((lg.sellPricePerLot - lg.buyPricePerLot) * lg.lotSize) as potentialProfit')
+            ->leftJoin('lg.dofusCharacter', 'c')
+            ->leftJoin('c.tradingProfile', 'tp')
+            ->where('tp.user = :user')
+            ->andWhere('lg.status = :available')
+            ->setParameter('user', $user)
+            ->setParameter('available', LotStatus::AVAILABLE)
+            ->getQuery()
+            ->getSingleScalarResult();
+
+        // Requête pour le profit réalisé (via LotUnit)
+        $realizedProfitResult = $this->getEntityManager()
+            ->createQueryBuilder()
+            ->select('SUM((lu.actualSellPrice - lg.buyPricePerLot) * lu.quantitySold) as realizedProfit')
+            ->from('App\Entity\LotUnit', 'lu')
+            ->join('lu.lotGroup', 'lg')
+            ->leftJoin('lg.dofusCharacter', 'c')
+            ->leftJoin('c.tradingProfile', 'tp')
+            ->where('tp.user = :user')
+            ->setParameter('user', $user)
+            ->getQuery()
+            ->getSingleScalarResult();
+
         // Parser les résultats
         $stats = [
             'totalLots' => 0,
             'availableLots' => 0,
             'soldLots' => 0,
             'investedAmount' => 0,
-            'realizedProfit' => 0,
-            'potentialProfit' => 0
+            'realizedProfit' => (int) ($realizedProfitResult ?? 0),
+            'potentialProfit' => (int) ($potentialProfitResult ?? 0)
         ];
 
         foreach ($result as $row) {
