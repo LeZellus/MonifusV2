@@ -15,20 +15,6 @@ Usage: {% include 'components/stats_card.html.twig' with {
 {% set color_class = 'text-' ~ (color|default('blue')) ~ '-400' %}
 {% set value_size = (size|default('normal')) == 'large' ? 'text-3xl' : 'text-2xl' %}
 
-{# Gestion des différents types de valeurs #}
-{% if value is not empty and value is not null %}
-    {% if unit is defined and unit == 'kamas' %}
-        {# Valeur avec unité kamas : utiliser le nouveau formatage #}
-        {% set formatted_value = value|round|format_kamas %}
-    {% else %}
-        {# Autres valeurs : formatage classique #}
-        {% set formatted_value = value|number_format(0, ',', ' ') %}
-        {% set formatted_value = formatted_value ~ (unit is defined and unit ? ' ' ~ unit : '') %}
-    {% endif %}
-{% else %}
-    {% set formatted_value = value ~ (unit is defined and unit ? ' ' ~ unit : '') %}
-{% endif %}
-
 <div class="wrapper-background text-center">
     <h3 class="text-white text-lg font-semibold mb-2 flex items-center justify-center">
         {% if icon is defined %}
@@ -38,7 +24,17 @@ Usage: {% include 'components/stats_card.html.twig' with {
     </h3>
     
     <p class="{{ color_class }} {{ value_size }} font-bold">
-        {{ formatted_value|raw }}
+        {% if value is not empty and value is not null %}
+            {% if unit is defined and unit == 'kamas' %}
+                {# Valeur avec unité kamas : utiliser le formatage avec |raw #}
+                {{ value|round|format_kamas|raw }}
+            {% else %}
+                {# Autres valeurs : formatage classique sans |raw #}
+                {{ value|number_format(0, ',', ' ') }}{% if unit is defined and unit %} {{ unit }}{% endif %}
+            {% endif %}
+        {% else %}
+            {{ value }}{% if unit is defined and unit %} {{ unit }}{% endif %}
+        {% endif %}
     </p>
     
     {% if subtitle is defined %}

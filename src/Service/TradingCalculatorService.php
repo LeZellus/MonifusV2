@@ -32,10 +32,10 @@ class TradingCalculatorService
             return $this->getEmptyStats();
         }
 
-        // Statistiques globales existantes
-        $globalStats = $this->getGlobalStats($user);
+        // Statistiques globales avec différenciation investi en cours/total
+        $globalStats = $this->getEnhancedGlobalStats($user);
         
-        // Nouvelles données enrichies
+        // Données enrichies
         $topItems = $this->getEnhancedTopItems($user);
         $characterBreakdown = $this->getCharacterBreakdown($user);
         $weeklyData = $this->getWeeklyPerformance($user);
@@ -48,8 +48,6 @@ class TradingCalculatorService
             'global' => $globalStats,
             'topItems' => $topItems,
             'charactersCount' => count($characters),
-            
-            // Nouvelles données
             'characterBreakdown' => $characterBreakdown,
             'weeklyData' => $weeklyData,
             'monthlyData' => $monthlyData,
@@ -60,36 +58,59 @@ class TradingCalculatorService
         ];
     }
 
-    private function getGlobalStats(User $user): array
+    /**
+     * Stats globales enrichies avec différenciation investi en cours/total
+     */
+    private function getEnhancedGlobalStats(User $user): array
     {
-        return $this->lotGroupRepository->getUserGlobalStats($user);
+        $baseStats = $this->lotGroupRepository->getUserGlobalStats($user);
+        
+        // Calculs ROI enrichis
+        $totalProfit = $baseStats['realizedProfit'] + $baseStats['potentialProfit'];
+        
+        // ROI sur investi total (le vrai ROI global)
+        $roiOnTotal = $baseStats['totalInvestment'] > 0 
+            ? ($totalProfit / $baseStats['totalInvestment']) * 100 
+            : 0;
+        
+        // ROI sur investi en cours (pour les lots actifs)
+        $roiOnCurrent = $baseStats['currentInvestment'] > 0 
+            ? ($baseStats['potentialProfit'] / $baseStats['currentInvestment']) * 100 
+            : null;
+
+        // Efficacité du capital
+        $capitalEfficiency = $baseStats['totalInvestment'] > 0 
+            ? $baseStats['realizedProfit'] / $baseStats['totalInvestment'] 
+            : 0;
+
+        // Profit moyen par lot - EN COURS (lots disponibles)
+        $avgProfitPerLotCurrent = $baseStats['availableLots'] > 0 
+            ? $baseStats['potentialProfit'] / $baseStats['availableLots'] 
+            : 0;
+
+        // Profit moyen par lot - TOTAL (lots vendus)
+        $avgProfitPerLotTotal = $baseStats['soldLots'] > 0 
+            ? $baseStats['realizedProfit'] / $baseStats['soldLots'] 
+            : 0;
+
+        return array_merge($baseStats, [
+            'roiOnTotal' => $roiOnTotal,
+            'roiOnCurrent' => $roiOnCurrent,
+            'capitalEfficiency' => $capitalEfficiency,
+            'avgProfitPerLotCurrent' => $avgProfitPerLotCurrent,
+            'avgProfitPerLotTotal' => $avgProfitPerLotTotal,
+            // Legacy
+            'avgProfitPerLot' => $avgProfitPerLotTotal
+        ]);
     }
 
     private function getEnhancedTopItems(User $user): array
     {
-        return $this->lotGroupRepository->createQueryBuilder('lg')
-            ->select([
-                'i.name as itemName',
-                'COUNT(lg.id) as lotsCount',
-                'SUM((lg.sellPricePerLot - lg.buyPricePerLot) * lg.lotSize) as totalProfit',
-                'AVG((lg.sellPricePerLot - lg.buyPricePerLot) / lg.buyPricePerLot * 100) as roi',
-                'SUM(lg.buyPricePerLot * lg.lotSize) as totalInvested'
-            ])
-            ->join('lg.item', 'i')
-            ->join('lg.dofusCharacter', 'c')
-            ->join('c.tradingProfile', 'tp')
-            ->where('tp.user = :user')
-            ->setParameter('user', $user)
-            ->groupBy('i.id', 'i.name')
-            ->orderBy('totalProfit', 'DESC')
-            ->setMaxResults(5)
-            ->getQuery()
-            ->getResult();
+        return $this->lotGroupRepository->getTopItemsByProfit($user, 5);
     }
 
     private function getCharacterBreakdown(User $user): array
     {
-        // Récupérer les entités complètes avec leurs relations
         $characters = $this->characterRepository->createQueryBuilder('c')
             ->leftJoin('c.lotGroups', 'lg')
             ->join('c.server', 's')
@@ -105,21 +126,23 @@ class TradingCalculatorService
             $totalLots = 0;
             $activeLots = 0;
             $totalProfit = 0;
-            $totalInvested = 0;
+            $currentInvestment = 0;
+            $totalInvestment = 0;
 
             foreach ($character->getLotGroups() as $lot) {
                 $totalLots++;
+                $lotInvestment = $lot->getBuyPricePerLot() * $lot->getLotSize();
+                $totalInvestment += $lotInvestment;
                 
                 if ($lot->getStatus() === LotStatus::AVAILABLE) {
                     $activeLots++;
-                    $totalInvested += $lot->getBuyPricePerLot() * $lot->getLotSize();
-                    $totalProfit += ($lot->getSellPricePerLot() - $lot->getBuyPricePerLot()) * $lot->getLotSize();
-                } elseif ($lot->getStatus() === LotStatus::SOLD) {
+                    $currentInvestment += $lotInvestment;
                     $totalProfit += ($lot->getSellPricePerLot() - $lot->getBuyPricePerLot()) * $lot->getLotSize();
                 }
             }
 
-            $roi = $totalInvested > 0 ? ($totalProfit / $totalInvested) * 100 : 0;
+            // ROI sur investissement total du personnage
+            $roi = $totalInvestment > 0 ? ($totalProfit / $totalInvestment) * 100 : 0;
 
             $result[] = [
                 'id' => $character->getId(),
@@ -132,7 +155,8 @@ class TradingCalculatorService
                 'totalLots' => $totalLots,
                 'activeLots' => $activeLots,
                 'totalProfit' => $totalProfit,
-                'totalInvested' => $totalInvested,
+                'currentInvestment' => $currentInvestment,
+                'totalInvestment' => $totalInvestment,
                 'roi' => $roi
             ];
         }
@@ -144,7 +168,7 @@ class TradingCalculatorService
     {
         $weekAgo = new \DateTime('-7 days');
         
-        return $this->lotUnitRepository->createQueryBuilder('lu')
+        $result = $this->lotUnitRepository->createQueryBuilder('lu')
             ->select([
                 'COUNT(lu.id) as sales',
                 'SUM((lu.actualSellPrice - lg.buyPricePerLot) * lu.quantitySold) as profit'
@@ -157,14 +181,16 @@ class TradingCalculatorService
             ->setParameter('user', $user)
             ->setParameter('weekAgo', $weekAgo)
             ->getQuery()
-            ->getOneOrNullResult() ?: ['sales' => 0, 'profit' => 0];
+            ->getOneOrNullResult();
+
+        return $result ?: ['sales' => 0, 'profit' => 0];
     }
 
     private function getMonthlyPerformance(User $user): array
     {
         $monthAgo = new \DateTime('-30 days');
         
-        return $this->lotUnitRepository->createQueryBuilder('lu')
+        $result = $this->lotUnitRepository->createQueryBuilder('lu')
             ->select([
                 'COUNT(lu.id) as sales',
                 'SUM((lu.actualSellPrice - lg.buyPricePerLot) * lu.quantitySold) as profit'
@@ -177,7 +203,9 @@ class TradingCalculatorService
             ->setParameter('user', $user)
             ->setParameter('monthAgo', $monthAgo)
             ->getQuery()
-            ->getOneOrNullResult() ?: ['sales' => 0, 'profit' => 0];
+            ->getOneOrNullResult();
+
+        return $result ?: ['sales' => 0, 'profit' => 0];
     }
 
     private function getMarketSurveillanceStats(User $user): array
@@ -213,9 +241,9 @@ class TradingCalculatorService
             ->getSingleScalarResult();
 
         return [
-            'watchedItems' => $watchedItems,
-            'activeWatches' => $activeWatches,
-            'recentUpdates' => $recentUpdates,
+            'watchedItems' => $watchedItems ?: 0,
+            'activeWatches' => $activeWatches ?: 0,
+            'recentUpdates' => $recentUpdates ?: 0,
             'opportunities' => 0 // À implémenter selon ta logique
         ];
     }
@@ -228,7 +256,7 @@ class TradingCalculatorService
         $twoWeeksAgo = new \DateTime('-14 days');
         $oneWeekAgo = new \DateTime('-7 days');
         
-        $lastWeek = $this->lotUnitRepository->createQueryBuilder('lu')
+        $lastWeekProfit = $this->lotUnitRepository->createQueryBuilder('lu')
             ->select('SUM((lu.actualSellPrice - lg.buyPricePerLot) * lu.quantitySold) as profit')
             ->join('lu.lotGroup', 'lg')
             ->join('lg.dofusCharacter', 'c')
@@ -242,14 +270,14 @@ class TradingCalculatorService
             ->getQuery()
             ->getSingleScalarResult() ?: 0;
 
-        $weekTrend = $lastWeek > 0 
-            ? (($thisWeek['profit'] - $lastWeek) / $lastWeek) * 100 
+        $weekTrend = $lastWeekProfit > 0 
+            ? (($thisWeek['profit'] - $lastWeekProfit) / $lastWeekProfit) * 100 
             : 0;
 
-        // Meilleur jour (exemple basique)
+        // Meilleur jour (simplifié)
         $bestDay = [
-            'profit' => $thisWeek['profit'] / 7, // Moyenne par jour
-            'date' => new \DateTime() // À améliorer avec une vraie logique
+            'profit' => $thisWeek['profit'],
+            'date' => new \DateTime()
         ];
 
         return [
@@ -260,25 +288,42 @@ class TradingCalculatorService
 
     private function getRecommendations(User $user): array
     {
-        // Suggestions basées sur les items les plus rentables
-        $suggestedItems = $this->lotGroupRepository->createQueryBuilder('lg')
-            ->select('i.name')
-            ->join('lg.item', 'i')
-            ->join('lg.dofusCharacter', 'c')
-            ->join('c.tradingProfile', 'tp')
-            ->where('tp.user = :user')
-            ->andWhere('lg.status = :sold')
-            ->setParameter('user', $user)
-            ->setParameter('sold', LotStatus::SOLD)
-            ->groupBy('i.name')
-            ->orderBy('AVG((lg.sellPricePerLot - lg.buyPricePerLot) / lg.buyPricePerLot)', 'DESC')
-            ->setMaxResults(3)
-            ->getQuery()
-            ->getResult();
+        $recommendations = [];
+        $stats = $this->lotGroupRepository->getUserGlobalStats($user);
 
-        return [
-            'suggestedItems' => array_column($suggestedItems, 'name')
-        ];
+        // Recommandations basées sur les métriques
+        if ($stats['currentInvestment'] == 0 && $stats['totalLots'] == 0) {
+            $recommendations[] = [
+                'type' => 'action',
+                'title' => 'Commencer le trading',
+                'message' => 'Créez vos premiers lots pour commencer à trader',
+                'priority' => 'high'
+            ];
+        }
+
+        if ($stats['availableLots'] > 20) {
+            $recommendations[] = [
+                'type' => 'warning',
+                'title' => 'Beaucoup de lots en attente',
+                'message' => 'Vous avez ' . $stats['availableLots'] . ' lots à vendre',
+                'priority' => 'medium'
+            ];
+        }
+
+        $roiOnTotal = $stats['totalInvestment'] > 0 
+            ? (($stats['realizedProfit'] + $stats['potentialProfit']) / $stats['totalInvestment']) * 100 
+            : 0;
+
+        if ($roiOnTotal < 10 && $stats['totalInvestment'] > 0) {
+            $recommendations[] = [
+                'type' => 'tip',
+                'title' => 'ROI faible',
+                'message' => 'Votre ROI global est de ' . number_format($roiOnTotal, 1) . '%. Analysez vos stratégies.',
+                'priority' => 'low'
+            ];
+        }
+
+        return $recommendations;
     }
 
     private function getEmptyStats(): array
@@ -288,19 +333,25 @@ class TradingCalculatorService
                 'totalLots' => 0,
                 'availableLots' => 0,
                 'soldLots' => 0,
-                'investedAmount' => 0,
+                'currentInvestment' => 0,
+                'totalInvestment' => 0,
+                'investedAmount' => 0, // legacy
                 'realizedProfit' => 0,
-                'potentialProfit' => 0
+                'potentialProfit' => 0,
+                'roiOnTotal' => 0,
+                'roiOnCurrent' => null,
+                'capitalEfficiency' => 0,
+                'avgProfitPerLot' => 0
             ],
             'topItems' => [],
             'charactersCount' => 0,
             'characterBreakdown' => [],
             'weeklyData' => ['sales' => 0, 'profit' => 0],
             'monthlyData' => ['sales' => 0, 'profit' => 0],
-            'marketData' => ['watchedItems' => 0, 'activeWatches' => 0, 'recentUpdates' => 0, 'opportunities' => 0],
+            'marketData' => ['watchedItems' => 0, 'activeWatches' => 0, 'opportunities' => 0],
             'weekTrend' => 0,
             'bestDay' => ['profit' => 0, 'date' => new \DateTime()],
-            'recommendations' => ['suggestedItems' => []]
+            'recommendations' => []
         ];
     }
 }
