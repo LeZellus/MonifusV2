@@ -76,7 +76,7 @@
                         title: 'ROI Total',
                         value: stats.global.roiOnTotal|number_format(1),
                         unit: '%',
-                        subtitle: 'Sur ' ~ (stats.global.totalInvestment / 1000)|round ~ 'k investis',
+                        subtitle: 'Sur ' ~ totalInvestmentFormatted ~ ' investis',
                         icon: '📊',
                         color: stats.global.roiOnTotal >= 15 ? 'green' : (stats.global.roiOnTotal >= 5 ? 'orange' : 'red')
                     } %}

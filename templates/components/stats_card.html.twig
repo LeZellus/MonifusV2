@@ -38,6 +38,6 @@ Usage: {% include 'components/stats_card.html.twig' with {
     </p>
     
     {% if subtitle is defined %}
-        <p class="text-gray-400 text-sm">{{ subtitle }}</p>
+        <p class="text-gray-400 text-sm">{{ subtitle|raw }}</p>
     {% endif %}
 </div>
