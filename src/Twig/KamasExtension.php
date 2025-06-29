@@ -10,7 +10,7 @@ class KamasExtension extends AbstractExtension
     public function getFilters(): array
     {
         return [
-            new TwigFilter('format_kamas', [$this, 'formatKamas']),
+            new TwigFilter('format_kamas', [$this, 'formatKamas'], ['is_safe' => ['html']]),
         ];
     }
 
@@ -26,14 +26,14 @@ class KamasExtension extends AbstractExtension
             $hundreds_thousands = intval(floor($remainder / 100000));
             
             if ($hundreds_thousands > 0) {
-                $formatted = $millions . 'm' . $hundreds_thousands . ' k';
+                $formatted = $millions . 'm' . $hundreds_thousands . '<span class="text-orange-400"> k</span>';
             } else {
-                $formatted = $millions . 'm k';
+                $formatted = $millions . 'm<span class="text-orange-400"> k</span>';
             }
             
             return ($amount < 0 ? '-' : '') . $formatted;
         }
         
-        return number_format($amount, 0, ',', ' ') . ' k';
+        return number_format($amount, 0, ',', ' ') . '<span class="text-orange-400"> k</span>';
     }
 }

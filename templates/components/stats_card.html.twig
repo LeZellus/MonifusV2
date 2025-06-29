@@ -38,7 +38,7 @@ Usage: {% include 'components/stats_card.html.twig' with {
     </h3>
     
     <p class="{{ color_class }} {{ value_size }} font-bold">
-        {{ formatted_value }}
+        {{ formatted_value|raw }}
     </p>
     
     {% if subtitle is defined %}
