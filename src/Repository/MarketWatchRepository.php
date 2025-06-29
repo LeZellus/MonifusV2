@@ -20,16 +20,21 @@ class MarketWatchRepository extends ServiceEntityRepository
     /**
      * Récupère toutes les observations pour un personnage
      */
-    public function findByCharacterWithItems(DofusCharacter $character): array
+    public function findByCharacterWithItems(DofusCharacter $character, string $searchQuery = ''): array
     {
-        return $this->createQueryBuilder('mw')
-            ->select('mw', 'i')
-            ->join('mw.item', 'i')
+        $qb = $this->createQueryBuilder('mw')
+            ->leftJoin('mw.item', 'i')
+            ->leftJoin('mw.dofusCharacter', 'c')
             ->where('mw.dofusCharacter = :character')
-            ->setParameter('character', $character)
-            ->orderBy('mw.observedAt', 'DESC')
-            ->getQuery()
-            ->getResult();
+            ->setParameter('character', $character);
+
+        // Ajout de la recherche si un terme est fourni
+        if (!empty($searchQuery)) {
+            $qb->andWhere('LOWER(i.name) LIKE LOWER(:search)')
+            ->setParameter('search', '%' . $searchQuery . '%');
+        }
+
+        return $qb->getQuery()->getResult();
     }
 
     /**
@@ -81,10 +86,14 @@ class MarketWatchRepository extends ServiceEntityRepository
     /**
      * Groupe les observations par item et calcule les statistiques
      */
-    public function getItemsDataWithStats(DofusCharacter $character): array
+    public function getItemsDataWithStats(DofusCharacter $character, string $searchQuery = ''): array
     {
-        $observations = $this->findByCharacterWithItems($character);
+        // 1. Votre méthode actuelle utilise findByCharacterWithItems() 
+        // 2. On va juste ajouter le filtre de recherche dans cette logique
         
+        $observations = $this->findByCharacterWithItems($character, $searchQuery);
+        
+        // Le reste de votre code existant ne change pas du tout !
         // Grouper par item
         $itemsGrouped = [];
         foreach ($observations as $observation) {

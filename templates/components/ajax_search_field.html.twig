@@ -1,0 +1,116 @@
+{# templates/components/ajax_search_field.html.twig #}
+{#
+Composant de recherche AJAX réutilisable
+
+Usage:
+{% include 'components/ajax_search_field.html.twig' with {
+    url: path('app_search_route'),
+    placeholder: 'Rechercher des items...',
+    debounce: 300,
+    minLength: 2,
+    containers: [
+        { name: 'table_rows', selector: '#table-body' },
+        { name: 'mobile_cards', selector: '#mobile-cards' }
+    ]
+} %}
+#}
+
+{% set config = {
+    url: url|default(''),
+    placeholder: placeholder|default('Rechercher...'),
+    debounce: debounce|default(300),
+    minLength: minLength|default(0),
+    keyboardShortcut: keyboardShortcut|default('k'),
+    countTemplate: countTemplate|default('{{count}} résultat(s) pour "{{query}}"'),
+    emptyMessage: emptyMessage|default('Aucun résultat trouvé')
+} %}
+
+<div data-controller="ajax_search"
+     {% for key, value in config %}
+     data-ajax-search-{{ key|replace({'_': '-'}) }}-value="{{ value }}"
+     {% endfor %}
+     {{ attributes|default('')|raw }}>
+
+    <button onclick="console.log('Test basic JS:', document.querySelector('[data-controller]'))">
+        Test JS
+    </button>
+    
+    <div class="{{ containerClass|default('max-w-md') }}">
+        <!-- Champ de recherche -->
+        <div class="relative">
+            <input type="text" 
+                   data-ajax-search-target="input"
+                   data-action="input->ajax-search#search"
+                   class="{{ inputClass|default('w-full bg-gray-800 border border-gray-600 rounded-lg px-4 py-2 pr-10 text-white placeholder-gray-400 focus:border-orange-500 focus:ring-1 focus:ring-orange-500 transition-colors') }}">
+            
+            <!-- Loader -->
+            <div data-ajax-search-target="loader" 
+                 class="absolute right-10 top-1/2 transform -translate-y-1/2 hidden">
+                <div class="{{ loaderClass|default('animate-spin rounded-full h-4 w-4 border-2 border-orange-400 border-t-transparent') }}"></div>
+            </div>
+            
+            <!-- Icône de recherche -->
+            <div data-ajax-search-target="icon" 
+                 class="absolute right-2 top-1/2 transform -translate-y-1/2 text-gray-400">
+                {% if searchIcon is defined %}
+                    {{ searchIcon|raw }}
+                {% else %}
+                    <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"></path>
+                    </svg>
+                {% endif %}
+            </div>
+        </div>
+        
+        <!-- Informations de recherche -->
+        <div data-ajax-search-target="results" 
+             class="{{ resultsClass|default('mt-2 hidden') }}">
+            <div class="flex items-center justify-between">
+                <span data-ajax-search-target="count" 
+                      class="{{ countClass|default('text-gray-400 text-sm') }}"></span>
+                
+                {% if showClearButton|default(true) %}
+                <button data-ajax-search-target="clear"
+                        data-action="click->ajax-search#clear" 
+                        class="{{ clearClass|default('text-orange-400 hover:text-orange-300 text-sm transition-colors') }}">
+                    {{ clearText|default('Effacer') }}
+                </button>
+                {% endif %}
+            </div>
+        </div>
+
+        <!-- Conteneurs de contenu (définis par containers) -->
+        {% if containers is defined %}
+            {% for container in containers %}
+                <div data-ajax-search-target="container"
+                     data-search-container="{{ container.name }}"
+                     {% if container.selector is defined %}id="{{ container.selector|replace({'#': '', '.': ''}) }}"{% endif %}
+                     class="{{ container.class|default('') }}">
+                    {% if container.content is defined %}
+                        {{ container.content|raw }}
+                    {% endif %}
+                </div>
+            {% endfor %}
+        {% endif %}
+
+        <!-- Slot pour contenu personnalisé -->
+        {% if customContent is defined %}
+            {{ customContent|raw }}
+        {% endif %}
+    </div>
+
+    <!-- Événements personnalisés (optionnel) -->
+    {% if events is defined %}
+        <script>
+        document.addEventListener('DOMContentLoaded', function() {
+            const searchContainer = document.querySelector('[data-controller*="ajax-search"]');
+            
+            {% for event in events %}
+            searchContainer.addEventListener('ajax-search:{{ event.name }}', function(e) {
+                {{ event.handler|raw }}
+            });
+            {% endfor %}
+        });
+        </script>
+    {% endif %}
+</div>

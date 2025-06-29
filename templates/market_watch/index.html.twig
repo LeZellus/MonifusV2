@@ -5,7 +5,8 @@
 {% block body %}
     <div class="wrapper-container">
         {% if selectedCharacter %}
-            <div class="flex justify-between items-center">
+            <!-- En-tête avec titre et bouton nouveau -->
+            <div class="flex justify-between items-center mb-6">
                 <h2 class="text-white text-2xl font-bold">
                     Items observés par {{ selectedCharacter.name }}
                 </h2>
@@ -15,17 +16,96 @@
                 </a>
             </div>
 
-            {% include 'components/data_table.html.twig' with {
-                headers: ['Ressource', 'Moy. x1', 'Moy. x10', 'Moy. x100', 'Suivi', 'Actions'],
-                rows: items_data,
-                row_template: 'market_watch/_table_row.html.twig',
-                mobile_card_template: 'market_watch/_mobile_card.html.twig',
-                empty_message: 'Aucune observation pour ' ~ selectedCharacter.name,
-                empty_action: {
-                    url: path('app_market_watch_new'),
-                    text: 'Créer la première observation'
-                }
-            } %}
+            <!-- Contrôleur AJAX Search - Logique entièrement dans le contrôleur -->
+            <div data-controller="ajax-search" 
+                 data-ajax-search-url-value="{{ path('app_market_watch_search') }}"
+                 data-ajax-search-debounce-value="300">
+                
+                <!-- Barre de recherche -->
+                <div class="mb-6">
+                    <div class="max-w-md">
+                        <div class="relative">
+                            <input type="text" 
+                                   data-ajax-search-target="input"
+                                   data-action="input->ajax-search#search"
+                                   placeholder="Rechercher une observation..."
+                                   class="w-full bg-gray-800 border border-gray-600 rounded-lg px-4 py-2 pr-10 text-white placeholder-gray-400 focus:border-orange-500 focus:ring-1 focus:ring-orange-500 transition-colors">
+                            
+                            <!-- Loader -->
+                            <div data-ajax-search-target="loader" class="absolute right-10 top-1/2 transform -translate-y-1/2 hidden">
+                                <div class="animate-spin rounded-full h-4 w-4 border-2 border-orange-400 border-t-transparent"></div>
+                            </div>
+                            
+                            <!-- Icône de recherche -->
+                            <div data-ajax-search-target="icon" class="absolute right-2 top-1/2 transform -translate-y-1/2 text-gray-400">
+                                <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"></path>
+                                </svg>
+                            </div>
+                        </div>
+                        
+                        <!-- Résultats de recherche -->
+                        <div data-ajax-search-target="results" class="mt-2 hidden">
+                            <div class="flex items-center justify-between">
+                                <span data-ajax-search-target="count" class="text-gray-400 text-sm"></span>
+                                <button data-action="click->ajax-search#clear" 
+                                        class="text-orange-400 hover:text-orange-300 text-sm transition-colors">
+                                    Effacer
+                                </button>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Conteneur des résultats -->
+                <div id="results-container">
+                    <!-- Vue desktop -->
+                    <div id="desktop-table" class="hidden md:block bg-gray-800 rounded-lg overflow-hidden">
+                        <table class="w-full">
+                            <thead class="bg-gray-700">
+                                <tr>
+                                    <th class="table-header">Ressource</th>
+                                    <th class="table-header">Moy. x1</th>
+                                    <th class="table-header">Moy. x10</th>
+                                    <th class="table-header">Moy. x100</th>
+                                    <th class="table-header">Suivi</th>
+                                    <th class="table-header">Actions</th>
+                                </tr>
+                            </thead>
+                            <tbody data-ajax-search-target="container"
+                                   data-search-container="table_rows"
+                                   class="divide-y divide-gray-700">
+                                {% for item in items_data %}
+                                    {% include 'market_watch/_table_row.html.twig' with {item: item} %}
+                                {% endfor %}
+                            </tbody>
+                        </table>
+                    </div>
+
+                    <!-- Vue mobile -->
+                    <div data-ajax-search-target="container"
+                         data-search-container="mobile_cards"
+                         class="md:hidden space-y-4">
+                        {% for item in items_data %}
+                            {% include 'market_watch/_mobile_card.html.twig' with {item: item} %}
+                        {% endfor %}
+                    </div>
+
+                    <!-- Message vide -->
+                    <div data-ajax-search-target="container"
+                         data-search-container="empty_state"
+                         class="text-center py-12 hidden">
+                        {% include 'components/empty_state.html.twig' with {
+                            type: 'no_results',
+                            title: 'Aucune observation trouvée',
+                            action: {
+                                url: path('app_market_watch_new'),
+                                text: 'Créer une observation'
+                            }
+                        } %}
+                    </div>
+                </div>
+            </div>
         {% else %}
             <!-- Aucun personnage sélectionné -->
             {% include 'components/empty_state.html.twig' with {

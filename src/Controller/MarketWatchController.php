@@ -10,6 +10,7 @@ use Doctrine\ORM\EntityManagerInterface;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
+use Symfony\Component\HttpFoundation\JsonResponse;
 use Symfony\Component\Routing\Attribute\Route;
 use Symfony\Component\Security\Http\Attribute\IsGranted;
 use App\Repository\ItemRepository;
@@ -190,6 +191,67 @@ class MarketWatchController extends AbstractController
             'averages' => $averages,
             'chart_data' => $chartData,
         ]);
+    }
+
+    #[Route('/search', name: 'app_market_watch_search', methods: ['GET'])]
+    public function search(
+        MarketWatchRepository $marketWatchRepository,
+        CharacterSelectionService $characterService,
+        Request $request
+    ): JsonResponse {
+        // Debug pour voir si la route est appelée
+        error_log("🔍 Route de recherche appelée");
+        error_log("Query parameter: " . $request->query->get('q', 'VIDE'));
+        
+        $selectedCharacter = $characterService->getSelectedCharacter($this->getUser());
+        
+        if (!$selectedCharacter) {
+            error_log("❌ Aucun personnage sélectionné");
+            return new JsonResponse(['error' => 'Aucun personnage sélectionné'], 400);
+        }
+        
+        error_log("✅ Personnage trouvé: " . $selectedCharacter->getName());
+
+        $searchQuery = trim($request->query->get('q', ''));
+        error_log("Terme de recherche traité: '" . $searchQuery . "'");
+        
+        // Utiliser votre méthode existante avec la recherche
+        $itemsData = $marketWatchRepository->getItemsDataWithStats($selectedCharacter, $searchQuery);
+        error_log("Nombre d'items trouvés: " . count($itemsData));
+
+        // Rendu des lignes du tableau
+        $tableRows = '';
+        foreach ($itemsData as $item) {
+            $tableRows .= $this->renderView('market_watch/_table_row.html.twig', [
+                'item' => $item
+            ]);
+        }
+        error_log("HTML table rows généré, longueur: " . strlen($tableRows));
+
+        // Rendu des cartes mobile
+        $mobileCards = '';
+        foreach ($itemsData as $item) {
+            $mobileCards .= $this->renderView('market_watch/_mobile_card.html.twig', [
+                'item' => $item
+            ]);
+        }
+        error_log("HTML mobile cards généré, longueur: " . strlen($mobileCards));
+
+        $response = [
+            'table_rows' => $tableRows,
+            'mobile_cards' => $mobileCards,
+            'count' => count($itemsData),
+            'query' => $searchQuery
+        ];
+        
+        error_log("Réponse JSON prête: " . json_encode([
+            'count' => $response['count'],
+            'query' => $response['query'],
+            'table_rows_length' => strlen($response['table_rows']),
+            'mobile_cards_length' => strlen($response['mobile_cards'])
+        ]));
+
+        return new JsonResponse($response);
     }
 
     public function history(Item $item, ChartDataService $chartService): Response
