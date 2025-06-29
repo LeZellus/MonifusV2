@@ -49,12 +49,12 @@
             } %}
         {% elseif performanceTotal > 0 %}
             {% include 'components/badge.html.twig' with {
-                text: '+' ~ (performanceTotal / 1000)|number_format(0, ',', ' ') ~ 'k',
+                text: '+' ~ performanceTotal|format_kamas,
                 color: 'green',
             } %}
         {% else %}
             {% include 'components/badge.html.twig' with {
-                text: (performanceTotal / 1000)|number_format(0, ',', ' ') ~ 'k',
+                text: performanceTotal|format_kamas,
                 color: 'red',
             } %}
         {% endif %}

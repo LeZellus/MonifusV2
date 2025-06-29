@@ -67,7 +67,7 @@
                             color: roi >= 20 ? 'green' : (roi >= 5 ? 'orange' : 'red')
                         } %}
                         
-                        {% set avgProfitPerLot = stats.global.soldLots > 0 ? (stats.global.realizedProfit / stats.global.soldLots) : 0 %}
+                        {% set avgProfitPerLot = stats.global.soldLots > 0 ? (stats.global.realizedProfit / stats.global.soldLots)|round : 0 %}
                         {% include 'components/stats_card.html.twig' with {
                             title: 'Profit moyen/lot',
                             value: avgProfitPerLot,

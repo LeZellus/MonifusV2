@@ -1,11 +1,10 @@
 {# templates/components/price_display.html.twig #}
 {#
-Affichage simplifié des prix
+Affichage simplifié des prix avec nouveau formatage
 Usage: {% include 'components/price_display.html.twig' with {
     price: 1500000,
     size: 'normal' (optional: small, normal, large),
-    color: 'green' (optional: white, green, blue, purple, red, yellow),
-    unit: 'kamas' (optional: 'kamas', 'K', ou null pour auto)
+    color: 'green' (optional: white, green, blue, purple, red, yellow)
 } %}
 #}
 
@@ -13,22 +12,6 @@ Usage: {% include 'components/price_display.html.twig' with {
                    ((size|default('normal')) == 'large' ? 'text-xl' : 'text-base') %}
 {% set color_class = color|default('green') == 'white' ? 'text-white' : 'text-' ~ (color|default('green')) ~ '-400' %}
 
-{# Si unit est explicitement défini à 'kamas', afficher le prix complet #}
-{% if unit is defined and unit == 'kamas' %}
-    {% set formatted = price|number_format(0, ',', ' ') %}
-    {% set auto_unit = 'kamas' %}
-{# Sinon, auto-formatage selon la valeur #}
-{% elseif price >= 1000000 %}
-    {% set formatted = (price / 1000000)|number_format(1, ',', ' ') %}
-    {% set auto_unit = unit|default('M') %}
-{% elseif price >= 1000 %}
-    {% set formatted = (price / 1000)|number_format(0, ',', ' ') %}
-    {% set auto_unit = unit|default('K') %}
-{% else %}
-    {% set formatted = price|number_format(0, ',', ' ') %}
-    {% set auto_unit = unit|default('') %}
-{% endif %}
-
 <span class="{{ color_class }} {{ size_class }} font-medium">
-    {{ formatted }}{% if auto_unit %} {{ auto_unit }}{% endif %}
+    {{ price|format_kamas }}
 </span>

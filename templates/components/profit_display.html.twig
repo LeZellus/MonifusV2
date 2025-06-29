@@ -1,7 +1,7 @@
 {# templates/components/profit_display.html.twig #}
 {# 
 Affichage cohérent des profits avec logique de calcul centralisée
-Usage: {% include 'components/unified_profit_display.html.twig' with {
+Usage: {% include 'components/profit_display.html.twig' with {
     buy_price: 1000,
     sell_price: 1200, 
     quantity: 100 (optional, default: 1),
@@ -9,17 +9,17 @@ Usage: {% include 'components/unified_profit_display.html.twig' with {
 } %}
 #}
 
-
-
+{% set profit_per_unit = sell_price - buy_price %}
+{% set total_profit = profit_per_unit * quantity|default(1) %}
 {% set profit_percent = buy_price > 0 ? (profit_per_unit / buy_price * 100) : 0 %}
 
 {% if mode|default('detailed') == 'compact' %}
     <div class="profit-{{ total_profit >= 0 ? 'positive' : 'negative' }} font-medium">
-        {{ (total_profit / 1000)|number_format(0, ',', ' ') }}k
+        {{ total_profit|format_kamas }}
     </div>
 {% else %}
     <div class="text-white font-medium">
-        {{ (total_profit / 1000)|number_format(0, ',', ' ') }}k
+        {{ total_profit|format_kamas }}
     </div>
     <div class="profit-{{ total_profit >= 0 ? 'positive' : 'negative' }} text-xs">
         ({{ profit_percent|number_format(1) }}%)

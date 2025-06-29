@@ -1,10 +1,10 @@
 {# templates/components/stats_card.html.twig #}
 {#
-Composant pour afficher des cartes de statistiques
+Composant pour afficher des cartes de statistiques avec nouveau formatage
 Usage: {% include 'components/stats_card.html.twig' with {
     title: 'Titre',
     value: '42' ou 1500000,
-    unit: 'K' ou 'kamas' ou null,
+    unit: 'kamas' ou null,
     subtitle: 'Description optionnelle',
     icon: '💰' (optionnel),
     color: 'blue' (optionnel: blue, green, orange, red, purple, yellow),
@@ -15,22 +15,18 @@ Usage: {% include 'components/stats_card.html.twig' with {
 {% set color_class = 'text-' ~ (color|default('blue')) ~ '-400' %}
 {% set value_size = (size|default('normal')) == 'large' ? 'text-3xl' : 'text-2xl' %}
 
-{# Si unit est explicitement défini à 'kamas', afficher le prix complet #}
-{% if unit is defined and unit == 'kamas' %}
-    {% set formatted_value = value|number_format(0, ',', ' ') %}
-    {% set auto_unit = 'kamas' %}
-{# Sinon, formatage simple des valeurs avec auto-formatage #}
-{% elseif value is not empty and value is not null %}
-    {% if value is same as(value|round) and value >= 1000 %}
-        {% set formatted_value = (value / 1000)|number_format(0, ',', ' ') %}
-        {% set auto_unit = unit is defined ? unit : 'K' %}
+{# Gestion des différents types de valeurs #}
+{% if value is not empty and value is not null %}
+    {% if unit is defined and unit == 'kamas' %}
+        {# Valeur avec unité kamas : utiliser le nouveau formatage #}
+        {% set formatted_value = value|round|format_kamas %}
     {% else %}
-        {% set formatted_value = value %}
-        {% set auto_unit = unit is defined ? unit : null %}
+        {# Autres valeurs : formatage classique #}
+        {% set formatted_value = value|number_format(0, ',', ' ') %}
+        {% set formatted_value = formatted_value ~ (unit is defined and unit ? ' ' ~ unit : '') %}
     {% endif %}
 {% else %}
-    {% set formatted_value = value %}
-    {% set auto_unit = unit is defined ? unit : null %}
+    {% set formatted_value = value ~ (unit is defined and unit ? ' ' ~ unit : '') %}
 {% endif %}
 
 <div class="wrapper-background text-center">
@@ -42,7 +38,7 @@ Usage: {% include 'components/stats_card.html.twig' with {
     </h3>
     
     <p class="{{ color_class }} {{ value_size }} font-bold">
-        {{ formatted_value }}{% if auto_unit %} {{ auto_unit }}{% endif %}
+        {{ formatted_value }}
     </p>
     
     {% if subtitle is defined %}

@@ -101,19 +101,6 @@ class ProfitCalculatorService
     // ===== FORMATAGE =====
     
     /**
-     * Formate un montant en kamas
-     */
-    public function formatKamas(int $amount): string
-    {
-        if (abs($amount) >= 1000000) {
-            return number_format($amount / 1000000, 1) . 'M';
-        } elseif (abs($amount) >= 1000) {
-            return number_format($amount / 1000, 0) . 'k';
-        }
-        return number_format($amount);
-    }
-    
-    /**
      * Retourne la classe CSS selon le profit
      */
     public function getProfitClass(int $profit): string

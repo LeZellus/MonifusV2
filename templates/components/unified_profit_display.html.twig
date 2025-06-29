@@ -1,18 +1,13 @@
 {# templates/components/unified_profit_display.html.twig #}
 {# 
-Template unifié pour l'affichage des profits - remplace profit_display.html.twig
 Usage: 
   {% include 'components/unified_profit_display.html.twig' with {
     buy_price: 1000,
     sell_price: 1200, 
     quantity: 100,
-    mode: 'detailed|compact|simple' (défaut: detailed)
-  } %}
-
-  OU avec entité LotGroup:
-  {% include 'components/unified_profit_display.html.twig' with {
-    lot_group: lotGroup,
-    mode: 'detailed'
+    mode: 'detailed|compact|simple' (défaut: detailed),
+    size: 'sm|base|lg' (défaut: base),
+    bold: true|false (défaut: false)
   } %}
 #}
 
@@ -39,21 +34,26 @@ Usage:
 {% set profit_class = profit_class(final_profit) %}
 {% set display_mode = mode|default('detailed') %}
 
+{# Classes de taille et style #}
+{% set size_class = size|default('base') == 'sm' ? 'text-sm' : 
+                   (size|default('base') == 'lg' ? 'text-lg' : 'text-base') %}
+{% set weight_class = bold is defined and bold ? 'font-bold' : 'font-medium' %}
+
 {# Affichage selon le mode #}
 {% if display_mode == 'simple' %}
-    <span class="{{ profit_class }} font-medium">
-        {{ format_kamas(final_profit) }}
+    <span class="{{ profit_class }} {{ size_class }} {{ weight_class }}">
+        {{ final_profit|format_kamas }}
     </span>
 
 {% elseif display_mode == 'compact' %}
-    <div class="{{ profit_class }} font-medium">
-        {{ format_kamas(final_profit) }}
+    <div class="{{ profit_class }} {{ size_class }} {{ weight_class }}">
+        {{ final_profit|format_kamas }}
     </div>
 
 {% else %} {# detailed #}
     <div class="profit-display">
-        <div class="text-white font-medium">
-            {{ format_kamas(final_profit) }}
+        <div class="text-white {{ size_class }} {{ weight_class }}">
+            {{ final_profit|format_kamas }}
         </div>
         {% if final_roi != 0 %}
             <div class="{{ profit_class }} text-xs">
