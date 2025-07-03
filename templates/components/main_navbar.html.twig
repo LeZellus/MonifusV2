@@ -85,6 +85,12 @@
                         <span class="mr-1">👥</span>
                         Profils
                     </a>
+
+                    <a href="https://buymeacoffee.com/monifus" target="_blank" 
+                       class="text-orange-500 hover:text-orange-600 font-bold flex items-center transition-colors">
+                        <span class="mr-1">☕</span>
+                        Faire un don
+                    </a>
                 </div>
 
                 <!-- Actions utilisateur connecté -->
@@ -138,6 +144,11 @@
                                 <a href="{{ path('app_docs_index') }}" 
                                    class="block px-4 py-2 text-sm text-gray-300 hover:bg-gray-700 hover:text-white">
                                     📚 Documentation
+                                </a>
+                                <a href="https://buymeacoffee.com/monifus" 
+                                target="_blank"
+                                class="block px-4 py-2 text-sm hover:bg-gray-700 text-orange-500 font-bold">
+                                    ☕ Faire un don
                                 </a>
                                 <hr class="border-gray-700 my-1">
                                 <a href="{{ path('app_logout') }}" 
@@ -235,7 +246,11 @@
                        class="block px-3 py-2 text-gray-300 hover:text-white hover:bg-gray-700 rounded-md">
                         📚 Documentation
                     </a>
-                    <a href="{{ path('app_logout') }}" 
+                    <a href="{{ path('app_docs_index') }}" 
+                       class="block px-3 py-2 text-orange-500 hover:text-orange-600 hover:bg-gray-700 rounded-md font-bold">
+                        ☕ Faire un don
+                    </a>
+                    <a href="https://buymeacoffee.com/monifus" target="_blank"
                        class="block px-3 py-2 text-red-400 hover:text-red-300 hover:bg-gray-700 rounded-md">
                         🚪 Déconnexion
                     </a>
