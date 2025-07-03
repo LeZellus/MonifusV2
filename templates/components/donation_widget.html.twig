@@ -1,0 +1,27 @@
+
+<!-- templates/components/simple_donation_widget.html.twig -->
+<div class="fixed bottom-6 right-6 z-50" data-controller="donation-widget">
+    <div class="wrapper-background relative max-w-xs shadow-xl border border-orange-500/30">
+        <button type="button" 
+                class="absolute top-3 right-3 w-6 h-6 flex items-center justify-center rounded-full bg-red-500 hover:bg-red-600 text-white transition-all z-10" 
+                data-action="click->donation-widget#close">
+            <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                <line x1="18" y1="6" x2="6" y2="18"></line>
+                <line x1="6" y1="6" x2="18" y2="18"></line>
+            </svg>
+        </button>
+        
+        <div class="text-center pt-2">
+            <div class="text-4xl mb-3">☕</div>
+            <h4 class="text-white font-bold text-lg mb-2">Vous aimez Monifus ?</h4>
+            <p class="text-gray-300 text-sm mb-4">Soutenez le développement !</p>
+            
+            <a href="https://buymeacoffee.com/monifus" 
+               target="_blank" 
+               class="btn-warning inline-flex items-center gap-2"
+               data-action="click->donation-widget#trackDonation">
+                ☕ Offrir un café
+            </a>
+        </div>
+    </div>
+</div>
