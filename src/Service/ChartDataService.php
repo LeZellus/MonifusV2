@@ -6,11 +6,16 @@ use DateTime;
 
 class ChartDataService
 {
-    private const MAX_CHART_POINTS = 50; // Augmenté pour les périodes courtes
+    private const MAX_CHART_POINTS = 50;
     
-    /**
-     * Prépare les données avec filtrage temporel
-     */
+    // Configuration des types de prix
+    private const PRICE_TYPES = [
+        'x1' => ['method' => 'getPricePerUnit', 'color' => '#10B981'],
+        'x10' => ['method' => 'getPricePer10', 'color' => '#3B82F6'],
+        'x100' => ['method' => 'getPricePer100', 'color' => '#8B5CF6'],
+        'x1000' => ['method' => 'getPricePer1000', 'color' => '#F59E0B']
+    ];
+    
     public function prepareMarketWatchChartData(array $priceHistory, ?string $period = null): array
     {
         if (empty($priceHistory)) {
@@ -37,9 +42,6 @@ class ChartDataService
         ];
     }
 
-    /**
-     * Filtre les observations selon la période
-     */
     private function filterByPeriod(array $priceHistory, ?string $period): array
     {
         if (!$period || $period === 'all') {
@@ -74,9 +76,6 @@ class ChartDataService
         });
     }
 
-    /**
-     * Réduit intelligemment le nombre de points
-     */
     private function reduceDataPoints(array $priceHistory): array
     {
         $totalObservations = count($priceHistory);
@@ -85,7 +84,6 @@ class ChartDataService
             return $priceHistory;
         }
 
-        // Algorithme amélioré : garde toujours le premier et le dernier
         $step = max(1, intval($totalObservations / (self::MAX_CHART_POINTS - 2)));
         $reducedHistory = [];
         
@@ -105,105 +103,91 @@ class ChartDataService
         return $reducedHistory;
     }
 
-    // ... reste des méthodes inchangées
+    // ✅ VERSION OPTIMISÉE : Élimine toute la répétition
     private function extractPriceData(array $priceHistory): array
     {
         $labels = [];
-        $priceDataX1 = [];
-        $priceDataX10 = [];
-        $priceDataX100 = [];
-        $priceDataX1000 = [];
-        $averageDataX1 = [];
-        $averageDataX10 = [];
-        $averageDataX100 = [];
-        $averageDataX1000 = [];
+        $data = [];
         
-        $runningSumX1 = 0;
-        $runningSumX10 = 0;
-        $runningSumX100 = 0;
-        $runningSumX1000 = 0;
-        $countX1 = 0;
-        $countX10 = 0;
-        $countX100 = 0;
-        $countX1000 = 0;
+        // Initialisation des données pour chaque type
+        foreach (self::PRICE_TYPES as $type => $config) {
+            $data[$type] = [
+                'prices' => [],
+                'averages' => [],
+                'runningSum' => 0,
+                'count' => 0
+            ];
+        }
         
         foreach ($priceHistory as $observation) {
             $labels[] = $this->formatDateLabel($priceHistory, $observation);
             
-            // Prix x1
-            $priceX1 = $observation->getPricePerUnit();
-            $priceDataX1[] = $priceX1 ? intval($priceX1) : null;
-            if ($priceX1) {
-                $runningSumX1 += $priceX1;
-                $countX1++;
+            // Traitement pour chaque type de prix
+            foreach (self::PRICE_TYPES as $type => $config) {
+                $method = $config['method'];
+                $price = $observation->$method();
+                
+                // Ajouter le prix (ou null)
+                $data[$type]['prices'][] = $price ? intval($price) : null;
+                
+                // Calculer la moyenne mobile
+                if ($price) {
+                    $data[$type]['runningSum'] += $price;
+                    $data[$type]['count']++;
+                }
+                
+                $average = $data[$type]['count'] > 0 
+                    ? intval(round($data[$type]['runningSum'] / $data[$type]['count'])) 
+                    : null;
+                    
+                $data[$type]['averages'][] = $average;
             }
-            $averageDataX1[] = $countX1 > 0 ? intval(round($runningSumX1 / $countX1)) : null;
-            
-            // Prix x10
-            $priceX10 = $observation->getPricePer10();
-            $priceDataX10[] = $priceX10 ? intval($priceX10) : null;
-            if ($priceX10) {
-                $runningSumX10 += $priceX10;
-                $countX10++;
-            }
-            $averageDataX10[] = $countX10 > 0 ? intval(round($runningSumX10 / $countX10)) : null;
-            
-            // Prix x100
-            $priceX100 = $observation->getPricePer100();
-            $priceDataX100[] = $priceX100 ? intval($priceX100) : null;
-            if ($priceX100) {
-                $runningSumX100 += $priceX100;
-                $countX100++;
-            }
-            $averageDataX100[] = $countX100 > 0 ? intval(round($runningSumX100 / $countX100)) : null;
-
-            // Prix x1000
-            $priceX1000 = $observation->getPricePer1000();
-            $priceDataX1000[] = $priceX1000 ? intval($priceX1000) : null;
-            if ($priceX1000) {
-                $runningSumX1000 += $priceX1000;
-                $countX1000++;
-            }
-            $averageDataX1000[] = $countX1000 > 0 ? intval(round($runningSumX1000 / $countX1000)) : null;
         }
 
-        return [
-            'labels' => $labels,
-            'priceDataX1' => $priceDataX1,
-            'priceDataX10' => $priceDataX10,
-            'priceDataX100' => $priceDataX100,
-            'priceDataX1000' => $priceDataX1000,
-            'averageDataX1' => $averageDataX1,
-            'averageDataX10' => $averageDataX10,
-            'averageDataX100' => $averageDataX100,
-            'averageDataX1000' => $averageDataX1000,
-            'countX1' => $countX1,
-            'countX10' => $countX10,
-            'countX100' => $countX100,
-            'countX1000' => $countX1000
-        ];
+        // Construire le tableau de retour
+        $result = ['labels' => $labels];
+        
+        foreach (self::PRICE_TYPES as $type => $config) {
+            $typeUpper = strtoupper($type);
+            $result["priceData{$typeUpper}"] = $data[$type]['prices'];
+            $result["averageData{$typeUpper}"] = $data[$type]['averages'];
+            $result["count{$typeUpper}"] = $data[$type]['count'];
+        }
+        
+        return $result;
     }
 
+    // ✅ VERSION OPTIMISÉE : Génération dynamique des datasets
     private function buildDatasets(array $chartData): array
     {
         $datasets = [];
         
-        $colors = [
-            'x1' => ['border' => '#10B981', 'background' => 'rgba(16, 185, 129, 0.1)'],
-            'x10' => ['border' => '#3B82F6', 'background' => 'rgba(59, 130, 246, 0.1)'],
-            'x100' => ['border' => '#8B5CF6', 'background' => 'rgba(139, 92, 246, 0.1)'],
-            'x1000' => ['border' => '#F59E0B', 'background' => 'rgba(245, 158, 11, 0.1)']
-        ];
-
-        // Prix observés + moyennes
-        foreach (['x1', 'x10', 'x100', 'x1000'] as $type) {
+        foreach (self::PRICE_TYPES as $type => $config) {
             $countKey = "count" . strtoupper($type);
+            
             if ($chartData[$countKey] > 0) {
                 $priceKey = "priceData" . strtoupper($type);
                 $avgKey = "averageData" . strtoupper($type);
                 
-                $datasets[] = $this->createDataset("Prix $type observé", $chartData[$priceKey], $colors[$type]);
-                $datasets[] = $this->createDataset("Moyenne mobile $type", $chartData[$avgKey], $colors[$type], true);
+                $colors = [
+                    'border' => $config['color'],
+                    'background' => $this->hexToRgba($config['color'], 0.1)
+                ];
+                
+                // Prix observé
+                $datasets[] = $this->createDataset(
+                    "Prix $type observé", 
+                    $chartData[$priceKey], 
+                    $colors
+                );
+                
+                // Moyenne mobile
+                $datasets[] = $this->createDataset(
+                    "Moyenne mobile $type", 
+                    $chartData[$avgKey], 
+                    $colors, 
+                    true
+                );
             }
         }
 
@@ -227,6 +211,17 @@ class ChartDataService
         }
 
         return $dataset;
+    }
+
+    // ✅ HELPER : Convertit une couleur hex en rgba
+    private function hexToRgba(string $hex, float $alpha): string
+    {
+        $hex = ltrim($hex, '#');
+        $r = hexdec(substr($hex, 0, 2));
+        $g = hexdec(substr($hex, 2, 2));
+        $b = hexdec(substr($hex, 4, 2));
+        
+        return "rgba($r, $g, $b, $alpha)";
     }
 
     private function formatDateLabel(array $priceHistory, $observation): string
