@@ -112,16 +112,20 @@ class ChartDataService
         $priceDataX1 = [];
         $priceDataX10 = [];
         $priceDataX100 = [];
+        $priceDataX1000 = [];
         $averageDataX1 = [];
         $averageDataX10 = [];
         $averageDataX100 = [];
+        $averageDataX1000 = [];
         
         $runningSumX1 = 0;
         $runningSumX10 = 0;
         $runningSumX100 = 0;
+        $runningSumX1000 = 0;
         $countX1 = 0;
         $countX10 = 0;
         $countX100 = 0;
+        $countX1000 = 0;
         
         foreach ($priceHistory as $observation) {
             $labels[] = $this->formatDateLabel($priceHistory, $observation);
@@ -152,6 +156,15 @@ class ChartDataService
                 $countX100++;
             }
             $averageDataX100[] = $countX100 > 0 ? intval(round($runningSumX100 / $countX100)) : null;
+
+            // Prix x1000
+            $priceX1000 = $observation->getPricePer1000();
+            $priceDataX1000[] = $priceX1000 ? intval($priceX1000) : null;
+            if ($priceX1000) {
+                $runningSumX1000 += $priceX1000;
+                $countX1000++;
+            }
+            $averageDataX1000[] = $countX1000 > 0 ? intval(round($runningSumX1000 / $countX1000)) : null;
         }
 
         return [
@@ -159,12 +172,15 @@ class ChartDataService
             'priceDataX1' => $priceDataX1,
             'priceDataX10' => $priceDataX10,
             'priceDataX100' => $priceDataX100,
+            'priceDataX1000' => $priceDataX1000,
             'averageDataX1' => $averageDataX1,
             'averageDataX10' => $averageDataX10,
             'averageDataX100' => $averageDataX100,
+            'averageDataX1000' => $averageDataX1000,
             'countX1' => $countX1,
             'countX10' => $countX10,
-            'countX100' => $countX100
+            'countX100' => $countX100,
+            'countX1000' => $countX1000
         ];
     }
 
@@ -175,11 +191,12 @@ class ChartDataService
         $colors = [
             'x1' => ['border' => '#10B981', 'background' => 'rgba(16, 185, 129, 0.1)'],
             'x10' => ['border' => '#3B82F6', 'background' => 'rgba(59, 130, 246, 0.1)'],
-            'x100' => ['border' => '#8B5CF6', 'background' => 'rgba(139, 92, 246, 0.1)']
+            'x100' => ['border' => '#8B5CF6', 'background' => 'rgba(139, 92, 246, 0.1)'],
+            'x1000' => ['border' => '#F59E0B', 'background' => 'rgba(245, 158, 11, 0.1)']
         ];
 
         // Prix observés + moyennes
-        foreach (['x1', 'x10', 'x100'] as $type) {
+        foreach (['x1', 'x10', 'x100', 'x1000'] as $type) {
             $countKey = "count" . strtoupper($type);
             if ($chartData[$countKey] > 0) {
                 $priceKey = "priceData" . strtoupper($type);

@@ -12,7 +12,8 @@ export default class extends Controller {
     }
 
     connect() {
-        this.enabledTypes = ['x1', 'x10', 'x100'];
+        // MODIFIÉ : Inclure x1000 dans les types activés par défaut
+        this.enabledTypes = ['x1', 'x10', 'x100', 'x1000'];
         this.currentPeriod = 'all';
         this.originalData = this.dataValue;
         
@@ -26,7 +27,31 @@ export default class extends Controller {
                 maintainAspectRatio: false,
                 plugins: {
                     legend: {
-                        labels: { color: '#fff' }
+                        labels: { 
+                            color: '#fff',
+                            // MODIFIÉ : Améliorer l'affichage de la légende
+                            boxWidth: 12,
+                            padding: 10,
+                            usePointStyle: true,
+                            generateLabels: function(chart) {
+                                const original = Chart.defaults.plugins.legend.labels.generateLabels;
+                                const labels = original.call(this, chart);
+                                
+                                // Raccourcir les labels pour économiser l'espace
+                                return labels.map(label => {
+                                    label.text = label.text
+                                        .replace('Prix x1 observé', 'Prix x1')
+                                        .replace('Prix x10 observé', 'Prix x10') 
+                                        .replace('Prix x100 observé', 'Prix x100')
+                                        .replace('Prix x1000 observé', 'Prix x1000')
+                                        .replace('Moyenne mobile x1', 'Moy. x1')
+                                        .replace('Moyenne mobile x10', 'Moy. x10')
+                                        .replace('Moyenne mobile x100', 'Moy. x100')
+                                        .replace('Moyenne mobile x1000', 'Moy. x1000');
+                                    return label;
+                                });
+                            }
+                        }
                     }
                 },
                 scales: {
@@ -57,7 +82,7 @@ export default class extends Controller {
         this.updatePointsInfo();
     }
 
-    // Filtre par type de courbe (x1, x10, x100)
+    // Filtre par type de courbe (x1, x10, x100, x1000)
     filterChart(event) {
         const filterType = event.currentTarget.dataset.filter;
         const isActive = event.currentTarget.classList.contains('active');
@@ -78,7 +103,7 @@ export default class extends Controller {
     }
 
     // Filtre par période
-    filterPeriod(event) {
+    changePeriod(event) {
         event.preventDefault();
         
         const newPeriod = event.currentTarget.dataset.period;
@@ -86,10 +111,10 @@ export default class extends Controller {
         // Mise à jour visuelle des boutons de période
         this.periodBtnTargets.forEach(btn => {
             btn.classList.remove('bg-orange-600', 'text-white');
-            btn.classList.add('bg-gray-700', 'text-gray-300');
+            btn.classList.add('bg-gray-700', 'text-gray-300', 'hover:bg-gray-600');
         });
         
-        event.currentTarget.classList.remove('bg-gray-700', 'text-gray-300');
+        event.currentTarget.classList.remove('bg-gray-700', 'text-gray-300', 'hover:bg-gray-600');
         event.currentTarget.classList.add('bg-orange-600', 'text-white');
         
         this.currentPeriod = newPeriod;
@@ -107,25 +132,23 @@ export default class extends Controller {
         const periodFilteredData = this.filterDataByPeriod();
         
         // 2. Filtrage par type de courbe
-        const typeFilteredDatasets = periodFilteredData.datasets.filter(dataset => {
-            const label = dataset.label.toLowerCase();
-            
-            return this.enabledTypes.some(type => {
-                if (type === 'x1') {
-                    return label.includes('x1') && !label.includes('x10') && !label.includes('x100');
-                } else if (type === 'x10') {
-                    return label.includes('x10') && !label.includes('x100');
-                } else if (type === 'x100') {
-                    return label.includes('x100');
-                }
-                return false;
-            });
-        });
-
-        return {
-            labels: periodFilteredData.labels,
-            datasets: typeFilteredDatasets
+        const filteredData = {
+            labels: [...periodFilteredData.labels],
+            datasets: periodFilteredData.datasets.filter(dataset => {
+                // MODIFIÉ : Inclure x1000 dans le filtrage avec logique précise
+                const isX1Dataset = dataset.label.includes('x1') && !dataset.label.includes('x10') && !dataset.label.includes('x100') && !dataset.label.includes('x1000');
+                const isX10Dataset = dataset.label.includes('x10') && !dataset.label.includes('x100') && !dataset.label.includes('x1000');
+                const isX100Dataset = dataset.label.includes('x100') && !dataset.label.includes('x1000');
+                const isX1000Dataset = dataset.label.includes('x1000'); // NOUVEAU
+                
+                return (isX1Dataset && this.enabledTypes.includes('x1')) ||
+                       (isX10Dataset && this.enabledTypes.includes('x10')) ||
+                       (isX100Dataset && this.enabledTypes.includes('x100')) ||
+                       (isX1000Dataset && this.enabledTypes.includes('x1000')); // NOUVEAU
+            })
         };
+        
+        return filteredData;
     }
 
     filterDataByPeriod() {
@@ -134,111 +157,51 @@ export default class extends Controller {
         }
 
         const now = new Date();
-        const cutoffDate = new Date(now);
-
+        let cutoffDate = new Date();
+        
         switch (this.currentPeriod) {
-            case '7d':
+            case '3':
+                cutoffDate.setDate(now.getDate() - 3);
+                break;
+            case '7':
                 cutoffDate.setDate(now.getDate() - 7);
                 break;
-            case '30d':
+            case '30':
                 cutoffDate.setDate(now.getDate() - 30);
-                break;
-            case '3m':
-                cutoffDate.setMonth(now.getMonth() - 3);
-                break;
-            case '6m':
-                cutoffDate.setMonth(now.getMonth() - 6);
-                break;
-            case '1y':
-                cutoffDate.setFullYear(now.getFullYear() - 1);
                 break;
             default:
                 return this.originalData;
         }
 
-        console.log(`Filtrage période "${this.currentPeriod}"`);
-        console.log('Date limite:', cutoffDate.toDateString());
-        console.log('Données originales:', this.originalData.labels);
-
-        // Filtrer les labels et datasets selon la période
+        // Convertir les labels en dates et filtrer
         const filteredIndices = [];
-        const filteredLabels = [];
-        
         this.originalData.labels.forEach((label, index) => {
-            const labelDate = this.parseLabelToDate(label);
-            const isIncluded = labelDate >= cutoffDate;
+            // Convertir le label en date (format: 'dd/mm' ou 'dd/mm/yy')
+            const parts = label.split('/');
+            let day = parseInt(parts[0]);
+            let month = parseInt(parts[1]) - 1; // Les mois en JS commencent à 0
+            let year = parts[2] ? (2000 + parseInt(parts[2])) : now.getFullYear();
             
-            console.log(`Index ${index}: "${label}" → ${labelDate.toDateString()} → ${isIncluded ? 'INCLUS' : 'EXCLU'}`);
+            const labelDate = new Date(year, month, day);
             
-            if (isIncluded) {
+            if (labelDate >= cutoffDate) {
                 filteredIndices.push(index);
-                filteredLabels.push(label);
             }
         });
 
-        console.log('Indices conservés:', filteredIndices);
-        console.log('Labels conservés:', filteredLabels);
-
-        // Filtrer les données de chaque dataset
-        const filteredDatasets = this.originalData.datasets.map(dataset => ({
-            ...dataset,
-            data: dataset.data.filter((_, index) => filteredIndices.includes(index))
-        }));
-
         return {
-            labels: filteredLabels,
-            datasets: filteredDatasets
+            labels: filteredIndices.map(i => this.originalData.labels[i]),
+            datasets: this.originalData.datasets.map(dataset => ({
+                ...dataset,
+                data: filteredIndices.map(i => dataset.data[i])
+            }))
         };
-    }
-
-    parseLabelToDate(label) {
-        // Debug pour voir les labels reçus
-        console.log('Parsing label:', label);
-        
-        // Convertir "d/m" ou "d/m/y" en Date
-        const parts = label.split('/');
-        if (parts.length < 2) {
-            console.warn('Label invalide:', label);
-            return new Date(0); // Date très ancienne pour être exclus
-        }
-        
-        const day = parseInt(parts[0]);
-        const month = parseInt(parts[1]) - 1; // JS months are 0-indexed
-        
-        // Gestion de l'année
-        let year;
-        if (parts[2]) {
-            // Format d/m/y ou d/m/yy ou d/m/yyyy
-            const yearPart = parseInt(parts[2]);
-            if (yearPart < 50) {
-                year = 2000 + yearPart; // 25 → 2025
-            } else if (yearPart < 100) {
-                year = 1900 + yearPart; // 95 → 1995
-            } else {
-                year = yearPart; // 2025 → 2025
-            }
-        } else {
-            // Format d/m → année courante
-            year = new Date().getFullYear();
-        }
-        
-        const parsedDate = new Date(year, month, day);
-        console.log(`Label "${label}" → Date: ${parsedDate.toDateString()}`);
-        
-        return parsedDate;
     }
 
     updatePointsInfo() {
         if (this.hasPointsInfoTarget) {
-            const filtered = this.getFilteredData();
-            const totalPoints = this.originalData.labels.length;
-            const displayedPoints = filtered.labels.length;
-            
-            if (totalPoints !== displayedPoints) {
-                this.pointsInfoTarget.textContent = `${displayedPoints} / ${totalPoints} points`;
-            } else {
-                this.pointsInfoTarget.textContent = `${totalPoints} points`;
-            }
+            const visiblePoints = this.chart.data.labels.length;
+            this.pointsInfoTarget.textContent = `${visiblePoints} points`;
         }
     }
 
