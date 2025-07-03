@@ -60,6 +60,7 @@ class MarketWatchRepository extends ServiceEntityRepository
         $pricesUnit = [];
         $prices10 = [];
         $prices100 = [];
+        $prices1000 = [];
         
         foreach ($observations as $obs) {
             if ($obs->getPricePerUnit() !== null) {
@@ -71,15 +72,20 @@ class MarketWatchRepository extends ServiceEntityRepository
             if ($obs->getPricePer100() !== null) {
                 $prices100[] = $obs->getPricePer100();
             }
+            if ($obs->getPricePer1000() !== null) {
+                $prices1000[] = $obs->getPricePer1000();
+            }
         }
         
         return [
             'avg_price_unit' => !empty($pricesUnit) ? round(array_sum($pricesUnit) / count($pricesUnit)) : null,
             'avg_price_10' => !empty($prices10) ? round(array_sum($prices10) / count($prices10)) : null,
             'avg_price_100' => !empty($prices100) ? round(array_sum($prices100) / count($prices100)) : null,
+            'avg_price_1000' => !empty($prices1000) ? round(array_sum($prices1000) / count($prices1000)) : null,
             'price_unit_count' => count($pricesUnit),
             'price_10_count' => count($prices10),
-            'price_100_count' => count($prices100)
+            'price_100_count' => count($prices100),
+            'price_1000_count' => count($prices1000)
         ];
     }
 

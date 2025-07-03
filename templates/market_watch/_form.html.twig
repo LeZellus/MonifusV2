@@ -11,7 +11,7 @@
     } %}
 
     {% if is_edit %}
-        <!-- Historique récent pour contexte -->
+        <!-- Historique récent pour contexte - MODIFIÉ : Ajout du prix x1000 -->
         <div class="wrapper-background">
             {% include 'components/section_header.html.twig' with {
                 type: 'simple',
@@ -21,7 +21,7 @@
                 wrapper_class: ''
             } %}
             
-            <div class="grid grid-cols-3 gap-4">
+            <div class="grid grid-cols-2 md:grid-cols-4 gap-4">
                 <div class="bg-gray-700 rounded-lg p-3 text-center">
                     <div class="text-gray-400 text-sm">Prix x1</div>
                     {% if market_watch.pricePerUnit %}
@@ -46,13 +46,22 @@
                         <div class="text-gray-500">Non renseigné</div>
                     {% endif %}
                 </div>
+                <!-- NOUVEAU : Prix x1000 -->
+                <div class="bg-gray-700 rounded-lg p-3 text-center">
+                    <div class="text-gray-400 text-sm">Prix x1000</div>
+                    {% if market_watch.pricePer1000 %}
+                        <div class="text-yellow-400 text-lg font-bold">{{ (market_watch.pricePer1000 / 1000)|number_format(0, ',', ' ') }}k</div>
+                    {% else %}
+                        <div class="text-gray-500">Non renseigné</div>
+                    {% endif %}
+                </div>
             </div>
         </div>
     {% else %}
-        <!-- Explication du système pour nouveau -->
+        <!-- Explication du système pour nouveau - MODIFIÉ : Mention du x1000 -->
         {% set explanation_content %}
             <p>• 📋 Observez les prix sur l'hôtel de vente de votre serveur</p>
-            <p>• 🔢 Notez les prix par unité (x1), par 10 (x10) et/ou par 100 (x100)</p>
+            <p>• 🔢 Notez les prix par unité (x1), par 10 (x10), par 100 (x100) et/ou par 1000 (x1000)</p>
             <p>• 📈 Répétez régulièrement pour suivre l'évolution des prix</p>
             <p>• 💰 Identifiez les meilleures opportunités d'achat/vente</p>
         {% endset %}
@@ -110,7 +119,7 @@
                     <div class="form-help">📅 {{ is_edit ? 'Date de cette observation' : 'Quand avez-vous observé ces prix ?' }}</div>
                 </div>
 
-                <!-- Prix observés -->
+                <!-- Prix observés - MODIFIÉ : Grille en 2x2 pour inclure le x1000 -->
                 <div class="bg-gradient-to-r from-blue-600 to-purple-600 rounded-lg p-4">
                     <h4 class="text-white font-semibold mb-4 flex items-center">
                         <span class="mr-2">💰</span>
@@ -120,9 +129,10 @@
                         {{ is_edit ? 'Modifiez les prix selon vos dernières observations. Laissez vide pour supprimer un prix.' : 'Renseignez au moins un prix. Laissez vide si cette unité n\'est pas disponible.' }}
                     </div>
                     
-                    <div class="grid grid-cols-1 md:grid-cols-3 gap-4">
-                        <div class="bg-white bg-opacity-10 rounded-lg p-4">
-                            {{ form_label(form.pricePerUnit, null, {'label_attr': {'class': 'block text-white font-medium mb-2'}}) }}
+                    <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+                        <!-- Prix x1 -->
+                        <div>
+                            {{ form_label(form.pricePerUnit, null, {'label_attr': {'class': 'block text-green-200 font-medium mb-2'}}) }}
                             <div class="relative">
                                 {{ form_widget(form.pricePerUnit, {'attr': {'class': 'w-full px-4 py-3 pr-12 border border-gray-600 bg-gray-700 text-white rounded-lg focus:outline-none focus:border-green-500'}}) }}
                                 <div class="absolute inset-y-0 right-0 pr-3 flex items-center">
@@ -130,11 +140,12 @@
                                 </div>
                             </div>
                             {{ form_errors(form.pricePerUnit) }}
-                            <div class="text-green-200 text-xs mt-1">Prix d'1 seule unité</div>
+                            <div class="text-green-200 text-xs mt-1">Prix d'une unité</div>
                         </div>
 
-                        <div class="bg-white bg-opacity-10 rounded-lg p-4">
-                            {{ form_label(form.pricePer10, null, {'label_attr': {'class': 'block text-white font-medium mb-2'}}) }}
+                        <!-- Prix x10 -->
+                        <div>
+                            {{ form_label(form.pricePer10, null, {'label_attr': {'class': 'block text-blue-200 font-medium mb-2'}}) }}
                             <div class="relative">
                                 {{ form_widget(form.pricePer10, {'attr': {'class': 'w-full px-4 py-3 pr-12 border border-gray-600 bg-gray-700 text-white rounded-lg focus:outline-none focus:border-blue-500'}}) }}
                                 <div class="absolute inset-y-0 right-0 pr-3 flex items-center">
@@ -145,8 +156,9 @@
                             <div class="text-blue-200 text-xs mt-1">Prix d'un lot de 10</div>
                         </div>
 
-                        <div class="bg-white bg-opacity-10 rounded-lg p-4">
-                            {{ form_label(form.pricePer100, null, {'label_attr': {'class': 'block text-white font-medium mb-2'}}) }}
+                        <!-- Prix x100 -->
+                        <div>
+                            {{ form_label(form.pricePer100, null, {'label_attr': {'class': 'block text-purple-200 font-medium mb-2'}}) }}
                             <div class="relative">
                                 {{ form_widget(form.pricePer100, {'attr': {'class': 'w-full px-4 py-3 pr-12 border border-gray-600 bg-gray-700 text-white rounded-lg focus:outline-none focus:border-purple-500'}}) }}
                                 <div class="absolute inset-y-0 right-0 pr-3 flex items-center">
@@ -155,6 +167,19 @@
                             </div>
                             {{ form_errors(form.pricePer100) }}
                             <div class="text-purple-200 text-xs mt-1">Prix d'un lot de 100</div>
+                        </div>
+
+                        <!-- NOUVEAU : Prix x1000 -->
+                        <div>
+                            {{ form_label(form.pricePer1000, null, {'label_attr': {'class': 'block text-yellow-200 font-medium mb-2'}}) }}
+                            <div class="relative">
+                                {{ form_widget(form.pricePer1000, {'attr': {'class': 'w-full px-4 py-3 pr-12 border border-gray-600 bg-gray-700 text-white rounded-lg focus:outline-none focus:border-yellow-500'}}) }}
+                                <div class="absolute inset-y-0 right-0 pr-3 flex items-center">
+                                    <span class="text-gray-400 text-sm">kamas</span>
+                                </div>
+                            </div>
+                            {{ form_errors(form.pricePer1000) }}
+                            <div class="text-yellow-200 text-xs mt-1">Prix d'un lot de 1000</div>
                         </div>
                     </div>
                 </div>

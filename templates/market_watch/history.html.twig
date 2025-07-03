@@ -4,8 +4,25 @@
 
 {% block body %}
     <div class="wrapper-container">
-        <!-- Statistiques rapides -->
-        <div class="grid grid-cols-1 md:grid-cols-4 gap-4">
+        <!-- En-tête -->
+        <div class="flex justify-between items-center mb-6">
+            <div>
+                <h1 class="text-white text-3xl font-bold flex items-center">
+                    <span class="text-orange-400 mr-3">📈</span>
+                    Historique des prix - {{ item.name }}
+                </h1>
+                <p class="text-gray-400 mt-2">
+                    {{ price_history|length }} observation{{ price_history|length > 1 ? 's' : '' }} enregistrée{{ price_history|length > 1 ? 's' : '' }}
+                </p>
+            </div>
+            <a href="{{ path('app_market_watch_index') }}" 
+               class="bg-gray-600 hover:bg-gray-700 text-white px-4 py-2 rounded-lg transition-colors">
+                ← Retour à la liste
+            </a>
+        </div>
+
+        <!-- Statistiques rapides - MODIFIÉ : Grille 2x2 pour inclure x1000 -->
+        <div class="grid grid-cols-2 md:grid-cols-5 gap-4 mb-6">
             {% include 'components/stats_card.html.twig' with {
                 title: 'Observations total',
                 value: price_history|length,
@@ -35,10 +52,18 @@
                 color: 'purple',
                 subtitle: averages.price_100_count > 0 ? '(' ~ averages.price_100_count ~ ' obs)' : null
             } %}
-        </div> 
+
+            <!-- NOUVEAU : Statistiques x1000 -->
+            {% include 'components/stats_card.html.twig' with {
+                title: 'Moyenne x1000',
+                value: averages.avg_price_1000,
+                unit: 'kamas',
+                color: 'yellow',
+                subtitle: averages.price_1000_count > 0 ? '(' ~ averages.price_1000_count ~ ' obs)' : null
+            } %}
+        </div>
 
         <!-- Conseils -->
-
         {% set moyenne_mobile_content %}
             <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
                 <div>
@@ -79,7 +104,7 @@
                 <div class="flex justify-between items-center">
                     <h3 class="text-white text-xl font-bold">📈 Évolution des prix</h3>
                     
-                    <!-- Boutons de filtre de courbes -->
+                    <!-- Boutons de filtre de courbes - MODIFIÉ : Ajout du bouton x1000 -->
                     <div class="flex space-x-2">
                         <button 
                             data-chart-target="filterBtn"
@@ -102,28 +127,31 @@
                             class="active bg-purple-600 hover:bg-purple-700 text-white px-3 py-1 rounded text-sm transition-colors">
                             x100
                         </button>
+                        <!-- NOUVEAU : Bouton x1000 -->
+                        <button 
+                            data-chart-target="filterBtn"
+                            data-filter="x1000"
+                            data-action="click->chart#filterChart"
+                            class="active bg-yellow-600 hover:bg-yellow-700 text-white px-3 py-1 rounded text-sm transition-colors">
+                            x1000
+                        </button>
                     </div>
                 </div>
-                
+
                 <!-- Boutons de période temporelle -->
                 <div class="flex justify-between items-center">
                     <div class="flex space-x-2">
-                        {% set periods = [
-                            {value: '7d', label: '7j'},
-                            {value: '30d', label: '30j'},
-                            {value: '3m', label: '3m'},
-                            {value: '6m', label: '6m'},
-                            {value: '1y', label: '1an'},
-                            {value: 'all', label: 'Tout'}
+                        {% for period in [
+                            {value: 'all', label: 'Tout'},
+                            {value: '30', label: '30j'},
+                            {value: '7', label: '7j'},
+                            {value: '3', label: '3j'}
                         ] %}
-                        
-                        {% for period in periods %}
                             <button 
                                 data-chart-target="periodBtn"
                                 data-period="{{ period.value }}"
-                                data-action="click->chart#filterPeriod"
-                                class="px-3 py-1 rounded text-sm transition-colors
-                                    {{ loop.last ? 'bg-orange-600 text-white' : 'bg-gray-700 text-gray-300 hover:bg-gray-600' }}">
+                                data-action="click->chart#changePeriod"
+                                class="{{ period.value == 'all' ? 'bg-orange-600 text-white' : 'bg-gray-700 text-gray-300 hover:bg-gray-600' }}">
                                 {{ period.label }}
                             </button>
                         {% endfor %}
@@ -172,137 +200,108 @@
                 {% set isOldest = loop.last %}
                 
                 <div class="wrapper-background border-l-4 {{ isLatest ? 'border-green-500' : (isOldest ? 'border-gray-500' : 'border-blue-500') }}">
-                    <div class="flex justify-between items-start mb-4">
-                        <div>
-                            <div class="flex items-center space-x-2">
-                                <h4 class="text-white font-semibold">{{ observation.observedAt|date('d/m/Y à H:i') }}</h4>
+                    <div class="flex justify-between items-start mb-3">
+                        <div class="flex items-center space-x-3">
+                            <div class="text-2xl">
                                 {% if isLatest %}
-                                    <span class="bg-green-600 text-green-100 px-2 py-1 rounded-full text-xs">RÉCENT</span>
+                                    🟢
                                 {% elseif isOldest %}
-                                    <span class="bg-gray-600 text-gray-100 px-2 py-1 rounded-full text-xs">PREMIER</span>
+                                    ⚫
+                                {% else %}
+                                    🔵
                                 {% endif %}
                             </div>
-                            <p class="text-gray-400 text-sm">
-                                Il y a {{ (observation.observedAt.diff(date())).days }} jour(s)
-                            </p>
-                        </div>
-                        <div class="flex space-x-2">
-                            <a href="{{ path('app_market_watch_edit', {id: observation.id}) }}" 
-                            class="text-blue-400 hover:text-blue-300">Modifier</a>
-                            <form action="{{ path('app_market_watch_delete', {id: observation.id}) }}" method="post" 
-                                onsubmit="return confirm('Supprimer cette observation ?')" class="inline">
-                                <button type="submit" class="text-red-400 hover:text-red-300">Supprimer</button>
-                            </form>
+                            <div>
+                                <div class="text-white font-semibold">
+                                    {{ observation.observedAt|date('d/m/Y à H:i') }}
+                                    {% if isLatest %}
+                                        <span class="text-green-400 text-sm ml-2">(Dernière)</span>
+                                    {% elseif isOldest %}
+                                        <span class="text-gray-400 text-sm ml-2">(Première)</span>
+                                    {% endif %}
+                                </div>
+                                {% if observation.notes %}
+                                    <div class="text-gray-400 text-sm mt-1">{{ observation.notes }}</div>
+                                {% endif %}
+                            </div>
                         </div>
                         
+                        <!-- Actions -->
+                        <div class="flex space-x-2">
+                            <a href="{{ path('app_market_watch_edit', {id: observation.id}) }}" 
+                               class="text-blue-400 hover:text-blue-300 text-sm transition-colors">
+                                ✏️ Modifier
+                            </a>
+                            <form method="post" action="{{ path('app_market_watch_delete', {id: observation.id}) }}" 
+                                  class="inline" 
+                                  onsubmit="return confirm('Supprimer cette observation ?')">
+                                <button type="submit" 
+                                        class="text-red-400 hover:text-red-300 text-sm transition-colors">
+                                    🗑️ Supprimer
+                                </button>
+                            </form>
+                        </div>
                     </div>
 
-                     <!-- Prix observés -->
-                    <div class="grid grid-cols-1 md:grid-cols-3 gap-4">
-                        <!-- Prix x1 -->
-                        <div class="bg-gray-700 rounded-lg p-3">
-                            <div class="text-gray-400 text-sm mb-1">Prix x1</div>
+                    <!-- Prix observés - MODIFIÉ : Grille 2x2 pour inclure x1000 -->
+                    <div class="grid grid-cols-2 md:grid-cols-4 gap-3">
+                        <div class="bg-green-600 bg-opacity-20 border border-green-600 rounded p-3 text-center">
+                            <div class="text-green-400 text-xs mb-1">Prix x1</div>
                             {% if observation.pricePerUnit %}
                                 {% include 'components/price_display.html.twig' with {
                                     price: observation.pricePerUnit,
+                                    size: 'normal',
                                     color: 'green',
-                                    size: 'large',
-                                    unit: 'kamas'
+                                    show_kamas: false
                                 } %}
-                                {% if not loop.last %}
-                                    {% set nextObservation = price_history[loop.index0 + 1] %}
-                                    {% if nextObservation.pricePerUnit %}
-                                        {% set diff = observation.pricePerUnit - nextObservation.pricePerUnit %}
-                                        {% if diff != 0 %}
-                                            <div class="text-{{ diff > 0 ? 'red' : 'green' }}-400 text-xs mt-1">
-                                                {{ diff > 0 ? '↗' : '↘' }} 
-                                                {% include 'components/price_display.html.twig' with {
-                                                    price: diff|abs,
-                                                    color: diff > 0 ? 'red' : 'green',
-                                                    size: 'small',
-                                                    unit: 'kamas'
-                                                } %}
-                                            </div>
-                                        {% endif %}
-                                    {% endif %}
-                                {% endif %}
                             {% else %}
-                                <div class="text-gray-500 text-lg">Non observé</div>
+                                <div class="text-gray-500">-</div>
                             {% endif %}
                         </div>
-
-                        <!-- Prix x10 -->
-                        <div class="bg-gray-700 rounded-lg p-3">
-                            <div class="text-gray-400 text-sm mb-1">Prix x10</div>
+                        
+                        <div class="bg-blue-600 bg-opacity-20 border border-blue-600 rounded p-3 text-center">
+                            <div class="text-blue-400 text-xs mb-1">Prix x10</div>
                             {% if observation.pricePer10 %}
                                 {% include 'components/price_display.html.twig' with {
                                     price: observation.pricePer10,
+                                    size: 'normal',
                                     color: 'blue',
-                                    size: 'large',
-                                    unit: 'kamas'
+                                    show_kamas: false
                                 } %}
-                                {% if not loop.last %}
-                                    {% set nextObservation = price_history[loop.index0 + 1] %}
-                                    {% if nextObservation.pricePer10 %}
-                                        {% set diff = observation.pricePer10 - nextObservation.pricePer10 %}
-                                        {% if diff != 0 %}
-                                            <div class="text-{{ diff > 0 ? 'red' : 'green' }}-400 text-xs mt-1">
-                                                {{ diff > 0 ? '↗' : '↘' }} 
-                                                {% include 'components/price_display.html.twig' with {
-                                                    price: diff|abs,
-                                                    color: diff > 0 ? 'red' : 'green',
-                                                    size: 'small',
-                                                    unit: 'kamas'
-                                                } %}
-                                            </div>
-                                        {% endif %}
-                                    {% endif %}
-                                {% endif %}
                             {% else %}
-                                <div class="text-gray-500 text-lg">Non observé</div>
+                                <div class="text-gray-500">-</div>
                             {% endif %}
                         </div>
-
-                        <!-- Prix x100 -->
-                        <div class="bg-gray-700 rounded-lg p-3">
-                            <div class="text-gray-400 text-sm mb-1">Prix x100</div>
+                        
+                        <div class="bg-purple-600 bg-opacity-20 border border-purple-600 rounded p-3 text-center">
+                            <div class="text-purple-400 text-xs mb-1">Prix x100</div>
                             {% if observation.pricePer100 %}
                                 {% include 'components/price_display.html.twig' with {
                                     price: observation.pricePer100,
+                                    size: 'normal',
                                     color: 'purple',
-                                    size: 'large',
-                                    unit: 'kamas'
+                                    show_kamas: false
                                 } %}
-                                {% if not loop.last %}
-                                    {% set nextObservation = price_history[loop.index0 + 1] %}
-                                    {% if nextObservation.pricePer100 %}
-                                        {% set diff = observation.pricePer100 - nextObservation.pricePer100 %}
-                                        {% if diff != 0 %}
-                                            <div class="text-{{ diff > 0 ? 'red' : 'green' }}-400 text-xs mt-1">
-                                                {{ diff > 0 ? '↗' : '↘' }} 
-                                                {% include 'components/price_display.html.twig' with {
-                                                    price: diff|abs,
-                                                    color: diff > 0 ? 'red' : 'green',
-                                                    size: 'small',
-                                                    unit: 'kamas'
-                                                } %}
-                                            </div>
-                                        {% endif %}
-                                    {% endif %}
-                                {% endif %}
                             {% else %}
-                                <div class="text-gray-500 text-lg">Non observé</div>
+                                <div class="text-gray-500">-</div>
+                            {% endif %}
+                        </div>
+
+                        <!-- NOUVEAU : Prix x1000 -->
+                        <div class="bg-yellow-600 bg-opacity-20 border border-yellow-600 rounded p-3 text-center">
+                            <div class="text-yellow-400 text-xs mb-1">Prix x1000</div>
+                            {% if observation.pricePer1000 %}
+                                {% include 'components/price_display.html.twig' with {
+                                    price: observation.pricePer1000,
+                                    size: 'normal',
+                                    color: 'yellow',
+                                    show_kamas: false
+                                } %}
+                            {% else %}
+                                <div class="text-gray-500">-</div>
                             {% endif %}
                         </div>
                     </div>
-
-                    <!-- Notes -->
-                    {% if observation.notes %}
-                        <div class="bg-gray-700 bg-opacity-50 rounded-lg p-3">
-                            <div class="text-gray-400 text-sm mb-1">📝 Notes :</div>
-                            <p class="text-gray-300 text-sm italic">"{{ observation.notes }}"</p>
-                        </div>
-                    {% endif %}
                 </div>
             {% endfor %}
         </div>

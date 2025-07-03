@@ -41,6 +41,19 @@
             <span class="text-gray-500">-</span>
         {% endif %}
     </td>
+    <!-- NOUVEAU : Colonne x1000 -->
+    <td class="table-cell">
+        {% if item.avg_price_1000 %}
+            {% include 'components/price_display.html.twig' with {
+                price: item.avg_price_1000,
+                show_kamas: false,
+                color: 'white'
+            } %}
+            <div class="text-gray-500 text-xs">{{ item.price_1000_count }} obs</div>
+        {% else %}
+            <span class="text-gray-500">-</span>
+        {% endif %}
+    </td>
     <td class="table-cell">
         <div class="font-medium text-lime-500">{{ item.observation_count }} observations</div>
         <div class="text-gray-500 text-xs">

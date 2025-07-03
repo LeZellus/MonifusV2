@@ -21,7 +21,8 @@
         </div>
     </div>
 
-    <div class="grid grid-cols-3 gap-2 mb-3 text-center">
+    <!-- MODIFIÉ : Grille 2x2 pour inclure x1000 -->
+    <div class="grid grid-cols-2 gap-2 mb-3 text-center">
         <div class="bg-gray-700 rounded p-2">
             <div class="text-gray-400 text-xs">Moy. x1</div>
             {% if item.avg_price_unit %}
@@ -60,6 +61,21 @@
                     show_kamas: false
                 } %}
                 <div class="text-gray-500 text-xs">{{ item.price_100_count }}</div>
+            {% else %}
+                <div class="text-gray-500 text-sm">-</div>
+            {% endif %}
+        </div>
+        <!-- NOUVEAU : Prix x1000 -->
+        <div class="bg-gray-700 rounded p-2">
+            <div class="text-gray-400 text-xs">Moy. x1000</div>
+            {% if item.avg_price_1000 %}
+                {% include 'components/price_display.html.twig' with {
+                    price: item.avg_price_1000,
+                    size: 'small',
+                    color: 'yellow',
+                    show_kamas: false
+                } %}
+                <div class="text-gray-500 text-xs">{{ item.price_1000_count }}</div>
             {% else %}
                 <div class="text-gray-500 text-sm">-</div>
             {% endif %}

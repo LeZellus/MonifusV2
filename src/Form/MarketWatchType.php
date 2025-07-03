@@ -78,6 +78,14 @@ class MarketWatchType extends AbstractType
                     'placeholder' => 'ex: 140000'
                 ]
             ])
+            ->add('pricePer1000', IntegerType::class, [
+                'label' => 'Prix par 1000 (x1000)',
+                'required' => false,
+                'attr' => [
+                    'class' => 'form-input',
+                    'placeholder' => 'ex: 1350000'
+                ]
+            ])
             ->add('notes', TextareaType::class, [
                 'label' => 'Notes sur le marché',
                 'required' => false,

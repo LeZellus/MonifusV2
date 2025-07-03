@@ -47,6 +47,9 @@ class MarketWatch
     #[ORM\Column]
     private ?\DateTimeImmutable $updatedAt = null;
 
+    #[ORM\Column(type: Types::BIGINT, nullable: true)]
+    private ?string $pricePer1000 = null;
+
     #[ORM\PrePersist]
     public function setCreatedAtValue(): void
     {
@@ -123,6 +126,18 @@ class MarketWatch
         return $this;
     }
 
+    public function getPricePer1000(): ?int
+    {
+        return $this->pricePer1000;
+    }
+
+    public function setPricePer1000(?int $pricePer1000): static
+    {
+        $this->pricePer1000 = $pricePer1000;
+
+        return $this;
+    }
+
     public function getNotes(): ?string
     {
         return $this->notes;
@@ -162,7 +177,8 @@ class MarketWatch
     {
         return $this->pricePerUnit !== null || 
                $this->pricePer10 !== null || 
-               $this->pricePer100 !== null;
+               $this->pricePer100 !== null ||
+               $this->pricePer1000 !== null;
     }
 
     /**
@@ -174,6 +190,7 @@ class MarketWatch
         if ($this->pricePerUnit !== null) $count++;
         if ($this->pricePer10 !== null) $count++;
         if ($this->pricePer100 !== null) $count++;
+        if ($this->pricePer1000 !== null) $count++; // MODIFIÉ : Inclure pricePer1000
         return $count;
     }
 
@@ -194,6 +211,10 @@ class MarketWatch
         
         if ($this->pricePer100 !== null) {
             $prices['x100'] = $this->pricePer100;
+        }
+
+        if ($this->pricePer1000 !== null) {
+            $prices['x1000'] = $this->pricePer1000;
         }
         
         return $prices;
