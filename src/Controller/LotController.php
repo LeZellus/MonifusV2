@@ -9,6 +9,7 @@ use App\Repository\LotGroupRepository;
 use App\Service\CharacterSelectionService;
 use Doctrine\ORM\EntityManagerInterface;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
+use Symfony\Component\HttpFoundation\JsonResponse;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\Routing\Attribute\Route;
@@ -35,6 +36,47 @@ class LotController extends AbstractController
             'lots' => $lots,
             'characters' => $characters,
             'selectedCharacter' => $selectedCharacter,
+        ]);
+    }
+
+    #[Route('/search', name: 'app_lot_search', methods: ['GET'])]
+    public function search(
+        LotGroupRepository $lotRepository,
+        CharacterSelectionService $characterService,
+        Request $request
+    ): JsonResponse {
+        $selectedCharacter = $characterService->getSelectedCharacter($this->getUser());
+        
+        if (!$selectedCharacter) {
+            return new JsonResponse(['error' => 'Aucun personnage sélectionné'], 400);
+        }
+
+        $searchQuery = trim($request->query->get('q', ''));
+        
+        // Rechercher les lots par nom d'item
+        $lots = $lotRepository->searchByItemName($selectedCharacter, $searchQuery);
+
+        // Rendu des lignes du tableau (clé: table_rows)
+        $tableRows = '';
+        foreach ($lots as $lot) {
+            $tableRows .= $this->renderView('lot/_table_row.html.twig', [
+                'item' => $lot
+            ]);
+        }
+
+        // Rendu des cartes mobile (clé: mobile_cards)
+        $mobileCards = '';
+        foreach ($lots as $lot) {
+            $mobileCards .= $this->renderView('lot/_mobile_card.html.twig', [
+                'item' => $lot
+            ]);
+        }
+
+        return new JsonResponse([
+            'table_rows' => $tableRows,    // ✅ Correspond à data-search-container="table_rows"
+            'mobile_cards' => $mobileCards, // ✅ Correspond à data-search-container="mobile_cards"
+            'count' => count($lots),
+            'query' => $searchQuery
         ]);
     }
 
@@ -81,65 +123,44 @@ class LotController extends AbstractController
         ]);
     }
 
-    #[Route('/{id}/edit', name: 'app_lot_edit')]
-    public function edit(
-        int $id,
-        Request $request, 
-        EntityManagerInterface $em,
-        CharacterSelectionService $characterService,
-        LotGroupRepository $lotRepository
-    ): Response {
-        $selectedCharacter = $characterService->getSelectedCharacter($this->getUser());
+    #[Route('/{id}', name: 'app_lot_show', methods: ['GET'])]
+    public function show(LotGroup $lotGroup): Response
+    {
+        return $this->render('lot/show.html.twig', [
+            'lot_group' => $lotGroup,
+        ]);
+    }
+
+    #[Route('/{id}/edit', name: 'app_lot_edit', methods: ['GET', 'POST'])]
+    public function edit(Request $request, LotGroup $lotGroup, EntityManagerInterface $em): Response
+    {
+        $form = $this->createForm(LotGroupType::class, $lotGroup, [
+            'is_edit' => true,
+            'current_item' => $lotGroup->getItem()
+        ]);
         
-        if (!$selectedCharacter) {
-            throw $this->createAccessDeniedException();
-        }
-
-        $lotGroup = $lotRepository->findOneByIdAndCharacter($id, $selectedCharacter);
-        
-        if (!$lotGroup) {
-            throw $this->createNotFoundException();
-        }
-
-        $form = $this->createForm(LotGroupType::class, $lotGroup, ['is_edit' => true]);
-
         $form->handleRequest($request);
         if ($form->isSubmitted() && $form->isValid()) {
             $em->flush();
-
             $this->addFlash('success', 'Lot modifié avec succès !');
             return $this->redirectToRoute('app_lot_index');
         }
 
         return $this->render('lot/edit.html.twig', [
+            'lot' => $lotGroup,  // ✅ Changé de 'lot_group' vers 'lot'
             'form' => $form,
-            'lot' => $lotGroup,
         ]);
     }
 
-    #[Route('/{id}/delete', name: 'app_lot_delete', methods: ['POST'])]
-    public function delete(
-        int $id,
-        EntityManagerInterface $em,
-        CharacterSelectionService $characterService,
-        LotGroupRepository $lotRepository
-    ): Response {
-        $selectedCharacter = $characterService->getSelectedCharacter($this->getUser());
-        
-        if (!$selectedCharacter) {
-            throw $this->createAccessDeniedException();
+    #[Route('/{id}', name: 'app_lot_delete', methods: ['POST'])]
+    public function delete(Request $request, LotGroup $lotGroup, EntityManagerInterface $em): Response
+    {
+        if ($this->isCsrfTokenValid('delete'.$lotGroup->getId(), $request->getPayload()->getString('_token'))) {
+            $em->remove($lotGroup);
+            $em->flush();
+            $this->addFlash('success', 'Lot supprimé avec succès !');
         }
 
-        $lotGroup = $lotRepository->findOneByIdAndCharacter($id, $selectedCharacter);
-        
-        if (!$lotGroup) {
-            throw $this->createNotFoundException();
-        }
-
-        $em->remove($lotGroup);
-        $em->flush();
-
-        $this->addFlash('success', 'Lot supprimé avec succès !');
         return $this->redirectToRoute('app_lot_index');
     }
 }

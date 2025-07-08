@@ -22,7 +22,7 @@ Usage: {% include 'components/data_table.html.twig' with {
                     {% endfor %}
                 </tr>
             </thead>
-            <tbody class="divide-y divide-gray-700">
+            <tbody id="{{ table_id|default('table-body') }}" class="divide-y divide-gray-700">
                 {% for row in rows %}
                     {% include row_template with {item: row, loop: loop} %}
                 {% endfor %}
@@ -32,7 +32,7 @@ Usage: {% include 'components/data_table.html.twig' with {
 
     <!-- Vue mobile (optionnelle) -->
     {% if mobile_card_template is defined %}
-        <div class="{{ mobile_breakpoint|default('md') }}:hidden space-y-4">
+        <div id="{{ mobile_container_id|default('mobile-cards') }}" class="{{ mobile_breakpoint|default('md') }}:hidden space-y-4">
             {% for row in rows %}
                 {% include mobile_card_template with {item: row, loop: loop} %}
             {% endfor %}

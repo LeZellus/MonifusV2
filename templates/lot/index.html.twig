@@ -8,7 +8,7 @@
 
     <div class="wrapper-container">
         {% if selectedCharacter %}
-            <div class="flex justify-between items-center">
+            <div class="flex justify-between items-center mb-6">
                 <h2 class="text-white text-2xl font-bold">
                     Lots de {{ selectedCharacter.name }}
                 </h2>
@@ -18,17 +18,91 @@
                 </a>
             </div>
 
-            {% include 'components/data_table.html.twig' with {
-                headers: ['Item', 'Configuration', 'Prix Achat', 'Prix Vente', 'Profit', 'Statut', 'Actions'],
-                rows: lots,
-                row_template: 'lot/_table_row.html.twig',
-                mobile_card_template: 'lot/_mobile_card.html.twig',
-                empty_message: 'Aucun lot pour ' ~ selectedCharacter.name,
-                empty_action: {
-                    url: path('app_lot_new'),
-                    text: 'Créer le premier lot'
-                }
-            } %}
+            <!-- Contrôleur AJAX Search - Même approche que market_watch -->
+            <div data-controller="ajax-search" 
+                 data-ajax-search-url-value="{{ path('app_lot_search') }}"
+                 data-ajax-search-debounce-value="300">
+                
+                <!-- Barre de recherche -->
+                <div class="mb-6">
+                    <div class="max-w-md">
+                        <div class="relative">
+                            <input type="text" 
+                                   data-ajax-search-target="input"
+                                   data-action="input->ajax-search#search"
+                                   placeholder="Rechercher des lots par item..."
+                                   class="w-full bg-gray-800 border border-gray-600 rounded-lg px-4 py-2 pr-10 text-white placeholder-gray-400 focus:border-blue-500 focus:ring-1 focus:ring-blue-500 transition-colors">
+                            
+                            <!-- Loader -->
+                            <div data-ajax-search-target="loader" class="absolute right-10 top-1/2 transform -translate-y-1/2 hidden">
+                                <div class="animate-spin rounded-full h-4 w-4 border-2 border-blue-400 border-t-transparent"></div>
+                            </div>
+                            
+                            <!-- Icône de recherche -->
+                            <div data-ajax-search-target="icon" class="absolute right-2 top-1/2 transform -translate-y-1/2 text-gray-400">
+                                <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"></path>
+                                </svg>
+                            </div>
+                        </div>
+
+                        <!-- Informations de recherche -->
+                        <div data-ajax-search-target="results" class="mt-2 hidden">
+                            <div class="flex items-center justify-between">
+                                <span data-ajax-search-target="count" class="text-gray-400 text-sm"></span>
+                                <button data-ajax-search-target="clear"
+                                        data-action="click->ajax-search#clear" 
+                                        class="text-orange-500 hover:text-blue-300 text-sm transition-colors">
+                                    Effacer
+                                </button>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Vue desktop -->
+                <div class="hidden md:block bg-gray-800 rounded-lg overflow-hidden">
+                    <table class="w-full">
+                        <thead class="bg-gray-700">
+                            <tr>
+                                {% for header in ['Item', 'Configuration', 'Prix Achat', 'Prix Vente', 'Profit', 'Statut', 'Actions'] %}
+                                    <th class="table-header">{{ header }}</th>
+                                {% endfor %}
+                            </tr>
+                        </thead>
+                        <tbody data-ajax-search-target="container"
+                               data-search-container="table_rows"
+                               class="divide-y divide-gray-700">
+                            {% for lot in lots %}
+                                {% include 'lot/_table_row.html.twig' with {item: lot} %}
+                            {% endfor %}
+                        </tbody>
+                    </table>
+                </div>
+
+                <!-- Vue mobile -->
+                <div data-ajax-search-target="container"
+                     data-search-container="mobile_cards"
+                     class="md:hidden space-y-4">
+                    {% for lot in lots %}
+                        {% include 'lot/_mobile_card.html.twig' with {item: lot} %}
+                    {% endfor %}
+                </div>
+
+                <!-- Message vide -->
+                <div data-ajax-search-target="container"
+                     data-search-container="empty_state"
+                     class="text-center py-12 hidden">
+                    {% include 'components/empty_state.html.twig' with {
+                        type: 'no_results',
+                        title: 'Aucun lot trouvé',
+                        action: {
+                            url: path('app_lot_new'),
+                            text: 'Créer un lot'
+                        }
+                    } %}
+                </div>
+            </div>
         {% else %}
             {% include 'components/empty_state.html.twig' with {
                 type: 'no_character',

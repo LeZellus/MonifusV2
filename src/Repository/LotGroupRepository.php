@@ -204,4 +204,22 @@ class LotGroupRepository extends ServiceEntityRepository
             ->getQuery()
             ->getResult();
     }
+
+    public function searchByItemName(DofusCharacter $character, string $searchQuery = ''): array
+    {
+        $qb = $this->createQueryBuilder('lg')
+            ->leftJoin('lg.item', 'i')
+            ->leftJoin('lg.dofusCharacter', 'c')
+            ->where('c = :character')
+            ->setParameter('character', $character)
+            ->orderBy('lg.createdAt', 'DESC');
+
+        // Si une recherche est spécifiée, filtrer par nom d'item
+        if (!empty($searchQuery)) {
+            $qb->andWhere('LOWER(i.name) LIKE LOWER(:search)')
+            ->setParameter('search', '%' . $searchQuery . '%');
+        }
+
+        return $qb->getQuery()->getResult();
+    }
 }
