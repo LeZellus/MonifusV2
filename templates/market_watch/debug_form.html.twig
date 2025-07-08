@@ -1,0 +1,41 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Debug Form</title>
+</head>
+<body>
+    <h1>🔧 Debug Formulaire - Étape: {{ test_step }}</h1>
+    
+    <div style="background: #f0f0f0; padding: 10px; margin: 10px 0;">
+        <h2>Informations :</h2>
+        <p>Personnage: {{ character.name }}</p>
+        <p>Item prérempli: {{ preselected_item ? preselected_item.name : 'aucun' }}</p>
+        <p>Form créé: {{ form ? 'OUI' : 'NON' }}</p>
+    </div>
+
+    {% if form %}
+        <h2>Test basique du formulaire :</h2>
+        {{ form_start(form) }}
+            <p>Form start OK</p>
+            
+            {# Test champ par champ #}
+            {% if form.itemSearch is defined %}
+                <p>Champ itemSearch: OK</p>
+            {% endif %}
+            
+            {% if form.item is defined %}
+                <p>Champ item: OK</p>
+            {% endif %}
+            
+            {% if form.observedAt is defined %}
+                <p>Champ observedAt: OK</p>
+                {{ form_row(form.observedAt) }}
+            {% endif %}
+            
+            <button type="submit">Test Submit</button>
+        {{ form_end(form) }}
+    {% endif %}
+
+    <p><a href="{{ path('app_market_watch_index') }}">Retour</a></p>
+</body>
+</html>

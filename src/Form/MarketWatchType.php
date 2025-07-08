@@ -21,12 +21,18 @@ class MarketWatchType extends AbstractType
     public function buildForm(FormBuilderInterface $builder, array $options): void
     {
         $isEdit = $options['is_edit'] ?? false;
+        $preselectedItem = $options['preselected_item'] ?? null;
         
         if ($isEdit) {
-            // En mode édition, on affiche juste l'item actuel (read-only via template)
-            // Pas besoin de champ dans le formulaire car l'item ne peut pas être modifié
+            // En mode édition, pas de champ item (read-only via template)
+        } elseif ($preselectedItem) {
+            // Item prérempli - champ caché
+            $builder->add('item', HiddenType::class, [
+                'data' => $preselectedItem->getId(),
+                'mapped' => false,
+            ]);
         } else {
-            // En mode création, champ de recherche + champ caché
+            // Mode création normal avec recherche
             $builder->add('itemSearch', TextType::class, [
                 'label' => 'Rechercher une ressource',
                 'mapped' => false,
@@ -102,6 +108,7 @@ class MarketWatchType extends AbstractType
         $resolver->setDefaults([
             'data_class' => MarketWatch::class,
             'is_edit' => false,
+            'preselected_item' => null,
             'constraints' => [
                 new Callback([$this, 'validateAtLeastOnePrice'])
             ]
@@ -111,7 +118,7 @@ class MarketWatchType extends AbstractType
     public function validateAtLeastOnePrice(MarketWatch $marketWatch, ExecutionContextInterface $context): void
     {
         if (!$marketWatch->hasAnyPrice()) {
-            $context->buildViolation('Vous devez renseigner au moins un prix (x1, x10 ou x100)')
+            $context->buildViolation('Vous devez renseigner au moins un prix (x1, x10, x100 ou x1000)')
                 ->atPath('pricePerUnit')
                 ->addViolation();
         }

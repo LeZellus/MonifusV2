@@ -1,13 +1,31 @@
 {% extends 'base.html.twig' %}
 
-{% block title %}Nouvelle Observation - {{ character.name }}{% endblock %}
+{% block title %}
+    {% if preselected_item is defined %}
+        Nouvelle observation - {{ preselected_item.name }}
+    {% else %}
+        Nouvelle observation - {{ character.name }}
+    {% endif %}
+{% endblock %}
 
 {% block body %}
     <div class="wrapper-container">
+        {% if preselected_item is defined %}
+            <!-- Breadcrumb pour item prérempli -->
+            <div class="mb-4">
+                <nav class="text-sm text-gray-400">
+                    <a href="{{ path('app_market_watch_index') }}" class="hover:text-white">Market Watch</a>
+                    <span class="mx-2">→</span>
+                    <span class="text-green-400">Nouvelle observation pour {{ preselected_item.name }}</span>
+                </nav>
+            </div>
+        {% endif %}
+        
         {% include 'market_watch/_form.html.twig' with {
             form: form,
             character: character,
-            is_edit: false
+            is_edit: false,
+            preselected_item: preselected_item ?? null
         } %}
     </div>
 {% endblock %}

@@ -40,12 +40,14 @@ class MarketWatchController extends AbstractController
         ]);
     }
 
-    #[Route('/new', name: 'app_market_watch_new')]
+    
+    #[Route('/new/{itemId}', name: 'app_market_watch_new', requirements: ['itemId' => '\d+'], defaults: ['itemId' => null])]
     public function new(
         Request $request, 
         EntityManagerInterface $em,
         ItemRepository $itemRepository,
-        CharacterSelectionService $characterService
+        CharacterSelectionService $characterService,
+        ?int $itemId = null
     ): Response {
         $selectedCharacter = $characterService->getSelectedCharacter($this->getUser());
 
@@ -54,59 +56,60 @@ class MarketWatchController extends AbstractController
             return $this->redirectToRoute('app_profile_index');
         }
 
+        // Gestion du préremplissage d'item
+        $preselectedItem = null;
+        if ($itemId) {
+            $preselectedItem = $itemRepository->find($itemId);
+            if (!$preselectedItem) {
+                $this->addFlash('error', 'Ressource introuvable.');
+                return $this->redirectToRoute('app_market_watch_index');
+            }
+        }
+
         $marketWatch = new MarketWatch();
-        $form = $this->createForm(MarketWatchType::class, $marketWatch, ['is_edit' => false]);
+        
+        // Configuration du formulaire selon le contexte
+        $formOptions = ['is_edit' => false];
+        if ($preselectedItem) {
+            $formOptions['preselected_item'] = $preselectedItem;
+        }
+        
+        $form = $this->createForm(MarketWatchType::class, $marketWatch, $formOptions);
 
         $form->handleRequest($request);
-        if ($form->isSubmitted()) {
-            // DEBUG : Afficher les données du formulaire
-            $formData = $request->request->all();
-            error_log("=== DEBUG FORM DATA ===");
-            error_log("Form submitted: " . json_encode($formData, JSON_PRETTY_PRINT));
-            
-            // DEBUG : Vérifier les données de l'entité
-            error_log("=== DEBUG ENTITY DATA ===");
-            error_log("PricePerUnit: " . ($marketWatch->getPricePerUnit() ?? 'null'));
-            error_log("PricePer10: " . ($marketWatch->getPricePer10() ?? 'null'));
-            error_log("PricePer100: " . ($marketWatch->getPricePer100() ?? 'null'));
-            error_log("PricePer1000: " . ($marketWatch->getPricePer1000() ?? 'null'));
-            
-            // DEBUG : Vérifier les erreurs de validation
-            if (!$form->isValid()) {
-                error_log("=== FORM ERRORS ===");
-                foreach ($form->getErrors(true) as $error) {
-                    error_log("Error: " . $error->getMessage());
-                }
-            }
-            
-            if ($form->isValid()) {
+        if ($form->isSubmitted() && $form->isValid()) {
+            // Si pas d'item prérempli, récupérer depuis le formulaire
+            if (!$preselectedItem) {
                 $itemId = $form->get('item')->getData();
                 if ($itemId && $item = $itemRepository->find($itemId)) {
                     $marketWatch->setItem($item);
-                    $marketWatch->setDofusCharacter($selectedCharacter);
-                    
-                    // DEBUG : Vérifier les données avant persist
-                    error_log("=== DEBUG BEFORE PERSIST ===");
-                    error_log("Item: " . $item->getName());
-                    error_log("Character: " . $selectedCharacter->getName());
-                    error_log("PricePer1000 avant persist: " . ($marketWatch->getPricePer1000() ?? 'null'));
-                    
-                    $em->persist($marketWatch);
-                    $em->flush();
-
-                    $this->addFlash('success', 'Observation de prix ajoutée avec succès !');
-                    return $this->redirectToRoute('app_market_watch_index');
+                } else {
+                    $this->addFlash('error', 'Veuillez sélectionner une ressource valide.');
+                    return $this->render('market_watch/new.html.twig', [
+                        'form' => $form,
+                        'character' => $selectedCharacter,
+                        'preselected_item' => $preselectedItem,
+                    ]);
                 }
-                
-                $this->addFlash('error', 'Veuillez sélectionner une ressource valide.');
             } else {
-                $this->addFlash('error', 'Le formulaire contient des erreurs.');
+                // Item prérempli
+                $marketWatch->setItem($preselectedItem);
             }
+            
+            $marketWatch->setDofusCharacter($selectedCharacter);
+            
+            $em->persist($marketWatch);
+            $em->flush();
+
+            $itemName = $marketWatch->getItem()->getName();
+            $this->addFlash('success', "Observation ajoutée pour {$itemName} !");
+            return $this->redirectToRoute('app_market_watch_index');
         }
 
         return $this->render('market_watch/new.html.twig', [
             'form' => $form,
             'character' => $selectedCharacter,
+            'preselected_item' => $preselectedItem,
         ]);
     }
 

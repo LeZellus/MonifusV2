@@ -4,14 +4,20 @@
     {% include 'components/section_header.html.twig' with {
         type: 'character',
         character: character,
-        action_title: is_edit ? 'Modifier Observation - ' ~ market_watch.item.name : 'Nouvelle Observation',
-        action_description: is_edit ? ('Observé le ' ~ market_watch.observedAt|date('d/m/Y à H:i')) : 'Observer les prix du marché',
+        action_title: is_edit ? 
+            ('Modifier Observation - ' ~ (market_watch is defined ? market_watch.item.name : 'Item')) : 
+            (preselected_item is defined and preselected_item ? 
+                ('Nouvelle Observation - ' ~ preselected_item.name) : 
+                'Nouvelle Observation'),
+        action_description: is_edit ? 
+            (market_watch is defined ? ('Observé le ' ~ market_watch.observedAt|date('d/m/Y à H:i')) : 'Modification') : 
+            'Observer les prix du marché',
         color: 'orange',
         icon: is_edit ? '📝' : '📊'
     } %}
 
-    {% if is_edit %}
-        <!-- Historique récent pour contexte - MODIFIÉ : Ajout du prix x1000 -->
+    {% if is_edit and market_watch is defined %}
+        <!-- Historique récent pour contexte - Mode édition uniquement -->
         <div class="wrapper-background">
             {% include 'components/section_header.html.twig' with {
                 type: 'simple',
@@ -46,7 +52,7 @@
                         <div class="text-gray-500">Non renseigné</div>
                     {% endif %}
                 </div>
-                <!-- NOUVEAU : Prix x1000 -->
+                <!-- Prix x1000 -->
                 <div class="bg-gray-700 rounded-lg p-3 text-center">
                     <div class="text-gray-400 text-sm">Prix x1000</div>
                     {% if market_watch.pricePer1000 %}
@@ -57,8 +63,26 @@
                 </div>
             </div>
         </div>
+    {% elseif preselected_item is defined and preselected_item %}
+        <!-- Mode préremplissage - Affichage de l'item sélectionné -->
+        <div class="wrapper-background">
+            <div class="flex items-center justify-between p-4 bg-green-800 bg-opacity-30 border border-green-600 rounded-lg">
+                <div class="flex items-center space-x-3">
+                    <span class="text-2xl">📦</span>
+                    <div>
+                        <div class="text-amber-500 font-medium">{{ preselected_item.name }}</div>
+                        {% if preselected_item.level %}
+                            <div class="text-gray-400 text-sm">Niv.{{ preselected_item.level }}</div>
+                        {% endif %}
+                    </div>
+                </div>
+                <div class="text-green-400 text-sm">
+                    ✅ Prérempli
+                </div>
+            </div>
+        </div>
     {% else %}
-        <!-- Explication du système pour nouveau - MODIFIÉ : Mention du x1000 -->
+        <!-- Explication du système pour nouveau -->
         {% set explanation_content %}
             <p>• 📋 Observez les prix sur l'hôtel de vente de votre serveur</p>
             <p>• 🔢 Notez les prix par unité (x1), par 10 (x10), par 100 (x100) et/ou par 1000 (x1000)</p>
@@ -87,7 +111,7 @@
         {{ form_start(form) }}
             <div class="space-y-6">
                 <!-- Ressource avec autocomplétion ou lecture seule -->
-                {% if is_edit %}
+                {% if is_edit and market_watch is defined %}
                     {% include 'components/autocomplete_field.html.twig' with {
                         form: form,
                         search_field: 'itemSearch',
@@ -98,6 +122,11 @@
                         label: 'Ressource observée',
                         readonly_help: '🔒 Ressource observée (non modifiable)'
                     } %}
+                {% elseif preselected_item is defined and preselected_item %}
+                    <!-- Mode préremplissage - Champ caché géré par le FormType -->
+                    <div class="text-green-400 text-sm">
+                        📦 Ressource: {{ preselected_item.name }} (préremplie)
+                    </div>
                 {% else %}
                     {% include 'components/autocomplete_field.html.twig' with {
                         form: form,
@@ -119,14 +148,14 @@
                     <div class="form-help">📅 {{ is_edit ? 'Date de cette observation' : 'Quand avez-vous observé ces prix ?' }}</div>
                 </div>
 
-                <!-- Prix observés - MODIFIÉ : Grille en 2x2 pour inclure le x1000 -->
+                <!-- Prix observés -->
                 <div class="bg-gradient-to-r from-blue-600 to-purple-600 rounded-lg p-4">
                     <h4 class="text-white font-semibold mb-4 flex items-center">
                         <span class="mr-2">💰</span>
                         {{ is_edit ? 'Nouveaux prix observés' : 'Prix observés sur l\'hôtel de vente' }}
                     </h4>
                     <div class="text-blue-100 text-sm mb-4">
-                        {{ is_edit ? 'Modifiez les prix selon vos dernières observations. Laissez vide pour supprimer un prix.' : 'Renseignez au moins un prix. Laissez vide si cette unité n\'est pas disponible.' }}
+                        {{ is_edit ? 'Modifiez les prix selon vos dernières observations. Laissez vide pour supprimer un prix.' : 'Renseignez au moins un prix. Tous les champs sont optionnels.' }}
                     </div>
                     
                     <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
@@ -169,7 +198,7 @@
                             <div class="text-purple-200 text-xs mt-1">Prix d'un lot de 100</div>
                         </div>
 
-                        <!-- NOUVEAU : Prix x1000 -->
+                        <!-- Prix x1000 -->
                         <div>
                             {{ form_label(form.pricePer1000, null, {'label_attr': {'class': 'block text-yellow-200 font-medium mb-2'}}) }}
                             <div class="relative">
