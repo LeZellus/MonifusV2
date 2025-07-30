@@ -61,7 +61,7 @@
                     
                     {% include 'components/stats_card.html.twig' with {
                         title: 'Taux de vente',
-                        value: ((stats.global.soldLots / stats.global.totalLots) * 100)|number_format(1),
+                        value: stats.global.totalLots > 0 ? ((stats.global.soldLots / stats.global.totalLots) * 100)|number_format(1) : 0,
                         unit: '%',
                         subtitle: stats.global.soldLots ~ ' / ' ~ stats.global.totalLots,
                         icon: '📈',

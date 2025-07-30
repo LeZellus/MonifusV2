@@ -1,16 +1,4 @@
 {# templates/components/unified_profit_display.html.twig #}
-{# 
-Usage: 
-  {% include 'components/unified_profit_display.html.twig' with {
-    buy_price: 1000,
-    sell_price: 1200, 
-    quantity: 100,
-    mode: 'detailed|compact|simple' (défaut: detailed),
-    size: 'sm|base|lg' (défaut: base),
-    bold: true|false (défaut: false)
-  } %}
-#}
-
 {# Détection du mode de calcul #}
 {% if lot_group is defined %}
     {% set metrics = lot_metrics(lot_group) %}
@@ -19,12 +7,17 @@ Usage:
     {% set total_profit = metrics.realizedProfit %}
     {% set roi = metrics.actualROI %}
 {% else %}
-    {% set total_profit = calculate_profit(sell_price, buy_price, quantity|default(1)) %}
-    {% set roi = calculate_roi(buy_price, sell_price) %}
+    {# Validation des données avant calcul #}
+    {% set safe_sell_price = sell_price ?? 0 %}
+    {% set safe_buy_price = buy_price ?? 0 %}
+    {% set safe_quantity = quantity|default(1) %}
+    
+    {% set total_profit = calculate_profit(safe_sell_price, safe_buy_price, safe_quantity) %}
+    {% set roi = calculate_roi(safe_buy_price, safe_sell_price) %}
     {% set metrics = {
         totalProfit: total_profit,
         roi: roi,
-        investment: calculate_investment(buy_price, quantity|default(1))
+        investment: calculate_investment(safe_buy_price, safe_quantity)
     } %}
 {% endif %}
 
