@@ -1,5 +1,5 @@
 {# templates/components/profile_selector.html.twig #}
-{% if app.user %}
+{% if app.user and selectorData is defined %}
 <div class="profile-selector wrapper-container">
     <div>
         {% if selectorData.currentProfile %}

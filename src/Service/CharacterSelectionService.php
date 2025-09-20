@@ -7,13 +7,16 @@ use App\Entity\DofusCharacter;
 use App\Repository\DofusCharacterRepository;
 use App\Repository\TradingProfileRepository;
 use Symfony\Component\HttpFoundation\RequestStack;
+use Symfony\Contracts\Cache\CacheInterface;
+use Symfony\Contracts\Cache\ItemInterface;
 
 class CharacterSelectionService
 {
     public function __construct(
         private RequestStack $requestStack,
         private DofusCharacterRepository $characterRepository,
-        private TradingProfileRepository $profileRepository
+        private TradingProfileRepository $profileRepository,
+        private CacheInterface $cache
     ) {
     }
 
@@ -67,14 +70,20 @@ class CharacterSelectionService
 
     private function findCharacterById(int $characterId, User $user): ?DofusCharacter
     {
-        return $this->characterRepository->createQueryBuilder('c')
-            ->join('c.tradingProfile', 'tp')
-            ->where('c.id = :id')
-            ->andWhere('tp.user = :user')
-            ->setParameter('id', $characterId)
-            ->setParameter('user', $user)
-            ->getQuery()
-            ->getOneOrNullResult();
+        $cacheKey = "character_{$characterId}_user_{$user->getId()}";
+        
+        return $this->cache->get($cacheKey, function (ItemInterface $item) use ($characterId, $user) {
+            $item->expiresAfter(300); // Cache for 5 minutes
+            
+            return $this->characterRepository->createQueryBuilder('c')
+                ->join('c.tradingProfile', 'tp')
+                ->where('c.id = :id')
+                ->andWhere('tp.user = :user')
+                ->setParameter('id', $characterId)
+                ->setParameter('user', $user)
+                ->getQuery()
+                ->getOneOrNullResult();
+        });
     }
 
     public function setSelectedCharacter(DofusCharacter $character): void
@@ -88,13 +97,19 @@ class CharacterSelectionService
 
     public function getUserCharacters(User $user): array
     {
-        return $this->characterRepository->createQueryBuilder('c')
-            ->join('c.tradingProfile', 'tp')
-            ->where('tp.user = :user')
-            ->setParameter('user', $user)
-            ->orderBy('c.name', 'ASC')
-            ->getQuery()
-            ->getResult();
+        $cacheKey = "user_characters_{$user->getId()}";
+        
+        return $this->cache->get($cacheKey, function (ItemInterface $item) use ($user) {
+            $item->expiresAfter(600); // Cache for 10 minutes
+            
+            return $this->characterRepository->createQueryBuilder('c')
+                ->join('c.tradingProfile', 'tp')
+                ->where('tp.user = :user')
+                ->setParameter('user', $user)
+                ->orderBy('c.name', 'ASC')
+                ->getQuery()
+                ->getResult();
+        });
     }
 
     private function getFirstCharacterForUser(User $user): ?DofusCharacter

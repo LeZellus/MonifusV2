@@ -16,9 +16,31 @@ services:
     App\:
         resource: '../src/'
         
+    # Explicitly configure performance-critical services with lazy loading
     App\Service\CharacterSelectionService:
-        autowire: true
-        autoconfigure: true
+        class: App\Service\CharacterSelectionService
+        lazy: true
+        
+    App\Service\DofusApiService:
+        class: App\Service\DofusApiService
+        lazy: true
+        
+    App\Service\TradingCalculatorService:
+        class: App\Service\TradingCalculatorService
+        lazy: true
+        
+    App\Service\ProfitCalculatorService:
+        class: App\Service\ProfitCalculatorService
+        lazy: true
+        
+    App\Service\ChartDataService:
+        class: App\Service\ChartDataService
+        lazy: true
+        
+    App\Service\DateTimeService:
+        class: App\Service\DateTimeService
+        lazy: true
+        
     App\Command\FixItemTypesCommand:
         tags: ['console.command']
     # add more service definitions when explicit configuration is needed

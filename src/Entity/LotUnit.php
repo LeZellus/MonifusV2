@@ -35,7 +35,7 @@ class LotUnit
     /**
      * @var Collection<int, Comment>
      */
-    #[ORM\OneToMany(targetEntity: Comment::class, mappedBy: 'lotUnit', cascade: ['remove'])]
+    #[ORM\OneToMany(targetEntity: Comment::class, mappedBy: 'lotUnit', cascade: ['remove'], fetch: 'EXTRA_LAZY')]
     private Collection $comments;
 
     public function __construct()

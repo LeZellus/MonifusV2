@@ -10,6 +10,8 @@ use App\Repository\LotUnitRepository;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\Routing\Attribute\Route;
+use Symfony\Contracts\Cache\CacheInterface;
+use Symfony\Contracts\Cache\ItemInterface;
 
 class HomeController extends AbstractController
 {
@@ -18,7 +20,8 @@ class HomeController extends AbstractController
         private readonly ClasseRepository $classeRepository,
         private readonly ServerRepository $serverRepository,
         private readonly LotGroupRepository $lotGroupRepository,
-        private readonly LotUnitRepository $lotUnitRepository
+        private readonly LotUnitRepository $lotUnitRepository,
+        private readonly CacheInterface $cache
     ) {
     }
 
@@ -29,12 +32,24 @@ class HomeController extends AbstractController
             return $this->redirectToRoute('app_trading_dashboard');
         }
 
-        $stats = $this->calculateGlobalStats();
+        $stats = $this->cache->get('home_global_stats', function (ItemInterface $item) {
+            $item->expiresAfter(300); // Cache for 5 minutes
+            return $this->calculateGlobalStats();
+        });
+
+        $basicCounts = $this->cache->get('home_basic_counts', function (ItemInterface $item) {
+            $item->expiresAfter(600); // Cache for 10 minutes
+            return [
+                'users_count' => $this->userRepository->count([]),
+                'classes_count' => $this->classeRepository->count([]),
+                'servers_count' => $this->serverRepository->count([]),
+            ];
+        });
 
         return $this->render('home/index.html.twig', [
-            'users_count' => $this->userRepository->count([]),
-            'classes_count' => $this->classeRepository->count([]),
-            'servers_count' => $this->serverRepository->count([]),
+            'users_count' => $basicCounts['users_count'],
+            'classes_count' => $basicCounts['classes_count'],
+            'servers_count' => $basicCounts['servers_count'],
             'total_kamas_tracked' => $stats['total_kamas_tracked'],
             'total_lots_managed' => $stats['total_lots_managed'],
             'formatted_kamas' => $stats['formatted_kamas'],
