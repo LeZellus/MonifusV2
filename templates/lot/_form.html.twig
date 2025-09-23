@@ -21,24 +21,24 @@
                 wrapper_class: ''
             } %}
             
-            <div class="grid grid-cols-2 md:grid-cols-4 gap-4">
-                <div class="bg-gray-700 rounded-lg p-3 text-center">
-                    <div class="text-gray-400 text-sm">Quantité</div>
-                    <div class="text-white text-lg font-bold">{{ lot.lotSize }}</div>
-                    <div class="text-gray-400 text-xs">lots</div>
+            <div class="stats-grid">
+                <div class="price-card">
+                    <div class="price-label">Quantité</div>
+                    <div class="stats-value text-white">{{ lot.lotSize }}</div>
+                    <div class="price-label">lots</div>
                 </div>
-                <div class="bg-gray-700 rounded-lg p-3 text-center">
-                    <div class="text-gray-400 text-sm">Prix achat</div>
-                    <div class="text-orange-400 text-lg font-bold">{{ lot.buyPricePerLot|format_kamas }}</div>
-                    <div class="text-gray-400 text-xs">par lot</div>
+                <div class="price-card">
+                    <div class="price-label">Prix achat</div>
+                    <div class="stats-value text-orange-400">{{ lot.buyPricePerLot|format_kamas }}</div>
+                    <div class="price-label">par lot</div>
                 </div>
-                <div class="bg-gray-700 rounded-lg p-3 text-center">
-                    <div class="text-gray-400 text-sm">Prix vente</div>
-                    <div class="text-orange-400 text-lg font-bold">{{ lot.sellPricePerLot|format_kamas }}</div>
-                    <div class="text-gray-400 text-xs">par lot</div>
+                <div class="price-card">
+                    <div class="price-label">Prix vente</div>
+                    <div class="stats-value text-orange-400">{{ lot.sellPricePerLot|format_kamas }}</div>
+                    <div class="price-label">par lot</div>
                 </div>
-                <div class="bg-gray-700 rounded-lg p-3 text-center">
-                    <div class="text-gray-400 text-sm">Profit total</div>
+                <div class="price-card">
+                    <div class="price-label">Profit total</div>
                     {% include 'components/unified_profit_display.html.twig' with {
                         buy_price: lot.buyPricePerLot,
                         sell_price: lot.sellPricePerLot,

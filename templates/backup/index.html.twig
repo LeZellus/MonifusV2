@@ -46,15 +46,14 @@
                         Téléchargez toutes vos données de trading au format JSON. 
                         Ce fichier contient vos profils, personnages, lots, ventes et surveillances.
                     </p>
-                    <a href="{{ path('app_backup_export') }}" 
-                       class="bg-blue-600 hover:bg-blue-700 text-white px-6 py-3 rounded-lg transition-colors inline-block">
+                    <a href="{{ path('app_backup_export') }}" class="btn-primary btn-lg">
                         📥 Télécharger la sauvegarde
                     </a>
                 </div>
 
                 <!-- Import des données -->
                 <div class="wrapper-background">
-                    <div class="flex items-center mb-4">
+                    <div class="flex-start mb-4">
                         <span class="text-2xl mr-3">📤</span>
                         <h3 class="text-white text-lg font-semibold">Importer mes données</h3>
                     </div>
@@ -62,8 +61,7 @@
                         Restaurez vos données depuis un fichier de sauvegarde JSON.
                         Idéal pour migrer ou récupérer vos données.
                     </p>
-                    <a href="{{ path('app_backup_import') }}" 
-                       class="bg-green-600 hover:bg-green-700 text-white px-6 py-3 rounded-lg transition-colors inline-block">
+                    <a href="{{ path('app_backup_import') }}" class="btn-success btn-lg">
                         📤 Importer des données
                     </a>
                 </div>

@@ -12,18 +12,18 @@
             <div class="mt-6 text-center">
                 <div class="wrapper-background max-w-md mx-auto">
                     <h3 class="text-white text-lg font-bold mb-4">Actions du profil</h3>
-                    <div class="space-y-3">
-                        <a href="{{ path('app_profile_edit', {id: selectorData.currentProfile.id}) }}" 
-                           class="bg-orange-600 hover:bg-orange-700 text-white px-4 py-2 rounded-lg transition-colors inline-flex items-center">
-                            <span class="mr-2">✏️</span>
+                    <div class="space-content-sm">
+                        <a href="{{ path('app_profile_edit', {id: selectorData.currentProfile.id}) }}"
+                           class="btn-warning btn-md icon-text">
+                            <span>✏️</span>
                             Modifier le profil
                         </a>
                         {% if profiles|length > 1 %}
-                            <form method="post" action="{{ path('app_profile_delete', {id: selectorData.currentProfile.id}) }}" 
-                                  onsubmit="return confirm('Êtes-vous sûr de vouloir supprimer le profil {{ selectorData.currentProfile.name }} et tous ses personnages ?')" 
+                            <form method="post" action="{{ path('app_profile_delete', {id: selectorData.currentProfile.id}) }}"
+                                  onsubmit="return confirm('Êtes-vous sûr de vouloir supprimer le profil {{ selectorData.currentProfile.name }} et tous ses personnages ?')"
                                   class="inline">
-                                <button type="submit" class="bg-red-600 hover:bg-red-700 text-white px-4 py-2 rounded-lg transition-colors inline-flex items-center">
-                                    <span class="mr-2">🗑️</span>
+                                <button type="submit" class="btn-danger btn-md icon-text">
+                                    <span>🗑️</span>
                                     Supprimer ce profil
                                 </button>
                             </form>

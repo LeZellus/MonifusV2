@@ -91,22 +91,22 @@
                 <span>Ajouter observation</span>
             </a>
             
-            <div class="flex space-x-2">
+            <div class="action-group">
                 <!-- Historique -->
-                <a href="{{ path('app_market_watch_history', {itemId: item.item.id}) }}" 
-                class="bg-blue-600 hover:bg-blue-700 text-white px-3 py-2 rounded-lg text-sm transition-colors"
-                title="Historique">
+                <a href="{{ path('app_market_watch_history', {itemId: item.item.id}) }}"
+                   class="btn-primary market-action-button"
+                   title="Historique">
                     📈
                 </a>
-                
+
                 <!-- Supprimer -->
-                <form method="post" 
-                    action="{{ path('app_market_watch_delete_all_for_item', {itemId: item.item.id}) }}" 
-                    class="inline"
-                    onsubmit="return confirm('Supprimer toutes les observations pour {{ item.item.name }} ?')">
+                <form method="post"
+                      action="{{ path('app_market_watch_delete_all_for_item', {itemId: item.item.id}) }}"
+                      class="inline"
+                      onsubmit="return confirm('Supprimer toutes les observations pour {{ item.item.name }} ?')">
                     <input type="hidden" name="_token" value="{{ csrf_token('delete_all_' ~ item.item.id) }}">
-                    <button type="submit" 
-                            class="bg-red-600 hover:bg-red-700 text-white px-3 py-2 rounded-lg text-sm transition-colors"
+                    <button type="submit"
+                            class="btn-danger market-action-button"
                             title="Supprimer">
                         🗑️
                     </button>

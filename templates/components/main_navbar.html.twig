@@ -24,7 +24,7 @@
                     
                     <!-- Trading -->
                     <div class="relative group">
-                        <button class="text-gray-300 hover:text-white flex items-center transition-colors">
+                        <button class="text-muted hover:text-white flex-start transition-colors">
                             <span class="mr-1">📦</span>
                             Trading
                             <svg class="w-4 h-4 ml-1" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -51,7 +51,7 @@
 
                     <!-- Market Watch -->
                     <div class="relative group">
-                        <button class="text-gray-300 hover:text-white flex items-center transition-colors">
+                        <button class="text-muted hover:text-white flex-start transition-colors">
                             <span class="mr-1">👁️</span>
                             Surveillance
                             <svg class="w-4 h-4 ml-1" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -96,14 +96,14 @@
                 <!-- Actions utilisateur connecté -->
                 <div class="flex items-center space-x-4">
                     <!-- Liens rapides -->
-                    <div class="hidden lg:flex items-center space-x-2">
-                        <a href="{{ path('app_backup_index') }}" 
-                           class="text-gray-400 hover:text-white p-2 rounded-lg transition-colors" 
+                    <div class="hidden lg:flex action-group">
+                        <a href="{{ path('app_backup_index') }}"
+                           class="text-muted hover:text-white p-2 rounded-lg transition-colors"
                            title="Sauvegarde">
                             💾
                         </a>
-                        <a href="{{ path('app_settings_index') }}" 
-                           class="text-gray-400 hover:text-white p-2 rounded-lg transition-colors" 
+                        <a href="{{ path('app_settings_index') }}"
+                           class="text-muted hover:text-white p-2 rounded-lg transition-colors"
                            title="Paramètres">
                             ⚙️
                         </a>

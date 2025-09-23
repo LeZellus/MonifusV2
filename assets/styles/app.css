@@ -393,6 +393,114 @@ body {
 }
 
 /* ============================================
+   ADDITIONAL UTILITY CLASSES
+   ============================================ */
+
+/* Common button sizes */
+.btn-sm {
+    @apply px-3 py-1.5 text-sm rounded;
+}
+
+.btn-md {
+    @apply px-4 py-2 text-sm rounded-lg;
+}
+
+.btn-lg {
+    @apply px-6 py-3 text-base rounded-lg;
+}
+
+/* Outline button variants */
+.btn-outline {
+    @apply border-2 bg-transparent font-medium transition-colors;
+}
+
+.btn-outline-primary {
+    @apply btn-outline border-blue-600 text-blue-600 hover:bg-blue-600 hover:text-white;
+}
+
+.btn-outline-danger {
+    @apply btn-outline border-red-600 text-red-600 hover:bg-red-600 hover:text-white;
+}
+
+.btn-outline-success {
+    @apply btn-outline border-green-600 text-green-600 hover:bg-green-600 hover:text-white;
+}
+
+/* Common cards */
+.card {
+    @apply bg-gray-800 border border-gray-700 rounded-lg p-6;
+}
+
+.card-sm {
+    @apply bg-gray-800 border border-gray-700 rounded-lg p-4;
+}
+
+.card-lg {
+    @apply bg-gray-800 border border-gray-700 rounded-lg p-8;
+}
+
+/* Text emphasis */
+.text-emphasis {
+    @apply text-white font-medium;
+}
+
+.text-muted {
+    @apply text-gray-400;
+}
+
+.text-muted-sm {
+    @apply text-gray-400 text-sm;
+}
+
+/* Common spacings */
+.space-content {
+    @apply space-y-4;
+}
+
+.space-content-sm {
+    @apply space-y-2;
+}
+
+.space-content-lg {
+    @apply space-y-6;
+}
+
+/* Market watch specific */
+.market-card {
+    @apply bg-gray-800/50 border border-gray-600/50 rounded-lg p-4;
+}
+
+.market-action-button {
+    @apply px-3 py-2 rounded-lg text-sm transition-colors inline-flex items-center;
+}
+
+/* Quick layout utilities */
+.flex-between {
+    @apply flex justify-between items-center;
+}
+
+.flex-center {
+    @apply flex justify-center items-center;
+}
+
+.flex-start {
+    @apply flex justify-start items-center;
+}
+
+/* Common gradients */
+.gradient-primary {
+    @apply bg-gradient-to-r from-blue-600 to-purple-600;
+}
+
+.gradient-success {
+    @apply bg-gradient-to-r from-green-600 to-blue-600;
+}
+
+.gradient-warning {
+    @apply bg-gradient-to-r from-orange-600 to-red-600;
+}
+
+/* ============================================
    TOGGLE CSS
    ============================================ */
 
