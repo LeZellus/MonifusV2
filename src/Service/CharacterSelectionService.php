@@ -24,22 +24,21 @@ class CharacterSelectionService
     {
         $session = $this->requestStack->getSession();
         $request = $this->requestStack->getCurrentRequest();
-        
-        $characterId = $session->get('selected_character_id');
-        $selectedProfileId = $session->get('selected_profile_id');
 
-        // Vérifier d'abord si le personnage en session existe
+        // 1. Essayer le personnage en session (priorité absolue)
+        $characterId = $session->get('selected_character_id');
         if ($characterId) {
             $character = $this->findCharacterById($characterId, $user);
             if ($character) {
                 return $character;
             }
+            // Nettoyer la session si le personnage n'existe plus
             $session->remove('selected_character_id');
+            $session->remove('selected_profile_id');
         }
 
-        // Essayer le cookie
+        // 2. Fallback: cookie de dernière session
         $lastCharacterId = $request ? $request->cookies->get("last_character_user_{$user->getId()}") : null;
-        
         if ($lastCharacterId) {
             $lastCharacter = $this->findCharacterById($lastCharacterId, $user);
             if ($lastCharacter) {
@@ -48,41 +47,52 @@ class CharacterSelectionService
             }
         }
 
-        // Fallback : profil sélectionné
+        // 3. Fallback: vérifier s'il y a un profil sélectionné en session
+        $session = $this->requestStack->getSession();
+        $selectedProfileId = $session->get('selected_profile_id');
+
         if ($selectedProfileId) {
-            $firstCharacter = $this->getFirstCharacterForProfile($selectedProfileId, $user);
-            if ($firstCharacter) {
-                $this->setSelectedCharacter($firstCharacter);
-                return $firstCharacter;
+            // Si un profil est sélectionné, chercher un personnage dans ce profil uniquement
+            $firstCharacterForProfile = $this->getFirstCharacterForProfile($selectedProfileId, $user);
+            if ($firstCharacterForProfile) {
+                $this->setSelectedCharacter($firstCharacterForProfile);
+                return $firstCharacterForProfile;
             }
+            // Si le profil sélectionné n'a pas de personnage, retourner null
             return null;
         }
-        
-        // Fallback final
+
+        // 4. Fallback final: premier personnage disponible (seulement si aucun profil spécifique sélectionné)
         $firstCharacter = $this->getFirstCharacterForUser($user);
         if ($firstCharacter) {
             $this->setSelectedCharacter($firstCharacter);
             return $firstCharacter;
         }
-        
+
         return null;
     }
 
     private function findCharacterById(int $characterId, User $user): ?DofusCharacter
     {
         $cacheKey = "character_{$characterId}_user_{$user->getId()}";
-        
+
         return $this->cache->get($cacheKey, function (ItemInterface $item) use ($characterId, $user) {
             $item->expiresAfter(300); // Cache for 5 minutes
-            
-            return $this->characterRepository->createQueryBuilder('c')
-                ->join('c.tradingProfile', 'tp')
-                ->where('c.id = :id')
-                ->andWhere('tp.user = :user')
-                ->setParameter('id', $characterId)
-                ->setParameter('user', $user)
-                ->getQuery()
-                ->getOneOrNullResult();
+
+            try {
+                return $this->characterRepository->createQueryBuilder('c')
+                    ->join('c.tradingProfile', 'tp')
+                    ->where('c.id = :id')
+                    ->andWhere('tp.user = :user')
+                    ->setParameter('id', $characterId)
+                    ->setParameter('user', $user)
+                    ->getQuery()
+                    ->getOneOrNullResult();
+            } catch (\Exception $e) {
+                // En cas d'erreur de base de données, retourner null
+                // et laisser les fallbacks prendre le relais
+                return null;
+            }
         });
     }
 
@@ -98,18 +108,48 @@ class CharacterSelectionService
     public function getUserCharacters(User $user): array
     {
         $cacheKey = "user_characters_{$user->getId()}";
-        
+
         return $this->cache->get($cacheKey, function (ItemInterface $item) use ($user) {
-            $item->expiresAfter(600); // Cache for 10 minutes
-            
+            $item->expiresAfter(300); // Réduit à 5 minutes pour plus de réactivité
+
             return $this->characterRepository->createQueryBuilder('c')
                 ->join('c.tradingProfile', 'tp')
                 ->where('tp.user = :user')
                 ->setParameter('user', $user)
-                ->orderBy('c.name', 'ASC')
+                ->orderBy('tp.name', 'ASC')  // Ordre par profil puis personnage
+                ->addOrderBy('c.name', 'ASC')
                 ->getQuery()
                 ->getResult();
         });
+    }
+
+    /**
+     * Invalide le cache des personnages d'un utilisateur
+     * Appelé automatiquement lors de modifications (création/suppression personnages)
+     */
+    public function invalidateUserCache(User $user): void
+    {
+        try {
+            $userCacheKey = "user_characters_{$user->getId()}";
+            $this->cache->delete($userCacheKey);
+
+            // Invalider aussi les caches individuels des personnages de cet utilisateur
+            $characters = $this->characterRepository->createQueryBuilder('c')
+                ->select('c.id')
+                ->join('c.tradingProfile', 'tp')
+                ->where('tp.user = :user')
+                ->setParameter('user', $user)
+                ->getQuery()
+                ->getArrayResult();
+
+            foreach ($characters as $char) {
+                $charCacheKey = "character_{$char['id']}_user_{$user->getId()}";
+                $this->cache->delete($charCacheKey);
+            }
+        } catch (\Exception $e) {
+            // En cas d'erreur, ne pas faire échouer l'opération principale
+            // L'invalidation du cache n'est pas critique
+        }
     }
 
     private function getFirstCharacterForUser(User $user): ?DofusCharacter

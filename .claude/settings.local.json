@@ -1,0 +1,9 @@
+{
+  "permissions": {
+    "allow": [
+      "Bash(del \"C:\\Users\\mathe\\Documents\\Dev\\MonifusV2\\src\\Command\\TestCharacterSelectionCommand.php\")"
+    ],
+    "deny": [],
+    "ask": []
+  }
+}

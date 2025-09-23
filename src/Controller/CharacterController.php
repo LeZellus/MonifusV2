@@ -44,6 +44,12 @@ class CharacterController extends AbstractController
             return $this->redirectToRoute('app_profile_index');
         }
 
+        // Forcer l'invalidation du cache de l'extension Twig
+        if ($request->hasSession()) {
+            $session = $request->getSession();
+            $session->set('profile_selector_last_update', time());
+        }
+
         $characterService->setSelectedCharacter($character);
         $this->addFlash('success', "Personnage {$character->getName()} sélectionné");
 

@@ -8,6 +8,7 @@ use App\Form\TradingProfileType;
 use App\Form\DofusCharacterType;
 use App\Repository\TradingProfileRepository;
 use App\Service\CharacterSelectionService;
+use App\Service\ProfileSelectorService;
 use Doctrine\ORM\EntityManagerInterface;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\HttpFoundation\Request;
@@ -61,10 +62,11 @@ class ProfileController extends AbstractController
 
     #[Route('/{id}/character/new', name: 'app_profile_character_new')]
     public function newCharacter(
-        TradingProfile $profile, 
-        Request $request, 
+        TradingProfile $profile,
+        Request $request,
         EntityManagerInterface $em,
-        CharacterSelectionService $characterService
+        CharacterSelectionService $characterService,
+        ProfileSelectorService $profileSelectorService
     ): Response {
         if ($profile->getUser() !== $this->getUser()) {
             throw $this->createAccessDeniedException();
@@ -78,9 +80,17 @@ class ProfileController extends AbstractController
             $character->setTradingProfile($profile);
             $em->persist($character);
             $em->flush();
-            
+
+            // Invalider les caches avant de sélectionner le nouveau personnage
+            $characterService->invalidateUserCache($this->getUser());
+            $profileSelectorService->invalidateCache($this->getUser());
+
+            // Forcer l'invalidation du cache de l'extension Twig
+            $session = $request->getSession();
+            $session->set('profile_selector_last_update', time());
+
             $characterService->setSelectedCharacter($character);
-            
+
             $this->addFlash('success', 'Personnage ajouté et sélectionné avec succès !');
             return $this->redirectToRoute('app_profile_index');
         }
@@ -95,10 +105,21 @@ class ProfileController extends AbstractController
     public function selectCharacter(
         DofusCharacter $character,
         CharacterSelectionService $characterService,
+        ProfileSelectorService $profileSelectorService,
         Request $request
     ): Response {
         if ($character->getTradingProfile()->getUser() !== $this->getUser()) {
             throw $this->createAccessDeniedException();
+        }
+
+        // Invalider le cache du sélecteur pour mettre à jour l'affichage
+        $profileSelectorService->invalidateCache($this->getUser());
+
+        // Forcer l'invalidation du cache de l'extension Twig
+        $request = $this->requestStack->getCurrentRequest();
+        if ($request && $request->hasSession()) {
+            $session = $request->getSession();
+            $session->set('profile_selector_last_update', time());
         }
 
         $characterService->setSelectedCharacter($character);
@@ -116,6 +137,7 @@ class ProfileController extends AbstractController
     public function switchProfile(
         TradingProfile $profile,
         CharacterSelectionService $characterService,
+        ProfileSelectorService $profileSelectorService,
         Request $request
     ): Response {
         if ($profile->getUser() !== $this->getUser()) {
@@ -123,20 +145,29 @@ class ProfileController extends AbstractController
         }
 
         $session = $this->requestStack->getSession();
-        
-        // Nettoyer la sélection de personnage
+
+        // Invalider les caches AVANT les modifications pour éviter les données obsolètes
+        $characterService->invalidateUserCache($this->getUser());
+        $profileSelectorService->invalidateCache($this->getUser());
+
+        // Forcer l'invalidation du cache de l'extension Twig
+        $session->set('profile_selector_last_update', time());
+
+        // Nettoyer complètement la session
         $session->remove('selected_character_id');
-        
+        $session->remove('selected_profile_id');
+
         // Sauvegarder le nouveau profil
         $session->set('selected_profile_id', $profile->getId());
 
-        // Sélectionner le premier personnage de ce profil
+        // Sélectionner le premier personnage de ce profil (s'il y en a un)
         $characters = $profile->getDofusCharacters();
         if ($characters->count() > 0) {
             $firstCharacter = $characters->first();
             $characterService->setSelectedCharacter($firstCharacter);
             $this->addFlash('success', "Profil '{$profile->getName()}' activé avec le personnage {$firstCharacter->getName()}");
         } else {
+            // Important: ne PAS appeler setSelectedCharacter si le profil est vide
             $this->addFlash('info', "Profil '{$profile->getName()}' activé. Ajoutez un personnage pour commencer !");
         }
 
@@ -202,7 +233,8 @@ class ProfileController extends AbstractController
     public function deleteCharacter(
         DofusCharacter $character,
         EntityManagerInterface $em,
-        CharacterSelectionService $characterService
+        CharacterSelectionService $characterService,
+        ProfileSelectorService $profileSelectorService
     ): Response {
         if ($character->getTradingProfile()->getUser() !== $this->getUser()) {
             throw $this->createAccessDeniedException();
@@ -217,6 +249,14 @@ class ProfileController extends AbstractController
 
         $em->remove($character);
         $em->flush();
+
+        // Invalider les caches après suppression
+        $characterService->invalidateUserCache($this->getUser());
+        $profileSelectorService->invalidateCache($this->getUser());
+
+        // Forcer l'invalidation du cache de l'extension Twig
+        $session = $this->requestStack->getSession();
+        $session->set('profile_selector_last_update', time());
 
         $this->addFlash('success', 'Personnage supprimé avec succès !');
         return $this->redirectToRoute('app_profile_index');
