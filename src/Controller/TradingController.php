@@ -12,6 +12,8 @@ use Symfony\Component\Security\Http\Attribute\IsGranted;
 use App\Service\TradingCalculatorService;
 use App\Service\NotificationService;
 use App\Service\WidgetService;
+use Symfony\Contracts\Cache\CacheInterface;
+use Symfony\Contracts\Cache\ItemInterface;
 
 #[Route('/trading')]
 #[IsGranted('ROLE_USER')]
@@ -22,10 +24,23 @@ class TradingController extends AbstractController
         TradingProfileRepository $tradingProfileRepository,
         TradingCalculatorService $calculator,
         NotificationService $notificationService,
-        WidgetService $widgetService 
+        WidgetService $widgetService,
+        CacheInterface $cache
     ): Response {
         $user = $this->getUser();
-        $stats = $calculator->getUserTradingStats($user);
+
+        // Cache avec invalidation intelligente basée sur l'activité utilisateur
+        $lastActivity = $cache->get("user_last_activity_{$user->getId()}", function() {
+            return 0;
+        });
+
+        $cacheTime = (time() - $lastActivity < 30) ? 5 : 120; // 5s si activité récente, sinon 2min
+
+        $stats = $cache->get("user_trading_stats_{$user->getId()}", function (ItemInterface $item) use ($calculator, $user, $cacheTime) {
+            $item->expiresAfter($cacheTime);
+            return $calculator->getUserTradingStats($user);
+        });
+
         $notifications = $notificationService->getUserNotifications($user);
         $quickStats = $widgetService->getQuickStats($user);
         

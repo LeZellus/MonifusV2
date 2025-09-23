@@ -8,6 +8,7 @@ use App\Form\LotUnitType;
 use App\Enum\LotStatus;
 use App\Service\CharacterSelectionService;
 use App\Service\ProfileSelectorService;
+use App\Service\CacheInvalidationService;
 use Doctrine\ORM\EntityManagerInterface;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\HttpFoundation\Request;
@@ -25,7 +26,8 @@ class LotSaleController extends AbstractController
         Request $request,
         EntityManagerInterface $em,
         CharacterSelectionService $characterService,
-        ProfileSelectorService $profileSelectorService
+        ProfileSelectorService $profileSelectorService,
+        CacheInvalidationService $cacheInvalidation
     ): Response {
         $selectedCharacter = $characterService->getSelectedCharacter($this->getUser());
 
@@ -90,6 +92,9 @@ class LotSaleController extends AbstractController
             // Invalider le cache des compteurs car le statut des lots a changé
             $profileSelectorService->forceInvalidateCountsCache($this->getUser());
 
+            // Invalider le cache des stats utilisateur
+            $cacheInvalidation->invalidateUserStatsAndMarkActivity($this->getUser());
+
             $message = $remainingQuantity === 0
                 ? "Lot entièrement vendu !"
                 : "Vente partielle effectuée ! Reste {$remainingQuantity} lots.";
@@ -109,7 +114,8 @@ class LotSaleController extends AbstractController
         int $id,
         EntityManagerInterface $em,
         CharacterSelectionService $characterService,
-        ProfileSelectorService $profileSelectorService
+        ProfileSelectorService $profileSelectorService,
+        CacheInvalidationService $cacheInvalidation
     ): Response {
         $selectedCharacter = $characterService->getSelectedCharacter($this->getUser());
         
@@ -146,6 +152,9 @@ class LotSaleController extends AbstractController
 
         // Invalider le cache des compteurs car le statut des lots a changé
         $profileSelectorService->forceInvalidateCountsCache($this->getUser());
+
+        // Invalider le cache des stats utilisateur
+        $cacheInvalidation->invalidateUserStatsAndMarkActivity($this->getUser());
 
         $this->addFlash('success', "Vente annulée ! {$quantityToRestore} lots restaurés.");
         return $this->redirectToRoute('app_lot_index');

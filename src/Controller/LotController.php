@@ -9,6 +9,7 @@ use App\Form\LotGroupType;
 use App\Repository\LotGroupRepository;
 use App\Service\CharacterSelectionService;
 use App\Service\ProfileSelectorService;
+use App\Service\CacheInvalidationService;
 use Doctrine\ORM\EntityManagerInterface;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\HttpFoundation\JsonResponse;
@@ -86,7 +87,8 @@ class LotController extends AbstractController
         Request $request,
         EntityManagerInterface $em,
         CharacterSelectionService $characterService,
-        ProfileSelectorService $profileSelectorService
+        ProfileSelectorService $profileSelectorService,
+        CacheInvalidationService $cacheInvalidation
     ): Response {
         $selectedCharacter = $characterService->getSelectedCharacter($this->getUser());
         
@@ -121,6 +123,9 @@ class LotController extends AbstractController
                     // Invalider le cache des compteurs pour mise à jour immédiate
                     $profileSelectorService->forceInvalidateCountsCache($this->getUser());
 
+                    // Invalider le cache des stats utilisateur
+                    $cacheInvalidation->invalidateUserStatsAndMarkActivity($this->getUser());
+
                     $this->addFlash('success', 'Lot ajouté avec succès !');
                     return $this->redirectToRoute('app_lot_index');
                 }
@@ -144,7 +149,7 @@ class LotController extends AbstractController
     }
 
     #[Route('/{id}/edit', name: 'app_lot_edit', methods: ['GET', 'POST'])]
-    public function edit(Request $request, LotGroup $lotGroup, EntityManagerInterface $em): Response
+    public function edit(Request $request, LotGroup $lotGroup, EntityManagerInterface $em, CacheInvalidationService $cacheInvalidation): Response
     {
         $form = $this->createForm(LotGroupType::class, $lotGroup, [
             'is_edit' => true,
@@ -154,6 +159,10 @@ class LotController extends AbstractController
         $form->handleRequest($request);
         if ($form->isSubmitted() && $form->isValid()) {
             $em->flush();
+
+            // Invalider le cache des stats utilisateur
+            $cacheInvalidation->invalidateUserStatsAndMarkActivity($this->getUser());
+
             $this->addFlash('success', 'Lot modifié avec succès !');
             return $this->redirectToRoute('app_lot_index');
         }
@@ -169,7 +178,8 @@ class LotController extends AbstractController
         Request $request,
         LotGroup $lotGroup,
         EntityManagerInterface $em,
-        ProfileSelectorService $profileSelectorService
+        ProfileSelectorService $profileSelectorService,
+        CacheInvalidationService $cacheInvalidation
     ): Response {
         if ($this->isCsrfTokenValid('delete'.$lotGroup->getId(), $request->getPayload()->getString('_token'))) {
             $em->remove($lotGroup);
@@ -177,6 +187,9 @@ class LotController extends AbstractController
 
             // Invalider le cache des compteurs pour mise à jour immédiate
             $profileSelectorService->forceInvalidateCountsCache($this->getUser());
+
+            // Invalider le cache des stats utilisateur
+            $cacheInvalidation->invalidateUserStatsAndMarkActivity($this->getUser());
 
             $this->addFlash('success', 'Lot supprimé avec succès !');
         }

@@ -3,7 +3,9 @@
     "allow": [
       "Bash(del \"C:\\Users\\mathe\\Documents\\Dev\\MonifusV2\\src\\Command\\TestCharacterSelectionCommand.php\")",
       "Bash(del \"C:\\Users\\mathe\\Documents\\Dev\\MonifusV2\\src\\Controller\\DebugProfileController.php\")",
-      "Bash(php:*)"
+      "Bash(php:*)",
+      "Bash(del test_cache.php)",
+      "Bash(vendor/bin/phpunit:*)"
     ],
     "deny": [],
     "ask": []

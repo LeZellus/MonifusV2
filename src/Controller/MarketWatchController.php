@@ -8,6 +8,7 @@ use App\Form\MarketWatchType;
 use App\Repository\MarketWatchRepository;
 use App\Service\CharacterSelectionService;
 use App\Service\ProfileSelectorService;
+use App\Service\CacheInvalidationService;
 use Doctrine\ORM\EntityManagerInterface;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\HttpFoundation\Request;
@@ -49,6 +50,7 @@ class MarketWatchController extends AbstractController
         ItemRepository $itemRepository,
         CharacterSelectionService $characterService,
         ProfileSelectorService $profileSelectorService,
+        CacheInvalidationService $cacheInvalidation,
         ?int $itemId = null
     ): Response {
         $selectedCharacter = $characterService->getSelectedCharacter($this->getUser());
@@ -112,6 +114,9 @@ class MarketWatchController extends AbstractController
             // Invalider le cache des compteurs pour mise à jour immédiate
             $profileSelectorService->forceInvalidateCountsCache($this->getUser());
 
+            // Invalider le cache des stats utilisateur
+            $cacheInvalidation->invalidateUserStatsAndMarkActivity($this->getUser());
+
             $itemName = $marketWatch->getItem()->getName();
             $this->addFlash('success', "Observation ajoutée pour {$itemName} !");
             return $this->redirectToRoute('app_market_watch_index');
@@ -126,10 +131,11 @@ class MarketWatchController extends AbstractController
 
     #[Route('/{id}/edit', name: 'app_market_watch_edit')]
     public function edit(
-        MarketWatch $marketWatch, 
-        Request $request, 
+        MarketWatch $marketWatch,
+        Request $request,
         EntityManagerInterface $em,
-        CharacterSelectionService $characterService
+        CharacterSelectionService $characterService,
+        CacheInvalidationService $cacheInvalidation
     ): Response {
         $selectedCharacter = $characterService->getSelectedCharacter($this->getUser());
 
@@ -142,6 +148,10 @@ class MarketWatchController extends AbstractController
         $form->handleRequest($request);
         if ($form->isSubmitted() && $form->isValid()) {
             $em->flush();
+
+            // Invalider le cache des stats utilisateur
+            $cacheInvalidation->invalidateUserStatsAndMarkActivity($this->getUser());
+
             $this->addFlash('success', 'Observation modifiée avec succès !');
             return $this->redirectToRoute('app_market_watch_index');
         }
@@ -157,7 +167,8 @@ class MarketWatchController extends AbstractController
         MarketWatch $marketWatch,
         EntityManagerInterface $em,
         CharacterSelectionService $characterService,
-        ProfileSelectorService $profileSelectorService
+        ProfileSelectorService $profileSelectorService,
+        CacheInvalidationService $cacheInvalidation
     ): Response {
         $selectedCharacter = $characterService->getSelectedCharacter($this->getUser());
 
@@ -171,6 +182,9 @@ class MarketWatchController extends AbstractController
         // Invalider le cache des compteurs pour mise à jour immédiate
         $profileSelectorService->forceInvalidateCountsCache($this->getUser());
 
+        // Invalider le cache des stats utilisateur
+        $cacheInvalidation->invalidateUserStatsAndMarkActivity($this->getUser());
+
         $this->addFlash('success', 'Observation supprimée avec succès !');
         return $this->redirectToRoute('app_market_watch_index');
     }
@@ -181,7 +195,8 @@ class MarketWatchController extends AbstractController
         MarketWatchRepository $marketWatchRepository,
         CharacterSelectionService $characterService,
         EntityManagerInterface $em,
-        ProfileSelectorService $profileSelectorService
+        ProfileSelectorService $profileSelectorService,
+        CacheInvalidationService $cacheInvalidation
     ): Response {
         $selectedCharacter = $characterService->getSelectedCharacter($this->getUser());
         
@@ -204,6 +219,9 @@ class MarketWatchController extends AbstractController
 
         // Invalider le cache des compteurs pour mise à jour immédiate
         $profileSelectorService->forceInvalidateCountsCache($this->getUser());
+
+        // Invalider le cache des stats utilisateur
+        $cacheInvalidation->invalidateUserStatsAndMarkActivity($this->getUser());
 
         $this->addFlash('success', count($observations) . ' observation(s) supprimée(s) pour ' . $observations[0]->getItem()->getName());
         return $this->redirectToRoute('app_market_watch_index');
