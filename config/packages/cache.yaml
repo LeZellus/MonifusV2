@@ -8,11 +8,11 @@ framework:
         # Other options include:
 
         # Redis (recommended for production)
-        app: cache.adapter.redis
-        default_redis_provider: '%env(default:default_redis_url:REDIS_URL)%'
+        # app: cache.adapter.redis
+        # default_redis_provider: '%env(default:default_redis_url:REDIS_URL)%'
 
-        # APCu fallback for when Redis is not available
-        # app: cache.adapter.apcu
+        # Filesystem cache (development default)
+        app: cache.adapter.filesystem
 
         # Namespaced pools use the above "app" backend by default
         pools:
