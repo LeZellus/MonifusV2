@@ -33,12 +33,12 @@ class HomeController extends AbstractController
         }
 
         $stats = $this->cache->get('home_global_stats', function (ItemInterface $item) {
-            $item->expiresAfter(300); // Cache for 5 minutes
+            $item->expiresAfter(1800); // Cache for 30 minutes
             return $this->calculateGlobalStats();
         });
 
         $basicCounts = $this->cache->get('home_basic_counts', function (ItemInterface $item) {
-            $item->expiresAfter(600); // Cache for 10 minutes
+            $item->expiresAfter(3600); // Cache for 1 hour
             return [
                 'users_count' => $this->userRepository->count([]),
                 'classes_count' => $this->classeRepository->count([]),
