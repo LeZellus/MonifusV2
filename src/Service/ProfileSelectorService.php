@@ -8,6 +8,8 @@ use App\Repository\TradingProfileRepository;
 use App\Repository\DofusCharacterRepository;
 use App\Repository\LotGroupRepository;
 use App\Repository\MarketWatchRepository;
+use App\Repository\LotUnitRepository;
+use App\Enum\LotStatus;
 use Symfony\Component\Security\Core\User\UserInterface;
 use Symfony\Component\HttpFoundation\RequestStack;
 use Symfony\Contracts\Cache\CacheInterface;
@@ -21,6 +23,7 @@ class ProfileSelectorService
         private RequestStack $requestStack,
         private LotGroupRepository $lotGroupRepository,
         private MarketWatchRepository $marketWatchRepository,
+        private LotUnitRepository $lotUnitRepository,
         private CacheInterface $cache
     ) {}
 
@@ -52,7 +55,8 @@ class ProfileSelectorService
             foreach ($profiles as $profile) {
                 foreach ($profile->getDofusCharacters() as $character) {
                     $characterId = $character->getId();
-                    $character->tempLotsCount = $characterCounts[$characterId]['lots'] ?? 0;
+                    $character->tempLotsAvailable = $characterCounts[$characterId]['lots_available'] ?? 0;
+                    $character->tempSalesTransactions = $characterCounts[$characterId]['sales_transactions'] ?? 0;
                     $character->tempWatchesCount = $characterCounts[$characterId]['watches'] ?? 0;
                 }
             }
@@ -99,16 +103,16 @@ class ProfileSelectorService
         $cacheKey = "character_counts_user_{$user->getId()}";
 
         return $this->cache->get($cacheKey, function (ItemInterface $item) use ($user) {
-            $item->expiresAfter(300); // Cache for 5 minutes
+            $item->expiresAfter(60); // Cache for 1 minute (shorter for faster updates)
 
-            // Get lot counts for all user characters in one query
+            // Get lot counts by status for all user characters
             $lotCounts = $this->lotGroupRepository->createQueryBuilder('lg')
-                ->select('c.id as character_id, COUNT(lg.id) as lot_count')
+                ->select('c.id as character_id, lg.status, COUNT(lg.id) as lot_count')
                 ->join('lg.dofusCharacter', 'c')
                 ->join('c.tradingProfile', 'tp')
                 ->where('tp.user = :user')
                 ->setParameter('user', $user)
-                ->groupBy('c.id')
+                ->groupBy('c.id', 'lg.status')
                 ->getQuery()
                 ->getArrayResult();
 
@@ -123,15 +127,69 @@ class ProfileSelectorService
                 ->getQuery()
                 ->getArrayResult();
 
+            // Get sale counts for all user characters (LotUnit transactions)
+            $saleCounts = $this->lotUnitRepository->createQueryBuilder('lu')
+                ->select('c.id as character_id, COUNT(lu.id) as sale_count')
+                ->join('lu.lotGroup', 'lg')
+                ->join('lg.dofusCharacter', 'c')
+                ->join('c.tradingProfile', 'tp')
+                ->where('tp.user = :user')
+                ->setParameter('user', $user)
+                ->groupBy('c.id')
+                ->getQuery()
+                ->getArrayResult();
+
             // Combine results
             $counts = [];
 
+            // Process lot counts by status
             foreach ($lotCounts as $row) {
-                $counts[$row['character_id']]['lots'] = (int)$row['lot_count'];
+                $characterId = $row['character_id'];
+                $status = $row['status']->value;
+                $count = (int)$row['lot_count'];
+
+                if (!isset($counts[$characterId])) {
+                    $counts[$characterId] = [
+                        'lots_available' => 0,
+                        'lots_sold' => 0,
+                        'sales_transactions' => 0,
+                        'watches' => 0
+                    ];
+                }
+
+                if ($status === 'available') {
+                    $counts[$characterId]['lots_available'] = $count;
+                } elseif ($status === 'sold') {
+                    $counts[$characterId]['lots_sold'] = $count;
+                }
             }
 
+            // Process watch counts
             foreach ($watchCounts as $row) {
-                $counts[$row['character_id']]['watches'] = (int)$row['watch_count'];
+                $characterId = $row['character_id'];
+                if (!isset($counts[$characterId])) {
+                    $counts[$characterId] = [
+                        'lots_available' => 0,
+                        'lots_sold' => 0,
+                        'sales_transactions' => 0,
+                        'watches' => 0
+                    ];
+                }
+                $counts[$characterId]['watches'] = (int)$row['watch_count'];
+            }
+
+            // Process sale counts (LotUnit transactions)
+            foreach ($saleCounts as $row) {
+                $characterId = $row['character_id'];
+                if (!isset($counts[$characterId])) {
+                    $counts[$characterId] = [
+                        'lots_available' => 0,
+                        'lots_sold' => 0,
+                        'sales_transactions' => 0,
+                        'watches' => 0
+                    ];
+                }
+                $counts[$characterId]['sales_transactions'] = (int)$row['sale_count'];
             }
 
             return $counts;
@@ -152,6 +210,19 @@ class ProfileSelectorService
             // est mis à jour dans le controller pour forcer le bypass du cache
         } catch (\Exception $e) {
             // En cas d'erreur, ne pas faire échouer l'opération principale
+        }
+    }
+
+    /**
+     * Force l'invalidation immédiate du cache des compteurs
+     */
+    public function forceInvalidateCountsCache(UserInterface $user): void
+    {
+        try {
+            $characterCountsKey = "character_counts_user_{$user->getId()}";
+            $this->cache->delete($characterCountsKey);
+        } catch (\Exception $e) {
+            // Ignorer les erreurs
         }
     }
 }

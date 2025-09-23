@@ -130,8 +130,20 @@
                                             <div class="text-white font-medium">{{ character.name }}</div>
                                             <div class="text-gray-400 text-sm">{{ character.classe.name }} • {{ character.server.name }}</div>
                                             <div class="flex space-x-2 text-xs mt-1">
-                                                <span class="text-green-400">📦 {{ character.tempLotsCount ?? 0 }}</span>
-                                                <span class="text-orange-400">👁️ {{ character.tempWatchesCount ?? 0 }}</span>
+                                                {% set availableLots = character.tempLotsAvailable ?? 0 %}
+                                                {% set salesTransactions = character.tempSalesTransactions ?? 0 %}
+
+                                                {% if availableLots > 0 %}
+                                                    <span class="text-green-400" title="Lots disponibles">📦 {{ availableLots }}</span>
+                                                {% else %}
+                                                    <span class="text-gray-500">📦 0</span>
+                                                {% endif %}
+
+                                                {% if salesTransactions > 0 %}
+                                                    <span class="text-gray-400" title="Transactions de vente">💰 {{ salesTransactions }}</span>
+                                                {% endif %}
+
+                                                <span class="text-orange-400" title="Observations">👁️ {{ character.tempWatchesCount ?? 0 }}</span>
                                             </div>
                                         </div>
                                         {% if selectorData.selectedCharacter and selectorData.selectedCharacter.id == character.id %}

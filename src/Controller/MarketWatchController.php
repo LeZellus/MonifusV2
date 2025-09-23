@@ -7,6 +7,7 @@ use App\Entity\DofusCharacter;
 use App\Form\MarketWatchType;
 use App\Repository\MarketWatchRepository;
 use App\Service\CharacterSelectionService;
+use App\Service\ProfileSelectorService;
 use Doctrine\ORM\EntityManagerInterface;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\HttpFoundation\Request;
@@ -43,10 +44,11 @@ class MarketWatchController extends AbstractController
     
     #[Route('/new/{itemId}', name: 'app_market_watch_new', requirements: ['itemId' => '\d+'], defaults: ['itemId' => null])]
     public function new(
-        Request $request, 
+        Request $request,
         EntityManagerInterface $em,
         ItemRepository $itemRepository,
         CharacterSelectionService $characterService,
+        ProfileSelectorService $profileSelectorService,
         ?int $itemId = null
     ): Response {
         $selectedCharacter = $characterService->getSelectedCharacter($this->getUser());
@@ -107,6 +109,9 @@ class MarketWatchController extends AbstractController
             $em->persist($marketWatch);
             $em->flush();
 
+            // Invalider le cache des compteurs pour mise à jour immédiate
+            $profileSelectorService->forceInvalidateCountsCache($this->getUser());
+
             $itemName = $marketWatch->getItem()->getName();
             $this->addFlash('success', "Observation ajoutée pour {$itemName} !");
             return $this->redirectToRoute('app_market_watch_index');
@@ -149,9 +154,10 @@ class MarketWatchController extends AbstractController
 
     #[Route('/{id}/delete', name: 'app_market_watch_delete', methods: ['POST'])]
     public function delete(
-        MarketWatch $marketWatch, 
+        MarketWatch $marketWatch,
         EntityManagerInterface $em,
-        CharacterSelectionService $characterService
+        CharacterSelectionService $characterService,
+        ProfileSelectorService $profileSelectorService
     ): Response {
         $selectedCharacter = $characterService->getSelectedCharacter($this->getUser());
 
@@ -162,6 +168,9 @@ class MarketWatchController extends AbstractController
         $em->remove($marketWatch);
         $em->flush();
 
+        // Invalider le cache des compteurs pour mise à jour immédiate
+        $profileSelectorService->forceInvalidateCountsCache($this->getUser());
+
         $this->addFlash('success', 'Observation supprimée avec succès !');
         return $this->redirectToRoute('app_market_watch_index');
     }
@@ -171,7 +180,8 @@ class MarketWatchController extends AbstractController
         int $itemId,
         MarketWatchRepository $marketWatchRepository,
         CharacterSelectionService $characterService,
-        EntityManagerInterface $em
+        EntityManagerInterface $em,
+        ProfileSelectorService $profileSelectorService
     ): Response {
         $selectedCharacter = $characterService->getSelectedCharacter($this->getUser());
         
@@ -191,6 +201,9 @@ class MarketWatchController extends AbstractController
             $em->remove($observation);
         }
         $em->flush();
+
+        // Invalider le cache des compteurs pour mise à jour immédiate
+        $profileSelectorService->forceInvalidateCountsCache($this->getUser());
 
         $this->addFlash('success', count($observations) . ' observation(s) supprimée(s) pour ' . $observations[0]->getItem()->getName());
         return $this->redirectToRoute('app_market_watch_index');

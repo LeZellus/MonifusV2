@@ -7,6 +7,7 @@ use App\Entity\LotUnit;
 use App\Form\LotUnitType;
 use App\Enum\LotStatus;
 use App\Service\CharacterSelectionService;
+use App\Service\ProfileSelectorService;
 use Doctrine\ORM\EntityManagerInterface;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\HttpFoundation\Request;
@@ -20,10 +21,11 @@ class LotSaleController extends AbstractController
 {
     #[Route('/{id}/sell', name: 'app_lot_sell')]
     public function sell(
-        LotGroup $lotGroup, 
-        Request $request, 
+        LotGroup $lotGroup,
+        Request $request,
         EntityManagerInterface $em,
-        CharacterSelectionService $characterService
+        CharacterSelectionService $characterService,
+        ProfileSelectorService $profileSelectorService
     ): Response {
         $selectedCharacter = $characterService->getSelectedCharacter($this->getUser());
 
@@ -85,10 +87,13 @@ class LotSaleController extends AbstractController
 
             $em->flush();
 
-            $message = $remainingQuantity === 0 
-                ? "Lot entièrement vendu !" 
+            // Invalider le cache des compteurs car le statut des lots a changé
+            $profileSelectorService->forceInvalidateCountsCache($this->getUser());
+
+            $message = $remainingQuantity === 0
+                ? "Lot entièrement vendu !"
                 : "Vente partielle effectuée ! Reste {$remainingQuantity} lots.";
-                
+
             $this->addFlash('success', $message);
             return $this->redirectToRoute('app_lot_index');
         }
@@ -103,7 +108,8 @@ class LotSaleController extends AbstractController
     public function cancelSale(
         int $id,
         EntityManagerInterface $em,
-        CharacterSelectionService $characterService
+        CharacterSelectionService $characterService,
+        ProfileSelectorService $profileSelectorService
     ): Response {
         $selectedCharacter = $characterService->getSelectedCharacter($this->getUser());
         
@@ -137,6 +143,9 @@ class LotSaleController extends AbstractController
         // ✅ Supprimer la vente
         $em->remove($lotUnit);
         $em->flush();
+
+        // Invalider le cache des compteurs car le statut des lots a changé
+        $profileSelectorService->forceInvalidateCountsCache($this->getUser());
 
         $this->addFlash('success', "Vente annulée ! {$quantityToRestore} lots restaurés.");
         return $this->redirectToRoute('app_lot_index');

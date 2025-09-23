@@ -8,6 +8,7 @@ use App\Entity\DofusCharacter;
 use App\Form\LotGroupType;
 use App\Repository\LotGroupRepository;
 use App\Service\CharacterSelectionService;
+use App\Service\ProfileSelectorService;
 use Doctrine\ORM\EntityManagerInterface;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\HttpFoundation\JsonResponse;
@@ -82,9 +83,10 @@ class LotController extends AbstractController
 
     #[Route('/new', name: 'app_lot_new')]
     public function new(
-        Request $request, 
-        EntityManagerInterface $em, 
-        CharacterSelectionService $characterService
+        Request $request,
+        EntityManagerInterface $em,
+        CharacterSelectionService $characterService,
+        ProfileSelectorService $profileSelectorService
     ): Response {
         $selectedCharacter = $characterService->getSelectedCharacter($this->getUser());
         
@@ -115,6 +117,9 @@ class LotController extends AbstractController
 
                     $em->persist($lotGroup);
                     $em->flush();
+
+                    // Invalider le cache des compteurs pour mise à jour immédiate
+                    $profileSelectorService->forceInvalidateCountsCache($this->getUser());
 
                     $this->addFlash('success', 'Lot ajouté avec succès !');
                     return $this->redirectToRoute('app_lot_index');
@@ -160,11 +165,19 @@ class LotController extends AbstractController
     }
 
     #[Route('/{id}', name: 'app_lot_delete', methods: ['POST'])]
-    public function delete(Request $request, LotGroup $lotGroup, EntityManagerInterface $em): Response
-    {
+    public function delete(
+        Request $request,
+        LotGroup $lotGroup,
+        EntityManagerInterface $em,
+        ProfileSelectorService $profileSelectorService
+    ): Response {
         if ($this->isCsrfTokenValid('delete'.$lotGroup->getId(), $request->getPayload()->getString('_token'))) {
             $em->remove($lotGroup);
             $em->flush();
+
+            // Invalider le cache des compteurs pour mise à jour immédiate
+            $profileSelectorService->forceInvalidateCountsCache($this->getUser());
+
             $this->addFlash('success', 'Lot supprimé avec succès !');
         }
 
