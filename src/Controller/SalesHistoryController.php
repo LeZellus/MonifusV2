@@ -38,7 +38,6 @@ class SalesHistoryController extends AbstractController
         return $this->render('sales_history/index.html.twig', [
             'sales' => $sales,
             'characters' => $characters,
-            'selectedCharacter' => $selectedCharacter,
             ...$stats,
             'current_filters' => ['period' => $periodFilter],
         ]);

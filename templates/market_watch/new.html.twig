@@ -1,7 +1,7 @@
 {% extends 'base.html.twig' %}
 
 {% block title %}
-    {% if preselected_item is defined %}
+    {% if preselected_item is defined and preselected_item is not null %}
         Nouvelle observation - {{ preselected_item.name }}
     {% else %}
         Nouvelle observation - {{ character.name }}
@@ -10,7 +10,7 @@
 
 {% block body %}
     <div class="max-w-2xl mx-auto py-4">
-        {% if preselected_item is defined %}
+        {% if preselected_item is defined and preselected_item is not null %}
             <!-- Breadcrumb pour item prérempli -->
             <div class="mb-4">
                 <nav class="text-sm text-gray-400">

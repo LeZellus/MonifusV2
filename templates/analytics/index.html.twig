@@ -8,7 +8,7 @@
 
     <div class="wrapper-container">
         <div class="grid gap-4">
-            {% if stats and (selectedCharacter or stats.global.totalLots > 0) %}
+            {% if stats and (selectorData.selectedCharacter or stats.global.totalLots > 0) %}
                 <!-- Statistiques principales reorganisées -->
                 <div class="grid md:grid-cols-3 gap-4">
                     <!-- Ligne 1: Investissements -->
@@ -306,8 +306,8 @@
                 {% include 'components/empty_state.html.twig' with {
                     type: 'no_data',
                     title: 'Aucune donnée disponible',
-                    message: selectedCharacter ? 'Aucun lot trouvé pour ce personnage.' : 'Sélectionnez un personnage pour voir ses statistiques.',
-                    action: selectedCharacter ? {
+                    message: selectorData.selectedCharacter ? 'Aucun lot trouvé pour ce personnage.' : 'Sélectionnez un personnage pour voir ses statistiques.',
+                    action: selectorData.selectedCharacter ? {
                         url: path('app_lot_new'),
                         text: 'Créer le premier lot',
                         icon: '📦'

@@ -28,7 +28,7 @@ class LotSaleController extends AbstractController
         $selectedCharacter = $characterService->getSelectedCharacter($this->getUser());
 
         // Vérifications de sécurité
-        if ($lotGroup->getDofusCharacter() !== $selectedCharacter) {
+        if (!$selectedCharacter || $lotGroup->getDofusCharacter()->getId() !== $selectedCharacter->getId()) {
             throw $this->createAccessDeniedException();
         }
 
@@ -121,7 +121,7 @@ class LotSaleController extends AbstractController
         $lotGroup = $lotUnit->getLotGroup();
         
         // Vérification de sécurité
-        if ($lotGroup->getDofusCharacter() !== $selectedCharacter) {
+        if ($lotGroup->getDofusCharacter()->getId() !== $selectedCharacter->getId()) {
             throw $this->createAccessDeniedException();
         }
 

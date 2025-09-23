@@ -191,4 +191,9 @@ class DofusCharacter
     {
         return $this->updatedAt;
     }
+
+    public function __toString(): string
+    {
+        return sprintf('DofusCharacter(id=%d, name=%s)', $this->id ?? 0, $this->name ?? 'unknown');
+    }
 }

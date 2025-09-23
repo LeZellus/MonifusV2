@@ -3,6 +3,7 @@
 namespace App\Controller;
 
 use App\Entity\MarketWatch;
+use App\Entity\DofusCharacter;
 use App\Form\MarketWatchType;
 use App\Repository\MarketWatchRepository;
 use App\Service\CharacterSelectionService;
@@ -36,7 +37,6 @@ class MarketWatchController extends AbstractController
         return $this->render('market_watch/index.html.twig', [
             'items_data' => $itemsData,
             'characters' => $characters,
-            'selectedCharacter' => $selectedCharacter,
         ]);
     }
 
@@ -95,9 +95,15 @@ class MarketWatchController extends AbstractController
                 // Item prérempli
                 $marketWatch->setItem($preselectedItem);
             }
-            
-            $marketWatch->setDofusCharacter($selectedCharacter);
-            
+
+            // S'assurer que le personnage est managé par Doctrine
+            $managedCharacter = $em->getRepository(DofusCharacter::class)->find($selectedCharacter->getId());
+            if (!$managedCharacter) {
+                $this->addFlash('error', 'Personnage introuvable.');
+                return $this->redirectToRoute('app_profile_index');
+            }
+            $marketWatch->setDofusCharacter($managedCharacter);
+
             $em->persist($marketWatch);
             $em->flush();
 
@@ -122,7 +128,7 @@ class MarketWatchController extends AbstractController
     ): Response {
         $selectedCharacter = $characterService->getSelectedCharacter($this->getUser());
 
-        if ($marketWatch->getDofusCharacter() !== $selectedCharacter) {
+        if ($marketWatch->getDofusCharacter()->getId() !== $selectedCharacter->getId()) {
             throw $this->createAccessDeniedException();
         }
 
@@ -149,7 +155,7 @@ class MarketWatchController extends AbstractController
     ): Response {
         $selectedCharacter = $characterService->getSelectedCharacter($this->getUser());
 
-        if ($marketWatch->getDofusCharacter() !== $selectedCharacter) {
+        if ($marketWatch->getDofusCharacter()->getId() !== $selectedCharacter->getId()) {
             throw $this->createAccessDeniedException();
         }
 

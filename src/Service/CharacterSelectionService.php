@@ -37,17 +37,7 @@ class CharacterSelectionService
             $session->remove('selected_profile_id');
         }
 
-        // 2. Fallback: cookie de dernière session
-        $lastCharacterId = $request ? $request->cookies->get("last_character_user_{$user->getId()}") : null;
-        if ($lastCharacterId) {
-            $lastCharacter = $this->findCharacterById($lastCharacterId, $user);
-            if ($lastCharacter) {
-                $this->setSelectedCharacter($lastCharacter);
-                return $lastCharacter;
-            }
-        }
-
-        // 3. Fallback: vérifier s'il y a un profil sélectionné en session
+        // 2. Fallback: vérifier s'il y a un profil sélectionné en session AVANT le cookie
         $session = $this->requestStack->getSession();
         $selectedProfileId = $session->get('selected_profile_id');
 
@@ -59,7 +49,18 @@ class CharacterSelectionService
                 return $firstCharacterForProfile;
             }
             // Si le profil sélectionné n'a pas de personnage, retourner null
+            // IMPORTANT: ne pas utiliser le cookie dans ce cas !
             return null;
+        }
+
+        // 3. Fallback: cookie de dernière session (seulement si aucun profil explicite)
+        $lastCharacterId = $request ? $request->cookies->get("last_character_user_{$user->getId()}") : null;
+        if ($lastCharacterId) {
+            $lastCharacter = $this->findCharacterById($lastCharacterId, $user);
+            if ($lastCharacter) {
+                $this->setSelectedCharacter($lastCharacter);
+                return $lastCharacter;
+            }
         }
 
         // 4. Fallback final: premier personnage disponible (seulement si aucun profil spécifique sélectionné)

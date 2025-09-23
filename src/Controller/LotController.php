@@ -4,6 +4,7 @@ namespace App\Controller;
 
 use App\Entity\LotGroup;
 use App\Entity\Item;
+use App\Entity\DofusCharacter;
 use App\Form\LotGroupType;
 use App\Repository\LotGroupRepository;
 use App\Service\CharacterSelectionService;
@@ -35,7 +36,6 @@ class LotController extends AbstractController
         return $this->render('lot/index.html.twig', [
             'lots' => $lots,
             'characters' => $characters,
-            'selectedCharacter' => $selectedCharacter,
         ]);
     }
 
@@ -99,13 +99,20 @@ class LotController extends AbstractController
         $form->handleRequest($request);
         if ($form->isSubmitted() && $form->isValid()) {
             $itemId = $form->get('item')->getData();
-            
+
             if ($itemId) {
                 $item = $em->getRepository(Item::class)->find($itemId);
                 if ($item) {
+                    // S'assurer que le personnage est managé par Doctrine
+                    $managedCharacter = $em->getRepository(DofusCharacter::class)->find($selectedCharacter->getId());
+                    if (!$managedCharacter) {
+                        $this->addFlash('error', 'Personnage introuvable.');
+                        return $this->redirectToRoute('app_profile_index');
+                    }
+
                     $lotGroup->setItem($item);
-                    $lotGroup->setDofusCharacter($selectedCharacter);
-                    
+                    $lotGroup->setDofusCharacter($managedCharacter);
+
                     $em->persist($lotGroup);
                     $em->flush();
 

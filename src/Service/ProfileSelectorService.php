@@ -147,9 +147,9 @@ class ProfileSelectorService
             $characterCountsKey = "character_counts_user_{$user->getId()}";
             $this->cache->delete($characterCountsKey);
 
-            // Invalider aussi le cache global de l'extension Twig
-            $selectorKey = "profile_selector_data_user_{$user->getId()}";
-            $this->cache->delete($selectorKey);
+            // L'extension Twig utilise un système de cache-busting avec timestamp
+            // Pas besoin d'invalider manuellement car profile_selector_last_update
+            // est mis à jour dans le controller pour forcer le bypass du cache
         } catch (\Exception $e) {
             // En cas d'erreur, ne pas faire échouer l'opération principale
         }
