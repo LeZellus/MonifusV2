@@ -12,7 +12,8 @@
       "Bash(del \"C:\\Users\\mathe\\Documents\\Dev\\MonifusV2\\templates\\components\\unified_profit_display.html.twig\")",
       "Bash(find:*)",
       "Bash(del \"C:\\Users\\mathe\\Documents\\Dev\\MonifusV2\\src\\Controller\\CompareProfileDebugController.php\")",
-      "Bash(wc:*)"
+      "Bash(wc:*)",
+      "Bash(del \"C:\\Users\\mathe\\Documents\\Dev\\MonifusV2\\src\\Command\\DebugEnutrofCommand.php\")"
     ],
     "deny": [],
     "ask": []

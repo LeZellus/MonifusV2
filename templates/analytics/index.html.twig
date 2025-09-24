@@ -7,305 +7,304 @@
 {% include 'components/profile_selector.html.twig' %}
 
     <div class="wrapper-container">
-        <div class="grid gap-4">
-            {% if stats and (selectorData.selectedCharacter or stats.global.totalLots > 0) %}
-                <!-- Statistiques principales reorganisées -->
-                <div class="grid md:grid-cols-3 gap-4">
-                    <!-- Ligne 1: Investissements -->
-                    {% include 'components/stats_card.html.twig' with {
-                        title: 'Investi Total',
-                        value: stats.global.totalInvestment,
-                        unit: 'kamas',
-                        subtitle: 'Historique complet',
-                        icon: '💰',
-                        color: 'purple'
-                    } %}
-                    
-                    {% include 'components/stats_card.html.twig' with {
-                        title: 'Investi en cours',
-                        value: stats.global.currentInvestment,
-                        unit: 'kamas',
-                        subtitle: stats.global.availableLots ~ ' lots disponibles',
-                        icon: '🔄',
-                        color: 'orange'
-                    } %}
-                    
-                    {% include 'components/stats_card.html.twig' with {
-                        title: 'Total Lots',
-                        value: stats.global.totalLots,
-                        subtitle: stats.charactersCount ~ ' personnages',
-                        icon: '📊',
-                        color: 'blue'
-                    } %}
+        {% if selectorData.selectedCharacter %}
+            <!-- Header avec nom du personnage -->
+            <div class="flex justify-between items-center mb-10">
+                <h2 class="page-title">
+                    Analytics - {{ selectorData.selectedCharacter.name }}
+                </h2>
+                <div class="text-gray-400 text-sm">
+                    {{ selectorData.selectedCharacter.server.name }}
                 </div>
+            </div>
 
-                <div class="grid md:grid-cols-3 gap-4">
-                    <!-- Ligne 2: Profits -->
-                    {% include 'components/stats_card.html.twig' with {
-                        title: 'Profit Réalisé',
-                        value: stats.global.realizedProfit,
-                        unit: 'kamas',
-                        subtitle: stats.global.soldLots ~ ' lots vendus',
-                        icon: '✅',
-                        color: 'green'
-                    } %}
-                    
-                    {% include 'components/stats_card.html.twig' with {
-                        title: 'Profit Potentiel',
-                        value: stats.global.potentialProfit,
-                        unit: 'kamas',
-                        subtitle: 'Si tout vendu au prix cible',
-                        icon: '🎯',
-                        color: 'blue'
-                    } %}
-                    
-                    {% include 'components/stats_card.html.twig' with {
-                        title: 'Taux de vente',
-                        value: stats.global.totalLots > 0 ? ((stats.global.soldLots / stats.global.totalLots) * 100)|number_format(1) : 0,
-                        unit: '%',
-                        subtitle: stats.global.soldLots ~ ' / ' ~ stats.global.totalLots,
-                        icon: '📈',
-                        color: 'blue'
-                    } %}
-                </div>
+            {% if characterStats %}
+                <!-- Statistiques spécifiques au personnage -->
+                <div class="space-y-20">
 
-                <div class="grid md:grid-cols-3 gap-4">
-                    <!-- Ligne 3: ROI et métriques avancées -->
-                    {% set totalInvestmentFormatted = stats.global.totalInvestment|format_kamas %}
-                    {% include 'components/stats_card.html.twig' with {
-                        title: 'ROI Total',
-                        value: stats.global.roiOnTotal|number_format(1),
-                        unit: '%',
-                        subtitle: 'Sur ' ~ totalInvestmentFormatted ~ ' investis',
-                        icon: '📊',
-                        color: stats.global.roiOnTotal >= 15 ? 'green' : (stats.global.roiOnTotal >= 5 ? 'orange' : 'red')
-                    } %}
-                    
-                    {% if stats.global.roiOnCurrent is not null %}
-                        {% include 'components/stats_card.html.twig' with {
-                            title: 'ROI en cours',
-                            value: stats.global.roiOnCurrent|number_format(1),
-                            unit: '%',
-                            subtitle: 'Retour sur investissement',
-                            icon: '⚡',
-                            color: stats.global.roiOnCurrent >= 15 ? 'green' : (stats.global.roiOnCurrent >= 5 ? 'orange' : 'red')
-                        } %}
-                    {% else %}
-                        {% include 'components/stats_card.html.twig' with {
-                            title: 'ROI en cours',
-                            value: 'N/A',
-                            subtitle: 'Aucun lot en cours',
-                            icon: '⚡',
-                            color: 'gray'
-                        } %}
-                    {% endif %}
-                    
-                    {% include 'components/stats_card.html.twig' with {
-                        title: 'Profit moyen/lot',
-                        value: stats.global.avgProfitPerLotTotal,
-                        unit: 'kamas',
-                        subtitle: 'Par lot vendu',
-                        icon: '💎',
-                        color: 'green'
-                    } %}
-                </div>
+                    <!-- ========== SECTION 1: VUE D'ENSEMBLE FINANCIÈRE ========== -->
+                    <section class="wrapper-background">
+                        <div class="p-10">
+                            <!-- En-tête de section -->
+                            <div class="flex items-center gap-5 mb-12">
+                                <div class="w-3 h-16 bg-gradient-to-b from-purple-400 to-purple-600 rounded-full shadow-lg"></div>
+                                <div>
+                                    <h2 class="text-3xl font-bold text-white mb-3">💰 Vue d'ensemble financière</h2>
+                                    <p class="text-gray-300 text-lg">Aperçu complet de vos investissements et profits réalisés</p>
+                                </div>
+                            </div>
 
-                <!-- Section supplémentaire pour les métriques en cours -->
-                {% if stats.global.availableLots > 0 %}
-                    <div class="bg-blue-600 bg-opacity-20 border-l-4 border-blue-500 rounded-lg p-6">
-                        <h3 class="text-blue-300 text-lg font-bold mb-4">📈 Métriques en cours</h3>
-                        <div class="grid md:grid-cols-2 gap-4">
-                            {% include 'components/stats_card.html.twig' with {
-                                title: 'Profit potentiel moyen/lot',
-                                value: stats.global.avgProfitPerLotCurrent,
-                                unit: 'kamas',
-                                subtitle: 'Par lot disponible',
-                                icon: '🔮',
-                                color: 'blue'
-                            } %}
-                            
-                            {% include 'components/stats_card.html.twig' with {
-                                title: 'Lots par personnage',
-                                value: (stats.global.totalLots / stats.charactersCount)|number_format(1),
-                                subtitle: 'Répartition moyenne',
-                                icon: '⚖️',
-                                color: 'purple'
-                            } %}
+                            <!-- Cartes statistiques -->
+                            <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-8">
+                                {% include 'components/stats_card.html.twig' with {
+                                    title: 'Investissement Total',
+                                    value: characterStats.totalInvestment,
+                                    unit: 'kamas',
+                                    subtitle: 'Capital investi au total',
+                                    icon: '💰',
+                                    color: 'purple'
+                                } %}
+                                {% include 'components/stats_card.html.twig' with {
+                                    title: 'Profit Réalisé',
+                                    value: characterStats.totalProfit,
+                                    unit: 'kamas',
+                                    subtitle: 'Bénéfice des ventes terminées',
+                                    icon: '✅',
+                                    color: characterStats.totalProfit >= 0 ? 'green' : 'red'
+                                } %}
+                                {% include 'components/stats_card.html.twig' with {
+                                    title: 'Profit Moyen',
+                                    value: characterStats.averageProfit,
+                                    unit: 'kamas',
+                                    subtitle: 'Par lot vendu',
+                                    icon: '📊',
+                                    color: 'cyan'
+                                } %}
+                                {% set roi = characterStats.totalInvestment > 0 ? (characterStats.totalProfit / characterStats.totalInvestment * 100) : 0 %}
+                                {% include 'components/stats_card.html.twig' with {
+                                    title: 'ROI Global',
+                                    value: roi|number_format(1),
+                                    unit: '%',
+                                    subtitle: 'Retour sur investissement',
+                                    icon: '💹',
+                                    color: roi >= 20 ? 'green' : (roi >= 10 ? 'orange' : 'red')
+                                } %}
+                            </div>
                         </div>
-                    </div>
-                {% endif %}
+                    </section>
 
-                <!-- Performance temporelle (si disponible) -->
-                {% if stats.weeklyData is defined %}
-                    {% set weekly_content %}
-                        <div class="grid grid-cols-2 md:grid-cols-4 gap-4">
-                            {% include 'components/stats_card.html.twig' with {
-                                title: 'Cette semaine',
-                                value: stats.weeklyData.profit,
-                                unit: 'kamas',
-                                subtitle: stats.weeklyData.sales ~ ' ventes',
-                                icon: '📅',
-                                color: 'blue'
-                            } %}
-                            {% include 'components/stats_card.html.twig' with {
-                                title: 'Ce mois',
-                                value: stats.monthlyData.profit,
-                                unit: 'kamas',
-                                subtitle: stats.monthlyData.sales ~ ' ventes',
-                                icon: '📆',
-                                color: 'green'
-                            } %}
-                            {% include 'components/stats_card.html.twig' with {
-                                title: 'Meilleur jour',
-                                value: stats.bestDay.profit,
-                                unit: 'kamas',
-                                subtitle: stats.bestDay.date|date('d/m'),
-                                icon: '🏆',
-                                color: 'yellow'
-                            } %}
-                            {% include 'components/stats_card.html.twig' with {
-                                title: 'Trend 7j',
-                                value: stats.weekTrend|number_format(1),
-                                unit: '%',
-                                subtitle: 'vs semaine précédente',
-                                icon: stats.weekTrend > 0 ? '📈' : '📉',
-                                color: stats.weekTrend > 0 ? 'green' : 'red'
-                            } %}
-                        </div>
-                    {% endset %}
+                    <!-- ========== SECTION 2: ACTIVITÉ DE TRADING ========== -->
+                    <section class="wrapper-background">
+                        <div class="p-10">
+                            <!-- En-tête de section -->
+                            <div class="flex items-center gap-5 mb-8">
+                                <div class="w-3 h-16 bg-gradient-to-b from-blue-400 to-blue-600 rounded-full shadow-lg"></div>
+                                <div>
+                                    <h2 class="text-3xl font-bold text-white mb-3">📊 Activité de trading</h2>
+                                    <p class="text-gray-300 text-lg">Vue d'ensemble de votre activité de vente</p>
+                                </div>
+                            </div>
 
-                    {% include 'components/form_section.html.twig' with {
-                        title: 'Performance temporelle',
-                        icon: '⏱️',
-                        color: 'blue',
-                        content: weekly_content
-                    } %}
-                {% endif %}
+                            <!-- Métriques principales en ligne -->
+                            <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-5 gap-6 mb-10">
+                                {% include 'components/stats_card.html.twig' with {
+                                    title: 'Lots Actifs',
+                                    value: characterStats.activeLots,
+                                    subtitle: 'En vente',
+                                    icon: '🔄',
+                                    color: 'blue'
+                                } %}
+                                {% include 'components/stats_card.html.twig' with {
+                                    title: 'Lots Vendus',
+                                    value: characterStats.soldLots,
+                                    subtitle: 'Terminés',
+                                    icon: '✔️',
+                                    color: 'green'
+                                } %}
+                                {% include 'components/stats_card.html.twig' with {
+                                    title: 'Transactions',
+                                    value: characterStats.totalTransactions,
+                                    subtitle: 'Ventes réalisées',
+                                    icon: '💰',
+                                    color: 'yellow'
+                                } %}
+                                {% set totalLots = characterStats.activeLots + characterStats.soldLots %}
+                                {% set successRate = totalLots > 0 ? (characterStats.soldLots / totalLots * 100) : 0 %}
+                                {% include 'components/stats_card.html.twig' with {
+                                    title: 'Taux Lots',
+                                    value: successRate|number_format(1),
+                                    unit: '%',
+                                    subtitle: characterStats.soldLots ~ '/' ~ totalLots ~ ' vendus',
+                                    icon: '🎯',
+                                    color: successRate >= 80 ? 'green' : (successRate >= 60 ? 'orange' : 'red')
+                                } %}
+                                {% set transactionRate = (characterStats.activeLots + characterStats.soldLots) > 0 ? (characterStats.totalTransactions / (characterStats.totalTransactions + characterStats.activeLots) * 100) : 0 %}
+                                {% include 'components/stats_card.html.twig' with {
+                                    title: 'Efficacité',
+                                    value: transactionRate|number_format(1),
+                                    unit: '%',
+                                    subtitle: 'Ventes vs stock',
+                                    icon: '⚡',
+                                    color: transactionRate >= 80 ? 'green' : (transactionRate >= 60 ? 'orange' : 'red')
+                                } %}
+                            </div>
 
-                <!-- Analyse par serveur/personnage -->
-                {% if stats.characterBreakdown is defined %}
-                    {% set character_content %}
-                        <div class="space-y-3">
-                            {% for char in stats.characterBreakdown %}
-                                <div class="flex justify-between items-center p-4 bg-gray-700 rounded-lg">
-                                    <div class="flex items-center space-x-3">
-                                        <img src="/classes{{ asset(char.classe.imgUrl) }}" alt="{{ char.classe.name }}" class="w-8 h-8 rounded">
-                                        <div>
-                                            <div class="text-white font-medium">{{ char.name }}</div>
-                                            <div class="text-gray-400 text-sm">{{ char.server }} • {{ char.activeLots }} lots actifs</div>
+                            <!-- Bloc explicatif compact -->
+                            <div class="bg-gradient-to-r from-blue-900/20 to-purple-900/20 border border-blue-500/30 rounded-xl p-6">
+                                <div class="flex items-start gap-6">
+                                    <div class="flex-shrink-0">
+                                        <div class="w-12 h-12 bg-gradient-to-br from-blue-500 to-purple-600 rounded-full flex items-center justify-center">
+                                            <span class="text-xl">💡</span>
                                         </div>
                                     </div>
-                                    <div class="text-right">
-                                        {{ price(char.totalProfit, char.totalProfit >= 0 ? 'green' : 'red', 'base') }}
-                                        <div class="text-muted-sm">ROI: {{ char.roi|number_format(1) }}%</div>
+                                    <div class="flex-1">
+                                        <h3 class="text-lg font-bold text-white mb-3">Différence Lots vs Transactions</h3>
+                                        <div class="grid md:grid-cols-2 gap-6 text-sm">
+                                            <div class="space-y-2">
+                                                <div class="flex items-center gap-2">
+                                                    <span class="text-blue-400 font-semibold">📦 Lot :</span>
+                                                    <span class="text-gray-300">Groupe d'items identiques</span>
+                                                </div>
+                                                <div class="text-gray-400 text-xs ml-6">Ex: 100 Blé d'Or = 1 lot</div>
+                                            </div>
+                                            <div class="space-y-2">
+                                                <div class="flex items-center gap-2">
+                                                    <span class="text-yellow-400 font-semibold">💰 Transaction :</span>
+                                                    <span class="text-gray-300">Vente d'une partie du lot</span>
+                                                </div>
+                                                <div class="text-gray-400 text-xs ml-6">Ex: Vendre 30 items = 1 transaction</div>
+                                            </div>
+                                        </div>
+                                        <div class="mt-4 p-3 bg-gray-800/40 rounded-lg border-l-4 border-emerald-500">
+                                            <div class="text-emerald-300 text-xs font-medium mb-1">💡 Un lot peut générer plusieurs transactions</div>
+                                            <div class="text-gray-400 text-xs font-mono">Lot 100 items → Transaction 1: 30 items + Transaction 2: 70 items</div>
+                                        </div>
                                     </div>
                                 </div>
-                            {% endfor %}
+                            </div>
                         </div>
-                    {% endset %}
+                    </section>
 
-                    {% include 'components/form_section.html.twig' with {
-                        title: 'Performance par personnage',
-                        icon: '👥',
-                        color: 'purple',
-                        content: character_content
-                    } %}
-                {% endif %}
+                    <!-- ========== SECTION 3: ANALYSE DE PERFORMANCE ========== -->
+                    <section class="wrapper-background">
+                        <div class="p-10">
+                            <!-- En-tête de section -->
+                            <div class="flex items-center gap-5 mb-12">
+                                <div class="w-3 h-16 bg-gradient-to-b from-yellow-400 to-orange-500 rounded-full shadow-lg"></div>
+                                <div>
+                                    <h2 class="text-3xl font-bold text-white mb-3">🏆 Analyse de performance</h2>
+                                    <p class="text-gray-300 text-lg">Vos meilleurs et moins bons trades avec détails</p>
+                                </div>
+                            </div>
 
-                <!-- Top items rentables -->
-                {% if stats.topItems|length > 0 %}
-                    {% set top_items_content %}
-                        <div class="space-y-3">
-                            {% for item in stats.topItems %}
-                                {% set profit = item.totalProfit %}
-                                {% set avgProfitPerItem = item.lotsCount > 0 ? (profit / item.lotsCount) : 0 %}
-                                <div class="flex justify-between items-center p-4 bg-gray-700 rounded-lg">
+                            <!-- Contenu en 2 colonnes -->
+                            <div class="grid grid-cols-1 lg:grid-cols-2 gap-10">
+                                {% if characterStats.bestTrade %}
+                                    {% include 'components/stats_card.html.twig' with {
+                                        title: '🏆 Meilleur Trade',
+                                        value: characterStats.bestTrade.profit,
+                                        unit: 'kamas',
+                                        subtitle: characterStats.bestTrade.item ~ ' • ' ~ characterStats.bestTrade.soldAt|date('d/m/Y'),
+                                        icon: '🏆',
+                                        color: 'yellow'
+                                    } %}
+                                {% else %}
+                                    {% include 'components/stats_card.html.twig' with {
+                                        title: '🏆 Meilleur Trade',
+                                        value: '—',
+                                        subtitle: 'Commencez à vendre pour voir vos records',
+                                        icon: '🏆',
+                                        color: 'gray'
+                                    } %}
+                                {% endif %}
+
+                                {% if characterStats.worstTrade %}
+                                    {% include 'components/stats_card.html.twig' with {
+                                        title: '📉 Trade le moins rentable',
+                                        value: characterStats.worstTrade.profit,
+                                        unit: 'kamas',
+                                        subtitle: characterStats.worstTrade.item ~ ' • ' ~ characterStats.worstTrade.soldAt|date('d/m/Y'),
+                                        icon: '📉',
+                                        color: characterStats.worstTrade.profit >= 0 ? 'orange' : 'red'
+                                    } %}
+                                {% else %}
+                                    {% include 'components/stats_card.html.twig' with {
+                                        title: '📉 Trade le moins rentable',
+                                        value: '—',
+                                        subtitle: 'Aucune vente enregistrée pour le moment',
+                                        icon: '📉',
+                                        color: 'gray'
+                                    } %}
+                                {% endif %}
+                            </div>
+                        </div>
+                    </section>
+
+                    <!-- ========== SECTION 4: ÉVOLUTION TEMPORELLE ========== -->
+                    {% if characterStats.monthlyTrend|length > 0 %}
+                        <section class="wrapper-background">
+                            <div class="p-10">
+                                <!-- En-tête de section -->
+                                <div class="flex items-center gap-5 mb-12">
+                                    <div class="w-3 h-16 bg-gradient-to-b from-green-400 to-teal-500 rounded-full shadow-lg"></div>
                                     <div>
-                                        <div class="text-white font-medium">{{ item.itemName }}</div>
-                                        <div class="text-gray-400 text-sm">
-                                            {{ item.lotsCount }} lots • 
-                                            {{ price(avgProfitPerItem, 'white', 'small') }}/lot
-                                        </div>
-                                    </div>
-                                    <div class="text-right">
-                                        {{ price(profit, profit >= 0 ? 'green' : 'red') }}
-                                        {% if item.roi is defined %}
-                                            <div class="text-gray-400 text-sm">ROI: {{ item.roi|number_format(1) }}%</div>
-                                        {% endif %}
+                                        <h2 class="text-3xl font-bold text-white mb-3">📈 Évolution sur 6 mois</h2>
+                                        <p class="text-gray-300 text-lg">Suivi détaillé de vos profits mensuels et tendances</p>
                                     </div>
                                 </div>
-                            {% endfor %}
-                        </div>
-                    {% endset %}
 
-                    {% include 'components/form_section.html.twig' with {
-                        title: 'Top Items Rentables',
-                        icon: '🏆',
-                        color: 'green',
-                        content: top_items_content
-                    } %}
-                {% endif %}
+                                <!-- Graphique mensuel -->
+                                <div class="bg-gray-800/30 border border-gray-600/30 rounded-xl p-8">
+                                    <div class="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-6 gap-6">
+                                        {% for month in characterStats.monthlyTrend %}
+                                            <div class="text-center p-6 bg-gray-700/40 rounded-xl border border-gray-600/40 hover:border-gray-500/60 hover:bg-gray-700/60 transition-all duration-200">
+                                                <div class="text-white font-bold text-base mb-2">{{ month.month }}</div>
+                                                <div class="text-{{ month.profit >= 0 ? 'green' : 'red' }}-400 font-bold text-2xl mb-1">
+                                                    {{ (month.profit/1000000)|number_format(1) }}M
+                                                </div>
+                                                <div class="text-gray-400 text-sm">
+                                                    {{ month.profit >= 0 ? '+' : '' }}{{ (month.profit/1000)|number_format(0) }}k
+                                                </div>
+                                            </div>
+                                        {% endfor %}
+                                    </div>
 
-                <!-- Statistiques de marché et surveillance -->
-                {% if stats.marketData is defined %}
-                    {% set market_content %}
-                        <div class="grid grid-cols-2 md:grid-cols-4 gap-4">
-                            {% include 'components/stats_card.html.twig' with {
-                                title: 'Items surveillés',
-                                value: stats.marketData.watchedItems,
-                                subtitle: 'En observation',
-                                icon: '👁️',
-                                color: 'blue'
-                            } %}
-                            {% include 'components/stats_card.html.twig' with {
-                                title: 'Surveillances actives',
-                                value: stats.marketData.activeWatches,
-                                subtitle: 'En cours',
-                                icon: '🔄',
-                                color: 'green'
-                            } %}
-                            {% include 'components/stats_card.html.twig' with {
-                                title: 'Mises à jour récentes',
-                                value: stats.marketData.recentUpdates,
-                                subtitle: 'Dernières heures',
-                                icon: '🆕',
-                                color: 'purple'
-                            } %}
-                            {% include 'components/stats_card.html.twig' with {
-                                title: 'Opportunités',
-                                value: stats.marketData.opportunities,
-                                subtitle: 'À saisir',
-                                icon: '💡',
-                                color: 'yellow'
-                            } %}
-                        </div>
-                    {% endset %}
-
-                    {% include 'components/form_section.html.twig' with {
-                        title: 'Surveillance des marchés',
-                        icon: '📊',
-                        color: 'yellow',
-                        content: market_content
-                    } %}
-                {% endif %}
+                                    <!-- Analyse de tendance -->
+                                    {% if characterStats.monthlyTrend|length > 1 %}
+                                        {% set lastMonth = characterStats.monthlyTrend|last %}
+                                        {% set prevMonth = characterStats.monthlyTrend[characterStats.monthlyTrend|length - 2] %}
+                                        {% set trend = lastMonth.profit - prevMonth.profit %}
+                                        <div class="mt-8 p-6 bg-gray-800/50 rounded-xl border border-gray-600/30">
+                                            <div class="flex items-center justify-center gap-3 text-base">
+                                                {% if trend > 0 %}
+                                                    <span class="text-green-400 text-xl">📈</span>
+                                                    <span class="text-green-400 font-semibold">Tendance positive :</span>
+                                                    <span class="text-green-300 font-bold">+{{ (trend/1000)|number_format(0) }}k par rapport au mois dernier</span>
+                                                {% elseif trend < 0 %}
+                                                    <span class="text-red-400 text-xl">📉</span>
+                                                    <span class="text-red-400 font-semibold">Tendance négative :</span>
+                                                    <span class="text-red-300 font-bold">{{ (trend/1000)|number_format(0) }}k par rapport au mois dernier</span>
+                                                {% else %}
+                                                    <span class="text-gray-400 text-xl">➡️</span>
+                                                    <span class="text-gray-400 font-semibold">Stabilité :</span>
+                                                    <span class="text-gray-300">Performance identique au mois dernier</span>
+                                                {% endif %}
+                                            </div>
+                                        </div>
+                                    {% endif %}
+                                </div>
+                            </div>
+                        </section>
+                    {% endif %}
+                </div>
 
             {% else %}
-                <!-- Aucun personnage sélectionné ou pas de données -->
+                <!-- Pas de données pour ce personnage -->
                 {% include 'components/empty_state.html.twig' with {
                     type: 'no_data',
-                    title: 'Aucune donnée disponible',
-                    message: selectorData.selectedCharacter ? 'Aucun lot trouvé pour ce personnage.' : 'Sélectionnez un personnage pour voir ses statistiques.',
-                    action: selectorData.selectedCharacter ? {
+                    title: 'Aucune donnée pour ' ~ selectorData.selectedCharacter.name,
+                    message: 'Ce personnage n\'a pas encore de lots enregistrés.',
+                    action: {
                         url: path('app_lot_new'),
                         text: 'Créer le premier lot',
                         icon: '📦'
-                    } : {
-                        url: path('app_profile_index'),
-                        text: 'Gérer les personnages',
-                        icon: '👥'
                     }
                 } %}
             {% endif %}
-        </div>
+
+        {% else %}
+            <!-- Aucun personnage sélectionné -->
+            {% include 'components/empty_state.html.twig' with {
+                type: 'no_character',
+                title: 'Aucun personnage sélectionné',
+                message: 'Sélectionnez un personnage pour voir ses statistiques détaillées.',
+                action: {
+                    url: path('app_profile_index'),
+                    text: 'Gérer les personnages',
+                    icon: '👥'
+                }
+            } %}
+        {% endif %}
     </div>
+
 {% endblock %}

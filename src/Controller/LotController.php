@@ -146,7 +146,7 @@ class LotController extends AbstractController
         Request $request,
         LotGroup $lotGroup,
         EntityManagerInterface $em,
-        ProfileSelectorService $profileSelectorService,
+        ProfileCharacterService $profileCharacterService,
         CacheInvalidationService $cacheInvalidation
     ): Response {
         if ($this->isCsrfTokenValid('delete'.$lotGroup->getId(), $request->getPayload()->getString('_token'))) {
@@ -154,7 +154,7 @@ class LotController extends AbstractController
             $em->flush();
 
             // Invalider le cache des compteurs pour mise à jour immédiate
-            $profileSelectorService->forceInvalidateCountsCache($this->getUser());
+            $profileCharacterService->forceInvalidateCountsCache($this->getUser());
 
             // Invalider le cache des stats utilisateur
             $cacheInvalidation->invalidateUserStatsAndMarkActivity($this->getUser());

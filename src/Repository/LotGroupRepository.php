@@ -222,4 +222,92 @@ class LotGroupRepository extends ServiceEntityRepository
 
         return $qb->getQuery()->getResult();
     }
+
+    /**
+     * Stats complètes pour un personnage spécifique
+     */
+    public function getCharacterCompleteStats(DofusCharacter $character): array
+    {
+        // Stats groupées par statut
+        $result = $this->createQueryBuilder('lg')
+            ->select([
+                'COUNT(lg.id) as totalLots',
+                'SUM(lg.buyPricePerLot * lg.lotSize) as totalInvestment',
+                'lg.status'
+            ])
+            ->where('lg.dofusCharacter = :character')
+            ->groupBy('lg.status')
+            ->setParameter('character', $character)
+            ->getQuery()
+            ->getArrayResult();
+
+        $baseStats = [
+            'totalLots' => 0,
+            'activeLots' => 0,
+            'soldLots' => 0,
+            'totalInvestment' => 0,
+            'currentInvestment' => 0,
+        ];
+
+        foreach ($result as $stat) {
+            $status = $stat['status']->value; // Enum vers string
+            $baseStats['totalLots'] += (int) $stat['totalLots'];
+            $baseStats['totalInvestment'] += (int) ($stat['totalInvestment'] ?? 0);
+
+            if ($status === 'available') {
+                $baseStats['activeLots'] = (int) $stat['totalLots'];
+                $baseStats['currentInvestment'] = (int) ($stat['totalInvestment'] ?? 0);
+            }
+            // Note: soldLots sera recalculé plus bas basé sur les vraies ventes
+        }
+
+        // Compter les lots vendus par statut (pour cohérence avec l'interface utilisateur)
+        $soldLotsFromStatus = 0;
+        foreach ($result as $stat) {
+            if ($stat['status']->value === 'sold') {
+                $soldLotsFromStatus = (int) $stat['totalLots'];
+                break;
+            }
+        }
+
+        $baseStats['soldLots'] = $soldLotsFromStatus;
+
+        // Profit potentiel (lots disponibles uniquement)
+        $potentialProfitResult = $this->createQueryBuilder('lg')
+            ->select('SUM((lg.sellPricePerLot - lg.buyPricePerLot) * lg.lotSize) as potentialProfit')
+            ->where('lg.dofusCharacter = :character')
+            ->andWhere('lg.status = :available')
+            ->setParameter('character', $character)
+            ->setParameter('available', LotStatus::AVAILABLE)
+            ->getQuery()
+            ->getSingleScalarResult();
+
+        // Profit réalisé (sur les lots vendus via LotUnit)
+        $realizedProfitResult = $this->createQueryBuilder('lg')
+            ->select('SUM((lu.actualSellPrice - lg.buyPricePerLot) * lu.quantitySold) as realizedProfit')
+            ->leftJoin('lg.lotUnits', 'lu')
+            ->where('lg.dofusCharacter = :character')
+            ->andWhere('lg.status = :sold')
+            ->setParameter('character', $character)
+            ->setParameter('sold', LotStatus::SOLD)
+            ->getQuery()
+            ->getSingleScalarResult();
+
+        // Transactions réalisées
+        $transactionsResult = $this->createQueryBuilder('lg')
+            ->select('COUNT(lu.id) as transactions')
+            ->leftJoin('lg.lotUnits', 'lu')
+            ->where('lg.dofusCharacter = :character')
+            ->andWhere('lg.status = :sold')
+            ->setParameter('character', $character)
+            ->setParameter('sold', LotStatus::SOLD)
+            ->getQuery()
+            ->getSingleScalarResult();
+
+        return array_merge($baseStats, [
+            'potentialProfit' => (int) ($potentialProfitResult ?? 0),
+            'realizedProfit' => (int) ($realizedProfitResult ?? 0),
+            'totalTransactions' => (int) ($transactionsResult ?? 0),
+        ]);
+    }
 }
