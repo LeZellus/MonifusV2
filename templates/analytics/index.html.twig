@@ -9,272 +9,270 @@
     <div class="wrapper-container">
         {% if selectorData.selectedCharacter %}
             <!-- Header avec nom du personnage -->
-            <div class="flex justify-between items-center mb-10">
-                <h2 class="page-title">
-                    Analytics - {{ selectorData.selectedCharacter.name }}
-                </h2>
-                <div class="text-gray-400 text-sm">
-                    {{ selectorData.selectedCharacter.server.name }}
+            <div class="flex justify-between items-center mb-8">
+                <div>
+                    <h2 class="page-title mb-2">
+                        Analytics - {{ selectorData.selectedCharacter.name }}
+                    </h2>
+                    <p class="text-gray-400">{{ selectorData.selectedCharacter.server.name }} • Analyse détaillée de performance</p>
                 </div>
             </div>
 
             {% if characterStats %}
-                <!-- Statistiques spécifiques au personnage -->
-                <div class="space-y-20">
+                <!-- Contenu principal -->
+                <div class="space-y-8">
 
-                    <!-- ========== SECTION 1: VUE D'ENSEMBLE FINANCIÈRE ========== -->
-                    <section class="wrapper-background">
-                        <div class="p-10">
-                            <!-- En-tête de section -->
-                            <div class="flex items-center gap-5 mb-12">
-                                <div class="w-3 h-16 bg-gradient-to-b from-purple-400 to-purple-600 rounded-full shadow-lg"></div>
-                                <div>
-                                    <h2 class="text-3xl font-bold text-white mb-3">💰 Vue d'ensemble financière</h2>
-                                    <p class="text-gray-300 text-lg">Aperçu complet de vos investissements et profits réalisés</p>
-                                </div>
+                    <!-- ========== VUE D'ENSEMBLE FINANCIÈRE ========== -->
+                    <div class="bg-gray-800/50 border border-gray-600/50 rounded-lg p-6">
+                        <div class="flex items-center space-x-3 mb-6">
+                            <div class="w-10 h-10 bg-gradient-to-br from-purple-500 to-purple-600 rounded-lg flex items-center justify-center">
+                                <span class="text-xl">💰</span>
                             </div>
-
-                            <!-- Cartes statistiques -->
-                            <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-8">
-                                {% include 'components/stats_card.html.twig' with {
-                                    title: 'Investissement Total',
-                                    value: characterStats.totalInvestment,
-                                    unit: 'kamas',
-                                    subtitle: 'Capital investi au total',
-                                    icon: '💰',
-                                    color: 'purple'
-                                } %}
-                                {% include 'components/stats_card.html.twig' with {
-                                    title: 'Profit Réalisé',
-                                    value: characterStats.totalProfit,
-                                    unit: 'kamas',
-                                    subtitle: 'Bénéfice des ventes terminées',
-                                    icon: '✅',
-                                    color: characterStats.totalProfit >= 0 ? 'green' : 'red'
-                                } %}
-                                {% include 'components/stats_card.html.twig' with {
-                                    title: 'Profit Moyen',
-                                    value: characterStats.averageProfit,
-                                    unit: 'kamas',
-                                    subtitle: 'Par lot vendu',
-                                    icon: '📊',
-                                    color: 'cyan'
-                                } %}
-                                {% set roi = characterStats.totalInvestment > 0 ? (characterStats.totalProfit / characterStats.totalInvestment * 100) : 0 %}
-                                {% include 'components/stats_card.html.twig' with {
-                                    title: 'ROI Global',
-                                    value: roi|number_format(1),
-                                    unit: '%',
-                                    subtitle: 'Retour sur investissement',
-                                    icon: '💹',
-                                    color: roi >= 20 ? 'green' : (roi >= 10 ? 'orange' : 'red')
-                                } %}
+                            <div>
+                                <h2 class="text-white font-medium text-lg">Vue d'ensemble financière</h2>
+                                <p class="text-gray-400 text-sm">Aperçu de vos investissements et profits</p>
                             </div>
                         </div>
-                    </section>
 
-                    <!-- ========== SECTION 2: ACTIVITÉ DE TRADING ========== -->
-                    <section class="wrapper-background">
-                        <div class="p-10">
-                            <!-- En-tête de section -->
-                            <div class="flex items-center gap-5 mb-8">
-                                <div class="w-3 h-16 bg-gradient-to-b from-blue-400 to-blue-600 rounded-full shadow-lg"></div>
-                                <div>
-                                    <h2 class="text-3xl font-bold text-white mb-3">📊 Activité de trading</h2>
-                                    <p class="text-gray-300 text-lg">Vue d'ensemble de votre activité de vente</p>
-                                </div>
+                        <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">
+                            {% include 'components/stats_card.html.twig' with {
+                                title: 'Investissement Total',
+                                value: characterStats.totalInvestment,
+                                unit: 'kamas',
+                                subtitle: 'Capital investi au total',
+                                icon: '💰',
+                                color: 'purple'
+                            } %}
+                            {% include 'components/stats_card.html.twig' with {
+                                title: 'Profit Réalisé',
+                                value: characterStats.totalProfit,
+                                unit: 'kamas',
+                                subtitle: 'Bénéfice des ventes terminées',
+                                icon: '✅',
+                                color: characterStats.totalProfit >= 0 ? 'green' : 'red'
+                            } %}
+                            {% include 'components/stats_card.html.twig' with {
+                                title: 'Profit Moyen',
+                                value: characterStats.averageProfit,
+                                unit: 'kamas',
+                                subtitle: 'Par lot vendu',
+                                icon: '📊',
+                                color: 'cyan'
+                            } %}
+                            {% set roi = characterStats.totalInvestment > 0 ? (characterStats.totalProfit / characterStats.totalInvestment * 100) : 0 %}
+                            {% include 'components/stats_card.html.twig' with {
+                                title: 'ROI Global',
+                                value: roi|number_format(1),
+                                unit: '%',
+                                subtitle: 'Retour sur investissement',
+                                icon: '💹',
+                                color: roi >= 20 ? 'green' : (roi >= 10 ? 'orange' : 'red')
+                            } %}
+                        </div>
+                    </div>
+
+                    <!-- ========== ACTIVITÉ DE TRADING ========== -->
+                    <div class="bg-gray-800/50 border border-gray-600/50 rounded-lg p-6">
+                        <div class="flex items-center space-x-3 mb-6">
+                            <div class="w-10 h-10 bg-gradient-to-br from-blue-500 to-blue-600 rounded-lg flex items-center justify-center">
+                                <span class="text-xl">📊</span>
                             </div>
-
-                            <!-- Métriques principales en ligne -->
-                            <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-5 gap-6 mb-10">
-                                {% include 'components/stats_card.html.twig' with {
-                                    title: 'Lots Actifs',
-                                    value: characterStats.activeLots,
-                                    subtitle: 'En vente',
-                                    icon: '🔄',
-                                    color: 'blue'
-                                } %}
-                                {% include 'components/stats_card.html.twig' with {
-                                    title: 'Lots Vendus',
-                                    value: characterStats.soldLots,
-                                    subtitle: 'Terminés',
-                                    icon: '✔️',
-                                    color: 'green'
-                                } %}
-                                {% include 'components/stats_card.html.twig' with {
-                                    title: 'Transactions',
-                                    value: characterStats.totalTransactions,
-                                    subtitle: 'Ventes réalisées',
-                                    icon: '💰',
-                                    color: 'yellow'
-                                } %}
-                                {% set totalLots = characterStats.activeLots + characterStats.soldLots %}
-                                {% set successRate = totalLots > 0 ? (characterStats.soldLots / totalLots * 100) : 0 %}
-                                {% include 'components/stats_card.html.twig' with {
-                                    title: 'Taux Lots',
-                                    value: successRate|number_format(1),
-                                    unit: '%',
-                                    subtitle: characterStats.soldLots ~ '/' ~ totalLots ~ ' vendus',
-                                    icon: '🎯',
-                                    color: successRate >= 80 ? 'green' : (successRate >= 60 ? 'orange' : 'red')
-                                } %}
-                                {% set transactionRate = (characterStats.activeLots + characterStats.soldLots) > 0 ? (characterStats.totalTransactions / (characterStats.totalTransactions + characterStats.activeLots) * 100) : 0 %}
-                                {% include 'components/stats_card.html.twig' with {
-                                    title: 'Efficacité',
-                                    value: transactionRate|number_format(1),
-                                    unit: '%',
-                                    subtitle: 'Ventes vs stock',
-                                    icon: '⚡',
-                                    color: transactionRate >= 80 ? 'green' : (transactionRate >= 60 ? 'orange' : 'red')
-                                } %}
+                            <div>
+                                <h2 class="text-white font-medium text-lg">Activité de trading</h2>
+                                <p class="text-gray-400 text-sm">Statistiques de vos lots et transactions</p>
                             </div>
+                        </div>
 
-                            <!-- Bloc explicatif compact -->
-                            <div class="bg-gradient-to-r from-blue-900/20 to-purple-900/20 border border-blue-500/30 rounded-xl p-6">
-                                <div class="flex items-start gap-6">
-                                    <div class="flex-shrink-0">
-                                        <div class="w-12 h-12 bg-gradient-to-br from-blue-500 to-purple-600 rounded-full flex items-center justify-center">
-                                            <span class="text-xl">💡</span>
-                                        </div>
+                        <!-- Métriques en grille comme les cartes de personnages -->
+                        <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4 mb-6">
+                            <!-- Carte Lots -->
+                            <div class="p-4 bg-gray-800/70 border border-gray-600/50 rounded-lg hover:bg-gray-700/50 transition-colors">
+                                <div class="flex items-center space-x-3">
+                                    <div class="w-10 h-10 bg-gradient-to-br from-blue-500 to-blue-600 rounded-lg flex items-center justify-center">
+                                        <span class="text-xl">📦</span>
                                     </div>
                                     <div class="flex-1">
-                                        <h3 class="text-lg font-bold text-white mb-3">Différence Lots vs Transactions</h3>
-                                        <div class="grid md:grid-cols-2 gap-6 text-sm">
-                                            <div class="space-y-2">
-                                                <div class="flex items-center gap-2">
-                                                    <span class="text-blue-400 font-semibold">📦 Lot :</span>
-                                                    <span class="text-gray-300">Groupe d'items identiques</span>
-                                                </div>
-                                                <div class="text-gray-400 text-xs ml-6">Ex: 100 Blé d'Or = 1 lot</div>
-                                            </div>
-                                            <div class="space-y-2">
-                                                <div class="flex items-center gap-2">
-                                                    <span class="text-yellow-400 font-semibold">💰 Transaction :</span>
-                                                    <span class="text-gray-300">Vente d'une partie du lot</span>
-                                                </div>
-                                                <div class="text-gray-400 text-xs ml-6">Ex: Vendre 30 items = 1 transaction</div>
-                                            </div>
-                                        </div>
-                                        <div class="mt-4 p-3 bg-gray-800/40 rounded-lg border-l-4 border-emerald-500">
-                                            <div class="text-emerald-300 text-xs font-medium mb-1">💡 Un lot peut générer plusieurs transactions</div>
-                                            <div class="text-gray-400 text-xs font-mono">Lot 100 items → Transaction 1: 30 items + Transaction 2: 70 items</div>
+                                        <h3 class="text-white font-medium">Gestion des lots</h3>
+                                        <div class="flex items-center space-x-2 text-xs mt-1">
+                                            <span class="text-blue-400">🔄 {{ characterStats.activeLots }}</span>
+                                            <span class="text-green-400">✓ {{ characterStats.soldLots }}</span>
+                                            {% set totalLots = characterStats.activeLots + characterStats.soldLots %}
+                                            {% set successRate = totalLots > 0 ? (characterStats.soldLots / totalLots * 100) : 0 %}
+                                            <span class="text-{{ successRate >= 80 ? 'green' : (successRate >= 60 ? 'orange' : 'red') }}-400">🎯 {{ successRate|number_format(1) }}%</span>
                                         </div>
                                     </div>
                                 </div>
+                                <p class="text-gray-400 text-sm mt-2">{{ characterStats.soldLots }}/{{ totalLots }} lots terminés</p>
                             </div>
-                        </div>
-                    </section>
 
-                    <!-- ========== SECTION 3: ANALYSE DE PERFORMANCE ========== -->
-                    <section class="wrapper-background">
-                        <div class="p-10">
-                            <!-- En-tête de section -->
-                            <div class="flex items-center gap-5 mb-12">
-                                <div class="w-3 h-16 bg-gradient-to-b from-yellow-400 to-orange-500 rounded-full shadow-lg"></div>
-                                <div>
-                                    <h2 class="text-3xl font-bold text-white mb-3">🏆 Analyse de performance</h2>
-                                    <p class="text-gray-300 text-lg">Vos meilleurs et moins bons trades avec détails</p>
+                            <!-- Carte Transactions -->
+                            <div class="p-4 bg-gray-800/70 border border-gray-600/50 rounded-lg hover:bg-gray-700/50 transition-colors">
+                                <div class="flex items-center space-x-3">
+                                    <div class="w-10 h-10 bg-gradient-to-br from-yellow-500 to-orange-500 rounded-lg flex items-center justify-center">
+                                        <span class="text-xl">💰</span>
+                                    </div>
+                                    <div class="flex-1">
+                                        <h3 class="text-white font-medium">Ventes individuelles</h3>
+                                        <div class="flex items-center space-x-2 text-xs mt-1">
+                                            <span class="text-yellow-400">💰 {{ characterStats.totalTransactions }}</span>
+                                            {% set transactionRate = (characterStats.activeLots + characterStats.soldLots) > 0 ? (characterStats.totalTransactions / (characterStats.totalTransactions + characterStats.activeLots) * 100) : 0 %}
+                                            <span class="text-{{ transactionRate >= 80 ? 'green' : (transactionRate >= 60 ? 'orange' : 'red') }}-400">⚡ {{ transactionRate|number_format(1) }}%</span>
+                                        </div>
+                                    </div>
+                                </div>
+                                <p class="text-gray-400 text-sm mt-2">Ventes individuelles réalisées</p>
+                            </div>
+
+                            <!-- Guide explicatif compact -->
+                            <div class="p-4 bg-gradient-to-br from-green-900/20 to-blue-900/20 border border-green-500/30 rounded-lg">
+                                <div class="flex items-center space-x-3 mb-3">
+                                    <div class="w-10 h-10 bg-gradient-to-br from-green-500 to-teal-500 rounded-lg flex items-center justify-center">
+                                        <span class="text-xl">💡</span>
+                                    </div>
+                                    <h3 class="text-white font-medium">Différence clé</h3>
+                                </div>
+                                <div class="space-y-2 text-xs">
+                                    <div><span class="text-blue-400 font-semibold">📦 Lot :</span> <span class="text-gray-300">Groupe d'items identiques</span></div>
+                                    <div><span class="text-yellow-400 font-semibold">💰 Transaction :</span> <span class="text-gray-300">Vente d'une partie du lot</span></div>
+                                    <div class="text-emerald-300 text-xs mt-2 font-medium">Un lot peut générer plusieurs transactions</div>
                                 </div>
                             </div>
+                        </div>
+                    </div>
 
-                            <!-- Contenu en 2 colonnes -->
-                            <div class="grid grid-cols-1 lg:grid-cols-2 gap-10">
-                                {% if characterStats.bestTrade %}
-                                    {% include 'components/stats_card.html.twig' with {
-                                        title: '🏆 Meilleur Trade',
-                                        value: characterStats.bestTrade.profit,
-                                        unit: 'kamas',
-                                        subtitle: characterStats.bestTrade.item ~ ' • ' ~ characterStats.bestTrade.soldAt|date('d/m/Y'),
-                                        icon: '🏆',
-                                        color: 'yellow'
-                                    } %}
-                                {% else %}
-                                    {% include 'components/stats_card.html.twig' with {
-                                        title: '🏆 Meilleur Trade',
-                                        value: '—',
-                                        subtitle: 'Commencez à vendre pour voir vos records',
-                                        icon: '🏆',
-                                        color: 'gray'
-                                    } %}
-                                {% endif %}
-
-                                {% if characterStats.worstTrade %}
-                                    {% include 'components/stats_card.html.twig' with {
-                                        title: '📉 Trade le moins rentable',
-                                        value: characterStats.worstTrade.profit,
-                                        unit: 'kamas',
-                                        subtitle: characterStats.worstTrade.item ~ ' • ' ~ characterStats.worstTrade.soldAt|date('d/m/Y'),
-                                        icon: '📉',
-                                        color: characterStats.worstTrade.profit >= 0 ? 'orange' : 'red'
-                                    } %}
-                                {% else %}
-                                    {% include 'components/stats_card.html.twig' with {
-                                        title: '📉 Trade le moins rentable',
-                                        value: '—',
-                                        subtitle: 'Aucune vente enregistrée pour le moment',
-                                        icon: '📉',
-                                        color: 'gray'
-                                    } %}
-                                {% endif %}
+                    <!-- ========== ANALYSE DE PERFORMANCE ========== -->
+                    <div class="bg-gray-800/50 border border-gray-600/50 rounded-lg p-6">
+                        <div class="flex items-center space-x-3 mb-6">
+                            <div class="w-10 h-10 bg-gradient-to-br from-yellow-500 to-orange-500 rounded-lg flex items-center justify-center">
+                                <span class="text-xl">🏆</span>
+                            </div>
+                            <div>
+                                <h2 class="text-white font-medium text-lg">Analyse de performance</h2>
+                                <p class="text-gray-400 text-sm">Vos meilleurs et moins bons trades</p>
                             </div>
                         </div>
-                    </section>
 
-                    <!-- ========== SECTION 4: ÉVOLUTION TEMPORELLE ========== -->
+                        <div class="grid grid-cols-1 lg:grid-cols-2 gap-4">
+                            {% if characterStats.bestTrade %}
+                                <div class="p-4 bg-gray-800/70 border border-gray-600/50 rounded-lg hover:bg-gray-700/50 transition-colors">
+                                    <div class="flex items-center space-x-3">
+                                        <div class="w-10 h-10 bg-gradient-to-br from-yellow-500 to-yellow-600 rounded-lg flex items-center justify-center">
+                                            <span class="text-xl">🏆</span>
+                                        </div>
+                                        <div class="flex-1">
+                                            <h3 class="text-white font-medium">Meilleur Trade</h3>
+                                            <div class="flex items-center space-x-2 text-xs mt-1">
+                                                <span class="text-green-400">💰 {{ (characterStats.bestTrade.profit/1000)|number_format(0) }}k</span>
+                                                <span class="text-gray-400">📅 {{ characterStats.bestTrade.soldAt|date('d/m') }}</span>
+                                            </div>
+                                        </div>
+                                    </div>
+                                    <p class="text-gray-400 text-sm mt-2">{{ characterStats.bestTrade.item }}</p>
+                                </div>
+                            {% else %}
+                                <div class="p-4 bg-gray-800/70 border border-gray-600/50 rounded-lg">
+                                    <div class="flex items-center space-x-3">
+                                        <div class="w-10 h-10 bg-gradient-to-br from-gray-500 to-gray-600 rounded-lg flex items-center justify-center">
+                                            <span class="text-xl">🏆</span>
+                                        </div>
+                                        <div class="flex-1">
+                                            <h3 class="text-white font-medium">Meilleur Trade</h3>
+                                            <div class="text-xs mt-1">
+                                                <span class="text-gray-500">Aucune vente</span>
+                                            </div>
+                                        </div>
+                                    </div>
+                                    <p class="text-gray-400 text-sm mt-2">Commencez à vendre pour voir vos records</p>
+                                </div>
+                            {% endif %}
+
+                            {% if characterStats.worstTrade %}
+                                <div class="p-4 bg-gray-800/70 border border-gray-600/50 rounded-lg hover:bg-gray-700/50 transition-colors">
+                                    <div class="flex items-center space-x-3">
+                                        <div class="w-10 h-10 bg-gradient-to-br from-{{ characterStats.worstTrade.profit >= 0 ? 'orange' : 'red' }}-500 to-{{ characterStats.worstTrade.profit >= 0 ? 'orange' : 'red' }}-600 rounded-lg flex items-center justify-center">
+                                            <span class="text-xl">📉</span>
+                                        </div>
+                                        <div class="flex-1">
+                                            <h3 class="text-white font-medium">Trade le moins rentable</h3>
+                                            <div class="flex items-center space-x-2 text-xs mt-1">
+                                                <span class="text-{{ characterStats.worstTrade.profit >= 0 ? 'orange' : 'red' }}-400">💰 {{ (characterStats.worstTrade.profit/1000)|number_format(0) }}k</span>
+                                                <span class="text-gray-400">📅 {{ characterStats.worstTrade.soldAt|date('d/m') }}</span>
+                                            </div>
+                                        </div>
+                                    </div>
+                                    <p class="text-gray-400 text-sm mt-2">{{ characterStats.worstTrade.item }}</p>
+                                </div>
+                            {% else %}
+                                <div class="p-4 bg-gray-800/70 border border-gray-600/50 rounded-lg">
+                                    <div class="flex items-center space-x-3">
+                                        <div class="w-10 h-10 bg-gradient-to-br from-gray-500 to-gray-600 rounded-lg flex items-center justify-center">
+                                            <span class="text-xl">📉</span>
+                                        </div>
+                                        <div class="flex-1">
+                                            <h3 class="text-white font-medium">Trade le moins rentable</h3>
+                                            <div class="text-xs mt-1">
+                                                <span class="text-gray-500">Aucune vente</span>
+                                            </div>
+                                        </div>
+                                    </div>
+                                    <p class="text-gray-400 text-sm mt-2">Aucune vente enregistrée</p>
+                                </div>
+                            {% endif %}
+                        </div>
+                    </div>
+
+                    <!-- ========== ÉVOLUTION TEMPORELLE ========== -->
                     {% if characterStats.monthlyTrend|length > 0 %}
-                        <section class="wrapper-background">
-                            <div class="p-10">
-                                <!-- En-tête de section -->
-                                <div class="flex items-center gap-5 mb-12">
-                                    <div class="w-3 h-16 bg-gradient-to-b from-green-400 to-teal-500 rounded-full shadow-lg"></div>
-                                    <div>
-                                        <h2 class="text-3xl font-bold text-white mb-3">📈 Évolution sur 6 mois</h2>
-                                        <p class="text-gray-300 text-lg">Suivi détaillé de vos profits mensuels et tendances</p>
-                                    </div>
+                        <div class="bg-gray-800/50 border border-gray-600/50 rounded-lg p-6">
+                            <div class="flex items-center space-x-3 mb-6">
+                                <div class="w-10 h-10 bg-gradient-to-br from-green-500 to-teal-500 rounded-lg flex items-center justify-center">
+                                    <span class="text-xl">📈</span>
                                 </div>
-
-                                <!-- Graphique mensuel -->
-                                <div class="bg-gray-800/30 border border-gray-600/30 rounded-xl p-8">
-                                    <div class="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-6 gap-6">
-                                        {% for month in characterStats.monthlyTrend %}
-                                            <div class="text-center p-6 bg-gray-700/40 rounded-xl border border-gray-600/40 hover:border-gray-500/60 hover:bg-gray-700/60 transition-all duration-200">
-                                                <div class="text-white font-bold text-base mb-2">{{ month.month }}</div>
-                                                <div class="text-{{ month.profit >= 0 ? 'green' : 'red' }}-400 font-bold text-2xl mb-1">
-                                                    {{ (month.profit/1000000)|number_format(1) }}M
-                                                </div>
-                                                <div class="text-gray-400 text-sm">
-                                                    {{ month.profit >= 0 ? '+' : '' }}{{ (month.profit/1000)|number_format(0) }}k
-                                                </div>
-                                            </div>
-                                        {% endfor %}
-                                    </div>
-
-                                    <!-- Analyse de tendance -->
-                                    {% if characterStats.monthlyTrend|length > 1 %}
-                                        {% set lastMonth = characterStats.monthlyTrend|last %}
-                                        {% set prevMonth = characterStats.monthlyTrend[characterStats.monthlyTrend|length - 2] %}
-                                        {% set trend = lastMonth.profit - prevMonth.profit %}
-                                        <div class="mt-8 p-6 bg-gray-800/50 rounded-xl border border-gray-600/30">
-                                            <div class="flex items-center justify-center gap-3 text-base">
-                                                {% if trend > 0 %}
-                                                    <span class="text-green-400 text-xl">📈</span>
-                                                    <span class="text-green-400 font-semibold">Tendance positive :</span>
-                                                    <span class="text-green-300 font-bold">+{{ (trend/1000)|number_format(0) }}k par rapport au mois dernier</span>
-                                                {% elseif trend < 0 %}
-                                                    <span class="text-red-400 text-xl">📉</span>
-                                                    <span class="text-red-400 font-semibold">Tendance négative :</span>
-                                                    <span class="text-red-300 font-bold">{{ (trend/1000)|number_format(0) }}k par rapport au mois dernier</span>
-                                                {% else %}
-                                                    <span class="text-gray-400 text-xl">➡️</span>
-                                                    <span class="text-gray-400 font-semibold">Stabilité :</span>
-                                                    <span class="text-gray-300">Performance identique au mois dernier</span>
-                                                {% endif %}
-                                            </div>
-                                        </div>
-                                    {% endif %}
+                                <div>
+                                    <h2 class="text-white font-medium text-lg">Évolution sur 6 mois</h2>
+                                    <p class="text-gray-400 text-sm">Suivi de vos profits mensuels</p>
                                 </div>
                             </div>
-                        </section>
+
+                            <!-- Grille mensuelle comme cartes de personnages -->
+                            <div class="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-6 gap-4">
+                                {% for month in characterStats.monthlyTrend %}
+                                    <div class="p-4 bg-gray-800/70 border border-gray-600/50 rounded-lg hover:bg-gray-700/50 transition-colors text-center">
+                                        <div class="text-white font-medium mb-2">{{ month.month }}</div>
+                                        <div class="text-{{ month.profit >= 0 ? 'green' : 'red' }}-400 font-bold text-lg mb-1">
+                                            {{ (month.profit/1000000)|number_format(1) }}M
+                                        </div>
+                                        <div class="text-gray-400 text-xs">
+                                            {{ month.profit >= 0 ? '+' : '' }}{{ (month.profit/1000)|number_format(0) }}k
+                                        </div>
+                                    </div>
+                                {% endfor %}
+                            </div>
+
+                            <!-- Analyse de tendance -->
+                            {% if characterStats.monthlyTrend|length > 1 %}
+                                {% set lastMonth = characterStats.monthlyTrend|last %}
+                                {% set prevMonth = characterStats.monthlyTrend[characterStats.monthlyTrend|length - 2] %}
+                                {% set trend = lastMonth.profit - prevMonth.profit %}
+                                <div class="mt-6 p-4 bg-gray-800/40 border border-gray-600/30 rounded-lg">
+                                    <div class="flex items-center justify-center gap-3">
+                                        {% if trend > 0 %}
+                                            <span class="text-green-400 text-lg">📈</span>
+                                            <span class="text-green-400 font-medium">Tendance positive :</span>
+                                            <span class="text-green-300 font-bold">+{{ (trend/1000)|number_format(0) }}k vs mois dernier</span>
+                                        {% elseif trend < 0 %}
+                                            <span class="text-red-400 text-lg">📉</span>
+                                            <span class="text-red-400 font-medium">Tendance négative :</span>
+                                            <span class="text-red-300 font-bold">{{ (trend/1000)|number_format(0) }}k vs mois dernier</span>
+                                        {% else %}
+                                            <span class="text-gray-400 text-lg">➡️</span>
+                                            <span class="text-gray-400 font-medium">Stabilité :</span>
+                                            <span class="text-gray-300">Performance identique</span>
+                                        {% endif %}
+                                    </div>
+                                </div>
+                            {% endif %}
+                        </div>
                     {% endif %}
                 </div>
 

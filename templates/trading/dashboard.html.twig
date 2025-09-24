@@ -7,99 +7,224 @@
 {% include 'components/profile_selector.html.twig' %}
 
 <div class="wrapper-container">
-    <!-- Statistiques globales -->
-    <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">
-        {% include 'components/stats_card.html.twig' with {
-            title: 'Profils',
-            value: trading_profiles_count,
-            color: 'blue'
-        } %}
-        {% include 'components/stats_card.html.twig' with {
-            title: 'Personnages', 
-            value: stats.charactersCount,
-            color: 'green'
-        } %}
-        {% include 'components/stats_card.html.twig' with {
-            title: 'Lots Total',
-            value: stats.global.totalLots,
-            subtitle: stats.global.availableLots ~ ' dispo • ' ~ stats.global.soldLots ~ ' vendus',
-            color: 'purple'
-        } %}
-        {% include 'components/stats_card.html.twig' with {
-            title: 'Profit Potentiel',
-            value: ((stats.global.realizedProfit + stats.global.potentialProfit) / 1000000)|number_format(1) ~ 'M',
-            subtitle: (stats.global.realizedProfit / 1000000)|number_format(1) ~ 'M réalisé',
-            color: 'green'
-        } %}
+    <!-- Header dashboard -->
+    <div class="mb-8">
+        <h1 class="page-title mb-2">🎯 Dashboard Trading</h1>
+        <p class="text-gray-400">Vue d'ensemble de votre activité et performance</p>
     </div>
 
-    <!-- Notifications -->
-    {% if notifications|length > 0 %}
-        <div class="grid gap-4">
-            <h3 class="text-white text-xl font-semibold">🔔 Notifications</h3>
-            <div class="space-y-3">
-                {% for notification in notifications %}
-                    <div class="bg-gray-800 border-l-4 border-{{ notification.type == 'success' ? 'green' : (notification.type == 'warning' ? 'yellow' : 'blue') }}-500 rounded-lg p-4">
-                        <div class="flex items-center justify-between">
-                            <div class="flex items-center space-x-3">
-                                <span class="text-2xl">{{ notification.icon }}</span>
-                                <div>
-                                    <h4 class="text-white font-medium">{{ notification.title }}</h4>
-                                    <p class="text-gray-300 text-sm">{{ notification.message }}</p>
-                                </div>
-                            </div>
-                            <a href="{{ notification.link }}" 
-                            class="bg-{{ notification.type == 'success' ? 'green' : (notification.type == 'warning' ? 'yellow' : 'blue') }}-600 hover:bg-{{ notification.type == 'success' ? 'green' : (notification.type == 'warning' ? 'yellow' : 'blue') }}-700 text-white px-3 py-1 rounded text-sm transition-colors">
-                                {{ notification.action }}
-                            </a>
-                        </div>
-                    </div>
-                {% endfor %}
-            </div>
-        </div>
-    {% endif %}
+    <!-- Contenu principal -->
+    <div class="space-y-8">
 
-    <!-- Actions principales -->
-    <div class="stats-grid text-white">
-        <a href="{{ path('app_profile_index') }}" class="btn-primary btn-with-icon">
-            <h3 class="text-xl font-bold mb-2">👥 Profils</h3>
-            <p class="text-blue-200">Gérer personnages et sélection</p>
-        </a>
-        <a href="{{ path('app_trading_lots') }}" class="btn-success btn-with-icon">
-            <h3 class="text-xl font-bold mb-2">📦 Mon Trading</h3>
-            <p class="text-green-200">Gérer mes lots et ventes</p>
-        </a>
-        <a href="{{ path('app_trading_surveillance') }}" class="btn-warning btn-with-icon">
-            <h3 class="text-xl font-bold mb-2">👁️ Surveillance</h3>
-            <p class="text-orange-200">Surveiller les prix du marché</p>
-        </a>
-        <a href="{{ path('app_analytics_index') }}" class="btn-purple btn-with-icon">
-            <h3 class="text-xl font-bold mb-2">📊 Analytics</h3>
-            <p class="text-purple-200">Analyser mes performances</p>
-        </a>
-    </div>
-
-    <!-- Performance de la semaine -->
-    {% if quick_stats.weekSalesCount > 0 %}
-        <div class="space-content">
-            <h3 class="page-title">🏆 Performance de la semaine</h3>
-            <div class="gradient-primary card">
-                <div class="stats-grid-3 text-white">
-                    <div class="text-center">
-                        <div class="stats-value-lg">{{ quick_stats.weekSalesCount }}</div>
-                        <div class="text-blue-100 text-sm">ventes réalisées</div>
-                    </div>
-                    <div class="text-center">
-                        <div class="stats-value-lg">{{ (quick_stats.weekProfit / 1000000)|number_format(1) }}M</div>
-                        <div class="text-blue-100 text-sm">profit total</div>
-                    </div>
-                    <div class="text-center">
-                        <div class="text-lg font-medium">{{ quick_stats.bestItem }}</div>
-                        <div class="text-blue-100 text-sm">meilleur item (+{{ (quick_stats.bestItemProfit / 1000)|number_format(0, ',', ' ') }}k)</div>
-                    </div>
+        <!-- ========== STATISTIQUES GLOBALES ========== -->
+        <div class="bg-gray-800/50 border border-gray-600/50 rounded-lg p-6">
+            <div class="flex items-center space-x-3 mb-6">
+                <div class="w-10 h-10 bg-gradient-to-br from-blue-500 to-blue-600 rounded-lg flex items-center justify-center">
+                    <span class="text-xl">📊</span>
+                </div>
+                <div>
+                    <h2 class="text-white font-medium text-lg">Vue d'ensemble</h2>
+                    <p class="text-gray-400 text-sm">Aperçu global de votre activité</p>
                 </div>
             </div>
+
+            <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">
+                {% include 'components/stats_card.html.twig' with {
+                    title: 'Profils Trading',
+                    value: trading_profiles_count,
+                    subtitle: 'Comptes configurés',
+                    icon: '👥',
+                    color: 'blue'
+                } %}
+                {% include 'components/stats_card.html.twig' with {
+                    title: 'Personnages',
+                    value: stats.charactersCount,
+                    subtitle: 'Actifs sur vos profils',
+                    icon: '🎮',
+                    color: 'green'
+                } %}
+                {% include 'components/stats_card.html.twig' with {
+                    title: 'Lots Total',
+                    value: stats.global.totalLots,
+                    subtitle: stats.global.availableLots ~ ' dispo • ' ~ stats.global.soldLots ~ ' vendus',
+                    icon: '📦',
+                    color: 'purple'
+                } %}
+                {% include 'components/stats_card.html.twig' with {
+                    title: 'Profit Potentiel',
+                    value: ((stats.global.realizedProfit + stats.global.potentialProfit) / 1000000)|number_format(1),
+                    unit: 'M',
+                    subtitle: (stats.global.realizedProfit / 1000000)|number_format(1) ~ 'M réalisé',
+                    icon: '💰',
+                    color: 'green'
+                } %}
+            </div>
         </div>
-    {% endif %}
+
+        <!-- ========== PERFORMANCE RÉCENTE ========== -->
+        {% if quick_stats.weekSalesCount > 0 %}
+            <div class="bg-gray-800/50 border border-gray-600/50 rounded-lg p-6">
+                <div class="flex items-center space-x-3 mb-6">
+                    <div class="w-10 h-10 bg-gradient-to-br from-yellow-500 to-orange-500 rounded-lg flex items-center justify-center">
+                        <span class="text-xl">🏆</span>
+                    </div>
+                    <div>
+                        <h2 class="text-white font-medium text-lg">Performance cette semaine</h2>
+                        <p class="text-gray-400 text-sm">Vos résultats des 7 derniers jours</p>
+                    </div>
+                </div>
+
+                <div class="grid grid-cols-1 md:grid-cols-3 gap-4">
+                    {% include 'components/stats_card.html.twig' with {
+                        title: 'Ventes Réalisées',
+                        value: quick_stats.weekSalesCount,
+                        subtitle: 'Transactions cette semaine',
+                        icon: '🔥',
+                        color: 'orange'
+                    } %}
+                    {% include 'components/stats_card.html.twig' with {
+                        title: 'Profit Hebdo',
+                        value: (quick_stats.weekProfit / 1000000)|number_format(1),
+                        unit: 'M',
+                        subtitle: 'Bénéfice de la semaine',
+                        icon: '💸',
+                        color: 'green'
+                    } %}
+                    {% include 'components/stats_card.html.twig' with {
+                        title: 'Meilleur Item',
+                        value: quick_stats.bestItem|length > 15 ? quick_stats.bestItem|slice(0, 15) ~ '...' : quick_stats.bestItem,
+                        subtitle: '+' ~ (quick_stats.bestItemProfit / 1000)|number_format(0) ~ 'k profit',
+                        icon: '⭐',
+                        color: 'yellow'
+                    } %}
+                </div>
+            </div>
+        {% endif %}
+
+        <!-- ========== NOTIFICATIONS ========== -->
+        {% if notifications|length > 0 %}
+            <div class="bg-gray-800/50 border border-gray-600/50 rounded-lg p-6">
+                <div class="flex items-center space-x-3 mb-6">
+                    <div class="w-10 h-10 bg-gradient-to-br from-red-500 to-pink-500 rounded-lg flex items-center justify-center">
+                        <span class="text-xl">🔔</span>
+                    </div>
+                    <div>
+                        <h2 class="text-white font-medium text-lg">Notifications</h2>
+                        <p class="text-gray-400 text-sm">{{ notifications|length }} alerte{{ notifications|length > 1 ? 's' : '' }} importante{{ notifications|length > 1 ? 's' : '' }}</p>
+                    </div>
+                </div>
+
+                <div class="space-y-3">
+                    {% for notification in notifications %}
+                        <div class="bg-gray-800/70 border border-gray-600/50 rounded-lg p-4 hover:bg-gray-700/50 transition-colors">
+                            <div class="flex items-center justify-between">
+                                <div class="flex items-center space-x-3">
+                                    <div class="w-8 h-8 bg-gradient-to-br from-{{ notification.type == 'success' ? 'green' : (notification.type == 'warning' ? 'yellow' : 'blue') }}-500 to-{{ notification.type == 'success' ? 'green' : (notification.type == 'warning' ? 'orange' : 'blue') }}-600 rounded-lg flex items-center justify-center">
+                                        <span class="text-sm">{{ notification.icon }}</span>
+                                    </div>
+                                    <div>
+                                        <h4 class="text-white font-medium">{{ notification.title }}</h4>
+                                        <p class="text-gray-400 text-sm">{{ notification.message }}</p>
+                                    </div>
+                                </div>
+                                <a href="{{ notification.link }}"
+                                   class="bg-{{ notification.type == 'success' ? 'green' : (notification.type == 'warning' ? 'yellow' : 'blue') }}-600/20 hover:bg-{{ notification.type == 'success' ? 'green' : (notification.type == 'warning' ? 'yellow' : 'blue') }}-600/30 border border-{{ notification.type == 'success' ? 'green' : (notification.type == 'warning' ? 'yellow' : 'blue') }}-500/50 text-{{ notification.type == 'success' ? 'green' : (notification.type == 'warning' ? 'yellow' : 'blue') }}-300 px-3 py-2 rounded-lg text-xs font-medium transition-colors">
+                                    {{ notification.action }}
+                                </a>
+                            </div>
+                        </div>
+                    {% endfor %}
+                </div>
+            </div>
+        {% endif %}
+
+        <!-- ========== ACTIONS RAPIDES ========== -->
+        <div class="bg-gray-800/50 border border-gray-600/50 rounded-lg p-6">
+            <div class="flex items-center space-x-3 mb-6">
+                <div class="w-10 h-10 bg-gradient-to-br from-purple-500 to-indigo-500 rounded-lg flex items-center justify-center">
+                    <span class="text-xl">🚀</span>
+                </div>
+                <div>
+                    <h2 class="text-white font-medium text-lg">Actions rapides</h2>
+                    <p class="text-gray-400 text-sm">Accédez rapidement à vos outils principaux</p>
+                </div>
+            </div>
+
+            <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">
+                <!-- Profils -->
+                <a href="{{ path('app_profile_index') }}"
+                   class="group p-4 bg-gray-800/70 border border-gray-600/50 rounded-lg hover:bg-gray-700/70 hover:border-blue-500/50 transition-all">
+                    <div class="flex items-center space-x-3 mb-3">
+                        <div class="w-10 h-10 bg-gradient-to-br from-blue-500 to-blue-600 rounded-lg flex items-center justify-center group-hover:scale-110 transition-transform">
+                            <span class="text-xl">👥</span>
+                        </div>
+                        <div class="flex-1">
+                            <h3 class="text-white font-medium">Profils</h3>
+                            <div class="flex items-center space-x-2 text-xs mt-1">
+                                <span class="text-blue-400">📊 {{ trading_profiles_count }}</span>
+                                <span class="text-green-400">👤 {{ stats.charactersCount }}</span>
+                            </div>
+                        </div>
+                    </div>
+                    <p class="text-gray-400 text-sm leading-relaxed">Gérer vos personnages et sélection</p>
+                </a>
+
+                <!-- Mon Trading -->
+                <a href="{{ path('app_trading_lots') }}"
+                   class="group p-4 bg-gray-800/70 border border-gray-600/50 rounded-lg hover:bg-gray-700/70 hover:border-green-500/50 transition-all">
+                    <div class="flex items-center space-x-3 mb-3">
+                        <div class="w-10 h-10 bg-gradient-to-br from-green-500 to-green-600 rounded-lg flex items-center justify-center group-hover:scale-110 transition-transform">
+                            <span class="text-xl">📦</span>
+                        </div>
+                        <div class="flex-1">
+                            <h3 class="text-white font-medium">Mon Trading</h3>
+                            <div class="flex items-center space-x-2 text-xs mt-1">
+                                <span class="text-green-400">📦 {{ stats.global.availableLots }}</span>
+                                <span class="text-gray-400">✓ {{ stats.global.soldLots }}</span>
+                            </div>
+                        </div>
+                    </div>
+                    <p class="text-gray-400 text-sm leading-relaxed">Gérer vos lots et ventes</p>
+                </a>
+
+                <!-- Surveillance -->
+                <a href="{{ path('app_trading_surveillance') }}"
+                   class="group p-4 bg-gray-800/70 border border-gray-600/50 rounded-lg hover:bg-gray-700/70 hover:border-yellow-500/50 transition-all">
+                    <div class="flex items-center space-x-3 mb-3">
+                        <div class="w-10 h-10 bg-gradient-to-br from-yellow-500 to-orange-500 rounded-lg flex items-center justify-center group-hover:scale-110 transition-transform">
+                            <span class="text-xl">👁️</span>
+                        </div>
+                        <div class="flex-1">
+                            <h3 class="text-white font-medium">Surveillance</h3>
+                            <div class="flex items-center space-x-2 text-xs mt-1">
+                                <span class="text-orange-400">👁️ Actif</span>
+                                <span class="text-gray-400">📈 Marché</span>
+                            </div>
+                        </div>
+                    </div>
+                    <p class="text-gray-400 text-sm leading-relaxed">Surveiller les prix du marché</p>
+                </a>
+
+                <!-- Analytics -->
+                <a href="{{ path('app_analytics_index') }}"
+                   class="group p-4 bg-gray-800/70 border border-gray-600/50 rounded-lg hover:bg-gray-700/70 hover:border-purple-500/50 transition-all">
+                    <div class="flex items-center space-x-3 mb-3">
+                        <div class="w-10 h-10 bg-gradient-to-br from-purple-500 to-indigo-500 rounded-lg flex items-center justify-center group-hover:scale-110 transition-transform">
+                            <span class="text-xl">📊</span>
+                        </div>
+                        <div class="flex-1">
+                            <h3 class="text-white font-medium">Analytics</h3>
+                            <div class="flex items-center space-x-2 text-xs mt-1">
+                                <span class="text-green-400">💰 {{ (stats.global.realizedProfit / 1000000)|number_format(1) }}M</span>
+                                <span class="text-purple-400">📈 Stats</span>
+                            </div>
+                        </div>
+                    </div>
+                    <p class="text-gray-400 text-sm leading-relaxed">Analyser vos performances</p>
+                </a>
+            </div>
+        </div>
+    </div>
 </div>
+
 {% endblock %}
