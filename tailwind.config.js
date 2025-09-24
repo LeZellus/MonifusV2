@@ -77,7 +77,32 @@ module.exports = {
     'bg-red-500', 'bg-orange-500', 'bg-amber-500', 'bg-yellow-500', 'bg-lime-500', 'bg-green-500',
     'bg-emerald-500', 'bg-teal-500', 'bg-cyan-500', 'bg-sky-500', 'bg-blue-500', 'bg-indigo-500',
     'bg-violet-500', 'bg-purple-500', 'bg-fuchsia-500', 'bg-pink-500', 'bg-rose-500',
-    'bg-gray-500', 'bg-slate-500', 'bg-zinc-500', 'bg-neutral-500', 'bg-stone-500'
+    'bg-gray-500', 'bg-slate-500', 'bg-zinc-500', 'bg-neutral-500', 'bg-stone-500',
+
+    // Classes slate pour le nouveau sélecteur
+    'bg-slate-600', 'bg-slate-700', 'bg-slate-800', 'bg-slate-900',
+    'bg-slate-700/50', 'bg-slate-800/50', 'bg-slate-800/60', 'bg-slate-900/50', 'bg-slate-900/95',
+    'bg-slate-700/30', 'bg-slate-700/60', 'bg-slate-600/20', 'bg-blue-600/20',
+    'border-slate-500', 'border-slate-600', 'border-slate-700',
+    'border-slate-600/50', 'border-slate-600/30', 'border-slate-600/40',
+    'hover:bg-slate-600', 'hover:bg-slate-700', 'hover:bg-slate-700/70', 'hover:bg-slate-700/80',
+    'hover:bg-slate-800', 'hover:border-blue-500', 'hover:border-blue-400', 'hover:border-slate-400',
+    'bg-emerald-600', 'bg-emerald-500', 'hover:bg-emerald-500', 'hover:bg-emerald-400',
+    'bg-blue-900/20', 'bg-emerald-500/20', 'bg-amber-500/20', 'bg-blue-500/20',
+    'bg-amber-600/20', 'bg-amber-600/40', 'bg-red-600/20', 'bg-red-600/40',
+    'text-emerald-300', 'text-amber-300', 'text-amber-200', 'text-red-300', 'text-red-200',
+    'text-blue-200', 'text-blue-300', 'text-blue-400', 'hover:text-blue-200', 'hover:text-blue-300',
+    'text-red-100', 'text-red-200', 'border-red-300', 'border-red-400', 'border-emerald-500/40',
+    'border-blue-500/40', 'border-amber-500/40', 'shadow-blue-500/20', 'shadow-emerald-500/25',
+    'ring-2', 'ring-blue-500', 'rounded-xl', 'rounded-2xl', 'shadow-lg', 'shadow-2xl',
+    'bg-gradient-to-br', 'bg-gradient-to-r', 'from-indigo-500', 'to-purple-600',
+    'from-emerald-600', 'to-emerald-500', 'from-blue-500', 'to-indigo-500', 'from-blue-600', 'to-indigo-600',
+    'from-purple-500', 'to-pink-500', 'from-red-600', 'to-red-500', 'from-red-500', 'to-red-400',
+    'from-slate-700', 'to-slate-600', 'from-slate-800', 'to-slate-700',
+    'animate-pulse', '-translate-y-1', '-translate-y-0.5', 'hover:-translate-y-1', 'hover:-translate-y-0.5',
+    'transform', 'scale-110', 'group-hover:scale-110', 'group-hover:rotate-180',
+    'backdrop-blur-xl', 'w-[28rem]', 'max-h-80', 'max-h-60',
+    'z-[9998]', 'z-[9999]', 'z-[10000]', 'z-[10001]'
   ],
   theme: {
     extend: {},

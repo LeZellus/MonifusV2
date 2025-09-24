@@ -2,7 +2,11 @@
 import { Controller } from "@hotwired/stimulus"
 
 export default class extends Controller {
-    static targets = ["panel", "overlay", "trigger"]
+    static targets = ["panel", "trigger"]
+
+    get overlayElement() {
+        return this.element.querySelector('[data-floating-selector-target="overlay"]')
+    }
 
     connect() {
         // Fermer le panel avec Escape
@@ -40,23 +44,31 @@ export default class extends Controller {
             this.panelTarget.classList.add('bottom-full', 'mb-4')
         }
 
-        // Montrer l'overlay et le panel
-        this.overlayTarget.classList.remove('hidden')
+        // Montrer l'overlay et le panel (avec vérifications d'existence)
+        if (this.overlayElement) {
+            this.overlayElement.classList.remove('hidden')
+        }
         this.panelTarget.classList.remove('hidden')
 
         // Animation d'entrée fluide
         requestAnimationFrame(() => {
             this.panelTarget.style.transform = 'scale(0.95) translateY(10px)'
             this.panelTarget.style.opacity = '0'
-            this.overlayTarget.style.opacity = '0'
+            if (this.overlayElement) {
+                this.overlayElement.style.opacity = '0'
+            }
 
             requestAnimationFrame(() => {
                 this.panelTarget.style.transition = 'all 0.2s cubic-bezier(0.16, 1, 0.3, 1)'
-                this.overlayTarget.style.transition = 'opacity 0.2s ease-out'
+                if (this.overlayElement) {
+                    this.overlayElement.style.transition = 'opacity 0.2s ease-out'
+                }
 
                 this.panelTarget.style.transform = 'scale(1) translateY(0)'
                 this.panelTarget.style.opacity = '1'
-                this.overlayTarget.style.opacity = '1'
+                if (this.overlayElement) {
+                    this.overlayElement.style.opacity = '1'
+                }
             })
         })
 
@@ -70,23 +82,31 @@ export default class extends Controller {
     closePanel() {
         // Animation de sortie
         this.panelTarget.style.transition = 'all 0.15s cubic-bezier(0.4, 0, 1, 1)'
-        this.overlayTarget.style.transition = 'opacity 0.15s ease-in'
+        if (this.overlayElement) {
+            this.overlayElement.style.transition = 'opacity 0.15s ease-in'
+        }
 
         this.panelTarget.style.transform = 'scale(0.95) translateY(10px)'
         this.panelTarget.style.opacity = '0'
-        this.overlayTarget.style.opacity = '0'
+        if (this.overlayElement) {
+            this.overlayElement.style.opacity = '0'
+        }
 
         // Masquer après l'animation
         setTimeout(() => {
             this.panelTarget.classList.add('hidden')
-            this.overlayTarget.classList.add('hidden')
+            if (this.overlayElement) {
+                this.overlayElement.classList.add('hidden')
+            }
 
             // Réinitialiser les styles
             this.panelTarget.style.transform = ''
             this.panelTarget.style.opacity = ''
             this.panelTarget.style.transition = ''
-            this.overlayTarget.style.opacity = ''
-            this.overlayTarget.style.transition = ''
+            if (this.overlayElement) {
+                this.overlayElement.style.opacity = ''
+                this.overlayElement.style.transition = ''
+            }
         }, 150)
 
         // Arrêter d'écouter les événements

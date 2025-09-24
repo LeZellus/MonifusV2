@@ -4,33 +4,10 @@
 
 {% block body %}
 
-    <!-- Page de gestion des profils - pas besoin de header compact -->
+    <!-- Page de gestion des profils avec le nouveau sélecteur -->
+    {% include 'components/profile_selector.html.twig' %}
 
     <div class="wrapper-container">
-        <!-- Section additionnelle pour la gestion des profils (optionnel) -->
-        {% if selectorData.currentProfile %}
-            <div class="mt-6 text-center">
-                <div class="wrapper-background max-w-md mx-auto">
-                    <h3 class="text-white text-lg font-bold mb-4">Actions du profil</h3>
-                    <div class="space-content-sm">
-                        <a href="{{ path('app_profile_edit', {id: selectorData.currentProfile.id}) }}"
-                           class="btn-warning btn-md icon-text">
-                            <span>✏️</span>
-                            Modifier le profil
-                        </a>
-                        {% if profiles|length > 1 %}
-                            <form method="post" action="{{ path('app_profile_delete', {id: selectorData.currentProfile.id}) }}"
-                                  onsubmit="return confirm('Êtes-vous sûr de vouloir supprimer le profil {{ selectorData.currentProfile.name }} et tous ses personnages ?')"
-                                  class="inline">
-                                <button type="submit" class="btn-danger btn-md icon-text">
-                                    <span>🗑️</span>
-                                    Supprimer ce profil
-                                </button>
-                            </form>
-                        {% endif %}
-                    </div>
-                </div>
-            </div>
-        {% endif %}
+        <!-- Le nouveau sélecteur contient maintenant toutes les actions nécessaires -->
     </div>
 {% endblock %}

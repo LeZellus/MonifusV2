@@ -51,11 +51,32 @@ class Classe
      */
     public function getImagePath(): string
     {
+        // Utiliser d'abord imgUrl si disponible
+        if ($this->imgUrl) {
+            return $this->imgUrl;
+        }
+
+        // Sinon, générer le chemin à partir du nom en gérant les accents
         if ($this->name) {
-            $filename = strtolower($this->name) . '.png';
+            // Conversion des accents et normalisation pour les noms de fichiers
+            $normalizedName = $this->normalizeClassName($this->name);
+            $filename = strtolower($normalizedName) . '.png';
             return '/classes/' . $filename;
         }
-        
+
         return '/classes/default.png';
+    }
+
+    /**
+     * Normalise le nom de classe pour correspondre aux noms de fichiers
+     */
+    private function normalizeClassName(string $name): string
+    {
+        $replacements = [
+            'Féca' => 'feca',
+            'féca' => 'feca',
+        ];
+
+        return $replacements[$name] ?? $name;
     }
 }

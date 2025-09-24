@@ -1,0 +1,281 @@
+{# templates/components/profile_selector.html.twig #}
+{% if app.user and selectorData is defined %}
+<div class="profile-selector wrapper-container">
+    <div>
+        {% if selectorData.currentProfile %}
+            {# Header du profil actuel #}
+            <div class="bg-gray-800/50 border border-gray-600/50 rounded-lg p-4 mb-4">
+                <div class="flex items-center justify-between">
+                    <div class="flex items-center space-x-3">
+                        <div class="w-10 h-10 bg-gradient-to-br from-purple-500 to-pink-500 rounded-lg flex items-center justify-center">
+                            <span class="text-white font-bold">{{ selectorData.currentProfile.name|first|upper }}</span>
+                        </div>
+                        <div>
+                            <h3 class="text-white font-medium">{{ selectorData.currentProfile.name }}</h3>
+                            <p class="text-gray-400 text-sm">
+                                {{ selectorData.currentProfile.dofusCharacters|length }} personnage{{ selectorData.currentProfile.dofusCharacters|length > 1 ? 's' : '' }}
+                            </p>
+                        </div>
+                    </div>
+                    
+                    <div class="flex items-center space-x-3">
+                        {# Actions du profil #}
+                        <div class="flex items-center space-x-2">
+                            <a href="{{ path('app_profile_edit', {id: selectorData.currentProfile.id}) }}" 
+                            class="flex items-center space-x-1 bg-orange-600/20 hover:bg-orange-600/30 border border-orange-500/50 rounded-lg px-3 py-2 text-xs text-orange-300 hover:text-orange-200 transition-all duration-200"
+                            title="Modifier ce profil">
+                                <svg class="w-3 h-3" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z"></path>
+                                </svg>
+                                <span>Éditer</span>
+                            </a>
+                            
+                            {% if selectorData.profiles|length > 1 %}
+                                <form method="post" action="{{ path('app_profile_delete', {id: selectorData.currentProfile.id}) }}" 
+                                      onsubmit="return confirm('Supprimer le profil {{ selectorData.currentProfile.name }} et tous ses personnages ?')" class="inline">
+                                    <button type="submit" class="flex items-center space-x-1 bg-red-600/20 hover:bg-red-600/30 border border-red-500/50 rounded-lg px-3 py-2 text-xs text-red-300 hover:text-red-200 transition-all duration-200"
+                                            title="Supprimer ce profil">
+                                        <svg class="w-3 h-3" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16"></path>
+                                        </svg>
+                                        <span>Suppr</span>
+                                    </button>
+                                </form>
+                            {% endif %}
+                        </div>
+
+                        {# Boutons de raccourcis #}
+                        <div class="flex items-center space-x-2">
+                            <a href="{{ path('app_profile_new') }}" 
+                            class="flex items-center space-x-1 bg-blue-600/20 hover:bg-blue-600/30 border border-blue-500/50 rounded-lg px-3 py-2 text-xs text-blue-300 hover:text-blue-200 transition-all duration-200"
+                            title="Créer un nouveau profil">
+                                <svg class="w-3 h-3" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 6v6m0 0v6m0-6h6m-6 0H6"></path>
+                                </svg>
+                                <span>Profil</span>
+                            </a>
+                            
+                            {% if selectorData.currentProfile %}
+                                <a href="{{ path('app_profile_character_new', {id: selectorData.currentProfile.id}) }}" 
+                                class="flex items-center space-x-1 bg-green-600/20 hover:bg-green-600/30 border border-green-500/50 rounded-lg px-3 py-2 text-xs text-green-300 hover:text-green-200 transition-all duration-200"
+                                title="Ajouter un personnage au profil actuel">
+                                    <svg class="w-3 h-3" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z"></path>
+                                    </svg>
+                                    <span>Perso</span>
+                                </a>
+                            {% endif %}
+                        </div>
+
+                        {# Sélecteur de profil stylé si plusieurs profils #}
+                        {% if selectorData.profiles|length > 1 %}
+                            <div class="relative" data-controller="dropdown" style="overflow: visible;">
+                                <button type="button" data-action="click->dropdown#toggle" 
+                                        class="flex items-center space-x-2 bg-gray-700/50 hover:bg-gray-700 border border-gray-600 rounded-lg px-4 py-2 text-sm text-white transition-all duration-200">
+                                    <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 9l4-4 4 4m0 6l-4 4-4-4"></path>
+                                    </svg>
+                                    <span>Changer</span>
+                                </button>
+                                
+                                <div data-dropdown-target="menu" class="hidden absolute right-0 top-full mt-2 w-64 bg-gray-900/95 backdrop-blur-md border border-gray-500 rounded-lg shadow-2xl shadow-black/40 z-50">
+                                    <div class="py-2">
+                                        {% for profile in selectorData.profiles %}
+                                            {% if profile.id != selectorData.currentProfile.id %}
+                                                <form method="post" action="{{ path('app_profile_switch', {id: profile.id}) }}" data-turbo="true" class="block">
+                                                    <input type="hidden" name="redirect_url" value="{{ app.request.uri }}">
+                                                    <button type="submit" class="w-full px-4 py-3 text-left hover:bg-gray-700/80 transition-colors flex items-center space-x-3">
+                                                        <div class="w-8 h-8 bg-gradient-to-br from-blue-500 to-indigo-500 rounded-lg flex items-center justify-center">
+                                                            <span class="text-white font-bold text-sm">{{ profile.name|first|upper }}</span>
+                                                        </div>
+                                                        <div class="flex-1">
+                                                            <div class="text-white font-medium">{{ profile.name }}</div>
+                                                            <div class="text-gray-400 text-xs">{{ profile.dofusCharacters|length }} personnage{{ profile.dofusCharacters|length > 1 ? 's' : '' }}</div>
+                                                        </div>
+                                                        <svg class="w-4 h-4 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7"></path>
+                                                        </svg>
+                                                    </button>
+                                                </form>
+                                            {% endif %}
+                                        {% endfor %}
+                                    </div>
+                                </div>
+                            </div>
+                        {% else %}
+                            <div class="flex items-center space-x-2 bg-gray-700/30 px-3 py-2 rounded-lg">
+                                <svg class="w-4 h-4 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"></path>
+                                </svg>
+                                <span class="text-xs text-gray-400">Profil unique</span>
+                            </div>
+                        {% endif %}
+                    </div>
+                </div>
+            </div>
+
+            {# Liste des personnages du profil actuel #}
+            {% set profileCharacters = selectorData.currentProfile.dofusCharacters %}
+            {% if profileCharacters|length > 0 %}
+                <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
+                    {% for character in profileCharacters %}
+                        <div class="relative group">
+                            <form method="post" action="{{ path('app_profile_character_select', {id: character.id}) }}" data-turbo="true">
+                                <button type="submit" class="w-full p-3 bg-gray-800/70 border border-gray-600/50 rounded-lg text-left hover:bg-gray-700 transition-colors
+                                    {{ selectorData.selectedCharacter and selectorData.selectedCharacter.id == character.id ? 'border-blue-500 bg-blue-600/20' : '' }}">
+                                    <div class="flex items-center space-x-3">
+                                        <img src="{{ asset(character.classe.imagePath) }}" alt="{{ character.classe.name }}" 
+                                            class="w-10 h-10 rounded-lg object-cover">
+                                        <div class="flex-1">
+                                            <div class="text-white font-medium">{{ character.name }}</div>
+                                            <div class="text-gray-400 text-sm">{{ character.classe.name }} • {{ character.server.name }}</div>
+                                            <div class="flex space-x-2 text-xs mt-1">
+                                                {% set availableLots = character.tempLotsAvailable ?? 0 %}
+                                                {% set salesTransactions = character.tempSalesTransactions ?? 0 %}
+
+                                                {% if availableLots > 0 %}
+                                                    <span class="text-green-400" title="Lots disponibles">📦 {{ availableLots }}</span>
+                                                {% else %}
+                                                    <span class="text-gray-500">📦 0</span>
+                                                {% endif %}
+
+                                                {% if salesTransactions > 0 %}
+                                                    <span class="text-gray-400" title="Transactions de vente">💰 {{ salesTransactions }}</span>
+                                                {% endif %}
+
+                                                <span class="text-orange-400" title="Observations">👁️ {{ character.tempWatchesCount ?? 0 }}</span>
+                                            </div>
+                                        </div>
+                                        {% if selectorData.selectedCharacter and selectorData.selectedCharacter.id == character.id %}
+                                            <div class="text-blue-400">✓</div>
+                                        {% endif %}
+                                    </div>
+                                </button>
+                            </form>
+                            
+                            {# Actions du personnage (visibles au hover) #}
+                            <div class="absolute top-2 right-2 opacity-0 group-hover:opacity-100 transition-opacity flex space-x-1">
+                                <a href="{{ path('app_profile_character_edit', {id: character.id}) }}" 
+                                   class="w-6 h-6 bg-orange-600/90 hover:bg-orange-600 text-white rounded flex items-center justify-center transition-colors"
+                                   title="Modifier {{ character.name }}"
+                                   onclick="event.stopPropagation();">
+                                    <svg class="w-3 h-3" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z"></path>
+                                    </svg>
+                                </a>
+                                
+                                {% if profileCharacters|length > 1 %}
+                                    <form method="post" action="{{ path('app_profile_character_delete', {id: character.id}) }}" 
+                                          onsubmit="return confirm('Supprimer le personnage {{ character.name }} ?')" 
+                                          class="inline"
+                                          onclick="event.stopPropagation();">
+                                        <button type="submit" class="w-6 h-6 bg-red-600/90 hover:bg-red-600 text-white rounded flex items-center justify-center transition-colors"
+                                                title="Supprimer {{ character.name }}">
+                                            <svg class="w-3 h-3" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16"></path>
+                                            </svg>
+                                        </button>
+                                    </form>
+                                {% endif %}
+                            </div>
+                        </div>
+                    {% endfor %}
+                </div>
+            {% else %}
+                <div class="text-center py-8 bg-gray-800/60 border-2 border-dashed border-gray-500/60 rounded-xl">
+                    <div class="w-16 h-16 bg-gray-600/50 rounded-full mx-auto mb-4 flex items-center justify-center">
+                        <svg class="w-8 h-8 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z"></path>
+                        </svg>
+                    </div>
+                    <h3 class="text-white font-medium text-lg mb-2">Aucun personnage dans ce profil</h3>
+                    <p class="text-gray-400 mb-6 text-sm">Ajoutez votre premier personnage pour commencer</p>
+
+                    {# Boutons d'action plus visibles #}
+                    <div class="space-y-3">
+                        <a href="{{ path('app_profile_character_new', {id: selectorData.currentProfile.id}) }}"
+                        class="inline-flex items-center space-x-2 bg-green-600 hover:bg-green-700 border border-green-500 text-white px-6 py-3 rounded-lg font-medium transition-all duration-200 hover:shadow-lg hover:shadow-green-500/25">
+                            <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z"></path>
+                            </svg>
+                            <span>Ajouter un personnage</span>
+                        </a>
+
+                        {# Option supplémentaire pour changer de profil si plusieurs existent #}
+                        {% if selectorData.profiles|length > 1 %}
+                            <div class="text-gray-500 text-sm">ou</div>
+                            <div class="relative inline-block" data-controller="dropdown">
+                                <button type="button" data-action="click->dropdown#toggle"
+                                        class="inline-flex items-center space-x-2 bg-gray-700 hover:bg-gray-600 border border-gray-600 text-gray-300 hover:text-white px-4 py-2 rounded-lg text-sm font-medium transition-all duration-200">
+                                    <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 7h12m0 0l-4-4m4 4l-4 4m0 6H4m0 0l4 4m-4-4l4-4"></path>
+                                    </svg>
+                                    <span>Changer de profil</span>
+                                </button>
+
+                                <div data-dropdown-target="menu" class="hidden absolute left-1/2 transform -translate-x-1/2 top-full mt-2 w-64 bg-gray-900/95 backdrop-blur-md border border-gray-500 rounded-lg shadow-2xl shadow-black/40 z-50">
+                                    <div class="py-2">
+                                        {% for profile in selectorData.profiles %}
+                                            {% if profile.id != selectorData.currentProfile.id %}
+                                                <form method="post" action="{{ path('app_profile_switch', {id: profile.id}) }}" data-turbo="true" class="block">
+                                                    <input type="hidden" name="redirect_url" value="{{ app.request.uri }}">
+                                                    <button type="submit" class="w-full px-4 py-3 text-left hover:bg-gray-700/80 transition-colors flex items-center space-x-3">
+                                                        <div class="w-6 h-6 bg-gradient-to-br from-purple-500 to-pink-500 rounded-lg flex items-center justify-center">
+                                                            <span class="text-white font-bold text-xs">{{ profile.name|first|upper }}</span>
+                                                        </div>
+                                                        <div class="flex-1">
+                                                            <div class="text-white font-medium">{{ profile.name }}</div>
+                                                            <div class="text-gray-400 text-xs">{{ profile.dofusCharacters|length }} personnage{{ profile.dofusCharacters|length > 1 ? 's' : '' }}</div>
+                                                        </div>
+                                                        <svg class="w-4 h-4 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7"></path>
+                                                        </svg>
+                                                    </button>
+                                                </form>
+                                            {% endif %}
+                                        {% endfor %}
+                                    </div>
+                                </div>
+                            </div>
+                        {% endif %}
+                    </div>
+                </div>
+            {% endif %}
+        {% else %}
+            {# Aucun profil #}
+            <div class="text-center py-8 bg-gray-800/30 border border-gray-600/30 rounded-lg">
+                <p class="text-gray-400 mb-4">Aucun profil de trading</p>
+                <a href="{{ path('app_profile_new') }}" 
+                class="bg-blue-600 hover:bg-blue-700 text-white px-6 py-3 rounded-lg">
+                    Créer mon premier profil
+                </a>
+            </div>
+        {% endif %}
+    </div>
+</div>
+
+{# CSS personnalisé pour améliorer la visibilité des dropdowns #}
+<style>
+/* Améliorer la visibilité des dropdowns de sélection de profil */
+[data-controller="dropdown"] [data-dropdown-target="menu"] {
+    backdrop-filter: blur(12px);
+    -webkit-backdrop-filter: blur(12px);
+}
+
+/* S'assurer que les dropdowns ne sont pas coupés par overflow hidden des parents */
+.profile-selector .wrapper-container {
+    overflow: visible !important;
+}
+
+/* Améliorer le contraste du texte dans les menus dropdown */
+[data-dropdown-target="menu"] button:hover {
+    background-color: rgba(55, 65, 81, 0.8) !important;
+}
+
+/* Bordures plus visibles pour les profils vides */
+.bg-gray-800\/60.border-dashed {
+    border-color: rgba(107, 114, 128, 0.8) !important;
+    background-color: rgba(31, 41, 55, 0.8) !important;
+}
+</style>
+{% endif %}

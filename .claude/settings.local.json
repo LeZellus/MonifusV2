@@ -13,7 +13,8 @@
       "Bash(find:*)",
       "Bash(del \"C:\\Users\\mathe\\Documents\\Dev\\MonifusV2\\src\\Controller\\CompareProfileDebugController.php\")",
       "Bash(wc:*)",
-      "Bash(del \"C:\\Users\\mathe\\Documents\\Dev\\MonifusV2\\src\\Command\\DebugEnutrofCommand.php\")"
+      "Bash(del \"C:\\Users\\mathe\\Documents\\Dev\\MonifusV2\\src\\Command\\DebugEnutrofCommand.php\")",
+      "Bash(curl:*)"
     ],
     "deny": [],
     "ask": []
