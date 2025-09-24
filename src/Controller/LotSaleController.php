@@ -7,6 +7,7 @@ use App\Entity\LotUnit;
 use App\Form\LotUnitType;
 use App\Enum\LotStatus;
 use App\Service\ProfileCharacterService;
+use App\Trait\CharacterSelectionTrait;
 use App\Service\CacheInvalidationService;
 use Doctrine\ORM\EntityManagerInterface;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
@@ -19,6 +20,7 @@ use Symfony\Component\Security\Http\Attribute\IsGranted;
 #[IsGranted('ROLE_USER')]
 class LotSaleController extends AbstractController
 {
+    use CharacterSelectionTrait;
     #[Route('/{id}/sell', name: 'app_lot_sell')]
     public function sell(
         LotGroup $lotGroup,
@@ -27,7 +29,11 @@ class LotSaleController extends AbstractController
         ProfileCharacterService $profileCharacterService,
         CacheInvalidationService $cacheInvalidation
     ): Response {
-        $selectedCharacter = $profileCharacterService->getSelectedCharacter($this->getUser());
+        $result = $this->getSelectedCharacterOrRedirect($profileCharacterService);
+        if ($result instanceof Response) {
+            return $result;
+        }
+        $selectedCharacter = $result;
 
         // Vérifications de sécurité
         if (!$selectedCharacter || $lotGroup->getDofusCharacter()->getId() !== $selectedCharacter->getId()) {
@@ -114,7 +120,11 @@ class LotSaleController extends AbstractController
         ProfileCharacterService $profileCharacterService,
         CacheInvalidationService $cacheInvalidation
     ): Response {
-        $selectedCharacter = $profileCharacterService->getSelectedCharacter($this->getUser());
+        $result = $this->getSelectedCharacterOrRedirect($profileCharacterService);
+        if ($result instanceof Response) {
+            return $result;
+        }
+        $selectedCharacter = $result;
         
         if (!$selectedCharacter) {
             throw $this->createAccessDeniedException();

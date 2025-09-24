@@ -9,6 +9,7 @@ use App\Form\LotGroupType;
 use App\Repository\LotGroupRepository;
 use App\Service\ProfileCharacterService;
 use App\Service\LotManagementService;
+use App\Trait\CharacterSelectionTrait;
 use Doctrine\ORM\EntityManagerInterface;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\HttpFoundation\JsonResponse;
@@ -21,13 +22,13 @@ use Symfony\Component\Security\Http\Attribute\IsGranted;
 #[IsGranted('ROLE_USER')]
 class LotController extends AbstractController
 {
+    use CharacterSelectionTrait;
     #[Route('/', name: 'app_lot_index')]
     public function index(
         LotManagementService $lotManagementService,
         ProfileCharacterService $profileCharacterService
     ): Response {
-        $selectedCharacter = $profileCharacterService->getSelectedCharacter($this->getUser());
-        $characters = $profileCharacterService->getUserCharacters($this->getUser());
+        [$selectedCharacter, $characters] = $this->getCharacterData($profileCharacterService);
         $lots = $lotManagementService->getAvailableLotsForCharacter($selectedCharacter);
 
         return $this->render('lot/index.html.twig', [
@@ -45,7 +46,7 @@ class LotController extends AbstractController
         $selectedCharacter = $profileCharacterService->getSelectedCharacter($this->getUser());
 
         if (!$selectedCharacter) {
-            return new JsonResponse(['error' => 'Aucun personnage sélectionné'], 400);
+            return $this->createCharacterErrorResponse();
         }
 
         $searchQuery = trim($request->query->get('q', ''));
@@ -74,12 +75,11 @@ class LotController extends AbstractController
         LotManagementService $lotManagementService,
         ProfileCharacterService $profileCharacterService
     ): Response {
-        $selectedCharacter = $profileCharacterService->getSelectedCharacter($this->getUser());
-
-        if (!$selectedCharacter) {
-            $this->addFlash('error', 'Aucun personnage sélectionné.');
-            return $this->redirectToRoute('app_profile_index');
+        $result = $this->getSelectedCharacterOrRedirect($profileCharacterService, 'Aucun personnage sélectionné.');
+        if ($result instanceof Response) {
+            return $result;
         }
+        $selectedCharacter = $result;
 
         $lotGroup = new LotGroup();
         $form = $this->createForm(LotGroupType::class, $lotGroup, ['is_edit' => false]);

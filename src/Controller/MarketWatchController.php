@@ -7,6 +7,7 @@ use App\Entity\DofusCharacter;
 use App\Form\MarketWatchType;
 use App\Service\ProfileCharacterService;
 use App\Service\MarketWatchService;
+use App\Trait\CharacterSelectionTrait;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
@@ -20,13 +21,13 @@ use App\Service\ChartDataService;
 #[IsGranted('ROLE_USER')]
 class MarketWatchController extends AbstractController
 {
+    use CharacterSelectionTrait;
     #[Route('/', name: 'app_market_watch_index')]
     public function index(
         MarketWatchService $marketWatchService,
         ProfileCharacterService $profileCharacterService
     ): Response {
-        $selectedCharacter = $profileCharacterService->getSelectedCharacter($this->getUser());
-        $characters = $profileCharacterService->getUserCharacters($this->getUser());
+        [$selectedCharacter, $characters] = $this->getCharacterData($profileCharacterService);
         $itemsData = $marketWatchService->getItemsDataForCharacter($selectedCharacter);
 
         return $this->render('market_watch/index.html.twig', [
@@ -44,12 +45,11 @@ class MarketWatchController extends AbstractController
         ProfileCharacterService $profileCharacterService,
         ?int $itemId = null
     ): Response {
-        $selectedCharacter = $profileCharacterService->getSelectedCharacter($this->getUser());
-
-        if (!$selectedCharacter) {
-            $this->addFlash('warning', 'Créez d\'abord un personnage.');
-            return $this->redirectToRoute('app_profile_index');
+        $result = $this->getSelectedCharacterOrRedirect($profileCharacterService);
+        if ($result instanceof Response) {
+            return $result;
         }
+        $selectedCharacter = $result;
 
         // Gestion du préremplissage d'item
         $preselectedItem = null;
@@ -97,7 +97,11 @@ class MarketWatchController extends AbstractController
         MarketWatchService $marketWatchService,
         ProfileCharacterService $profileCharacterService
     ): Response {
-        $selectedCharacter = $profileCharacterService->getSelectedCharacter($this->getUser());
+        $result = $this->getSelectedCharacterOrRedirect($profileCharacterService);
+        if ($result instanceof Response) {
+            return $result;
+        }
+        $selectedCharacter = $result;
 
         if (!$marketWatchService->canUserAccessMarketWatch($marketWatch, $selectedCharacter)) {
             throw $this->createAccessDeniedException();
@@ -124,7 +128,11 @@ class MarketWatchController extends AbstractController
         MarketWatchService $marketWatchService,
         ProfileCharacterService $profileCharacterService
     ): Response {
-        $selectedCharacter = $profileCharacterService->getSelectedCharacter($this->getUser());
+        $result = $this->getSelectedCharacterOrRedirect($profileCharacterService);
+        if ($result instanceof Response) {
+            return $result;
+        }
+        $selectedCharacter = $result;
 
         if (!$marketWatchService->canUserAccessMarketWatch($marketWatch, $selectedCharacter)) {
             throw $this->createAccessDeniedException();
@@ -141,12 +149,11 @@ class MarketWatchController extends AbstractController
         MarketWatchService $marketWatchService,
         ProfileCharacterService $profileCharacterService
     ): Response {
-        $selectedCharacter = $profileCharacterService->getSelectedCharacter($this->getUser());
-
-        if (!$selectedCharacter) {
-            $this->addFlash('error', 'Aucun personnage sélectionné.');
-            return $this->redirectToRoute('app_market_watch_index');
+        $result = $this->getSelectedCharacterOrRedirect($profileCharacterService, 'Aucun personnage sélectionné.');
+        if ($result instanceof Response) {
+            return $result;
         }
+        $selectedCharacter = $result;
 
         $count = $marketWatchService->deleteAllObservationsForItem($selectedCharacter, $itemId);
 
@@ -166,12 +173,11 @@ class MarketWatchController extends AbstractController
         ProfileCharacterService $profileCharacterService,
         ChartDataService $chartDataService
     ): Response {
-        $selectedCharacter = $profileCharacterService->getSelectedCharacter($this->getUser());
-
-        if (!$selectedCharacter) {
-            $this->addFlash('error', 'Aucun personnage sélectionné.');
-            return $this->redirectToRoute('app_market_watch_index');
+        $result = $this->getSelectedCharacterOrRedirect($profileCharacterService, 'Aucun personnage sélectionné.');
+        if ($result instanceof Response) {
+            return $result;
         }
+        $selectedCharacter = $result;
 
         $priceHistory = $marketWatchService->getPriceHistoryForItem($selectedCharacter, $itemId);
 
@@ -202,7 +208,7 @@ class MarketWatchController extends AbstractController
         $selectedCharacter = $profileCharacterService->getSelectedCharacter($this->getUser());
 
         if (!$selectedCharacter) {
-            return new JsonResponse(['error' => 'Aucun personnage sélectionné'], 400);
+            return $this->createCharacterErrorResponse('Aucun personnage sélectionné');
         }
 
         $searchQuery = trim($request->query->get('q', ''));

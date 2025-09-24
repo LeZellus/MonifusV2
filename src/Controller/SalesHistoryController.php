@@ -4,6 +4,7 @@ namespace App\Controller;
 
 use App\Repository\LotUnitRepository;
 use App\Service\ProfileCharacterService;
+use App\Trait\CharacterSelectionTrait;
 use App\Service\ExportService; 
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\HttpFoundation\Response;
@@ -15,6 +16,7 @@ use Symfony\Component\Security\Http\Attribute\IsGranted;
 #[IsGranted('ROLE_USER')]
 class SalesHistoryController extends AbstractController
 {
+    use CharacterSelectionTrait;
     #[Route('/', name: 'app_sales_history_index')]
     public function index(
         Request $request,
@@ -22,8 +24,7 @@ class SalesHistoryController extends AbstractController
         ProfileCharacterService $profileCharacterService
     ): Response {
         $periodFilter = $request->query->get('period', '30');
-        $selectedCharacter = $profileCharacterService->getSelectedCharacter($this->getUser());
-        $characters = $profileCharacterService->getUserCharacters($this->getUser());
+        [$selectedCharacter, $characters] = $this->getCharacterData($profileCharacterService);
 
         // Une seule ligne pour récupérer les ventes
         $sales = $lotUnitRepository->findSalesWithFilters(
