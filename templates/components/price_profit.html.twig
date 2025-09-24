@@ -1,66 +1,7 @@
-{#
-    Composant simplifié pour afficher profit et prix
-
-    Usage avec un lot :
-    {% include 'components/price_profit.html.twig' with {
-        'lot': lot_group,
-        'mode': 'detailed'  // optional: 'simple', 'compact', 'detailed'
-    } %}
-
-    Usage avec une vente :
-    {% include 'components/price_profit.html.twig' with {
-        'sale': lot_unit,
-        'mode': 'compact'
-    } %}
-
-    Usage avec des prix manuels :
-    {% include 'components/price_profit.html.twig' with {
-        'buy_price': 1000,
-        'sell_price': 1200,
-        'quantity': 100,
-        'mode': 'simple'
-    } %}
-#}
-
-{% set mode = mode|default('detailed') %}
-
-{# Récupération des données calculées via les services PHP #}
-{% if lot is defined %}
-    {% set data = lot_display_data(lot, mode) %}
-{% elseif sale is defined %}
-    {% set data = sale_display_data(sale, mode) %}
-{% else %}
-    {% set data = price_display_data(buy_price|default(0), sell_price|default(0), quantity|default(1), mode) %}
-{% endif %}
-
-{# Affichage selon le mode #}
-{% if mode == 'simple' %}
-    <span class="{{ data.profitClass }} font-medium">
-        {{ data.profitFormatted }}
-    </span>
-
-{% elseif mode == 'compact' %}
-    <div class="text-center">
-        <div class="{{ data.profitClass }} font-bold">{{ data.profitFormatted }}</div>
-        {% if data.showRoi %}
-            <div class="{{ data.profitClass }} text-xs opacity-75">({{ data.roiFormatted }})</div>
-        {% endif %}
-    </div>
-
-{% else %} {# detailed #}
-    <div class="space-y-1">
-        <div class="{{ data.profitClass }} font-medium text-lg">
-            {{ data.profitFormatted }}
-        </div>
-        {% if data.showRoi %}
-            <div class="{{ data.profitClass }} text-sm opacity-80">
-                ROI: {{ data.roiFormatted }}
-            </div>
-        {% endif %}
-        {% if show_investment|default(false) %}
-            <div class="text-gray-400 text-xs">
-                Investi: {{ data.investmentFormatted }}
-            </div>
-        {% endif %}
-    </div>
-{% endif %}
+{%- if lot is defined -%}
+{{ profit(lot, mode|default('compact')) }}
+{%- elseif sale is defined -%}
+{{ sale_profit(sale, mode|default('compact')) }}
+{%- else -%}
+{{ manual_profit(buy_price|default(0), sell_price|default(0), quantity|default(1), mode|default('compact')) }}
+{%- endif -%}

@@ -7,11 +7,7 @@
     </td>
     <td class="table-cell">
         {% if item.avg_price_unit %}
-            {% include 'components/price_simple.html.twig' with {
-                'amount': item.avg_price_unit,
-                'show_kamas': false,
-                'color': 'white'
-            } %}
+            {{ price(item.avg_price_unit, 'white') }}
             <div class="text-gray-500 text-xs">{{ item.price_unit_count }} obs</div>
         {% else %}
             <span class="text-gray-500">-</span>
@@ -19,11 +15,7 @@
     </td>
     <td class="table-cell">
         {% if item.avg_price_10 %}
-            {% include 'components/price_simple.html.twig' with {
-                'amount': item.avg_price_10,
-                'show_kamas': false,
-                'color': 'white'
-            } %}
+            {{ price(item.avg_price_10, 'white') }}
             <div class="text-gray-500 text-xs">{{ item.price_10_count }} obs</div>
         {% else %}
             <span class="text-gray-500">-</span>
@@ -31,11 +23,7 @@
     </td>
     <td class="table-cell">
         {% if item.avg_price_100 %}
-            {% include 'components/price_simple.html.twig' with {
-                'amount': item.avg_price_100,
-                'show_kamas': false,
-                'color': 'white'
-            } %}
+            {{ price(item.avg_price_100, 'white') }}
             <div class="text-gray-500 text-xs">{{ item.price_100_count }} obs</div>
         {% else %}
             <span class="text-gray-500">-</span>
@@ -44,11 +32,7 @@
     <!-- NOUVEAU : Colonne x1000 -->
     <td class="table-cell">
         {% if item.avg_price_1000 %}
-            {% include 'components/price_simple.html.twig' with {
-                'amount': item.avg_price_1000,
-                'show_kamas': false,
-                'color': 'white'
-            } %}
+            {{ price(item.avg_price_1000, 'white') }}
             <div class="text-gray-500 text-xs">{{ item.price_1000_count }} obs</div>
         {% else %}
             <span class="text-gray-500">-</span>

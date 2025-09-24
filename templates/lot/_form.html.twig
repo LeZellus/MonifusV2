@@ -29,19 +29,15 @@
                 </div>
                 <div class="price-card">
                     <div class="price-label">Prix achat</div>
-                    <div class="stats-value text-orange-400">{{ lot.buyPricePerLot|format_kamas }}</div>
+                    <div class="stats-value">{{ price(lot.buyPricePerLot, 'orange') }}</div>
                     <div class="price-label">par lot</div>
                 </div>
                 <div class="price-card">
                     <div class="price-label">Prix vente</div>
-                    <div class="stats-value text-orange-400">{{ lot.sellPricePerLot|format_kamas }}</div>
+                    <div class="stats-value">{{ price(lot.sellPricePerLot, 'orange') }}</div>
                     <div class="price-label">par lot</div>
                 </div>
-                {% include 'components/financial_card.html.twig' with {
-                    'label': 'Profit total',
-                    'lot': lot,
-                    'variant': 'success'
-                } %}
+                {{ financial_card('Profit total', lot, 'success') }}
             </div>
         </div>
     {% endif %}

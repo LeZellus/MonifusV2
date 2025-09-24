@@ -20,25 +20,16 @@
         <div class="text-gray-400 text-sm">par {{ lotGroup.saleUnit.value }}</div>
     </td>
     <td class="table-cell">
-        {% include 'components/price_simple.html.twig' with {
-            'amount': lotGroup.sellPricePerLot,
-            'color': 'white'
-        } %}
+        {{ price(lotGroup.sellPricePerLot, 'white') }}
         <div class="text-gray-400 text-sm">par lot</div>
     </td>
     
     <td class="table-cell">
-        {% include 'components/price_simple.html.twig' with {
-            'amount': item.actualSellPrice,
-            'color': 'white'
-        } %}
+        {{ price(item.actualSellPrice, 'white') }}
         <div class="text-gray-400 text-sm">par lot</div>
     </td>
     <td class="table-cell">
-        {% include 'components/price_profit.html.twig' with {
-            'sale': item,
-            'mode': 'compact'
-        } %}
+        {{ sale_profit(item, 'compact') }}
     </td>
     <td class="table-cell">        
         {% if performanceTotal == 0 %}

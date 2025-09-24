@@ -7,20 +7,14 @@
         <div class="text-gray-400 text-sm">Vente par {{ item.saleUnit.value }}</div>
     </td>
     <td class="table-cell">
-        {% include 'components/price_simple.html.twig' with {
-            'amount': item.buyPricePerLot,
-            'color': 'white'
-        } %}
+        {{ price(item.buyPricePerLot, 'white') }}
         <div class="text-gray-400 text-sm">par lot</div>
     </td>
     <td class="table-cell">
         {% if item.status.value == 'sold' and item.lotUnits|length > 0 %}
             {# Si vendu, afficher le prix réel de la dernière vente #}
             {% set lastSale = item.lotUnits|last %}
-            {% include 'components/price_simple.html.twig' with {
-                'amount': lastSale.actualSellPrice,
-                'color': 'white'
-            } %}
+            {{ price(lastSale.actualSellPrice, 'white') }}
             <div class="text-gray-400 text-sm">prix réel</div>
         {% else %}
             {# Sinon, toujours "À définir" #}
@@ -32,16 +26,10 @@
         {% if item.status.value == 'sold' and item.lotUnits|length > 0 %}
             {# Profit avec prix réel de vente #}
             {% set lastSale = item.lotUnits|last %}
-            {% include 'components/price_profit.html.twig' with {
-                'sale': lastSale,
-                'mode': 'compact'
-            } %}
+            {{ sale_profit(lastSale) }}
         {% elseif item.sellPricePerLot %}
             {# Profit estimé #}
-            {% include 'components/price_profit.html.twig' with {
-                'lot': item,
-                'mode': 'compact'
-            } %}
+            {{ profit(item) }}
         {% else %}
             <span class="text-gray-500">-</span>
         {% endif %}

@@ -9,7 +9,8 @@
       "Bash(git restore:*)",
       "Bash(rm:*)",
       "Bash(del \"C:\\Users\\mathe\\Documents\\Dev\\MonifusV2\\templates\\components\\price_display.html.twig\")",
-      "Bash(del \"C:\\Users\\mathe\\Documents\\Dev\\MonifusV2\\templates\\components\\unified_profit_display.html.twig\")"
+      "Bash(del \"C:\\Users\\mathe\\Documents\\Dev\\MonifusV2\\templates\\components\\unified_profit_display.html.twig\")",
+      "Bash(find:*)"
     ],
     "deny": [],
     "ask": []

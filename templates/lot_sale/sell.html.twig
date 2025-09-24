@@ -27,10 +27,7 @@
                     <div>
                         <div class="text-gray-400 text-sm">Prix prévu</div>
                         {% if lot_group.sellPricePerLot %}
-                            {% include 'components/price_simple.html.twig' with {
-                                'amount': lot_group.sellPricePerLot,
-                                'color': 'green'
-                            } %}
+                            {{ price(lot_group.sellPricePerLot, 'green') }}
                         {% else %}
                             <span class="text-gray-500 italic">Non défini</span>
                         {% endif %}

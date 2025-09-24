@@ -26,12 +26,7 @@
         <div class="bg-gray-700 rounded p-2">
             <div class="text-gray-400 text-xs">Moy. x1</div>
             {% if item.avg_price_unit %}
-                {% include 'components/price_simple.html.twig' with {
-                    'amount': item.avg_price_unit,
-                    'size': 'small',
-                    'color': 'green',
-                    'show_kamas': false
-                } %}
+                {{ price(item.avg_price_unit, 'green', 'small') }}
                 <div class="text-gray-500 text-xs">{{ item.price_unit_count }}</div>
             {% else %}
                 <div class="text-gray-500 text-sm">-</div>
@@ -40,12 +35,7 @@
         <div class="bg-gray-700 rounded p-2">
             <div class="text-gray-400 text-xs">Moy. x10</div>
             {% if item.avg_price_10 %}
-                {% include 'components/price_simple.html.twig' with {
-                    'amount': item.avg_price_10,
-                    'size': 'small',
-                    'color': 'blue',
-                    'show_kamas': false
-                } %}
+                {{ price(item.avg_price_10, 'blue', 'small') }}
                 <div class="text-gray-500 text-xs">{{ item.price_10_count }}</div>
             {% else %}
                 <div class="text-gray-500 text-sm">-</div>
@@ -54,12 +44,7 @@
         <div class="bg-gray-700 rounded p-2">
             <div class="text-gray-400 text-xs">Moy. x100</div>
             {% if item.avg_price_100 %}
-                {% include 'components/price_simple.html.twig' with {
-                    'amount': item.avg_price_100,
-                    'size': 'small',
-                    'color': 'purple',
-                    'show_kamas': false
-                } %}
+                {{ price(item.avg_price_100, 'purple', 'small') }}
                 <div class="text-gray-500 text-xs">{{ item.price_100_count }}</div>
             {% else %}
                 <div class="text-gray-500 text-sm">-</div>
@@ -69,12 +54,7 @@
         <div class="bg-gray-700 rounded p-2">
             <div class="text-gray-400 text-xs">Moy. x1000</div>
             {% if item.avg_price_1000 %}
-                {% include 'components/price_simple.html.twig' with {
-                    'amount': item.avg_price_1000,
-                    'size': 'small',
-                    'color': 'yellow',
-                    'show_kamas': false
-                } %}
+                {{ price(item.avg_price_1000, 'yellow', 'small') }}
                 <div class="text-gray-500 text-xs">{{ item.price_1000_count }}</div>
             {% else %}
                 <div class="text-gray-500 text-sm">-</div>

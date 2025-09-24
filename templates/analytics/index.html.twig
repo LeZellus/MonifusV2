@@ -196,11 +196,7 @@
                                         </div>
                                     </div>
                                     <div class="text-right">
-                                        {% include 'components/price_simple.html.twig' with {
-                                            'amount': char.totalProfit,
-                                            'color': char.totalProfit >= 0 ? 'green' : 'red',
-                                            'size': 'base'
-                                        } %}
+                                        {{ price(char.totalProfit, char.totalProfit >= 0 ? 'green' : 'red', 'base') }}
                                         <div class="text-muted-sm">ROI: {{ char.roi|number_format(1) }}%</div>
                                     </div>
                                 </div>
@@ -228,19 +224,11 @@
                                         <div class="text-white font-medium">{{ item.itemName }}</div>
                                         <div class="text-gray-400 text-sm">
                                             {{ item.lotsCount }} lots • 
-                                            {% include 'components/price_simple.html.twig' with {
-                                                'amount': avgProfitPerItem,
-                                                'size': 'small',
-                                                'show_kamas': false
-                                            } %}/lot
+                                            {{ price(avgProfitPerItem, 'white', 'small') }}/lot
                                         </div>
                                     </div>
                                     <div class="text-right">
-                                        {% include 'components/price_simple.html.twig' with {
-                                            'amount': profit,
-                                            'color': profit >= 0 ? 'green' : 'red',
-                                            'size': 'normal'
-                                        } %}
+                                        {{ price(profit, profit >= 0 ? 'green' : 'red') }}
                                         {% if item.roi is defined %}
                                             <div class="text-gray-400 text-sm">ROI: {{ item.roi|number_format(1) }}%</div>
                                         {% endif %}
