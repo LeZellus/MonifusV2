@@ -1,0 +1,5 @@
+{# Optimized stats_card using macro system #}
+{% from 'macros/ui_macros.html.twig' import stats_card %}
+
+{# Simply call the macro with passed parameters #}
+{{ stats_card(title, value, icon, color|default('blue'), subtitle) }}

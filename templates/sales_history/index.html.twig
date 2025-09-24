@@ -1,8 +1,10 @@
 {% extends 'base.html.twig' %}
+{% from 'macros/ui_macros.html.twig' import button, wrapper_section %}
 
 {% block title %}Historique des Ventes{% endblock %}
 
 {% block body %}
+{% set sales_headers = ['Date Vente', 'Item', 'Quantité', 'Prix Attendu', 'Prix Réel', 'Profit Total', 'Performance', 'Notes', 'Actions'] %}
 
 {% include 'components/profile_selector.html.twig' %}
 
@@ -59,12 +61,8 @@
                     </div>
 
                     <div class="action-group">
-                        <button type="submit" class="btn btn-primary">
-                            Filtrer
-                        </button>
-                        <a href="{{ path('app_sales_history_index') }}" class="btn btn-secondary">
-                            Reset
-                        </a>
+                        {{ button('Filtrer', type='submit') }}
+                        {{ button('Reset', path('app_sales_history_index'), class='btn-secondary') }}
                     </div>
                 </form>
             </div>
@@ -75,16 +73,13 @@
                     Historique des Ventes - {{ selectorData.selectedCharacter.name }}
                 </h2>
                 {% if sales|length > 0 %}
-                    <a href="{{ path('app_sales_history_export', app.request.query.all) }}" 
-                       class="btn btn-success">
-                        📊 Exporter CSV
-                    </a>
+                    {{ button('Exporter CSV', path('app_sales_history_export', app.request.query.all), class='btn-success', icon='📊') }}
                 {% endif %}
             </div>
 
             <!-- Tableau des ventes -->
             {% include 'components/data_table.html.twig' with {
-                headers: ['Date Vente', 'Item', 'Quantité', 'Prix Attendu', 'Prix Réel', 'Profit Total', 'Performance', 'Notes', 'Actions'],
+                headers: sales_headers,
                 rows: sales,
                 row_template: 'sales_history/_table_row.html.twig',
                 empty_message: 'Aucune vente enregistrée',

@@ -9,6 +9,7 @@ use App\Form\LotGroupType;
 use App\Repository\LotGroupRepository;
 use App\Service\ProfileCharacterService;
 use App\Service\LotManagementService;
+use App\Service\CacheInvalidationService;
 use App\Trait\CharacterSelectionTrait;
 use Doctrine\ORM\EntityManagerInterface;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;

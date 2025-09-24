@@ -1,0 +1,30 @@
+{% extends 'base.html.twig' %}
+{% from 'macros/docs_macros.html.twig' import info_box, guide_step, code_example %}
+{% from 'macros/ui_macros.html.twig' import button %}
+
+{% block body %}
+    <div class="wrapper-container">
+        <div class="grid grid-cols-1 lg:grid-cols-4 gap-4">
+            <!-- Sidebar -->
+            {% include 'docs/_sidebar.html.twig' %}
+
+            <!-- Contenu principal -->
+            <div class="lg:col-span-3 wrapper-background">
+                <h1 class="text-white text-3xl font-bold mb-6">
+                    {% if block('page_icon') %}{% block page_icon %}{% endblock %} {% endif %}
+                    {% block page_title %}Documentation{% endblock %}
+                </h1>
+
+                <div class="prose prose-invert max-w-none space-y-6">
+                    {% if block('page_intro') %}
+                        <p class="text-gray-300 text-lg">
+                            {% block page_intro %}{% endblock %}
+                        </p>
+                    {% endif %}
+
+                    {% block content %}{% endblock %}
+                </div>
+            </div>
+        </div>
+    </div>
+{% endblock %}

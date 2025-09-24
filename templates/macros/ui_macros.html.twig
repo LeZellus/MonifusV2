@@ -1,0 +1,97 @@
+{# Macro pour les boutons réutilisables #}
+{% macro button(text, url = null, type = 'button', class = 'btn-primary', icon = null, target = null, form_id = null) %}
+    {% if url %}
+        <a href="{{ url }}" class="btn {{ class }}"{% if target %} target="{{ target }}"{% endif %}>
+            {% if icon %}{{ icon }} {% endif %}{{ text }}
+        </a>
+    {% else %}
+        <button type="{{ type }}" class="btn {{ class }}"{% if form_id %} form="{{ form_id }}"{% endif %}>
+            {% if icon %}{{ icon }} {% endif %}{{ text }}
+        </button>
+    {% endif %}
+{% endmacro %}
+
+{# Macro pour les champs de formulaire #}
+{% macro form_field(label, name, type = 'text', value = '', placeholder = '', required = false, class = 'form-input') %}
+    <div class="form-field">
+        <label for="{{ name }}" class="form-label">{{ label }}</label>
+        <input type="{{ type }}"
+               id="{{ name }}"
+               name="{{ name }}"
+               value="{{ value }}"
+               placeholder="{{ placeholder }}"
+               class="{{ class }}"
+               {% if required %}required{% endif %}>
+    </div>
+{% endmacro %}
+
+{# Macro pour les sections avec wrapper #}
+{% macro wrapper_section(content, class = 'wrapper-background') %}
+    <div class="{{ class }}">
+        {{ content }}
+    </div>
+{% endmacro %}
+
+{# Macro pour les badges de statut #}
+{% macro status_badge(status, text = null) %}
+    {% set badge_class = 'badge' %}
+    {% set badge_text = text ?? status %}
+
+    {% if status == 'available' %}
+        {% set badge_class = badge_class ~ ' badge-success' %}
+    {% elseif status == 'sold' %}
+        {% set badge_class = badge_class ~ ' badge-gray' %}
+    {% elseif status == 'pending' %}
+        {% set badge_class = badge_class ~ ' badge-warning' %}
+    {% else %}
+        {% set badge_class = badge_class ~ ' badge-default' %}
+    {% endif %}
+
+    <span class="{{ badge_class }}">{{ badge_text }}</span>
+{% endmacro %}
+
+{# Macro pour les cartes de statistiques #}
+{% macro stats_card(title, value, icon = null, color = 'blue', description = null) %}
+    <div class="stats-card stats-card-{{ color }}">
+        {% if icon %}
+            <div class="stats-icon">{{ icon }}</div>
+        {% endif %}
+        <div class="stats-content">
+            <h3 class="stats-title">{{ title }}</h3>
+            <div class="stats-value">{{ value }}</div>
+            {% if description %}
+                <p class="stats-description">{{ description }}</p>
+            {% endif %}
+        </div>
+    </div>
+{% endmacro %}
+
+{# Macro pour les actions de ligne de tableau #}
+{% macro table_actions(edit_url = null, delete_url = null, view_url = null, custom_actions = []) %}
+    <div class="table-actions">
+        {% if view_url %}
+            <a href="{{ view_url }}" class="btn btn-sm btn-secondary" title="Voir">👁️</a>
+        {% endif %}
+        {% if edit_url %}
+            <a href="{{ edit_url }}" class="btn btn-sm btn-primary" title="Modifier">✏️</a>
+        {% endif %}
+        {% if delete_url %}
+            <a href="{{ delete_url }}" class="btn btn-sm btn-danger" title="Supprimer" onclick="return confirm('Êtes-vous sûr ?')">🗑️</a>
+        {% endif %}
+        {% for action in custom_actions %}
+            <a href="{{ action.url }}" class="btn btn-sm {{ action.class ?? 'btn-secondary' }}" title="{{ action.title ?? '' }}">
+                {{ action.icon ?? '' }} {{ action.text ?? '' }}
+            </a>
+        {% endfor %}
+    </div>
+{% endmacro %}
+
+{# Macro pour les alertes/messages #}
+{% macro alert(message, type = 'info', dismissible = false) %}
+    <div class="alert alert-{{ type }}{% if dismissible %} alert-dismissible{% endif %}">
+        {{ message }}
+        {% if dismissible %}
+            <button type="button" class="alert-close" onclick="this.parentElement.style.display='none'">×</button>
+        {% endif %}
+    </div>
+{% endmacro %}

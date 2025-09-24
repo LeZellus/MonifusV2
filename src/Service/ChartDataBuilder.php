@@ -45,13 +45,13 @@ class ChartDataBuilder
 
         return [
             'labels' => $labels,
-            'datasets' => [{
+            'datasets' => [[
                 'label' => 'Profits',
                 'data' => $profits,
                 'borderColor' => '#10B981',
                 'backgroundColor' => 'rgba(16, 185, 129, 0.1)',
                 'fill' => true
-            }],
+            ]],
             'meta' => [
                 'type' => 'performance',
                 'dataPoints' => count($performanceData)

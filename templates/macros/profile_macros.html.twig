@@ -1,0 +1,67 @@
+{# Macro pour afficher un personnage dans le sélecteur #}
+{% macro character_card(character, isSelected = false, showServer = true) %}
+    <div class="character-card{% if isSelected %} character-card-selected{% endif %}
+                flex items-center p-3 rounded-lg transition-all duration-200
+                {% if isSelected %}bg-blue-600/20 border-blue-500/50{% else %}bg-gray-700/50 hover:bg-gray-700/70 border-gray-600/50{% endif %}
+                border cursor-pointer">
+
+        <!-- Avatar du personnage -->
+        <div class="w-10 h-10 bg-gradient-to-br from-blue-500 to-purple-500 rounded-lg flex items-center justify-center mr-3">
+            <span class="text-white font-bold text-sm">{{ character.name|first|upper }}</span>
+        </div>
+
+        <!-- Infos du personnage -->
+        <div class="flex-1 min-w-0">
+            <div class="flex items-center justify-between">
+                <h4 class="text-white font-medium text-sm truncate">{{ character.name }}</h4>
+                {% if isSelected %}
+                    <span class="ml-2 w-2 h-2 bg-blue-400 rounded-full"></span>
+                {% endif %}
+            </div>
+            {% if showServer %}
+                <p class="text-gray-400 text-xs">{{ character.server.name }}</p>
+            {% endif %}
+        </div>
+    </div>
+{% endmacro %}
+
+{# Macro pour les actions de profil #}
+{% macro profile_actions(profile) %}
+    <div class="flex items-center space-x-2">
+        <a href="{{ path('app_profile_edit', {id: profile.id}) }}"
+           class="flex items-center space-x-1 bg-orange-600/20 hover:bg-orange-600/30 border border-orange-500/50 rounded-lg px-3 py-2 text-xs text-orange-300 hover:text-orange-200 transition-all duration-200"
+           title="Modifier ce profil">
+            <svg class="w-3 h-3" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M11 5H6a2 2 0 00-2 2v11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z"></path>
+            </svg>
+            <span>Éditer</span>
+        </a>
+    </div>
+{% endmacro %}
+
+{# Macro pour le header d'un profil #}
+{% macro profile_header(profile) %}
+    <div class="flex items-center space-x-3">
+        <div class="w-10 h-10 bg-gradient-to-br from-purple-500 to-pink-500 rounded-lg flex items-center justify-center">
+            <span class="text-white font-bold">{{ profile.name|first|upper }}</span>
+        </div>
+        <div>
+            <h3 class="text-white font-medium">{{ profile.name }}</h3>
+            <p class="text-gray-400 text-sm">
+                {{ profile.dofusCharacters|length }} personnage{{ profile.dofusCharacters|length > 1 ? 's' : '' }}
+            </p>
+        </div>
+    </div>
+{% endmacro %}
+
+{# Macro pour un sélecteur simple de personnages #}
+{% macro simple_character_selector(characters, selectedCharacter = null, name = 'character_id') %}
+    <select name="{{ name }}" class="form-input">
+        <option value="">Choisir un personnage</option>
+        {% for character in characters %}
+            <option value="{{ character.id }}" {% if selectedCharacter and selectedCharacter.id == character.id %}selected{% endif %}>
+                {{ character.name }} ({{ character.server.name }})
+            </option>
+        {% endfor %}
+    </select>
+{% endmacro %}

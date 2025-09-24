@@ -1,4 +1,5 @@
 {% extends 'base.html.twig' %}
+{% from 'macros/ui_macros.html.twig' import button %}
 
 {% block title %}Mes Lots de Trading{% endblock %}
 
@@ -12,9 +13,7 @@
                 <h2 class="page-title">
                     Lots de {{ selectorData.selectedCharacter.name }}
                 </h2>
-                <a href="{{ path('app_lot_new') }}" class="btn-success btn-md">
-                    + Nouveau lot
-                </a>
+                {{ button('Nouveau lot', path('app_lot_new'), class='btn-success btn-md', icon='+') }}
             </div>
 
             <!-- Contrôleur AJAX Search - Même approche que market_watch -->
@@ -50,7 +49,7 @@
                             <div class="flex items-center justify-between">
                                 <span data-ajax-search-target="count" class="text-gray-400 text-sm"></span>
                                 <button data-ajax-search-target="clear"
-                                        data-action="click->ajax-search#clear" 
+                                        data-action="click->ajax-search#clear"
                                         class="text-orange-500 hover:text-blue-300 text-sm transition-colors">
                                     Effacer
                                 </button>
@@ -64,7 +63,8 @@
                     <table class="w-full">
                         <thead class="bg-gray-700">
                             <tr>
-                                {% for header in ['Item', 'Configuration', 'Prix Achat', 'Prix Vente', 'Profit', 'Statut', 'Actions'] %}
+                                {% set headers = ['Item', 'Configuration', 'Prix Achat', 'Prix Vente', 'Profit', 'Statut', 'Actions'] %}
+                                {% for header in headers %}
                                     <th class="table-header">{{ header }}</th>
                                 {% endfor %}
                             </tr>

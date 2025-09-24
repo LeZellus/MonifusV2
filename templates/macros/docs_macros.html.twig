@@ -1,0 +1,60 @@
+{# Macro pour les sections de documentation #}
+{% macro docs_section(title, content, level = 2) %}
+    <h{{ level }} class="docs-section-title">{{ title }}</h{{ level }}>
+    <div class="docs-section-content">
+        {{ content }}
+    </div>
+{% endmacro %}
+
+{# Macro pour les encadrés d'information #}
+{% macro info_box(content, type = 'info', title = null) %}
+    <div class="info-box info-box-{{ type }}">
+        {% if title %}
+            <h4 class="info-box-title">{{ title }}</h4>
+        {% endif %}
+        <div class="info-box-content">
+            {{ content }}
+        </div>
+    </div>
+{% endmacro %}
+
+{# Macro pour les liens de navigation #}
+{% macro nav_link(url, text, current_path = null, icon = null) %}
+    {% set is_active = current_path and current_path == url %}
+    <a href="{{ url }}" class="nav-link{% if is_active %} nav-link-active{% endif %}">
+        {% if icon %}{{ icon }} {% endif %}{{ text }}
+    </a>
+{% endmacro %}
+
+{# Macro pour les étapes de guide #}
+{% macro guide_step(number, title, content, highlight = false) %}
+    <div class="guide-step{% if highlight %} guide-step-highlight{% endif %}">
+        <div class="guide-step-number">{{ number }}</div>
+        <div class="guide-step-content">
+            <h3 class="guide-step-title">{{ title }}</h3>
+            <div class="guide-step-text">{{ content }}</div>
+        </div>
+    </div>
+{% endmacro %}
+
+{# Macro pour les exemples de code #}
+{% macro code_example(code, language = 'text', title = null) %}
+    <div class="code-example">
+        {% if title %}
+            <div class="code-title">{{ title }}</div>
+        {% endif %}
+        <pre class="code-block"><code class="language-{{ language }}">{{ code }}</code></pre>
+    </div>
+{% endmacro %}
+
+{# Macro pour les listes d'éléments avec icônes #}
+{% macro icon_list(items, icon = '•') %}
+    <ul class="icon-list">
+        {% for item in items %}
+            <li class="icon-list-item">
+                <span class="icon-list-icon">{{ icon }}</span>
+                <span class="icon-list-text">{{ item }}</span>
+            </li>
+        {% endfor %}
+    </ul>
+{% endmacro %}

@@ -1,0 +1,86 @@
+{% extends 'docs/_layout.html.twig' %}
+
+{% block title %}Gestion des Lots - Documentation{% endblock %}
+
+{% block page_icon %}📦{% endblock %}
+{% block page_title %}Gestion des Lots - Guide complet{% endblock %}
+
+{% block page_intro %}
+Les lots sont le cœur de votre activité de trading. Apprenez à les créer, les gérer et les optimiser pour maximiser vos profits.
+{% endblock %}
+
+{% block content %}
+    <!-- Section 1 : Qu'est-ce qu'un lot -->
+    {{ info_box('
+        <p>Un lot représente une transaction de trading que vous planifiez ou avez effectuée. Il contient :</p>
+        <div class="grid grid-cols-1 md:grid-cols-2 gap-4 mt-4">
+            <div class="bg-blue-800 bg-opacity-30 p-4 rounded-lg">
+                <h3 class="text-blue-300 font-semibold mb-2">📊 Informations de base</h3>
+                <p>• <strong>Item :</strong> Ressource ou équipement à trader</p>
+                <p>• <strong>Quantité :</strong> Nombre d\'unités dans le lot</p>
+                <p>• <strong>Unité de vente :</strong> Comment vous vendez (x1, x10, x100)</p>
+            </div>
+            <div class="bg-blue-800 bg-opacity-30 p-4 rounded-lg">
+                <h3 class="text-blue-300 font-semibold mb-2">💰 Données financières</h3>
+                <p>• <strong>Prix d\'achat :</strong> Ce que vous avez payé</p>
+                <p>• <strong>Prix de vente :</strong> Votre prix de vente cible</p>
+                <p>• <strong>Profit :</strong> Calculé automatiquement</p>
+            </div>
+        </div>
+    ', 'info', 'Qu\'est-ce qu\'un lot de trading ?') }}
+
+    <!-- Section 2 : Créer un lot -->
+    <h2 class="text-white text-xl font-bold mb-4">➕ Créer un nouveau lot</h2>
+
+    {{ guide_step(1, 'Choisir l\'item', '
+        <p>Utilisez la recherche pour trouver l\'item que vous voulez trader. Le système propose une autocomplétion pour vous aider.</p>
+        <p class="text-green-300 text-sm mt-1">💡 Commencez par des items populaires comme les ressources de base</p>
+    ') }}
+
+    {{ guide_step(2, 'Configurer la quantité', '
+        <p>Définissez combien d\'unités vous tradez et votre unité de vente (x1, x10, x100).</p>
+        <p class="text-yellow-300 text-sm mt-1">⚠️ L\'unité de vente doit correspondre à votre stratégie réelle en jeu</p>
+    ') }}
+
+    {{ guide_step(3, 'Saisir les prix', '
+        <p>Entrez le prix que vous avez réellement payé et votre prix de vente cible.</p>
+        <p class="text-blue-300 text-sm mt-1">📊 Le profit et la marge sont calculés automatiquement</p>
+    ') }}
+
+    {{ guide_step(4, 'Valider et surveiller', '
+        <p>Une fois créé, le lot apparaît dans votre dashboard avec le statut "AVAILABLE".</p>
+        <p class="text-blue-300 text-sm mt-1">🎯 Mettez à jour le statut quand vous vendez réellement</p>
+    ') }}
+
+    <!-- Section 3 : Bonnes pratiques -->
+    {{ info_box('
+        <h3 class="font-semibold mb-3">🎯 Conseils pour maximiser vos profits</h3>
+        <ul class="space-y-2">
+            <li><strong>Recherchez les prix :</strong> Utilisez la surveillance de marché avant de créer un lot</li>
+            <li><strong>Diversifiez :</strong> Ne mettez pas tous vos kamas sur un seul type d\'item</li>
+            <li><strong>Patience :</strong> Parfois il vaut mieux attendre le bon moment pour vendre</li>
+            <li><strong>Historique :</strong> Consultez vos ventes passées pour identifier les tendances</li>
+        </ul>
+    ', 'success', 'Bonnes pratiques') }}
+
+    <!-- Section 4 : Gestion des lots -->
+    <h2 class="text-white text-xl font-bold mb-4">🔧 Gestion et modification des lots</h2>
+
+    {{ info_box('
+        <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+            <div>
+                <h4 class="font-semibold text-yellow-300 mb-2">🔄 Changer le statut</h4>
+                <p>Marquez vos lots comme vendus quand vous finalisez une vente en jeu.</p>
+            </div>
+            <div>
+                <h4 class="font-semibold text-blue-300 mb-2">✏️ Modifier les prix</h4>
+                <p>Ajustez vos prix si le marché évolue ou si vous vous êtes trompé.</p>
+            </div>
+        </div>
+    ', 'warning', 'Actions disponibles') }}
+
+    <div class="text-center mt-8">
+        {{ button('Créer mon premier lot', path('app_lot_new'), class='btn-success', icon='🚀') }}
+        {{ button('Voir mes lots existants', path('app_lot_index'), class='btn-primary', icon='📋') }}
+    </div>
+{% endblock %}
