@@ -60,5 +60,10 @@
         {% endfor %}
 
         {% include 'components/donation_widget.html.twig' %}
+
+        <!-- Sélecteur de personnage flottant (pour les utilisateurs connectés) -->
+        {% if app.user %}
+            {% include 'components/floating_profile_selector.html.twig' %}
+        {% endif %}
     </body>
 </html>
