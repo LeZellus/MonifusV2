@@ -37,17 +37,11 @@
                     <div class="stats-value text-orange-400">{{ lot.sellPricePerLot|format_kamas }}</div>
                     <div class="price-label">par lot</div>
                 </div>
-                <div class="price-card">
-                    <div class="price-label">Profit total</div>
-                    {% include 'components/unified_profit_display.html.twig' with {
-                        buy_price: lot.buyPricePerLot,
-                        sell_price: lot.sellPricePerLot,
-                        quantity: lot.lotSize,
-                        mode: 'simple',
-                        size: 'lg',
-                        bold: true
-                    } %}
-                </div>
+                {% include 'components/financial_card.html.twig' with {
+                    'label': 'Profit total',
+                    'lot': lot,
+                    'variant': 'success'
+                } %}
             </div>
         </div>
     {% endif %}

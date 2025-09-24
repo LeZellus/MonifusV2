@@ -7,9 +7,9 @@
         <div class="text-gray-400 text-sm">Vente par {{ item.saleUnit.value }}</div>
     </td>
     <td class="table-cell">
-        {% include 'components/price_display.html.twig' with {
-            price: item.buyPricePerLot,
-            color: 'white'
+        {% include 'components/price_simple.html.twig' with {
+            'amount': item.buyPricePerLot,
+            'color': 'white'
         } %}
         <div class="text-gray-400 text-sm">par lot</div>
     </td>
@@ -17,9 +17,9 @@
         {% if item.status.value == 'sold' and item.lotUnits|length > 0 %}
             {# Si vendu, afficher le prix réel de la dernière vente #}
             {% set lastSale = item.lotUnits|last %}
-            {% include 'components/price_display.html.twig' with {
-                price: lastSale.actualSellPrice,
-                color: 'white'
+            {% include 'components/price_simple.html.twig' with {
+                'amount': lastSale.actualSellPrice,
+                'color': 'white'
             } %}
             <div class="text-gray-400 text-sm">prix réel</div>
         {% else %}
@@ -30,20 +30,17 @@
     </td>
     <td class="table-cell">
         {% if item.status.value == 'sold' and item.lotUnits|length > 0 %}
-            {# Calculer le profit avec le prix réel #}
+            {# Profit avec prix réel de vente #}
             {% set lastSale = item.lotUnits|last %}
-            {% include 'components/unified_profit_display.html.twig' with {
-                buy_price: item.buyPricePerLot,
-                sell_price: lastSale.actualSellPrice,
-                quantity: lastSale.quantitySold,
-                color: 'white'
+            {% include 'components/price_profit.html.twig' with {
+                'sale': lastSale,
+                'mode': 'compact'
             } %}
         {% elseif item.sellPricePerLot %}
-            {% include 'components/unified_profit_display.html.twig' with {
-                buy_price: item.buyPricePerLot,
-                sell_price: item.sellPricePerLot,
-                quantity: item.lotSize,
-                color: 'white'
+            {# Profit estimé #}
+            {% include 'components/price_profit.html.twig' with {
+                'lot': item,
+                'mode': 'compact'
             } %}
         {% else %}
             <span class="text-gray-500">-</span>

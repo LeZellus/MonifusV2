@@ -1,0 +1,45 @@
+{#
+    Composant pour cartes de données financières
+
+    Usage :
+    {% include 'components/financial_card.html.twig' with {
+        'label': 'Profit total',
+        'lot': lot_group,
+        'variant': 'default'  // optional: default, success, warning, danger
+    } %}
+#}
+
+{% set variant = variant|default('default') %}
+
+{% set variant_classes = {
+    'default': 'price-card',
+    'success': 'price-card border-green-500/30 bg-green-500/5',
+    'warning': 'price-card border-orange-500/30 bg-orange-500/5',
+    'danger': 'price-card border-red-500/30 bg-red-500/5'
+} %}
+
+<div class="{{ variant_classes[variant] }}">
+    <div class="price-label">{{ label }}</div>
+
+    {% if lot is defined %}
+        {% include 'components/price_profit.html.twig' with {
+            'lot': lot,
+            'mode': 'compact'
+        } %}
+    {% elseif sale is defined %}
+        {% include 'components/price_profit.html.twig' with {
+            'sale': sale,
+            'mode': 'compact'
+        } %}
+    {% elseif amount is defined %}
+        {% include 'components/price_simple.html.twig' with {
+            'amount': amount,
+            'color': color|default('white'),
+            'size': 'lg'
+        } %}
+    {% endif %}
+
+    {% if description is defined %}
+        <div class="price-label">{{ description }}</div>
+    {% endif %}
+</div>

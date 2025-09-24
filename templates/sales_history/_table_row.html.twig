@@ -20,25 +20,24 @@
         <div class="text-gray-400 text-sm">par {{ lotGroup.saleUnit.value }}</div>
     </td>
     <td class="table-cell">
-        {% include 'components/price_display.html.twig' with {
-            price: lotGroup.sellPricePerLot,
-            color: 'white'
+        {% include 'components/price_simple.html.twig' with {
+            'amount': lotGroup.sellPricePerLot,
+            'color': 'white'
         } %}
         <div class="text-gray-400 text-sm">par lot</div>
     </td>
     
     <td class="table-cell">
-        {% include 'components/price_display.html.twig' with {
-            price: item.actualSellPrice,
-            color: 'white'
+        {% include 'components/price_simple.html.twig' with {
+            'amount': item.actualSellPrice,
+            'color': 'white'
         } %}
         <div class="text-gray-400 text-sm">par lot</div>
     </td>
     <td class="table-cell">
-        {% include 'components/unified_profit_display.html.twig' with {
-            buy_price: lotGroup.buyPricePerLot,
-            sell_price: item.actualSellPrice,
-            quantity: item.quantitySold
+        {% include 'components/price_profit.html.twig' with {
+            'sale': item,
+            'mode': 'compact'
         } %}
     </td>
     <td class="table-cell">        
