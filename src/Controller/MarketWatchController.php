@@ -6,8 +6,7 @@ use App\Entity\MarketWatch;
 use App\Entity\DofusCharacter;
 use App\Form\MarketWatchType;
 use App\Repository\MarketWatchRepository;
-use App\Service\CharacterSelectionService;
-use App\Service\ProfileSelectorService;
+use App\Service\ProfileCharacterService;
 use App\Service\CacheInvalidationService;
 use Doctrine\ORM\EntityManagerInterface;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
@@ -26,10 +25,10 @@ class MarketWatchController extends AbstractController
     #[Route('/', name: 'app_market_watch_index')]
     public function index(
         MarketWatchRepository $marketWatchRepository,
-        CharacterSelectionService $characterService
+        ProfileCharacterService $profileCharacterService
     ): Response {
-        $selectedCharacter = $characterService->getSelectedCharacter($this->getUser());
-        $characters = $characterService->getUserCharacters($this->getUser());
+        $selectedCharacter = $profileCharacterService->getSelectedCharacter($this->getUser());
+        $characters = $profileCharacterService->getUserCharacters($this->getUser());
 
         // Une seule ligne pour récupérer toutes les données avec stats
         $itemsData = $selectedCharacter 
@@ -48,12 +47,12 @@ class MarketWatchController extends AbstractController
         Request $request,
         EntityManagerInterface $em,
         ItemRepository $itemRepository,
-        CharacterSelectionService $characterService,
+        ProfileCharacterService $profileCharacterService,
         ProfileSelectorService $profileSelectorService,
         CacheInvalidationService $cacheInvalidation,
         ?int $itemId = null
     ): Response {
-        $selectedCharacter = $characterService->getSelectedCharacter($this->getUser());
+        $selectedCharacter = $profileCharacterService->getSelectedCharacter($this->getUser());
 
         if (!$selectedCharacter) {
             $this->addFlash('warning', 'Créez d\'abord un personnage.');
@@ -134,10 +133,10 @@ class MarketWatchController extends AbstractController
         MarketWatch $marketWatch,
         Request $request,
         EntityManagerInterface $em,
-        CharacterSelectionService $characterService,
+        ProfileCharacterService $profileCharacterService,
         CacheInvalidationService $cacheInvalidation
     ): Response {
-        $selectedCharacter = $characterService->getSelectedCharacter($this->getUser());
+        $selectedCharacter = $profileCharacterService->getSelectedCharacter($this->getUser());
 
         if ($marketWatch->getDofusCharacter()->getId() !== $selectedCharacter->getId()) {
             throw $this->createAccessDeniedException();
@@ -166,11 +165,11 @@ class MarketWatchController extends AbstractController
     public function delete(
         MarketWatch $marketWatch,
         EntityManagerInterface $em,
-        CharacterSelectionService $characterService,
+        ProfileCharacterService $profileCharacterService,
         ProfileSelectorService $profileSelectorService,
         CacheInvalidationService $cacheInvalidation
     ): Response {
-        $selectedCharacter = $characterService->getSelectedCharacter($this->getUser());
+        $selectedCharacter = $profileCharacterService->getSelectedCharacter($this->getUser());
 
         if ($marketWatch->getDofusCharacter()->getId() !== $selectedCharacter->getId()) {
             throw $this->createAccessDeniedException();
@@ -193,12 +192,12 @@ class MarketWatchController extends AbstractController
     public function deleteAllForItem(
         int $itemId,
         MarketWatchRepository $marketWatchRepository,
-        CharacterSelectionService $characterService,
+        ProfileCharacterService $profileCharacterService,
         EntityManagerInterface $em,
         ProfileSelectorService $profileSelectorService,
         CacheInvalidationService $cacheInvalidation
     ): Response {
-        $selectedCharacter = $characterService->getSelectedCharacter($this->getUser());
+        $selectedCharacter = $profileCharacterService->getSelectedCharacter($this->getUser());
         
         if (!$selectedCharacter) {
             $this->addFlash('error', 'Aucun personnage sélectionné.');
@@ -231,10 +230,10 @@ class MarketWatchController extends AbstractController
     public function itemHistory(
         int $itemId,
         MarketWatchRepository $marketWatchRepository,
-        CharacterSelectionService $characterService,
+        ProfileCharacterService $profileCharacterService,
         ChartDataService $chartDataService
     ): Response {
-        $selectedCharacter = $characterService->getSelectedCharacter($this->getUser());
+        $selectedCharacter = $profileCharacterService->getSelectedCharacter($this->getUser());
         
         if (!$selectedCharacter) {
             $this->addFlash('error', 'Aucun personnage sélectionné.');
@@ -266,14 +265,14 @@ class MarketWatchController extends AbstractController
     #[Route('/search', name: 'app_market_watch_search', methods: ['GET'])]
     public function search(
         MarketWatchRepository $marketWatchRepository,
-        CharacterSelectionService $characterService,
+        ProfileCharacterService $profileCharacterService,
         Request $request
     ): JsonResponse {
         // Debug pour voir si la route est appelée
         error_log("🔍 Route de recherche appelée");
         error_log("Query parameter: " . $request->query->get('q', 'VIDE'));
         
-        $selectedCharacter = $characterService->getSelectedCharacter($this->getUser());
+        $selectedCharacter = $profileCharacterService->getSelectedCharacter($this->getUser());
         
         if (!$selectedCharacter) {
             error_log("❌ Aucun personnage sélectionné");

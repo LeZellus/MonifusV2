@@ -3,7 +3,7 @@
 
 namespace App\Twig;
 
-use App\Service\ProfileSelectorService;
+use App\Service\ProfileCharacterService;
 use Symfony\Bundle\SecurityBundle\Security;
 use Symfony\Component\HttpFoundation\RequestStack;
 use Symfony\Contracts\Cache\CacheInterface;
@@ -14,7 +14,7 @@ use Twig\Extension\GlobalsInterface;
 class ProfileSelectorExtension extends AbstractExtension implements GlobalsInterface
 {
     public function __construct(
-        private ProfileSelectorService $profileSelectorService,
+        private ProfileCharacterService $profileCharacterService,
         private Security $security,
         private CacheInterface $cache,
         private RequestStack $requestStack
@@ -44,7 +44,7 @@ class ProfileSelectorExtension extends AbstractExtension implements GlobalsInter
 
         if ($bypassCache) {
             // Données fraîches pour s'assurer que les changements récents sont visibles
-            $selectorData = $this->profileSelectorService->getSelectorData($user);
+            $selectorData = $this->profileCharacterService->getSelectorData($user);
 
             // Validation supplémentaire : s'assurer que les données sont cohérentes
             if ($session && $session->get('selected_profile_id')) {
@@ -56,7 +56,7 @@ class ProfileSelectorExtension extends AbstractExtension implements GlobalsInter
                 if (!$currentProfile || $currentProfile->getId() !== $selectedProfileId) {
                     // Nettoyer et forcer un nouveau calcul
                     $session->remove('selected_character_id');
-                    $selectorData = $this->profileSelectorService->getSelectorData($user);
+                    $selectorData = $this->profileCharacterService->getSelectorData($user);
                 }
             }
 
@@ -69,7 +69,7 @@ class ProfileSelectorExtension extends AbstractExtension implements GlobalsInter
 
         $selectorData = $this->cache->get($cacheKey, function (ItemInterface $item) use ($user) {
             $item->expiresAfter(300); // Cache normal: 5 minutes
-            return $this->profileSelectorService->getSelectorData($user);
+            return $this->profileCharacterService->getSelectorData($user);
         });
 
         return [

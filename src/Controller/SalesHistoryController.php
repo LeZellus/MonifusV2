@@ -3,7 +3,7 @@
 namespace App\Controller;
 
 use App\Repository\LotUnitRepository;
-use App\Service\CharacterSelectionService;
+use App\Service\ProfileCharacterService;
 use App\Service\ExportService; 
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\HttpFoundation\Response;
@@ -19,11 +19,11 @@ class SalesHistoryController extends AbstractController
     public function index(
         Request $request,
         LotUnitRepository $lotUnitRepository,
-        CharacterSelectionService $characterService
+        ProfileCharacterService $profileCharacterService
     ): Response {
         $periodFilter = $request->query->get('period', '30');
-        $selectedCharacter = $characterService->getSelectedCharacter($this->getUser());
-        $characters = $characterService->getUserCharacters($this->getUser());
+        $selectedCharacter = $profileCharacterService->getSelectedCharacter($this->getUser());
+        $characters = $profileCharacterService->getUserCharacters($this->getUser());
 
         // Une seule ligne pour récupérer les ventes
         $sales = $lotUnitRepository->findSalesWithFilters(
@@ -47,11 +47,11 @@ class SalesHistoryController extends AbstractController
     public function export(
         Request $request,
         LotUnitRepository $lotUnitRepository,
-        CharacterSelectionService $characterService,
+        ProfileCharacterService $profileCharacterService,
         ExportService $exportService
     ): Response {
         $periodFilter = $request->query->get('period', '30');
-        $selectedCharacter = $characterService->getSelectedCharacter($this->getUser());
+        $selectedCharacter = $profileCharacterService->getSelectedCharacter($this->getUser());
 
         // Même logique, zéro duplication
         $sales = $lotUnitRepository->findSalesWithFilters(

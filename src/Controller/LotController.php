@@ -7,8 +7,7 @@ use App\Entity\Item;
 use App\Entity\DofusCharacter;
 use App\Form\LotGroupType;
 use App\Repository\LotGroupRepository;
-use App\Service\CharacterSelectionService;
-use App\Service\ProfileSelectorService;
+use App\Service\ProfileCharacterService;
 use App\Service\CacheInvalidationService;
 use Doctrine\ORM\EntityManagerInterface;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
@@ -25,10 +24,10 @@ class LotController extends AbstractController
     #[Route('/', name: 'app_lot_index')]
     public function index(
         LotGroupRepository $lotRepository,
-        CharacterSelectionService $characterService
+        ProfileCharacterService $profileCharacterService
     ): Response {
-        $selectedCharacter = $characterService->getSelectedCharacter($this->getUser());
-        $characters = $characterService->getUserCharacters($this->getUser());
+        $selectedCharacter = $profileCharacterService->getSelectedCharacter($this->getUser());
+        $characters = $profileCharacterService->getUserCharacters($this->getUser());
 
         $lots = [];
         if ($selectedCharacter) {
@@ -44,10 +43,10 @@ class LotController extends AbstractController
     #[Route('/search', name: 'app_lot_search', methods: ['GET'])]
     public function search(
         LotGroupRepository $lotRepository,
-        CharacterSelectionService $characterService,
+        ProfileCharacterService $profileCharacterService,
         Request $request
     ): JsonResponse {
-        $selectedCharacter = $characterService->getSelectedCharacter($this->getUser());
+        $selectedCharacter = $profileCharacterService->getSelectedCharacter($this->getUser());
         
         if (!$selectedCharacter) {
             return new JsonResponse(['error' => 'Aucun personnage sélectionné'], 400);
@@ -86,11 +85,11 @@ class LotController extends AbstractController
     public function new(
         Request $request,
         EntityManagerInterface $em,
-        CharacterSelectionService $characterService,
+        ProfileCharacterService $profileCharacterService,
         ProfileSelectorService $profileSelectorService,
         CacheInvalidationService $cacheInvalidation
     ): Response {
-        $selectedCharacter = $characterService->getSelectedCharacter($this->getUser());
+        $selectedCharacter = $profileCharacterService->getSelectedCharacter($this->getUser());
         
         if (!$selectedCharacter) {
             $this->addFlash('error', 'Aucun personnage sélectionné.');

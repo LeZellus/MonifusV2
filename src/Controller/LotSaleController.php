@@ -6,8 +6,7 @@ use App\Entity\LotGroup;
 use App\Entity\LotUnit;
 use App\Form\LotUnitType;
 use App\Enum\LotStatus;
-use App\Service\CharacterSelectionService;
-use App\Service\ProfileSelectorService;
+use App\Service\ProfileCharacterService;
 use App\Service\CacheInvalidationService;
 use Doctrine\ORM\EntityManagerInterface;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
@@ -25,11 +24,10 @@ class LotSaleController extends AbstractController
         LotGroup $lotGroup,
         Request $request,
         EntityManagerInterface $em,
-        CharacterSelectionService $characterService,
-        ProfileSelectorService $profileSelectorService,
+        ProfileCharacterService $profileCharacterService,
         CacheInvalidationService $cacheInvalidation
     ): Response {
-        $selectedCharacter = $characterService->getSelectedCharacter($this->getUser());
+        $selectedCharacter = $profileCharacterService->getSelectedCharacter($this->getUser());
 
         // Vérifications de sécurité
         if (!$selectedCharacter || $lotGroup->getDofusCharacter()->getId() !== $selectedCharacter->getId()) {
@@ -90,7 +88,7 @@ class LotSaleController extends AbstractController
             $em->flush();
 
             // Invalider le cache des compteurs car le statut des lots a changé
-            $profileSelectorService->forceInvalidateCountsCache($this->getUser());
+            $profileCharacterService->forceInvalidateCountsCache($this->getUser());
 
             // Invalider le cache des stats utilisateur
             $cacheInvalidation->invalidateUserStatsAndMarkActivity($this->getUser());
@@ -113,11 +111,10 @@ class LotSaleController extends AbstractController
     public function cancelSale(
         int $id,
         EntityManagerInterface $em,
-        CharacterSelectionService $characterService,
-        ProfileSelectorService $profileSelectorService,
+        ProfileCharacterService $profileCharacterService,
         CacheInvalidationService $cacheInvalidation
     ): Response {
-        $selectedCharacter = $characterService->getSelectedCharacter($this->getUser());
+        $selectedCharacter = $profileCharacterService->getSelectedCharacter($this->getUser());
         
         if (!$selectedCharacter) {
             throw $this->createAccessDeniedException();
@@ -151,7 +148,7 @@ class LotSaleController extends AbstractController
         $em->flush();
 
         // Invalider le cache des compteurs car le statut des lots a changé
-        $profileSelectorService->forceInvalidateCountsCache($this->getUser());
+        $profileCharacterService->forceInvalidateCountsCache($this->getUser());
 
         // Invalider le cache des stats utilisateur
         $cacheInvalidation->invalidateUserStatsAndMarkActivity($this->getUser());

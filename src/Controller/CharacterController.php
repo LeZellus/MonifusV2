@@ -2,7 +2,7 @@
 
 namespace App\Controller;
 
-use App\Service\CharacterSelectionService;
+use App\Service\ProfileCharacterService;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
@@ -20,7 +20,7 @@ class CharacterController extends AbstractController
     #[Route('/select/{id}', name: 'app_character_select', methods: ['POST'])]
     public function select(
         int $id,
-        CharacterSelectionService $characterService,
+        ProfileCharacterService $profileCharacterService,
         DofusCharacterRepository $characterRepository,
         Request $request
     ): Response {
@@ -50,7 +50,7 @@ class CharacterController extends AbstractController
             $session->set('profile_selector_last_update', time());
         }
 
-        $characterService->setSelectedCharacter($character);
+        $profileCharacterService->setSelectedCharacter($character);
         $this->addFlash('success', "Personnage {$character->getName()} sélectionné");
 
         // Revenir sur la page précédente au lieu de app_lot_index
@@ -92,7 +92,7 @@ class CharacterController extends AbstractController
     #[Route('/character/add', name: 'app_character_add')]
     public function addCharacter(
         TradingProfileRepository $repository,
-        CharacterSelectionService $characterService
+        ProfileCharacterService $profileCharacterService
     ): Response {
         $profiles = $repository->findBy(['user' => $this->getUser()]);
         
