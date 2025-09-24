@@ -8,6 +8,7 @@ use App\Form\TradingProfileType;
 use App\Form\DofusCharacterType;
 use App\Repository\TradingProfileRepository;
 use App\Service\ProfileCharacterService;
+use App\Service\ProfileManagementService;
 use Doctrine\ORM\EntityManagerInterface;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\HttpFoundation\Request;
@@ -39,17 +40,16 @@ class ProfileController extends AbstractController
     }
 
     #[Route('/new', name: 'app_profile_new')]
-    public function new(Request $request, EntityManagerInterface $em): Response
-    {
+    public function new(
+        Request $request,
+        ProfileManagementService $profileManagementService
+    ): Response {
         $profile = new TradingProfile();
         $form = $this->createForm(TradingProfileType::class, $profile);
-        
+
         $form->handleRequest($request);
         if ($form->isSubmitted() && $form->isValid()) {
-            $profile->setUser($this->getUser());
-            $em->persist($profile);
-            $em->flush();
-            
+            $profileManagementService->createProfile($profile, $this->getUser());
             $this->addFlash('success', 'Profil de trading créé avec succès !');
             return $this->redirectToRoute('app_profile_index');
         }
@@ -63,32 +63,18 @@ class ProfileController extends AbstractController
     public function newCharacter(
         TradingProfile $profile,
         Request $request,
-        EntityManagerInterface $em,
-        ProfileCharacterService $profileCharacterService,
-            ): Response {
+        ProfileManagementService $profileManagementService
+    ): Response {
         if ($profile->getUser() !== $this->getUser()) {
             throw $this->createAccessDeniedException();
         }
 
         $character = new DofusCharacter();
         $form = $this->createForm(DofusCharacterType::class, $character);
-        
+
         $form->handleRequest($request);
         if ($form->isSubmitted() && $form->isValid()) {
-            $character->setTradingProfile($profile);
-            $em->persist($character);
-            $em->flush();
-
-            // Invalider les caches avant de sélectionner le nouveau personnage
-            $profileCharacterService->invalidateUserCache($this->getUser());
-            $profileCharacterService->invalidateUserCache($this->getUser());
-
-            // Forcer l'invalidation du cache de l'extension Twig
-            $session = $request->getSession();
-            $session->set('profile_selector_last_update', time());
-
-            $profileCharacterService->setSelectedCharacter($character);
-
+            $profileManagementService->createCharacter($character, $profile, $this->getUser());
             $this->addFlash('success', 'Personnage ajouté et sélectionné avec succès !');
             return $this->redirectToRoute('app_profile_index');
         }
@@ -102,31 +88,21 @@ class ProfileController extends AbstractController
     #[Route('/character/{id}/select', name: 'app_profile_character_select')]
     public function selectCharacter(
         DofusCharacter $character,
-        ProfileCharacterService $profileCharacterService,
+        ProfileManagementService $profileManagementService,
         Request $request
     ): Response {
         if ($character->getTradingProfile()->getUser() !== $this->getUser()) {
             throw $this->createAccessDeniedException();
         }
 
-        // Invalider le cache du sélecteur pour mettre à jour l'affichage
-        $profileCharacterService->invalidateUserCache($this->getUser());
-
-        // Forcer l'invalidation du cache de l'extension Twig
-        $request = $this->requestStack->getCurrentRequest();
-        if ($request && $request->hasSession()) {
-            $session = $request->getSession();
-            $session->set('profile_selector_last_update', time());
-        }
-
-        $profileCharacterService->setSelectedCharacter($character);
+        $profileManagementService->selectCharacter($character, $this->getUser());
         $this->addFlash('success', "Personnage {$character->getName()} sélectionné !");
 
         $referer = $request->headers->get('referer');
         if ($referer) {
             return $this->redirect($referer);
         }
-        
+
         return $this->redirectToRoute('app_profile_index');
     }
 

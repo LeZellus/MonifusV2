@@ -5,10 +5,8 @@ namespace App\Controller;
 use App\Entity\MarketWatch;
 use App\Entity\DofusCharacter;
 use App\Form\MarketWatchType;
-use App\Repository\MarketWatchRepository;
 use App\Service\ProfileCharacterService;
-use App\Service\CacheInvalidationService;
-use Doctrine\ORM\EntityManagerInterface;
+use App\Service\MarketWatchService;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
@@ -24,16 +22,12 @@ class MarketWatchController extends AbstractController
 {
     #[Route('/', name: 'app_market_watch_index')]
     public function index(
-        MarketWatchRepository $marketWatchRepository,
+        MarketWatchService $marketWatchService,
         ProfileCharacterService $profileCharacterService
     ): Response {
         $selectedCharacter = $profileCharacterService->getSelectedCharacter($this->getUser());
         $characters = $profileCharacterService->getUserCharacters($this->getUser());
-
-        // Une seule ligne pour récupérer toutes les données avec stats
-        $itemsData = $selectedCharacter 
-            ? $marketWatchRepository->getItemsDataWithStats($selectedCharacter)
-            : [];
+        $itemsData = $marketWatchService->getItemsDataForCharacter($selectedCharacter);
 
         return $this->render('market_watch/index.html.twig', [
             'items_data' => $itemsData,
@@ -45,11 +39,9 @@ class MarketWatchController extends AbstractController
     #[Route('/new/{itemId}', name: 'app_market_watch_new', requirements: ['itemId' => '\d+'], defaults: ['itemId' => null])]
     public function new(
         Request $request,
-        EntityManagerInterface $em,
         ItemRepository $itemRepository,
+        MarketWatchService $marketWatchService,
         ProfileCharacterService $profileCharacterService,
-        ProfileSelectorService $profileSelectorService,
-        CacheInvalidationService $cacheInvalidation,
         ?int $itemId = null
     ): Response {
         $selectedCharacter = $profileCharacterService->getSelectedCharacter($this->getUser());
@@ -70,55 +62,25 @@ class MarketWatchController extends AbstractController
         }
 
         $marketWatch = new MarketWatch();
-        
-        // Configuration du formulaire selon le contexte
+
         $formOptions = ['is_edit' => false];
         if ($preselectedItem) {
             $formOptions['preselected_item'] = $preselectedItem;
         }
-        
+
         $form = $this->createForm(MarketWatchType::class, $marketWatch, $formOptions);
 
         $form->handleRequest($request);
         if ($form->isSubmitted() && $form->isValid()) {
-            // Si pas d'item prérempli, récupérer depuis le formulaire
-            if (!$preselectedItem) {
-                $itemId = $form->get('item')->getData();
-                if ($itemId && $item = $itemRepository->find($itemId)) {
-                    $marketWatch->setItem($item);
-                } else {
-                    $this->addFlash('error', 'Veuillez sélectionner une ressource valide.');
-                    return $this->render('market_watch/new.html.twig', [
-                        'form' => $form,
-                        'character' => $selectedCharacter,
-                        'preselected_item' => $preselectedItem,
-                    ]);
-                }
+            $formItemId = !$preselectedItem ? $form->get('item')->getData() : null;
+
+            if ($marketWatchService->createMarketWatch($selectedCharacter, $marketWatch, $preselectedItem, $formItemId)) {
+                $itemName = $marketWatch->getItem()->getName();
+                $this->addFlash('success', "Observation ajoutée pour {$itemName} !");
+                return $this->redirectToRoute('app_market_watch_index');
             } else {
-                // Item prérempli
-                $marketWatch->setItem($preselectedItem);
+                $this->addFlash('error', 'Erreur lors de la création de l\'observation.');
             }
-
-            // S'assurer que le personnage est managé par Doctrine
-            $managedCharacter = $em->getRepository(DofusCharacter::class)->find($selectedCharacter->getId());
-            if (!$managedCharacter) {
-                $this->addFlash('error', 'Personnage introuvable.');
-                return $this->redirectToRoute('app_profile_index');
-            }
-            $marketWatch->setDofusCharacter($managedCharacter);
-
-            $em->persist($marketWatch);
-            $em->flush();
-
-            // Invalider le cache des compteurs pour mise à jour immédiate
-            $profileSelectorService->forceInvalidateCountsCache($this->getUser());
-
-            // Invalider le cache des stats utilisateur
-            $cacheInvalidation->invalidateUserStatsAndMarkActivity($this->getUser());
-
-            $itemName = $marketWatch->getItem()->getName();
-            $this->addFlash('success', "Observation ajoutée pour {$itemName} !");
-            return $this->redirectToRoute('app_market_watch_index');
         }
 
         return $this->render('market_watch/new.html.twig', [
@@ -132,13 +94,12 @@ class MarketWatchController extends AbstractController
     public function edit(
         MarketWatch $marketWatch,
         Request $request,
-        EntityManagerInterface $em,
-        ProfileCharacterService $profileCharacterService,
-        CacheInvalidationService $cacheInvalidation
+        MarketWatchService $marketWatchService,
+        ProfileCharacterService $profileCharacterService
     ): Response {
         $selectedCharacter = $profileCharacterService->getSelectedCharacter($this->getUser());
 
-        if ($marketWatch->getDofusCharacter()->getId() !== $selectedCharacter->getId()) {
+        if (!$marketWatchService->canUserAccessMarketWatch($marketWatch, $selectedCharacter)) {
             throw $this->createAccessDeniedException();
         }
 
@@ -146,11 +107,7 @@ class MarketWatchController extends AbstractController
 
         $form->handleRequest($request);
         if ($form->isSubmitted() && $form->isValid()) {
-            $em->flush();
-
-            // Invalider le cache des stats utilisateur
-            $cacheInvalidation->invalidateUserStatsAndMarkActivity($this->getUser());
-
+            $marketWatchService->updateMarketWatch($marketWatch);
             $this->addFlash('success', 'Observation modifiée avec succès !');
             return $this->redirectToRoute('app_market_watch_index');
         }
@@ -164,26 +121,16 @@ class MarketWatchController extends AbstractController
     #[Route('/{id}/delete', name: 'app_market_watch_delete', methods: ['POST'])]
     public function delete(
         MarketWatch $marketWatch,
-        EntityManagerInterface $em,
-        ProfileCharacterService $profileCharacterService,
-        ProfileSelectorService $profileSelectorService,
-        CacheInvalidationService $cacheInvalidation
+        MarketWatchService $marketWatchService,
+        ProfileCharacterService $profileCharacterService
     ): Response {
         $selectedCharacter = $profileCharacterService->getSelectedCharacter($this->getUser());
 
-        if ($marketWatch->getDofusCharacter()->getId() !== $selectedCharacter->getId()) {
+        if (!$marketWatchService->canUserAccessMarketWatch($marketWatch, $selectedCharacter)) {
             throw $this->createAccessDeniedException();
         }
 
-        $em->remove($marketWatch);
-        $em->flush();
-
-        // Invalider le cache des compteurs pour mise à jour immédiate
-        $profileSelectorService->forceInvalidateCountsCache($this->getUser());
-
-        // Invalider le cache des stats utilisateur
-        $cacheInvalidation->invalidateUserStatsAndMarkActivity($this->getUser());
-
+        $marketWatchService->deleteMarketWatch($marketWatch);
         $this->addFlash('success', 'Observation supprimée avec succès !');
         return $this->redirectToRoute('app_market_watch_index');
     }
@@ -191,56 +138,42 @@ class MarketWatchController extends AbstractController
     #[Route('/item/{itemId}/delete-all', name: 'app_market_watch_delete_all_for_item', methods: ['POST'])]
     public function deleteAllForItem(
         int $itemId,
-        MarketWatchRepository $marketWatchRepository,
-        ProfileCharacterService $profileCharacterService,
-        EntityManagerInterface $em,
-        ProfileSelectorService $profileSelectorService,
-        CacheInvalidationService $cacheInvalidation
+        MarketWatchService $marketWatchService,
+        ProfileCharacterService $profileCharacterService
     ): Response {
         $selectedCharacter = $profileCharacterService->getSelectedCharacter($this->getUser());
-        
+
         if (!$selectedCharacter) {
             $this->addFlash('error', 'Aucun personnage sélectionné.');
             return $this->redirectToRoute('app_market_watch_index');
         }
 
-        $observations = $marketWatchRepository->findPriceHistoryForItem($selectedCharacter, $itemId);
-        
-        if (empty($observations)) {
+        $count = $marketWatchService->deleteAllObservationsForItem($selectedCharacter, $itemId);
+
+        if ($count === 0) {
             $this->addFlash('warning', 'Aucune observation à supprimer.');
-            return $this->redirectToRoute('app_market_watch_index');
+        } else {
+            $this->addFlash('success', "{$count} observation(s) supprimée(s).");
         }
 
-        foreach ($observations as $observation) {
-            $em->remove($observation);
-        }
-        $em->flush();
-
-        // Invalider le cache des compteurs pour mise à jour immédiate
-        $profileSelectorService->forceInvalidateCountsCache($this->getUser());
-
-        // Invalider le cache des stats utilisateur
-        $cacheInvalidation->invalidateUserStatsAndMarkActivity($this->getUser());
-
-        $this->addFlash('success', count($observations) . ' observation(s) supprimée(s) pour ' . $observations[0]->getItem()->getName());
         return $this->redirectToRoute('app_market_watch_index');
     }
 
     #[Route('/item/{itemId}/history', name: 'app_market_watch_history')]
     public function itemHistory(
         int $itemId,
-        MarketWatchRepository $marketWatchRepository,
+        MarketWatchService $marketWatchService,
         ProfileCharacterService $profileCharacterService,
         ChartDataService $chartDataService
     ): Response {
         $selectedCharacter = $profileCharacterService->getSelectedCharacter($this->getUser());
-        
+
         if (!$selectedCharacter) {
             $this->addFlash('error', 'Aucun personnage sélectionné.');
             return $this->redirectToRoute('app_market_watch_index');
         }
 
-        $priceHistory = $marketWatchRepository->findPriceHistoryForItem($selectedCharacter, $itemId);
+        $priceHistory = $marketWatchService->getPriceHistoryForItem($selectedCharacter, $itemId);
 
         if (empty($priceHistory)) {
             $this->addFlash('warning', 'Aucun historique de prix pour cet item.');
@@ -248,9 +181,7 @@ class MarketWatchController extends AbstractController
         }
 
         $item = $priceHistory[0]->getItem();
-        $averages = $marketWatchRepository->calculatePriceAverages($priceHistory);
-        
-        // Génération des données COMPLÈTES (pas de filtrage côté PHP)
+        $averages = $marketWatchService->calculatePriceAverages($priceHistory);
         $chartData = $chartDataService->prepareMarketWatchChartData($priceHistory, 'all');
 
         return $this->render('market_watch/history.html.twig', [
@@ -264,81 +195,33 @@ class MarketWatchController extends AbstractController
 
     #[Route('/search', name: 'app_market_watch_search', methods: ['GET'])]
     public function search(
-        MarketWatchRepository $marketWatchRepository,
+        MarketWatchService $marketWatchService,
         ProfileCharacterService $profileCharacterService,
         Request $request
     ): JsonResponse {
-        // Debug pour voir si la route est appelée
-        error_log("🔍 Route de recherche appelée");
-        error_log("Query parameter: " . $request->query->get('q', 'VIDE'));
-        
         $selectedCharacter = $profileCharacterService->getSelectedCharacter($this->getUser());
-        
+
         if (!$selectedCharacter) {
-            error_log("❌ Aucun personnage sélectionné");
             return new JsonResponse(['error' => 'Aucun personnage sélectionné'], 400);
         }
-        
-        error_log("✅ Personnage trouvé: " . $selectedCharacter->getName());
 
         $searchQuery = trim($request->query->get('q', ''));
-        error_log("Terme de recherche traité: '" . $searchQuery . "'");
-        
-        // Utiliser votre méthode existante avec la recherche
-        $itemsData = $marketWatchRepository->getItemsDataWithStats($selectedCharacter, $searchQuery);
-        error_log("Nombre d'items trouvés: " . count($itemsData));
+        $itemsData = $marketWatchService->getItemsDataForCharacter($selectedCharacter, $searchQuery);
 
-        // Rendu des lignes du tableau
         $tableRows = '';
-        foreach ($itemsData as $item) {
-            $tableRows .= $this->renderView('market_watch/_table_row.html.twig', [
-                'item' => $item
-            ]);
-        }
-        error_log("HTML table rows généré, longueur: " . strlen($tableRows));
-
-        // Rendu des cartes mobile
         $mobileCards = '';
-        foreach ($itemsData as $item) {
-            $mobileCards .= $this->renderView('market_watch/_mobile_card.html.twig', [
-                'item' => $item
-            ]);
-        }
-        error_log("HTML mobile cards généré, longueur: " . strlen($mobileCards));
 
-        $response = [
+        foreach ($itemsData as $item) {
+            $tableRows .= $this->renderView('market_watch/_table_row.html.twig', ['item' => $item]);
+            $mobileCards .= $this->renderView('market_watch/_mobile_card.html.twig', ['item' => $item]);
+        }
+
+        return new JsonResponse([
             'table_rows' => $tableRows,
             'mobile_cards' => $mobileCards,
             'count' => count($itemsData),
             'query' => $searchQuery
-        ];
-        
-        error_log("Réponse JSON prête: " . json_encode([
-            'count' => $response['count'],
-            'query' => $response['query'],
-            'table_rows_length' => strlen($response['table_rows']),
-            'mobile_cards_length' => strlen($response['mobile_cards'])
-        ]));
-
-        return new JsonResponse($response);
-    }
-
-    public function history(Item $item, ChartDataService $chartService): Response
-    {
-        $priceHistory = $this->marketWatchRepository
-            ->findByItemOrderedByDate($item);
-            
-        $averages = $this->marketWatchRepository
-            ->getAveragesByItem($item);
-
-        // Générer les données complètes (tous types)
-        $chartData = $chartService->buildChartData($priceHistory);
-
-        return $this->render('market_watch/history.html.twig', [
-            'item' => $item,
-            'price_history' => $priceHistory,
-            'averages' => $averages,
-            'chart_data' => $chartData
         ]);
     }
+
 }

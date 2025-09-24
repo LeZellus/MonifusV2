@@ -8,7 +8,7 @@ use App\Entity\DofusCharacter;
 use App\Form\LotGroupType;
 use App\Repository\LotGroupRepository;
 use App\Service\ProfileCharacterService;
-use App\Service\CacheInvalidationService;
+use App\Service\LotManagementService;
 use Doctrine\ORM\EntityManagerInterface;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\HttpFoundation\JsonResponse;
@@ -23,16 +23,12 @@ class LotController extends AbstractController
 {
     #[Route('/', name: 'app_lot_index')]
     public function index(
-        LotGroupRepository $lotRepository,
+        LotManagementService $lotManagementService,
         ProfileCharacterService $profileCharacterService
     ): Response {
         $selectedCharacter = $profileCharacterService->getSelectedCharacter($this->getUser());
         $characters = $profileCharacterService->getUserCharacters($this->getUser());
-
-        $lots = [];
-        if ($selectedCharacter) {
-            $lots = $lotRepository->findAvailableByCharacter($selectedCharacter);
-        }
+        $lots = $lotManagementService->getAvailableLotsForCharacter($selectedCharacter);
 
         return $this->render('lot/index.html.twig', [
             'lots' => $lots,
@@ -42,40 +38,30 @@ class LotController extends AbstractController
 
     #[Route('/search', name: 'app_lot_search', methods: ['GET'])]
     public function search(
-        LotGroupRepository $lotRepository,
+        LotManagementService $lotManagementService,
         ProfileCharacterService $profileCharacterService,
         Request $request
     ): JsonResponse {
         $selectedCharacter = $profileCharacterService->getSelectedCharacter($this->getUser());
-        
+
         if (!$selectedCharacter) {
             return new JsonResponse(['error' => 'Aucun personnage sélectionné'], 400);
         }
 
         $searchQuery = trim($request->query->get('q', ''));
-        
-        // Rechercher les lots par nom d'item
-        $lots = $lotRepository->searchByItemName($selectedCharacter, $searchQuery);
+        $lots = $lotManagementService->searchLotsByItemName($selectedCharacter, $searchQuery);
 
-        // Rendu des lignes du tableau (clé: table_rows)
         $tableRows = '';
-        foreach ($lots as $lot) {
-            $tableRows .= $this->renderView('lot/_table_row.html.twig', [
-                'item' => $lot
-            ]);
-        }
-
-        // Rendu des cartes mobile (clé: mobile_cards)
         $mobileCards = '';
+
         foreach ($lots as $lot) {
-            $mobileCards .= $this->renderView('lot/_mobile_card.html.twig', [
-                'item' => $lot
-            ]);
+            $tableRows .= $this->renderView('lot/_table_row.html.twig', ['item' => $lot]);
+            $mobileCards .= $this->renderView('lot/_mobile_card.html.twig', ['item' => $lot]);
         }
 
         return new JsonResponse([
-            'table_rows' => $tableRows,    // ✅ Correspond à data-search-container="table_rows"
-            'mobile_cards' => $mobileCards, // ✅ Correspond à data-search-container="mobile_cards"
+            'table_rows' => $tableRows,
+            'mobile_cards' => $mobileCards,
             'count' => count($lots),
             'query' => $searchQuery
         ]);
@@ -85,12 +71,11 @@ class LotController extends AbstractController
     public function new(
         Request $request,
         EntityManagerInterface $em,
-        ProfileCharacterService $profileCharacterService,
-        ProfileSelectorService $profileSelectorService,
-        CacheInvalidationService $cacheInvalidation
+        LotManagementService $lotManagementService,
+        ProfileCharacterService $profileCharacterService
     ): Response {
         $selectedCharacter = $profileCharacterService->getSelectedCharacter($this->getUser());
-        
+
         if (!$selectedCharacter) {
             $this->addFlash('error', 'Aucun personnage sélectionné.');
             return $this->redirectToRoute('app_profile_index');
@@ -106,30 +91,13 @@ class LotController extends AbstractController
             if ($itemId) {
                 $item = $em->getRepository(Item::class)->find($itemId);
                 if ($item) {
-                    // S'assurer que le personnage est managé par Doctrine
-                    $managedCharacter = $em->getRepository(DofusCharacter::class)->find($selectedCharacter->getId());
-                    if (!$managedCharacter) {
-                        $this->addFlash('error', 'Personnage introuvable.');
-                        return $this->redirectToRoute('app_profile_index');
-                    }
-
                     $lotGroup->setItem($item);
-                    $lotGroup->setDofusCharacter($managedCharacter);
-
-                    $em->persist($lotGroup);
-                    $em->flush();
-
-                    // Invalider le cache des compteurs pour mise à jour immédiate
-                    $profileSelectorService->forceInvalidateCountsCache($this->getUser());
-
-                    // Invalider le cache des stats utilisateur
-                    $cacheInvalidation->invalidateUserStatsAndMarkActivity($this->getUser());
-
+                    $lotManagementService->createLot($lotGroup, $selectedCharacter);
                     $this->addFlash('success', 'Lot ajouté avec succès !');
                     return $this->redirectToRoute('app_lot_index');
                 }
             }
-            
+
             $this->addFlash('error', 'Veuillez sélectionner un item valide.');
         }
 
