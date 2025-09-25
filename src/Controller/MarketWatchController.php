@@ -73,75 +73,84 @@ class MarketWatchController extends AbstractController
 
             error_log('📊 Paramètres: page=' . $page . ', length=' . $length . ', search=' . $search);
 
-            // Récupérer les observations individuelles plutôt que les données agrégées
-            $allObservations = $marketWatchRepository->findByCharacterWithItems($selectedCharacter, $search);
+            // Récupérer les données agrégées (une entrée par ressource avec moyennes)
+            $allItemsData = $marketWatchService->getItemsDataForCharacter($selectedCharacter, $search);
 
-            error_log('📋 Nombre total d\'observations trouvées: ' . count($allObservations));
+            error_log('📋 Nombre total d\'items trouvés: ' . count($allItemsData));
 
-            // Tri des observations
-            $columns = ['item', 'pricePerUnit', 'pricePer10', 'pricePer100', 'pricePer1000', 'observedAt'];
+            // Tri des données agrégées
+            $columns = ['item', 'avg_price_unit', 'avg_price_10', 'avg_price_100', 'avg_price_1000', 'latest_date'];
             if (isset($columns[$sortColumn])) {
                 $sortKey = $columns[$sortColumn];
-                usort($allObservations, function($a, $b) use ($sortKey, $sortDirection) {
+                usort($allItemsData, function($a, $b) use ($sortKey, $sortDirection) {
                     if ($sortKey === 'item') {
-                        $result = strcmp($a->getItem()->getName(), $b->getItem()->getName());
-                    } elseif ($sortKey === 'observedAt') {
-                        $result = $a->getObservedAt() <=> $b->getObservedAt();
+                        $result = strcmp($a['item']->getName(), $b['item']->getName());
+                    } elseif ($sortKey === 'latest_date') {
+                        $result = $a['latest_date'] <=> $b['latest_date'];
                     } else {
-                        $methodName = 'get' . ucfirst($sortKey);
-                        $valueA = method_exists($a, $methodName) ? $a->$methodName() : 0;
-                        $valueB = method_exists($b, $methodName) ? $b->$methodName() : 0;
-                        $result = ($valueA ?? 0) <=> ($valueB ?? 0);
+                        $result = ($a[$sortKey] ?? 0) <=> ($b[$sortKey] ?? 0);
                     }
                     return $sortDirection === 'desc' ? -$result : $result;
                 });
             }
 
-            $totalRecords = count($allObservations);
+            $totalRecords = count($allItemsData);
 
             // Pagination
             $start = ($page - 1) * $length;
-            $pagedObservations = array_slice($allObservations, $start, $length);
+            $pagedItemsData = array_slice($allItemsData, $start, $length);
 
-            error_log('📄 Observations paginées: ' . count($pagedObservations));
+            error_log('📄 Items paginés: ' . count($pagedItemsData));
 
-            // Formater les données avec HTML
-            $formattedData = array_map(function($observation) {
+            // Formater les données avec HTML et liens vers l'historique
+            $formattedData = array_map(function($itemData) {
+                $historyUrl = $this->generateUrl('app_market_watch_history', ['itemId' => $itemData['item']->getId()]);
+
                 return [
-                    sprintf('<div class="flex items-center gap-2"><img src="%s" alt="%s" class="w-8 h-8 rounded"><span>%s</span></div>',
-                        $observation->getItem()->getImgUrl() ?? '/images/items/default.png',
-                        htmlspecialchars($observation->getItem()->getName()),
-                        htmlspecialchars($observation->getItem()->getName())
+                    sprintf('<div class="flex items-center gap-2">
+                        <img src="%s" alt="%s" class="w-8 h-8 rounded">
+                        <a href="%s" class="text-white hover:text-blue-400 transition-colors">%s</a>
+                    </div>',
+                        $itemData['item']->getImgUrl() ?? '/images/items/default.png',
+                        htmlspecialchars($itemData['item']->getName()),
+                        $historyUrl,
+                        htmlspecialchars($itemData['item']->getName())
                     ),
-                    sprintf('<span class="text-green-400">%s K</span>', $observation->getPricePerUnit() ? number_format($observation->getPricePerUnit() / 1000, 1) : '-'),
-                    sprintf('<span class="text-blue-400">%s K</span>', $observation->getPricePer10() ? number_format($observation->getPricePer10() / 1000, 1) : '-'),
-                    sprintf('<span class="text-purple-400">%s K</span>', $observation->getPricePer100() ? number_format($observation->getPricePer100() / 1000, 1) : '-'),
-                    sprintf('<span class="text-orange-400">%s K</span>', $observation->getPricePer1000() ? number_format($observation->getPricePer1000() / 1000, 1) : '-'),
-                    $observation->getObservedAt()->format('d/m/Y H:i'),
+                    sprintf('<span class="text-green-400">%s K</span><div class="text-gray-500 text-xs">%d obs</div>',
+                        $itemData['avg_price_unit'] ? number_format($itemData['avg_price_unit'] / 1000, 1) : '-',
+                        $itemData['price_unit_count'] ?? 0
+                    ),
+                    sprintf('<span class="text-blue-400">%s K</span><div class="text-gray-500 text-xs">%d obs</div>',
+                        $itemData['avg_price_10'] ? number_format($itemData['avg_price_10'] / 1000, 1) : '-',
+                        $itemData['price_10_count'] ?? 0
+                    ),
+                    sprintf('<span class="text-purple-400">%s K</span><div class="text-gray-500 text-xs">%d obs</div>',
+                        $itemData['avg_price_100'] ? number_format($itemData['avg_price_100'] / 1000, 1) : '-',
+                        $itemData['price_100_count'] ?? 0
+                    ),
+                    sprintf('<span class="text-orange-400">%s K</span><div class="text-gray-500 text-xs">%d obs</div>',
+                        $itemData['avg_price_1000'] ? number_format($itemData['avg_price_1000'] / 1000, 1) : '-',
+                        $itemData['price_1000_count'] ?? 0
+                    ),
+                    $itemData['latest_date']->format('d/m/Y H:i'),
                     sprintf('<div class="flex gap-2">
-                        <a href="/market-watch/%d/edit" class="text-blue-400 hover:text-blue-300 text-xs px-2 py-1 border border-blue-400 rounded">Modifier</a>
-                        <form method="POST" action="/market-watch/%d/delete" style="display:inline;" onsubmit="return confirm(\'Supprimer cette observation ?\')">
+                        <a href="%s" class="text-blue-400 hover:text-blue-300 text-xs px-2 py-1 border border-blue-400 rounded">Historique</a>
+                        <a href="%s" class="text-green-400 hover:text-green-300 text-xs px-2 py-1 border border-green-400 rounded">Ajouter</a>
+                        <form method="POST" action="%s" style="display:inline;" onsubmit="return confirm(\'Supprimer toutes les observations pour cette ressource ?\')">
                             <button type="submit" class="text-red-400 hover:text-red-300 text-xs px-2 py-1 border border-red-400 rounded">Supprimer</button>
                         </form>
                     </div>',
-                        $observation->getId(),
-                        $observation->getId()
+                        $historyUrl,
+                        $this->generateUrl('app_market_watch_new', ['itemId' => $itemData['item']->getId()]),
+                        $this->generateUrl('app_market_watch_delete_all_for_item', ['itemId' => $itemData['item']->getId()])
                     )
                 ];
-            }, $pagedObservations);
+            }, $pagedItemsData);
 
-            // Générer les cartes mobiles HTML
+            // Générer les cartes mobiles HTML (utiliser la carte mobile existante)
             $mobileCards = '';
-            foreach ($pagedObservations as $observation) {
-                $itemData = [
-                    'item' => $observation->getItem(),
-                    'marketWatch' => $observation,
-                    'pricePerUnit' => $observation->getPricePerUnit(),
-                    'pricePer10' => $observation->getPricePer10(),
-                    'pricePer100' => $observation->getPricePer100(),
-                    'pricePer1000' => $observation->getPricePer1000()
-                ];
-                $mobileCards .= $this->renderView('market_watch/_observation_mobile_card.html.twig', ['item' => $itemData]);
+            foreach ($pagedItemsData as $itemData) {
+                $mobileCards .= $this->renderView('market_watch/_mobile_card.html.twig', ['item' => $itemData]);
             }
 
             return new JsonResponse([

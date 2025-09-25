@@ -201,9 +201,7 @@ export default class extends Controller {
         // Previous button
         const prevDisabled = this.currentPage === 1 ? 'disabled' : ''
         paginationHTML += `
-            <button class="pagination-btn ${prevDisabled}"
-                    data-action="click->custom-table#previousPage"
-                    ${prevDisabled ? 'disabled' : ''}>
+            <button class="pagination-btn ${prevDisabled}" data-nav="prev" ${prevDisabled ? 'disabled' : ''}>
                 Précédent
             </button>
         `
@@ -213,7 +211,7 @@ export default class extends Controller {
         const endPage = Math.min(totalPages, this.currentPage + 2)
 
         if (startPage > 1) {
-            paginationHTML += `<button class="pagination-btn" data-action="click->custom-table#goToPage" data-custom-table-page-param="1">1</button>`
+            paginationHTML += `<button class="pagination-btn" data-page="1">1</button>`
             if (startPage > 2) {
                 paginationHTML += `<span class="pagination-ellipsis">...</span>`
             }
@@ -222,9 +220,7 @@ export default class extends Controller {
         for (let i = startPage; i <= endPage; i++) {
             const active = i === this.currentPage ? 'active' : ''
             paginationHTML += `
-                <button class="pagination-btn ${active}"
-                        data-action="click->custom-table#goToPage"
-                        data-custom-table-page-param="${i}">
+                <button class="pagination-btn ${active}" data-page="${i}">
                     ${i}
                 </button>
             `
@@ -234,24 +230,41 @@ export default class extends Controller {
             if (endPage < totalPages - 1) {
                 paginationHTML += `<span class="pagination-ellipsis">...</span>`
             }
-            paginationHTML += `<button class="pagination-btn" data-action="click->custom-table#goToPage" data-custom-table-page-param="${totalPages}">${totalPages}</button>`
+            paginationHTML += `<button class="pagination-btn" data-page="${totalPages}">${totalPages}</button>`
         }
 
         // Next button
         const nextDisabled = this.currentPage === totalPages ? 'disabled' : ''
         paginationHTML += `
-            <button class="pagination-btn ${nextDisabled}"
-                    data-action="click->custom-table#nextPage"
-                    ${nextDisabled ? 'disabled' : ''}>
+            <button class="pagination-btn ${nextDisabled}" data-nav="next" ${nextDisabled ? 'disabled' : ''}>
                 Suivant
             </button>
         `
 
         this.paginationTarget.innerHTML = paginationHTML
+
+        // Ajouter les event listeners pour tous les boutons de pagination
+        this.paginationTarget.querySelectorAll('.pagination-btn').forEach(button => {
+            button.addEventListener('click', (e) => {
+                e.preventDefault()
+
+                if (button.disabled) return
+
+                const page = button.getAttribute('data-page')
+                const nav = button.getAttribute('data-nav')
+
+                if (page) {
+                    console.log('📄 Clic sur page:', page)
+                    this.goToPage(parseInt(page))
+                } else if (nav === 'prev') {
+                    console.log('📄 Clic sur précédent')
+                    this.previousPage()
+                } else if (nav === 'next') {
+                    console.log('📄 Clic sur suivant')
+                    this.nextPage()
+                }
+            })
+        })
     }
 
-    goToPageAction(event) {
-        const page = parseInt(event.params.page)
-        this.goToPage(page)
-    }
 }
