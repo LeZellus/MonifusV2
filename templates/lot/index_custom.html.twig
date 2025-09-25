@@ -1,0 +1,192 @@
+{% extends 'base.html.twig' %}
+{% from 'macros/ui_macros.html.twig' import button %}
+
+{% block title %}Mes Lots de Trading{% endblock %}
+
+{% block body %}
+{% include 'components/compact_profile_header.html.twig' %}
+
+<div class="wrapper-container">
+    <!-- Header Section -->
+    <div class="flex flex-col md:flex-row justify-between items-start md:items-center mb-6 gap-4">
+        <div class="flex items-center">
+            {% include 'components/section_header.html.twig' with {
+                type: 'simple',
+                title: 'Mes Lots de Trading',
+                icon: '📦',
+                color: 'blue',
+                wrapper_class: ''
+            } %}
+        </div>
+
+        <div class="flex gap-3">
+            <a href="{{ path('app_lot_new') }}"
+               class="btn btn-success flex items-center gap-2">
+                <span>+</span>
+                Nouveau lot
+            </a>
+        </div>
+    </div>
+
+    <!-- Desktop Table -->
+    <div class="hidden md:block bg-gray-800 rounded-lg overflow-hidden">
+        <div data-controller="custom-table"
+             data-custom-table-ajax-url-value="{{ path('app_lot_datatable') }}"
+             data-custom-table-page-length-value="25">
+
+            <!-- Contrôles supérieurs -->
+            <div class="p-4 bg-gray-700 border-b border-gray-600 flex flex-col md:flex-row md:items-center md:justify-between gap-4">
+                <!-- Sélecteur de longueur -->
+                <div class="flex items-center gap-2">
+                    <label class="text-sm font-medium text-gray-300">Afficher</label>
+                    <select data-custom-table-target="lengthSelect"
+                            class="bg-gray-600 border border-gray-500 text-white text-sm rounded px-2 py-1 focus:border-blue-500 focus:outline-none">
+                        <option value="10">10</option>
+                        <option value="25" selected>25</option>
+                        <option value="50">50</option>
+                        <option value="100">100</option>
+                    </select>
+                    <span class="text-sm text-gray-300">entrées</span>
+                </div>
+
+                <!-- Recherche -->
+                <div class="flex items-center gap-2">
+                    <label class="text-sm font-medium text-gray-300">Recherche :</label>
+                    <input type="text"
+                           data-custom-table-target="search"
+                           placeholder="Rechercher des lots..."
+                           class="bg-gray-600 border border-gray-500 text-white text-sm rounded px-3 py-1 focus:border-blue-500 focus:outline-none w-64">
+                </div>
+            </div>
+
+            <!-- Indicateur de chargement -->
+            <div data-custom-table-target="loading" class="hidden absolute inset-0 bg-gray-800 bg-opacity-75 flex items-center justify-center z-10">
+                <div class="bg-gray-700 px-6 py-4 rounded-lg shadow-lg">
+                    <div class="flex items-center gap-3">
+                        <div class="animate-spin rounded-full h-6 w-6 border-2 border-blue-500 border-t-transparent"></div>
+                        <span class="text-white">Chargement...</span>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Table -->
+            <div class="overflow-x-auto">
+                <table data-custom-table-target="table" class="w-full">
+                    <thead class="bg-gray-700">
+                        <tr>
+                            <th data-sortable class="sort-indicator px-6 py-3 text-left text-xs font-medium text-gray-300 uppercase tracking-wider cursor-pointer hover:bg-gray-600 transition-colors">
+                                Item
+                            </th>
+                            <th data-sortable class="sort-indicator px-6 py-3 text-center text-xs font-medium text-gray-300 uppercase tracking-wider cursor-pointer hover:bg-gray-600 transition-colors">
+                                Configuration
+                            </th>
+                            <th data-sortable class="sort-indicator px-6 py-3 text-right text-xs font-medium text-gray-300 uppercase tracking-wider cursor-pointer hover:bg-gray-600 transition-colors">
+                                Prix Achat
+                            </th>
+                            <th data-sortable class="sort-indicator px-6 py-3 text-right text-xs font-medium text-gray-300 uppercase tracking-wider cursor-pointer hover:bg-gray-600 transition-colors">
+                                Prix Vente
+                            </th>
+                            <th data-sortable class="sort-indicator px-6 py-3 text-center text-xs font-medium text-gray-300 uppercase tracking-wider cursor-pointer hover:bg-gray-600 transition-colors">
+                                Profit
+                            </th>
+                            <th data-sortable class="sort-indicator px-6 py-3 text-center text-xs font-medium text-gray-300 uppercase tracking-wider cursor-pointer hover:bg-gray-600 transition-colors">
+                                Statut
+                            </th>
+                            <th class="px-6 py-3 text-center text-xs font-medium text-gray-300 uppercase tracking-wider">
+                                Actions
+                            </th>
+                        </tr>
+                    </thead>
+                    <tbody data-custom-table-target="tbody" class="bg-gray-800 divide-y divide-gray-700">
+                        <!-- Rempli dynamiquement par le contrôleur Stimulus -->
+                    </tbody>
+                </table>
+            </div>
+
+            <!-- Contrôles inférieurs -->
+            <div class="p-4 bg-gray-700 border-t border-gray-600 flex flex-col md:flex-row md:items-center md:justify-between gap-4">
+                <!-- Informations -->
+                <div data-custom-table-target="info" class="text-sm text-gray-300">
+                    <!-- Rempli dynamiquement -->
+                </div>
+
+                <!-- Pagination -->
+                <div data-custom-table-target="pagination" class="flex items-center gap-1">
+                    <!-- Remplie dynamiquement -->
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Vue mobile avec les cartes personnalisées -->
+    <div class="md:hidden">
+        <div data-controller="market-watch-mobile"
+             data-market-watch-mobile-ajax-url-value="{{ path('app_lot_datatable') }}"
+             data-market-watch-mobile-page-length-value="10">
+
+            <!-- Contrôles mobiles -->
+            <div class="wrapper-background mb-4">
+                <div class="flex flex-col gap-4 p-4">
+                    <!-- Recherche -->
+                    <div>
+                        <label class="text-sm font-medium text-gray-300 block mb-2">Recherche :</label>
+                        <input type="text"
+                               data-market-watch-mobile-target="search"
+                               placeholder="Rechercher des lots..."
+                               class="w-full bg-gray-600 border border-gray-500 text-white text-sm rounded px-3 py-2 focus:border-blue-500 focus:outline-none">
+                    </div>
+
+                    <!-- Nombre d'entrées -->
+                    <div class="flex items-center gap-2">
+                        <label class="text-sm font-medium text-gray-300">Afficher :</label>
+                        <select data-market-watch-mobile-target="lengthSelect"
+                                class="bg-gray-600 border border-gray-500 text-white text-sm rounded px-2 py-1 focus:border-blue-500 focus:outline-none">
+                            <option value="10" selected>10</option>
+                            <option value="25">25</option>
+                            <option value="50">50</option>
+                        </select>
+                        <span class="text-sm text-gray-300">entrées</span>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Indicateur de chargement mobile -->
+            <div data-market-watch-mobile-target="loading" class="hidden wrapper-background">
+                <div class="flex items-center justify-center py-8">
+                    <div class="animate-spin rounded-full h-8 w-8 border-2 border-blue-500 border-t-transparent mr-3"></div>
+                    <span class="text-white">Chargement...</span>
+                </div>
+            </div>
+
+            <!-- Cartes mobiles -->
+            <div data-market-watch-mobile-target="cards" class="space-y-3">
+                <!-- Rempli dynamiquement -->
+            </div>
+
+            <!-- Message aucune donnée -->
+            <div data-market-watch-mobile-target="noData" class="hidden wrapper-background text-center py-8">
+                <div class="text-gray-400">
+                    <span class="text-4xl block mb-4">📦</span>
+                    <p class="text-lg mb-2">Aucun lot trouvé</p>
+                    <p class="text-sm">Commencez par créer votre premier lot.</p>
+                </div>
+            </div>
+
+            <!-- Pagination mobile -->
+            <div class="wrapper-background mt-4">
+                <div class="p-4 flex flex-col gap-4">
+                    <!-- Informations -->
+                    <div data-market-watch-mobile-target="info" class="text-sm text-gray-300 text-center">
+                        <!-- Rempli dynamiquement -->
+                    </div>
+
+                    <!-- Boutons de pagination -->
+                    <div data-market-watch-mobile-target="pagination" class="flex justify-center items-center gap-2">
+                        <!-- Remplie dynamiquement -->
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}
