@@ -97,6 +97,9 @@ class ProfileCharacterService
 
             return $this->characterRepository->createQueryBuilder('c')
                 ->join('c.tradingProfile', 'tp')
+                ->leftJoin('c.classe', 'cl')
+                ->leftJoin('c.server', 's')
+                ->addSelect('cl', 's')
                 ->where('tp.user = :user')
                 ->setParameter('user', $user)
                 ->orderBy('tp.name', 'ASC')
@@ -198,6 +201,9 @@ class ProfileCharacterService
             try {
                 return $this->characterRepository->createQueryBuilder('c')
                     ->join('c.tradingProfile', 'tp')
+                    ->leftJoin('c.classe', 'cl')
+                    ->leftJoin('c.server', 's')
+                    ->addSelect('cl', 's')
                     ->where('c.id = :id')
                     ->andWhere('tp.user = :user')
                     ->setParameter('id', $characterId)
@@ -242,6 +248,9 @@ class ProfileCharacterService
     {
         return $this->characterRepository->createQueryBuilder('c')
             ->join('c.tradingProfile', 'tp')
+            ->leftJoin('c.classe', 'cl')
+            ->leftJoin('c.server', 's')
+            ->addSelect('cl', 's')
             ->where('tp.user = :user')
             ->setParameter('user', $user)
             ->orderBy('c.name', 'ASC')
@@ -254,6 +263,9 @@ class ProfileCharacterService
     {
         return $this->characterRepository->createQueryBuilder('c')
             ->join('c.tradingProfile', 'tp')
+            ->leftJoin('c.classe', 'cl')
+            ->leftJoin('c.server', 's')
+            ->addSelect('cl', 's')
             ->where('tp.id = :profileId')
             ->andWhere('tp.user = :user')
             ->setParameter('profileId', $profileId)
