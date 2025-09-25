@@ -241,7 +241,9 @@ class LotGroupRepository extends ServiceEntityRepository
             ->leftJoin('lg.item', 'i')
             ->addSelect('i')
             ->where('lg.dofusCharacter = :character')
-            ->setParameter('character', $character);
+            ->andWhere('lg.status = :available')
+            ->setParameter('character', $character)
+            ->setParameter('available', LotStatus::AVAILABLE);
 
         // Recherche par nom d'item
         if (!empty($search)) {
