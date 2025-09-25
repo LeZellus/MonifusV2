@@ -61,10 +61,10 @@ class Classe
             // Conversion des accents et normalisation pour les noms de fichiers
             $normalizedName = $this->normalizeClassName($this->name);
             $filename = strtolower($normalizedName) . '.png';
-            return '/classes/' . $filename;
+            return 'classes/' . $filename;
         }
 
-        return '/classes/default.png';
+        return 'classes/default.png';
     }
 
     /**
