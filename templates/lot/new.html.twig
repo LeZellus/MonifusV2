@@ -3,6 +3,8 @@
 {% block title %}Nouveau Lot - {{ character.name }}{% endblock %}
 
 {% block body %}
+{% include 'components/compact_profile_header.html.twig' %}
+
     <div class="wrapper-container">
         {% include 'lot/_form.html.twig' with {
             'form': form,

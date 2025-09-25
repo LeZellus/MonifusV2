@@ -9,6 +9,8 @@
 {% endblock %}
 
 {% block body %}
+{% include 'components/compact_profile_header.html.twig' %}
+
     <div class="max-w-2xl mx-auto py-4">
         {% if preselected_item is defined and preselected_item is not null %}
             <!-- Breadcrumb pour item prérempli -->
@@ -20,7 +22,7 @@
                 </nav>
             </div>
         {% endif %}
-        
+
         {% include 'market_watch/_form.html.twig' with {
             form: form,
             character: character,

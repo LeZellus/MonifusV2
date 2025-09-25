@@ -83,9 +83,12 @@ class MarketWatchController extends AbstractController
             }
         }
 
+        [$selectedCharacter, $characters] = $this->getCharacterData($profileCharacterService);
+
         return $this->render('market_watch/new.html.twig', [
             'form' => $form,
             'character' => $selectedCharacter,
+            'characters' => $characters,
             'preselected_item' => $preselectedItem,
         ]);
     }
@@ -116,9 +119,12 @@ class MarketWatchController extends AbstractController
             return $this->redirectToRoute('app_market_watch_index');
         }
 
+        [$selectedCharacter, $characters] = $this->getCharacterData($profileCharacterService);
+
         return $this->render('market_watch/edit.html.twig', [
             'form' => $form,
             'market_watch' => $marketWatch,
+            'characters' => $characters,
         ]);
     }
 

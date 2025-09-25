@@ -1,20 +1,5 @@
 {# templates/market_watch/_form.html.twig #}
 <div class="max-w-2xl mx-auto grid gap-4">
-    <!-- En-tête avec info personnage -->
-    {% include 'components/section_header.html.twig' with {
-        type: 'character',
-        character: character,
-        action_title: is_edit ? 
-            ('Modifier Observation - ' ~ (market_watch is defined ? market_watch.item.name : 'Item')) : 
-            (preselected_item is defined and preselected_item ? 
-                ('Nouvelle Observation - ' ~ preselected_item.name) : 
-                'Nouvelle Observation'),
-        action_description: is_edit ? 
-            (market_watch is defined ? ('Observé le ' ~ market_watch.observedAt|date('d/m/Y à H:i')) : 'Modification') : 
-            'Observer les prix du marché',
-        color: 'orange',
-        icon: is_edit ? '📝' : '📊'
-    } %}
 
     {% if is_edit and market_watch is defined %}
         <!-- Historique récent pour contexte - Mode édition uniquement -->

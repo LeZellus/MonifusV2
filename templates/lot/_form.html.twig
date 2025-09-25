@@ -1,14 +1,5 @@
 <!-- templates/lot/_form.html.twig -->
 <div class="max-w-2xl mx-auto grid gap-4">
-    <!-- En-tête avec info personnage -->
-    {% include 'components/section_header.html.twig' with {
-        type: 'character',
-        character: character,
-        action_title: is_edit ? 'Modifier Lot' : 'Nouveau Lot',
-        action_description: is_edit ? 'Modifier un item du trading' : 'Ajouter un item au trading',
-        color: 'lime',
-        icon: '📦'
-    } %}
 
     {% if is_edit %}
         <!-- Informations actuelles du lot -->

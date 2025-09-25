@@ -102,9 +102,12 @@ class LotController extends AbstractController
             $this->addFlash('error', 'Veuillez sélectionner un item valide.');
         }
 
+        [$selectedCharacter, $characters] = $this->getCharacterData($profileCharacterService);
+
         return $this->render('lot/new.html.twig', [
             'form' => $form,
             'character' => $selectedCharacter,
+            'characters' => $characters,
         ]);
     }
 
@@ -117,8 +120,13 @@ class LotController extends AbstractController
     }
 
     #[Route('/{id}/edit', name: 'app_lot_edit', methods: ['GET', 'POST'])]
-    public function edit(Request $request, LotGroup $lotGroup, EntityManagerInterface $em, CacheInvalidationService $cacheInvalidation): Response
-    {
+    public function edit(
+        Request $request,
+        LotGroup $lotGroup,
+        EntityManagerInterface $em,
+        CacheInvalidationService $cacheInvalidation,
+        ProfileCharacterService $profileCharacterService
+    ): Response {
         $form = $this->createForm(LotGroupType::class, $lotGroup, [
             'is_edit' => true,
             'current_item' => $lotGroup->getItem()
@@ -135,9 +143,12 @@ class LotController extends AbstractController
             return $this->redirectToRoute('app_lot_index');
         }
 
+        [$selectedCharacter, $characters] = $this->getCharacterData($profileCharacterService);
+
         return $this->render('lot/edit.html.twig', [
-            'lot' => $lotGroup,  // ✅ Changé de 'lot_group' vers 'lot'
+            'lot' => $lotGroup,
             'form' => $form,
+            'characters' => $characters,
         ]);
     }
 
