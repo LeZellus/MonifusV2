@@ -111,6 +111,50 @@ class MarketWatchService
         return $marketWatch->getDofusCharacter()->getId() === $userCharacter->getId();
     }
 
+    public function calculateMarketWatchStats(?DofusCharacter $character): array
+    {
+        if (!$character) {
+            return [
+                'total_items_watched' => 0,
+                'total_observations' => 0,
+                'average_price' => 0,
+                'price_range' => 0
+            ];
+        }
+
+        $itemsData = $this->getItemsDataForCharacter($character);
+
+        $totalItems = count($itemsData);
+        $totalObservations = 0;
+        $totalPrice = 0;
+        $prices = [];
+
+        foreach ($itemsData as $itemData) {
+            $observations = $itemData['total_observations'] ?? 0;
+            $avgPrice = $itemData['average_price'] ?? 0;
+
+            $totalObservations += $observations;
+            if ($avgPrice > 0) {
+                $totalPrice += $avgPrice;
+                $prices[] = $avgPrice;
+            }
+        }
+
+        $averagePrice = $totalItems > 0 ? $totalPrice / $totalItems : 0;
+        $priceRange = 0;
+
+        if (!empty($prices)) {
+            $priceRange = max($prices) - min($prices);
+        }
+
+        return [
+            'total_items_watched' => $totalItems,
+            'total_observations' => $totalObservations,
+            'average_price' => $averagePrice,
+            'price_range' => $priceRange
+        ];
+    }
+
     private function invalidateCaches($user): void
     {
         $this->profileCharacterService->forceInvalidateCountsCache($user);

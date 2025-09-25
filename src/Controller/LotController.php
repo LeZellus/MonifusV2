@@ -32,10 +32,12 @@ class LotController extends AbstractController
     ): Response {
         [$selectedCharacter, $characters] = $this->getCharacterData($profileCharacterService);
         $lots = $lotManagementService->getAvailableLotsForCharacter($selectedCharacter);
+        $stats = $lotManagementService->calculateLotsStats($selectedCharacter);
 
         return $this->render('lot/index_custom.html.twig', [
             'character' => $selectedCharacter,
             'characters' => $characters,
+            ...$stats,
         ]);
     }
 

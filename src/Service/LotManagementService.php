@@ -66,6 +66,39 @@ class LotManagementService
         return $lotGroup->getDofusCharacter()->getId() === $userCharacter->getId();
     }
 
+    public function calculateLotsStats(?DofusCharacter $character): array
+    {
+        if (!$character) {
+            return [
+                'total_lots' => 0,
+                'total_investment' => 0,
+                'potential_profit' => 0,
+                'average_profit_per_lot' => 0
+            ];
+        }
+
+        $lots = $this->getAvailableLotsForCharacter($character);
+
+        $totalLots = count($lots);
+        $totalInvestment = 0;
+        $potentialProfit = 0;
+
+        foreach ($lots as $lot) {
+            $buyPrice = $lot->getBuyPricePerLot() ?? 0;
+            $sellPrice = $lot->getSellPricePerLot() ?? 0;
+
+            $totalInvestment += $buyPrice;
+            $potentialProfit += ($sellPrice - $buyPrice);
+        }
+
+        return [
+            'total_lots' => $totalLots,
+            'total_investment' => $totalInvestment,
+            'potential_profit' => $potentialProfit,
+            'average_profit_per_lot' => $totalLots > 0 ? $potentialProfit / $totalLots : 0
+        ];
+    }
+
     private function invalidateCaches($user): void
     {
         $this->profileCharacterService->forceInvalidateCountsCache($user);

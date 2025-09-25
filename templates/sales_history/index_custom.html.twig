@@ -8,40 +8,70 @@
 
     <div class="wrapper-container">
         {% if selectorData.selectedCharacter %}
-            <!-- Statistiques des ventes -->
-            <div class="stats-grid">
-                {% include 'components/stats_card.html.twig' with {
-                    title: 'Profit Réalisé',
-                    value: (total_realized_profit / 1000000)|number_format(1) ~ 'M',
-                    icon: '💰',
-                    color: 'green'
-                } %}
-                {% include 'components/stats_card.html.twig' with {
-                    title: 'Profit Attendu',
-                    value: (total_expected_profit / 1000000)|number_format(1) ~ 'M',
-                    icon: '🎯',
-                    color: 'blue'
-                } %}
-                {% include 'components/stats_card.html.twig' with {
-                    title: 'Différence',
-                    value: (profit_difference >= 0 ? '+' : '') ~ (profit_difference / 1000000)|number_format(1) ~ 'M',
-                    icon: '📊',
-                    color: profit_difference >= 0 ? 'green' : 'red'
-                } %}
-                {% include 'components/stats_card.html.twig' with {
-                    title: 'Période Active',
-                    value: current_filters.period ~ ' jours',
-                    icon: '📅',
-                    color: 'purple'
-                } %}
+            <!-- Header Section -->
+            <div class="bg-gray-800/50 border border-gray-600/50 rounded-lg p-6 mb-6">
+                <div class="flex flex-col md:flex-row justify-between items-start md:items-center gap-4">
+                    <div class="flex items-center space-x-3">
+                        <div class="w-10 h-10 bg-gradient-to-br from-purple-500 to-purple-600 rounded-lg flex items-center justify-center">
+                            <span class="text-xl">📈</span>
+                        </div>
+                        <div>
+                            <h2 class="text-white font-medium text-lg">Historique des Ventes</h2>
+                            <p class="text-gray-400 text-sm">Suivi de vos performances commerciales</p>
+                        </div>
+                    </div>
+
+                    <div class="flex gap-3">
+                        <a href="{{ path('app_sales_history_export', current_filters) }}"
+                           class="btn btn-success flex items-center gap-2 px-4 py-2 rounded-lg font-medium transition-all hover:scale-105">
+                            <span>📊</span>
+                            <span>Exporter CSV</span>
+                        </a>
+                    </div>
+                </div>
             </div>
 
-            <!-- En-tête et actions -->
-            <div class="flex justify-between items-center">
-                <h2 class="page-title">
-                    Historique des Ventes - {{ selectorData.selectedCharacter.name }}
-                </h2>
-                {{ button('Exporter CSV', path('app_sales_history_export', current_filters), class='btn-success', icon='📊') }}
+            <!-- Statistiques des ventes -->
+            <div class="bg-gray-800/50 border border-gray-600/50 rounded-lg p-6 mb-6">
+                <div class="flex items-center space-x-3 mb-6">
+                    <div class="w-10 h-10 bg-gradient-to-br from-green-500 to-green-600 rounded-lg flex items-center justify-center">
+                        <span class="text-xl">💰</span>
+                    </div>
+                    <div>
+                        <h2 class="text-white font-medium text-lg">Analyse des performances</h2>
+                        <p class="text-gray-400 text-sm">Aperçu de vos ventes sur la période sélectionnée</p>
+                    </div>
+                </div>
+
+                <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">
+                    {% include 'components/stats_card.html.twig' with {
+                        title: 'Profit Réalisé',
+                        value: total_realized_profit,
+                        unit: 'kamas',
+                        icon: '💰',
+                        color: 'green'
+                    } %}
+                    {% include 'components/stats_card.html.twig' with {
+                        title: 'Profit Attendu',
+                        value: total_expected_profit,
+                        unit: 'kamas',
+                        icon: '🎯',
+                        color: 'blue'
+                    } %}
+                    {% include 'components/stats_card.html.twig' with {
+                        title: 'Différence',
+                        value: profit_difference,
+                        unit: 'kamas',
+                        icon: '📊',
+                        color: profit_difference >= 0 ? 'green' : 'red'
+                    } %}
+                    {% include 'components/stats_card.html.twig' with {
+                        title: 'Période Active',
+                        value: current_filters.period ~ ' jours',
+                        icon: '📅',
+                        color: 'purple'
+                    } %}
+                </div>
             </div>
 
             <!-- Table personnalisée avec contrôles intégrés -->

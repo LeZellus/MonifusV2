@@ -30,10 +30,12 @@ class MarketWatchController extends AbstractController
     ): Response {
         [$selectedCharacter, $characters] = $this->getCharacterData($profileCharacterService);
         $itemsData = $marketWatchService->getItemsDataForCharacter($selectedCharacter);
+        $stats = $marketWatchService->calculateMarketWatchStats($selectedCharacter);
 
         return $this->render('market_watch/index_custom.html.twig', [
             'character' => $selectedCharacter,
             'characters' => $characters,
+            ...$stats,
         ]);
     }
 

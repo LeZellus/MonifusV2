@@ -8,13 +8,16 @@
 
     <div class="wrapper-container">
         {% if selectorData.selectedCharacter %}
-            <!-- Header avec nom du personnage -->
-            <div class="flex justify-between items-center mb-8">
-                <div>
-                    <h2 class="page-title mb-2">
-                        Analytics - {{ selectorData.selectedCharacter.name }}
-                    </h2>
-                    <p class="text-gray-400">{{ selectorData.selectedCharacter.server.name }} • Analyse détaillée de performance</p>
+            <!-- Header Section -->
+            <div class="bg-gray-800/50 border border-gray-600/50 rounded-lg p-6 mb-6">
+                <div class="flex items-center space-x-3">
+                    <div class="w-10 h-10 bg-gradient-to-br from-yellow-500 to-orange-500 rounded-lg flex items-center justify-center">
+                        <span class="text-xl">📊</span>
+                    </div>
+                    <div>
+                        <h2 class="text-white font-medium text-lg">Analytics</h2>
+                        <p class="text-gray-400 text-sm">Analyse détaillée de vos performances de trading</p>
+                    </div>
                 </div>
             </div>
 

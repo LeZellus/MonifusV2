@@ -7,23 +7,67 @@
 
 <div class="wrapper-container">
     <!-- Header Section -->
-    <div class="flex flex-col md:flex-row justify-between items-start md:items-center mb-6 gap-4">
-        <div class="flex items-center">
-            {% include 'components/section_header.html.twig' with {
-                type: 'simple',
-                title: 'Market Watch',
-                icon: '📊',
-                color: 'orange',
-                wrapper_class: ''
-            } %}
+    <div class="bg-gray-800/50 border border-gray-600/50 rounded-lg p-6 mb-6">
+        <div class="flex flex-col md:flex-row justify-between items-start md:items-center gap-4">
+            <div class="flex items-center space-x-3">
+                <div class="w-10 h-10 bg-gradient-to-br from-orange-500 to-orange-600 rounded-lg flex items-center justify-center">
+                    <span class="text-xl">📊</span>
+                </div>
+                <div>
+                    <h2 class="text-white font-medium text-lg">Market Watch</h2>
+                    <p class="text-gray-400 text-sm">Surveillance des prix du marché</p>
+                </div>
+            </div>
+
+            <div class="flex gap-3">
+                <a href="{{ path('app_market_watch_new') }}"
+                   class="btn btn-warning flex items-center gap-2 px-4 py-2 rounded-lg font-medium transition-all hover:scale-105">
+                    <span>📝</span>
+                    <span>Nouvelle observation</span>
+                </a>
+            </div>
+        </div>
+    </div>
+
+    <!-- Statistics Section -->
+    <div class="bg-gray-800/50 border border-gray-600/50 rounded-lg p-6 mb-6">
+        <div class="flex items-center space-x-3 mb-6">
+            <div class="w-10 h-10 bg-gradient-to-br from-purple-500 to-purple-600 rounded-lg flex items-center justify-center">
+                <span class="text-xl">📈</span>
+            </div>
+            <div>
+                <h2 class="text-white font-medium text-lg">Statistiques de surveillance</h2>
+                <p class="text-gray-400 text-sm">Aperçu de vos observations et analyses de marché</p>
+            </div>
         </div>
 
-        <div class="flex gap-3">
-            <a href="{{ path('app_market_watch_new') }}"
-               class="btn btn-warning flex items-center gap-2">
-                <span>📝</span>
-                Nouvelle observation
-            </a>
+        <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">
+            {% include 'components/stats_card.html.twig' with {
+                title: 'Items Surveillés',
+                value: total_items_watched,
+                icon: '👁️',
+                color: 'orange'
+            } %}
+            {% include 'components/stats_card.html.twig' with {
+                title: 'Observations Totales',
+                value: total_observations,
+                icon: '📝',
+                color: 'blue'
+            } %}
+            {% include 'components/stats_card.html.twig' with {
+                title: 'Prix Moyen',
+                value: average_price,
+                unit: 'kamas',
+                icon: '💰',
+                color: 'green'
+            } %}
+            {% include 'components/stats_card.html.twig' with {
+                title: 'Écart de Prix',
+                value: price_range,
+                unit: 'kamas',
+                icon: '📊',
+                color: 'purple'
+            } %}
         </div>
     </div>
 
