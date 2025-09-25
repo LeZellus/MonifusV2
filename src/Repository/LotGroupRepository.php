@@ -132,11 +132,13 @@ class LotGroupRepository extends ServiceEntityRepository
     }
 
     /**
-     * Lots disponibles pour un personnage
+     * Lots disponibles pour un personnage avec eager loading des relations Item
      */
     public function findAvailableByCharacter(DofusCharacter $character): array
     {
         return $this->createQueryBuilder('lg')
+            ->leftJoin('lg.item', 'i')
+            ->addSelect('i')
             ->where('lg.dofusCharacter = :character')
             ->andWhere('lg.status = :available')
             ->setParameter('character', $character)
@@ -209,6 +211,7 @@ class LotGroupRepository extends ServiceEntityRepository
     {
         $qb = $this->createQueryBuilder('lg')
             ->leftJoin('lg.item', 'i')
+            ->addSelect('i')
             ->leftJoin('lg.dofusCharacter', 'c')
             ->where('c = :character')
             ->setParameter('character', $character)
@@ -221,6 +224,61 @@ class LotGroupRepository extends ServiceEntityRepository
         }
 
         return $qb->getQuery()->getResult();
+    }
+
+    /**
+     * Récupération paginée et triée des lots pour datatable
+     */
+    public function findPaginatedAndSorted(
+        DofusCharacter $character,
+        string $search = '',
+        int $page = 1,
+        int $length = 25,
+        int $sortColumn = 0,
+        string $sortDirection = 'desc'
+    ): array {
+        $qb = $this->createQueryBuilder('lg')
+            ->leftJoin('lg.item', 'i')
+            ->addSelect('i')
+            ->where('lg.dofusCharacter = :character')
+            ->setParameter('character', $character);
+
+        // Recherche par nom d'item
+        if (!empty($search)) {
+            $qb->andWhere('LOWER(i.name) LIKE LOWER(:search)')
+               ->setParameter('search', '%' . $search . '%');
+        }
+
+        // Tri SQL
+        $columns = ['i.name', 'lg.lotSize', 'lg.buyPricePerLot', 'lg.sellPricePerLot', 'lg.sellPricePerLot - lg.buyPricePerLot', 'lg.status'];
+        if (isset($columns[$sortColumn])) {
+            $orderBy = $columns[$sortColumn];
+            // Pour le tri par profit, nous devons utiliser une expression
+            if ($sortColumn === 4) {
+                $qb->addSelect('(lg.sellPricePerLot - lg.buyPricePerLot) as HIDDEN profit');
+                $orderBy = 'profit';
+            }
+            $qb->orderBy($orderBy, $sortDirection);
+        } else {
+            $qb->orderBy('lg.createdAt', 'DESC');
+        }
+
+        // Compter le total avant pagination
+        $countQuery = clone $qb;
+        $countQuery->select('COUNT(lg.id)');
+        $totalRecords = (int) $countQuery->getQuery()->getSingleScalarResult();
+
+        // Pagination
+        $offset = ($page - 1) * $length;
+        $qb->setFirstResult($offset)
+           ->setMaxResults($length);
+
+        $lots = $qb->getQuery()->getResult();
+
+        return [
+            'lots' => $lots,
+            'totalRecords' => $totalRecords
+        ];
     }
 
     /**

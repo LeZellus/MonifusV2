@@ -11,6 +11,8 @@ use App\Service\ProfileCharacterService;
 use App\Service\LotManagementService;
 use App\Service\CacheInvalidationService;
 use App\Trait\CharacterSelectionTrait;
+use Symfony\Contracts\Cache\CacheInterface;
+use Symfony\Contracts\Cache\ItemInterface;
 use Doctrine\ORM\EntityManagerInterface;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\HttpFoundation\JsonResponse;
@@ -46,7 +48,9 @@ class LotController extends AbstractController
         Request $request,
         LotManagementService $lotManagementService,
         ProfileCharacterService $profileCharacterService,
-        CsrfTokenManagerInterface $csrfTokenManager
+        CsrfTokenManagerInterface $csrfTokenManager,
+        CacheInterface $cache,
+        LotGroupRepository $lotGroupRepository
     ): Response {
         error_log('🔍 Lot DataTable endpoint appelé avec: ' . json_encode($request->query->all()));
 
@@ -77,124 +81,106 @@ class LotController extends AbstractController
 
             error_log('📊 Paramètres: page=' . $page . ', length=' . $length . ', search=' . $search);
 
-            // Récupérer tous les lots du personnage
-            if (!empty($search)) {
-                $allLots = $lotManagementService->searchLotsByItemName($selectedCharacter, $search);
-            } else {
-                $allLots = $lotManagementService->getAvailableLotsForCharacter($selectedCharacter);
-            }
+            // Créer une clé de cache basée sur les paramètres
+            $cacheKey = sprintf(
+                'lot_datatable_char_%d_page_%d_len_%d_search_%s_sort_%d_%s',
+                $selectedCharacter->getId(),
+                $page,
+                $length,
+                md5($search),
+                $sortColumn,
+                $sortDirection
+            );
 
-            error_log('📋 Nombre total de lots trouvés: ' . count($allLots));
+            $cachedResult = $cache->get($cacheKey, function (ItemInterface $item) use (
+                $selectedCharacter, $search, $page, $length,
+                $sortColumn, $sortDirection, $csrfTokenManager, $lotGroupRepository
+            ) {
+                $item->expiresAfter(30); // Cache pendant 30 secondes
 
-            // Tri des lots
-            $columns = ['item', 'configuration', 'buyPrice', 'sellPrice', 'profit', 'status'];
-            if (isset($columns[$sortColumn])) {
-                $sortKey = $columns[$sortColumn];
-                usort($allLots, function($a, $b) use ($sortKey, $sortDirection) {
-                    switch ($sortKey) {
-                        case 'item':
-                            $result = strcmp($a->getItem()->getName(), $b->getItem()->getName());
-                            break;
-                        case 'configuration':
-                            $result = strcmp($a->getLotSize() . 'x ' . $a->getItem()->getName(), $b->getLotSize() . 'x ' . $b->getItem()->getName());
-                            break;
-                        case 'buyPrice':
-                            $result = ($a->getBuyPricePerLot() ?? 0) <=> ($b->getBuyPricePerLot() ?? 0);
-                            break;
-                        case 'sellPrice':
-                            $result = ($a->getSellPricePerLot() ?? 0) <=> ($b->getSellPricePerLot() ?? 0);
-                            break;
-                        case 'profit':
-                            $profitA = ($a->getSellPricePerLot() ?? 0) - ($a->getBuyPricePerLot() ?? 0);
-                            $profitB = ($b->getSellPricePerLot() ?? 0) - ($b->getBuyPricePerLot() ?? 0);
-                            $result = $profitA <=> $profitB;
-                            break;
-                        case 'status':
-                            $result = strcmp($a->getStatus()->value, $b->getStatus()->value);
-                            break;
-                        default:
-                            $result = 0;
-                    }
-                    return $sortDirection === 'desc' ? -$result : $result;
-                });
-            }
+                // Utiliser la nouvelle méthode optimisée avec tri et pagination SQL
+                $result = $lotGroupRepository->findPaginatedAndSorted(
+                    $selectedCharacter,
+                    $search,
+                    $page,
+                    $length,
+                    $sortColumn,
+                    $sortDirection
+                );
 
-            $totalRecords = count($allLots);
+                $pagedLots = $result['lots'];
+                $totalRecords = $result['totalRecords'];
 
-            // Pagination
-            $start = ($page - 1) * $length;
-            $pagedLots = array_slice($allLots, $start, $length);
+                error_log('📄 Lots trouvés avec tri SQL: ' . count($pagedLots) . '/' . $totalRecords);
 
-            error_log('📄 Lots paginés: ' . count($pagedLots));
+                // Formater les données avec HTML
+                $formattedData = array_map(function($lot) use ($csrfTokenManager) {
+                    $profit = ($lot->getSellPricePerLot() ?? 0) - ($lot->getBuyPricePerLot() ?? 0);
+                    $profitPerUnit = $lot->getLotSize() > 0 ? $profit / $lot->getLotSize() : 0;
 
-            // Formater les données avec HTML
-            $formattedData = array_map(function($lot) use ($csrfTokenManager) {
-                $profit = ($lot->getSellPricePerLot() ?? 0) - ($lot->getBuyPricePerLot() ?? 0);
-                $profitPerUnit = $lot->getLotSize() > 0 ? $profit / $lot->getLotSize() : 0;
+                    return [
+                        sprintf('<div class="flex items-center gap-2">
+                            <img src="%s" alt="%s" class="w-8 h-8 rounded">
+                            <span>%s</span>
+                        </div>',
+                            $lot->getItem()->getImgUrl() ?? '/images/items/default.png',
+                            htmlspecialchars($lot->getItem()->getName()),
+                            htmlspecialchars($lot->getItem()->getName())
+                        ),
+                        sprintf('<div class="text-center">
+                            <div class="text-white font-medium">%dx</div>
+                            <div class="text-gray-400 text-xs">%s</div>
+                        </div>',
+                            $lot->getLotSize(),
+                            $lot->getItem()->getItemType() ? $lot->getItem()->getItemType()->value : 'N/A'
+                        ),
+                        sprintf('<span class="text-red-400">%s K</span>',
+                            $lot->getBuyPricePerLot() ? number_format($lot->getBuyPricePerLot() / 1000, 1) : '-'
+                        ),
+                        sprintf('<span class="text-green-400">%s K</span>',
+                            $lot->getSellPricePerLot() ? number_format($lot->getSellPricePerLot() / 1000, 1) : '-'
+                        ),
+                        sprintf('<div class="text-center">
+                            <div class="%s font-medium">%s K</div>
+                            <div class="text-gray-400 text-xs">Par unité: %s K</div>
+                        </div>',
+                            $profit >= 0 ? 'text-green-400' : 'text-red-400',
+                            $profit ? number_format($profit / 1000, 1) : '-',
+                            $profitPerUnit ? number_format($profitPerUnit / 1000, 1) : '-'
+                        ),
+                        sprintf('<span class="px-2 py-1 rounded-full text-xs %s">%s</span>',
+                            $lot->getStatus()->value === 'available' ? 'bg-green-800 text-green-200' : 'bg-gray-800 text-gray-200',
+                            $lot->getStatus()->value === 'available' ? 'Disponible' : ucfirst($lot->getStatus()->value)
+                        ),
+                        sprintf('<div class="flex gap-2">
+                            <a href="%s" class="text-blue-400 hover:text-blue-300 text-xs px-2 py-1 border border-blue-400 rounded">Modifier</a>
+                            <a href="%s" class="text-green-400 hover:text-green-300 text-xs px-2 py-1 border border-green-400 rounded">Vendre</a>
+                            <form method="POST" action="%s" style="display:inline;" onsubmit="return confirm(\'Supprimer ce lot ?\')">
+                                <input type="hidden" name="_token" value="%s">
+                                <button type="submit" class="text-red-400 hover:text-red-300 text-xs px-2 py-1 border border-red-400 rounded">Supprimer</button>
+                            </form>
+                        </div>',
+                            $this->generateUrl('app_lot_edit', ['id' => $lot->getId()]),
+                            $this->generateUrl('app_lot_sell', ['id' => $lot->getId()]),
+                            $this->generateUrl('app_lot_delete', ['id' => $lot->getId()]),
+                            $csrfTokenManager->getToken('delete' . $lot->getId())->getValue()
+                        )
+                    ];
+                }, $pagedLots);
+
+                // Générer les cartes mobiles HTML en batch pour améliorer les performances
+                $mobileCards = $this->renderView('lot/_mobile_cards_batch.html.twig', ['items' => $pagedLots]);
 
                 return [
-                    sprintf('<div class="flex items-center gap-2">
-                        <img src="%s" alt="%s" class="w-8 h-8 rounded">
-                        <span>%s</span>
-                    </div>',
-                        $lot->getItem()->getImgUrl() ?? '/images/items/default.png',
-                        htmlspecialchars($lot->getItem()->getName()),
-                        htmlspecialchars($lot->getItem()->getName())
-                    ),
-                    sprintf('<div class="text-center">
-                        <div class="text-white font-medium">%dx</div>
-                        <div class="text-gray-400 text-xs">%s</div>
-                    </div>',
-                        $lot->getLotSize(),
-                        $lot->getItem()->getItemType() ? $lot->getItem()->getItemType()->value : 'N/A'
-                    ),
-                    sprintf('<span class="text-red-400">%s K</span>',
-                        $lot->getBuyPricePerLot() ? number_format($lot->getBuyPricePerLot() / 1000, 1) : '-'
-                    ),
-                    sprintf('<span class="text-green-400">%s K</span>',
-                        $lot->getSellPricePerLot() ? number_format($lot->getSellPricePerLot() / 1000, 1) : '-'
-                    ),
-                    sprintf('<div class="text-center">
-                        <div class="%s font-medium">%s K</div>
-                        <div class="text-gray-400 text-xs">Par unité: %s K</div>
-                    </div>',
-                        $profit >= 0 ? 'text-green-400' : 'text-red-400',
-                        $profit ? number_format($profit / 1000, 1) : '-',
-                        $profitPerUnit ? number_format($profitPerUnit / 1000, 1) : '-'
-                    ),
-                    sprintf('<span class="px-2 py-1 rounded-full text-xs %s">%s</span>',
-                        $lot->getStatus()->value === 'available' ? 'bg-green-800 text-green-200' : 'bg-gray-800 text-gray-200',
-                        $lot->getStatus()->value === 'available' ? 'Disponible' : ucfirst($lot->getStatus()->value)
-                    ),
-                    sprintf('<div class="flex gap-2">
-                        <a href="%s" class="text-blue-400 hover:text-blue-300 text-xs px-2 py-1 border border-blue-400 rounded">Modifier</a>
-                        <a href="%s" class="text-green-400 hover:text-green-300 text-xs px-2 py-1 border border-green-400 rounded">Vendre</a>
-                        <form method="POST" action="%s" style="display:inline;" onsubmit="return confirm(\'Supprimer ce lot ?\')">
-                            <input type="hidden" name="_token" value="%s">
-                            <button type="submit" class="text-red-400 hover:text-red-300 text-xs px-2 py-1 border border-red-400 rounded">Supprimer</button>
-                        </form>
-                    </div>',
-                        $this->generateUrl('app_lot_edit', ['id' => $lot->getId()]),
-                        $this->generateUrl('app_lot_sell', ['id' => $lot->getId()]),
-                        $this->generateUrl('app_lot_delete', ['id' => $lot->getId()]),
-                        $csrfTokenManager->getToken('delete' . $lot->getId())->getValue()
-                    )
+                    'draw' => $page,
+                    'recordsTotal' => $totalRecords,
+                    'recordsFiltered' => $totalRecords,
+                    'data' => $formattedData,
+                    'mobile_cards' => $mobileCards
                 ];
-            }, $pagedLots);
+            });
 
-            // Générer les cartes mobiles HTML
-            $mobileCards = '';
-            foreach ($pagedLots as $lot) {
-                $mobileCards .= $this->renderView('lot/_mobile_card.html.twig', ['item' => $lot]);
-            }
-
-            return new JsonResponse([
-                'draw' => $page,
-                'recordsTotal' => $totalRecords,
-                'recordsFiltered' => $totalRecords,
-                'data' => $formattedData,
-                'mobile_cards' => $mobileCards
-            ]);
+            return new JsonResponse($cachedResult);
 
         } catch (\Exception $e) {
             error_log('💥 Erreur Lot DataTable: ' . $e->getMessage());

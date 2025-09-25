@@ -71,7 +71,15 @@ class MarketWatchService
 
     public function deleteMarketWatch(MarketWatch $marketWatch): void
     {
-        $user = $marketWatch->getDofusCharacter()->getTradingProfile()->getUser();
+        // Récupérer l'utilisateur avant la suppression avec protection des relations
+        $user = null;
+        $character = $marketWatch->getDofusCharacter();
+        if ($character) {
+            $profile = $character->getTradingProfile();
+            if ($profile) {
+                $user = $profile->getUser();
+            }
+        }
 
         $this->em->remove($marketWatch);
         $this->em->flush();
@@ -157,7 +165,9 @@ class MarketWatchService
 
     private function invalidateCaches($user): void
     {
-        $this->profileCharacterService->forceInvalidateCountsCache($user);
-        $this->cacheInvalidation->invalidateUserStatsAndMarkActivity($user);
+        if ($user) {
+            $this->profileCharacterService->forceInvalidateCountsCache($user);
+            $this->cacheInvalidation->invalidateUserStatsAndMarkActivity($user);
+        }
     }
 }

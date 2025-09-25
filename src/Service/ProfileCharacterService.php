@@ -126,8 +126,9 @@ class ProfileCharacterService
             ->getQuery()
             ->getResult();
 
-        $currentProfile = $this->getCurrentProfile($user, $profiles);
+        // Récupérer le personnage sélectionné une seule fois
         $selectedCharacter = $this->getSelectedCharacter($user);
+        $currentProfile = $this->getCurrentProfile($user, $profiles, $selectedCharacter);
 
         // Calculer les stats pour chaque personnage
         if (!empty($profiles)) {
@@ -187,8 +188,12 @@ class ProfileCharacterService
         }
     }
 
-    public function forceInvalidateCountsCache(User $user): void
+    public function forceInvalidateCountsCache(?User $user): void
     {
+        if (!$user) {
+            return;
+        }
+
         try {
             $characterCountsKey = "character_counts_user_{$user->getId()}";
             $this->cache->delete($characterCountsKey);
@@ -224,7 +229,7 @@ class ProfileCharacterService
         });
     }
 
-    private function getCurrentProfile(User $user, array $profiles)
+    private function getCurrentProfile(User $user, array $profiles, ?DofusCharacter $selectedCharacter = null)
     {
         $session = $this->requestStack->getSession();
         $selectedProfileId = $session->get('selected_profile_id');
@@ -242,8 +247,7 @@ class ProfileCharacterService
             $session->remove('selected_character_id');
         }
 
-        // Fallback : utiliser le profil du personnage sélectionné
-        $selectedCharacter = $this->getSelectedCharacter($user);
+        // Fallback : utiliser le profil du personnage sélectionné (déjà récupéré)
         if ($selectedCharacter) {
             return $selectedCharacter->getTradingProfile();
         }
@@ -291,89 +295,57 @@ class ProfileCharacterService
         return $this->cache->get($cacheKey, function (ItemInterface $item) use ($user) {
             $item->expiresAfter(60);
 
-            // Get lot counts by status
-            $lotCounts = $this->lotGroupRepository->createQueryBuilder('lg')
-                ->select('c.id as character_id, lg.status, COUNT(lg.id) as lot_count')
-                ->join('lg.dofusCharacter', 'c')
-                ->join('c.tradingProfile', 'tp')
-                ->where('tp.user = :user')
-                ->setParameter('user', $user)
-                ->groupBy('c.id', 'lg.status')
-                ->getQuery()
-                ->getArrayResult();
+            // Une seule requête optimisée pour récupérer tous les compteurs
+            $query = "
+                SELECT
+                    c.id as character_id,
+                    COALESCE(lot_available.lot_count, 0) as lots_available,
+                    COALESCE(lot_sold.lot_count, 0) as lots_sold,
+                    COALESCE(watch_count.watch_count, 0) as watches,
+                    COALESCE(sale_count.sale_count, 0) as sales_transactions
+                FROM dofus_character c
+                INNER JOIN trading_profile tp ON c.trading_profile_id = tp.id
+                LEFT JOIN (
+                    SELECT lg.dofus_character_id, COUNT(*) as lot_count
+                    FROM lot_group lg
+                    WHERE lg.status = 'available'
+                    GROUP BY lg.dofus_character_id
+                ) lot_available ON c.id = lot_available.dofus_character_id
+                LEFT JOIN (
+                    SELECT lg.dofus_character_id, COUNT(*) as lot_count
+                    FROM lot_group lg
+                    WHERE lg.status = 'sold'
+                    GROUP BY lg.dofus_character_id
+                ) lot_sold ON c.id = lot_sold.dofus_character_id
+                LEFT JOIN (
+                    SELECT mw.dofus_character_id, COUNT(*) as watch_count
+                    FROM market_watch mw
+                    GROUP BY mw.dofus_character_id
+                ) watch_count ON c.id = watch_count.dofus_character_id
+                LEFT JOIN (
+                    SELECT lg.dofus_character_id, COUNT(*) as sale_count
+                    FROM lot_unit lu
+                    INNER JOIN lot_group lg ON lu.lot_group_id = lg.id
+                    WHERE lu.sold_at IS NOT NULL
+                    GROUP BY lg.dofus_character_id
+                ) sale_count ON c.id = sale_count.dofus_character_id
+                WHERE tp.user_id = :user_id
+            ";
 
-            // Get market watch counts
-            $watchCounts = $this->marketWatchRepository->createQueryBuilder('mw')
-                ->select('c.id as character_id, COUNT(mw.id) as watch_count')
-                ->join('mw.dofusCharacter', 'c')
-                ->join('c.tradingProfile', 'tp')
-                ->where('tp.user = :user')
-                ->setParameter('user', $user)
-                ->groupBy('c.id')
-                ->getQuery()
-                ->getArrayResult();
+            $stmt = $this->lotGroupRepository->getEntityManager()->getConnection()->prepare($query);
+            $result = $stmt->executeQuery(['user_id' => $user->getId()])->fetchAllAssociative();
 
-            // Get sale counts (only sold lot units)
-            $saleCounts = $this->lotUnitRepository->createQueryBuilder('lu')
-                ->select('c.id as character_id, COUNT(lu.id) as sale_count')
-                ->join('lu.lotGroup', 'lg')
-                ->join('lg.dofusCharacter', 'c')
-                ->join('c.tradingProfile', 'tp')
-                ->where('tp.user = :user')
-                ->andWhere('lu.soldAt IS NOT NULL')
-                ->setParameter('user', $user)
-                ->groupBy('c.id')
-                ->getQuery()
-                ->getArrayResult();
-
-            // Combine results
+            // Traiter les résultats de la requête optimisée
             $counts = [];
 
-            foreach ($lotCounts as $row) {
-                $characterId = $row['character_id'];
-                $status = $row['status']->value;
-                $count = (int)$row['lot_count'];
-
-                if (!isset($counts[$characterId])) {
-                    $counts[$characterId] = [
-                        'lots_available' => 0,
-                        'lots_sold' => 0,
-                        'sales_transactions' => 0,
-                        'watches' => 0
-                    ];
-                }
-
-                if ($status === 'available') {
-                    $counts[$characterId]['lots_available'] = $count;
-                } elseif ($status === 'sold') {
-                    $counts[$characterId]['lots_sold'] = $count;
-                }
-            }
-
-            foreach ($watchCounts as $row) {
-                $characterId = $row['character_id'];
-                if (!isset($counts[$characterId])) {
-                    $counts[$characterId] = [
-                        'lots_available' => 0,
-                        'lots_sold' => 0,
-                        'sales_transactions' => 0,
-                        'watches' => 0
-                    ];
-                }
-                $counts[$characterId]['watches'] = (int)$row['watch_count'];
-            }
-
-            foreach ($saleCounts as $row) {
-                $characterId = $row['character_id'];
-                if (!isset($counts[$characterId])) {
-                    $counts[$characterId] = [
-                        'lots_available' => 0,
-                        'lots_sold' => 0,
-                        'sales_transactions' => 0,
-                        'watches' => 0
-                    ];
-                }
-                $counts[$characterId]['sales_transactions'] = (int)$row['sale_count'];
+            foreach ($result as $row) {
+                $characterId = (int)$row['character_id'];
+                $counts[$characterId] = [
+                    'lots_available' => (int)$row['lots_available'],
+                    'lots_sold' => (int)$row['lots_sold'],
+                    'sales_transactions' => (int)$row['sales_transactions'],
+                    'watches' => (int)$row['watches']
+                ];
             }
 
             return $counts;

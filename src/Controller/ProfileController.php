@@ -120,7 +120,6 @@ class ProfileController extends AbstractController
 
         // Invalider les caches AVANT les modifications pour éviter les données obsolètes
         $profileCharacterService->invalidateUserCache($this->getUser());
-        $profileCharacterService->invalidateUserCache($this->getUser());
 
         // Forcer l'invalidation du cache de l'extension Twig
         $session->set('profile_selector_last_update', time());
@@ -222,7 +221,6 @@ class ProfileController extends AbstractController
         $em->flush();
 
         // Invalider les caches après suppression
-        $profileCharacterService->invalidateUserCache($this->getUser());
         $profileCharacterService->invalidateUserCache($this->getUser());
 
         // Forcer l'invalidation du cache de l'extension Twig
