@@ -25,8 +25,10 @@ class MarketWatchRepository extends ServiceEntityRepository
         $qb = $this->createQueryBuilder('mw')
             ->leftJoin('mw.item', 'i')
             ->leftJoin('mw.dofusCharacter', 'c')
+            ->addSelect('i', 'c')  // Ajout des select pour éviter les requêtes N+1
             ->where('mw.dofusCharacter = :character')
-            ->setParameter('character', $character);
+            ->setParameter('character', $character)
+            ->orderBy('mw.observedAt', 'DESC'); // Ordre par défaut : plus récent en premier
 
         // Ajout de la recherche si un terme est fourni
         if (!empty($searchQuery)) {
