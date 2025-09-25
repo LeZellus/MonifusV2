@@ -28,4 +28,17 @@ return [
     'chart.js' => [
         'version' => '3.9.1',
     ],
+    'datatables.net-dt' => [
+        'version' => '2.3.4',
+    ],
+    'jquery' => [
+        'version' => '3.7.1',
+    ],
+    'datatables.net' => [
+        'version' => '2.3.4',
+    ],
+    'datatables.net-dt/css/dataTables.dataTables.min.css' => [
+        'version' => '2.3.4',
+        'type' => 'css',
+    ],
 ];

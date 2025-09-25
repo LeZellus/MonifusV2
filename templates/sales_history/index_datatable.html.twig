@@ -1,0 +1,118 @@
+{% extends 'base.html.twig' %}
+{% from 'macros/ui_macros.html.twig' import button, wrapper_section %}
+
+{% block title %}Historique des Ventes{% endblock %}
+
+{% block stylesheets %}
+    {{ parent() }}
+    <link rel="stylesheet" href="{{ asset('vendor/datatables.net-dt/css/dataTables.dataTables.min.css') }}">
+{% endblock %}
+
+{% block body %}
+{% include 'components/compact_profile_header.html.twig' %}
+
+    <div class="wrapper-container">
+        {% if selectorData.selectedCharacter %}
+            <!-- Statistiques des ventes (gardées pour la compatibilité) -->
+            <div class="stats-grid">
+                {% include 'components/stats_card.html.twig' with {
+                    title: 'Profit Réalisé',
+                    value: (total_realized_profit / 1000000)|number_format(1) ~ 'M',
+                    icon: '💰',
+                    color: 'green'
+                } %}
+                {% include 'components/stats_card.html.twig' with {
+                    title: 'Profit Attendu',
+                    value: (total_expected_profit / 1000000)|number_format(1) ~ 'M',
+                    icon: '🎯',
+                    color: 'blue'
+                } %}
+                {% include 'components/stats_card.html.twig' with {
+                    title: 'Différence',
+                    value: (profit_difference >= 0 ? '+' : '') ~ (profit_difference / 1000000)|number_format(1) ~ 'M',
+                    icon: '📊',
+                    color: profit_difference >= 0 ? 'green' : 'red'
+                } %}
+                {% include 'components/stats_card.html.twig' with {
+                    title: 'Période Active',
+                    value: current_filters.period ~ ' jours',
+                    icon: '📅',
+                    color: 'purple'
+                } %}
+            </div>
+
+
+            <!-- En-tête et actions -->
+            <div class="flex justify-between items-center">
+                <h2 class="page-title">
+                    Historique des Ventes - {{ selectorData.selectedCharacter.name }}
+                </h2>
+                {{ button('Exporter CSV', path('app_sales_history_export', current_filters), class='btn-success', icon='📊') }}
+            </div>
+
+            <!-- DataTable avec style cohérent -->
+            <div class="hidden md:block bg-gray-800 rounded-lg overflow-hidden">
+                <div data-controller="datatable"
+                     data-datatable-ajax-url-value="{{ path('app_sales_history_datatable', current_filters) }}"
+                     data-datatable-columns-value="{{ columns_config|json_encode|e('html_attr') }}"
+                     data-datatable-page-length-value="25">
+
+                    <table data-datatable-target="table" class="w-full" id="sales-history-table">
+                        <thead class="bg-gray-700">
+                            <tr>
+                                <th class="table-header">Date Vente</th>
+                                <th class="table-header">Item</th>
+                                <th class="table-header">Quantité</th>
+                                <th class="table-header">Prix Attendu</th>
+                                <th class="table-header">Prix Réel</th>
+                                <th class="table-header">Profit Total</th>
+                                <th class="table-header">Performance</th>
+                                <th class="table-header">Notes</th>
+                                <th class="table-header">Actions</th>
+                            </tr>
+                        </thead>
+                        <tbody class="divide-y divide-gray-700">
+                            <!-- Rempli dynamiquement par DataTables -->
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+
+            <!-- Vue mobile simplifiée -->
+            <div class="md:hidden">
+                <div class="text-center py-8 text-gray-400">
+                    <p>La vue DataTables n'est disponible que sur desktop.</p>
+                    <p class="mt-2">
+                        <a href="{{ path('app_sales_history_export', current_filters) }}" class="text-blue-400 hover:text-blue-300">
+                            Télécharger en CSV
+                        </a>
+                    </p>
+                </div>
+            </div>
+
+        {% else %}
+            <!-- Aucun personnage sélectionné -->
+            {% include 'components/empty_state.html.twig' with {
+                type: 'no_character',
+                title: 'Aucun personnage sélectionné',
+                message: 'Sélectionnez un personnage pour voir son historique de ventes.',
+                action: {
+                    url: path('app_profile_index'),
+                    text: 'Gérer les personnages',
+                    icon: '👥'
+                }
+            } %}
+        {% endif %}
+    </div>
+{% endblock %}
+
+{% block javascripts %}
+    {{ parent() }}
+
+    <script>
+        // Listener pour les événements DataTable
+        document.addEventListener('datatable:initialized', function(event) {
+            console.log('✅ DataTable Sales History initialisé');
+        });
+    </script>
+{% endblock %}
