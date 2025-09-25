@@ -14,7 +14,8 @@
       "Bash(del \"C:\\Users\\mathe\\Documents\\Dev\\MonifusV2\\src\\Controller\\CompareProfileDebugController.php\")",
       "Bash(wc:*)",
       "Bash(del \"C:\\Users\\mathe\\Documents\\Dev\\MonifusV2\\src\\Command\\DebugEnutrofCommand.php\")",
-      "Bash(curl:*)"
+      "Bash(curl:*)",
+      "Bash(composer install:*)"
     ],
     "deny": [],
     "ask": []

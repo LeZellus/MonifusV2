@@ -141,6 +141,14 @@ class ProfileCharacterService
                     $character->tempWatchesCount = $characterCounts[$characterId]['watches'] ?? 0;
                 }
             }
+
+            // Aussi appliquer les stats au personnage sélectionné s'il existe
+            if ($selectedCharacter) {
+                $selectedCharacterId = $selectedCharacter->getId();
+                $selectedCharacter->tempLotsAvailable = $characterCounts[$selectedCharacterId]['lots_available'] ?? 0;
+                $selectedCharacter->tempSalesTransactions = $characterCounts[$selectedCharacterId]['sales_transactions'] ?? 0;
+                $selectedCharacter->tempWatchesCount = $characterCounts[$selectedCharacterId]['watches'] ?? 0;
+            }
         }
 
         return [
@@ -305,13 +313,14 @@ class ProfileCharacterService
                 ->getQuery()
                 ->getArrayResult();
 
-            // Get sale counts
+            // Get sale counts (only sold lot units)
             $saleCounts = $this->lotUnitRepository->createQueryBuilder('lu')
                 ->select('c.id as character_id, COUNT(lu.id) as sale_count')
                 ->join('lu.lotGroup', 'lg')
                 ->join('lg.dofusCharacter', 'c')
                 ->join('c.tradingProfile', 'tp')
                 ->where('tp.user = :user')
+                ->andWhere('lu.soldAt IS NOT NULL')
                 ->setParameter('user', $user)
                 ->groupBy('c.id')
                 ->getQuery()
