@@ -62,6 +62,11 @@ class DofusCharacter
     #[ORM\OneToMany(targetEntity: MarketWatch::class, mappedBy: 'dofusCharacter', cascade: ['remove'], fetch: 'EXTRA_LAZY')]
     private Collection $marketWatches;
 
+    // Propriétés temporaires pour éviter les warnings de propriétés dynamiques
+    public ?int $tempLotsAvailable = null;
+    public ?int $tempSalesTransactions = null;
+    public ?int $tempWatchesCount = null;
+
     public function __construct()
     {
         $this->lotGroups = new ArrayCollection();

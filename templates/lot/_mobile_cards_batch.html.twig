@@ -20,21 +20,13 @@
             <div>
                 <p class="text-gray-400 text-xs mb-1">Prix d'achat</p>
                 <p class="text-red-400 font-medium">
-                    {% if item.buyPricePerLot %}
-                        {{ (item.buyPricePerLot / 1000)|number_format(1) }} K
-                    {% else %}
-                        -
-                    {% endif %}
+                    {{ item.buyPricePerLot|format_kamas }}
                 </p>
             </div>
             <div>
                 <p class="text-gray-400 text-xs mb-1">Prix de vente</p>
                 <p class="text-green-400 font-medium">
-                    {% if item.sellPricePerLot %}
-                        {{ (item.sellPricePerLot / 1000)|number_format(1) }} K
-                    {% else %}
-                        -
-                    {% endif %}
+                    {{ item.sellPricePerLot|format_kamas }}
                 </p>
             </div>
         </div>
@@ -46,19 +38,10 @@
             <p class="text-gray-400 text-xs mb-1">Profit</p>
             <div class="flex justify-between items-center">
                 <p class="{{ profit >= 0 ? 'text-green-400' : 'text-red-400' }} font-medium">
-                    {% if profit %}
-                        {{ (profit / 1000)|number_format(1) }} K
-                    {% else %}
-                        -
-                    {% endif %}
+                    {{ profit|format_kamas }}
                 </p>
                 <p class="text-gray-400 text-xs">
-                    Par unité:
-                    {% if profitPerUnit %}
-                        {{ (profitPerUnit / 1000)|number_format(1) }} K
-                    {% else %}
-                        -
-                    {% endif %}
+                    Par unité: {{ profitPerUnit|format_kamas }}
                 </p>
             </div>
         </div>

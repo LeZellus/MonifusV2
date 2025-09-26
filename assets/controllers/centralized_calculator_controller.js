@@ -168,15 +168,36 @@ export default class extends Controller {
     // ===== UTILITAIRES =====
 
     formatKamas(amount) {
-        if (amount === 0) return '-';
-        
-        const absAmount = Math.abs(amount);
-        if (absAmount >= 1000000) {
-            return (amount / 1000000).toFixed(1) + 'M';
-        } else if (absAmount >= 1000) {
-            return Math.round(amount / 1000).toLocaleString() + 'k';
+        if (amount === 0 || amount === null || amount === undefined) return '-';
+
+        const abs = Math.abs(amount);
+        const sign = amount < 0 ? '-' : '';
+
+        // Format Dofus: 700 000 000k = 700kk (millions de milliers)
+        if (abs >= 1000000000) {
+            const kk = Math.floor(abs / 1000000);
+            return `${sign}${kk}kk`;
         }
-        return amount.toLocaleString();
+
+        // Format Dofus: 1 500 000k = 1m5k (millions + milliers)
+        if (abs >= 1000000) {
+            const millions = Math.floor(abs / 1000000);
+            const remainder = abs % 1000000;
+            const milliers = Math.floor(remainder / 1000);
+
+            if (milliers > 0) {
+                return `${sign}${millions}m${milliers}k`;
+            } else {
+                return `${sign}${millions}m`;
+            }
+        }
+
+        // Format standard: pas de "k" pour les milliers simples
+        if (abs >= 1000) {
+            return `${sign}${abs.toLocaleString('fr-FR')}`;
+        }
+
+        return `${sign}${abs}`;
     }
 
     getProfitClass(profit) {

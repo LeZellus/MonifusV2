@@ -10,6 +10,7 @@ use App\Repository\LotGroupRepository;
 use App\Service\ProfileCharacterService;
 use App\Service\LotManagementService;
 use App\Service\CacheInvalidationService;
+use App\Service\KamasFormatterService;
 use App\Trait\CharacterSelectionTrait;
 use Symfony\Contracts\Cache\CacheInterface;
 use Symfony\Contracts\Cache\ItemInterface;
@@ -98,6 +99,9 @@ class LotController extends AbstractController
             ) {
                 $item->expiresAfter(30); // Cache pendant 30 secondes
 
+                // Créer une instance du formateur
+                $kamasFormatter = new KamasFormatterService();
+
                 // Utiliser la nouvelle méthode optimisée avec tri et pagination SQL
                 $result = $lotGroupRepository->findPaginatedAndSorted(
                     $selectedCharacter,
@@ -114,7 +118,7 @@ class LotController extends AbstractController
                 error_log('📄 Lots trouvés avec tri SQL: ' . count($pagedLots) . '/' . $totalRecords);
 
                 // Formater les données avec HTML
-                $formattedData = array_map(function($lot) use ($csrfTokenManager) {
+                $formattedData = array_map(function($lot) use ($csrfTokenManager, $kamasFormatter) {
                     $profit = ($lot->getSellPricePerLot() ?? 0) - ($lot->getBuyPricePerLot() ?? 0);
                     $profitPerUnit = $lot->getLotSize() > 0 ? $profit / $lot->getLotSize() : 0;
 
@@ -134,19 +138,19 @@ class LotController extends AbstractController
                             $lot->getLotSize(),
                             $lot->getItem()->getItemType() ? $lot->getItem()->getItemType()->value : 'N/A'
                         ),
-                        sprintf('<span class="text-red-400">%s K</span>',
-                            $lot->getBuyPricePerLot() ? number_format($lot->getBuyPricePerLot() / 1000, 1) : '-'
+                        sprintf('<span class="text-red-400">%s</span>',
+                            $kamasFormatter->formatWithHtml($lot->getBuyPricePerLot())
                         ),
-                        sprintf('<span class="text-green-400">%s K</span>',
-                            $lot->getSellPricePerLot() ? number_format($lot->getSellPricePerLot() / 1000, 1) : '-'
+                        sprintf('<span class="text-green-400">%s</span>',
+                            $kamasFormatter->formatWithHtml($lot->getSellPricePerLot())
                         ),
                         sprintf('<div class="text-center">
-                            <div class="%s font-medium">%s K</div>
-                            <div class="text-gray-400 text-xs">Par unité: %s K</div>
+                            <div class="%s font-medium">%s</div>
+                            <div class="text-gray-400 text-xs">Par unité: %s</div>
                         </div>',
                             $profit >= 0 ? 'text-green-400' : 'text-red-400',
-                            $profit ? number_format($profit / 1000, 1) : '-',
-                            $profitPerUnit ? number_format($profitPerUnit / 1000, 1) : '-'
+                            $kamasFormatter->formatWithHtml($profit),
+                            $kamasFormatter->formatWithHtml((int)$profitPerUnit)
                         ),
                         sprintf('<span class="px-2 py-1 rounded-full text-xs %s">%s</span>',
                             $lot->getStatus()->value === 'available' ? 'bg-green-800 text-green-200' : 'bg-gray-800 text-gray-200',

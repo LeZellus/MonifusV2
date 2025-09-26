@@ -7,6 +7,7 @@ use App\Entity\DofusCharacter;
 use App\Form\MarketWatchType;
 use App\Service\ProfileCharacterService;
 use App\Service\MarketWatchService;
+use App\Service\KamasFormatterService;
 use App\Trait\CharacterSelectionTrait;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\HttpFoundation\Request;
@@ -44,7 +45,8 @@ class MarketWatchController extends AbstractController
         Request $request,
         MarketWatchService $marketWatchService,
         ProfileCharacterService $profileCharacterService,
-        MarketWatchRepository $marketWatchRepository
+        MarketWatchRepository $marketWatchRepository,
+        KamasFormatterService $kamasFormatter
     ): Response {
         error_log('🔍 MarketWatch DataTable endpoint appelé avec: ' . json_encode($request->query->all()));
 
@@ -105,7 +107,7 @@ class MarketWatchController extends AbstractController
             error_log('📄 Items paginés: ' . count($pagedItemsData));
 
             // Formater les données avec HTML et liens vers l'historique
-            $formattedData = array_map(function($itemData) {
+            $formattedData = array_map(function($itemData) use ($kamasFormatter) {
                 $historyUrl = $this->generateUrl('app_market_watch_history', ['itemId' => $itemData['item']->getId()]);
 
                 return [
@@ -118,20 +120,20 @@ class MarketWatchController extends AbstractController
                         $historyUrl,
                         htmlspecialchars($itemData['item']->getName())
                     ),
-                    sprintf('<span class="text-green-400">%s K</span><div class="text-gray-500 text-xs">%d obs</div>',
-                        $itemData['avg_price_unit'] ? number_format($itemData['avg_price_unit'] / 1000, 1) : '-',
+                    sprintf('<span class="text-green-400">%s</span><div class="text-gray-500 text-xs">%d obs</div>',
+                        $itemData['avg_price_unit'] ? $kamasFormatter->formatWithHtml((int)$itemData['avg_price_unit']) : '-',
                         $itemData['price_unit_count'] ?? 0
                     ),
-                    sprintf('<span class="text-blue-400">%s K</span><div class="text-gray-500 text-xs">%d obs</div>',
-                        $itemData['avg_price_10'] ? number_format($itemData['avg_price_10'] / 1000, 1) : '-',
+                    sprintf('<span class="text-blue-400">%s</span><div class="text-gray-500 text-xs">%d obs</div>',
+                        $itemData['avg_price_10'] ? $kamasFormatter->formatWithHtml((int)$itemData['avg_price_10']) : '-',
                         $itemData['price_10_count'] ?? 0
                     ),
-                    sprintf('<span class="text-purple-400">%s K</span><div class="text-gray-500 text-xs">%d obs</div>',
-                        $itemData['avg_price_100'] ? number_format($itemData['avg_price_100'] / 1000, 1) : '-',
+                    sprintf('<span class="text-purple-400">%s</span><div class="text-gray-500 text-xs">%d obs</div>',
+                        $itemData['avg_price_100'] ? $kamasFormatter->formatWithHtml((int)$itemData['avg_price_100']) : '-',
                         $itemData['price_100_count'] ?? 0
                     ),
-                    sprintf('<span class="text-orange-400">%s K</span><div class="text-gray-500 text-xs">%d obs</div>',
-                        $itemData['avg_price_1000'] ? number_format($itemData['avg_price_1000'] / 1000, 1) : '-',
+                    sprintf('<span class="text-orange-400">%s</span><div class="text-gray-500 text-xs">%d obs</div>',
+                        $itemData['avg_price_1000'] ? $kamasFormatter->formatWithHtml((int)$itemData['avg_price_1000']) : '-',
                         $itemData['price_1000_count'] ?? 0
                     ),
                     $itemData['latest_date']->format('d/m/Y H:i'),
