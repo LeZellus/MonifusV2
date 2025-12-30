@@ -12,8 +12,6 @@ use App\Service\LotManagementService;
 use App\Service\CacheInvalidationService;
 use App\Service\KamasFormatterService;
 use App\Trait\CharacterSelectionTrait;
-use Symfony\Contracts\Cache\CacheInterface;
-use Symfony\Contracts\Cache\ItemInterface;
 use Doctrine\ORM\EntityManagerInterface;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\HttpFoundation\JsonResponse;
@@ -47,20 +45,13 @@ class LotController extends AbstractController
     #[Route('/datatable', name: 'app_lot_datatable', methods: ['GET'])]
     public function datatable(
         Request $request,
-        LotManagementService $lotManagementService,
         ProfileCharacterService $profileCharacterService,
         CsrfTokenManagerInterface $csrfTokenManager,
-        CacheInterface $cache,
         LotGroupRepository $lotGroupRepository
     ): Response {
-        error_log('🔍 Lot DataTable endpoint appelé avec: ' . json_encode($request->query->all()));
-
         try {
             $user = $this->getUser();
-            error_log('🔐 Utilisateur connecté: ' . ($user ? $user->getUserIdentifier() : 'aucun'));
-
             $selectedCharacter = $profileCharacterService->getSelectedCharacter($user);
-            error_log('👤 Personnage sélectionné: ' . ($selectedCharacter ? $selectedCharacter->getName() . ' (ID: ' . $selectedCharacter->getId() . ')' : 'aucun'));
 
             if (!$selectedCharacter) {
                 return new JsonResponse([
@@ -80,111 +71,87 @@ class LotController extends AbstractController
             $sortColumn = (int) $request->query->get('sortColumn', 0);
             $sortDirection = $request->query->get('sortDirection', 'desc');
 
-            error_log('📊 Paramètres: page=' . $page . ', length=' . $length . ', search=' . $search);
+            // Créer une instance du formateur
+            $kamasFormatter = new KamasFormatterService();
 
-            // Créer une clé de cache basée sur les paramètres
-            $cacheKey = sprintf(
-                'lot_datatable_char_%d_page_%d_len_%d_search_%s_sort_%d_%s',
-                $selectedCharacter->getId(),
+            // Utiliser la nouvelle méthode optimisée avec tri et pagination SQL
+            $result = $lotGroupRepository->findPaginatedAndSorted(
+                $selectedCharacter,
+                $search,
                 $page,
                 $length,
-                md5($search),
                 $sortColumn,
                 $sortDirection
             );
 
-            $cachedResult = $cache->get($cacheKey, function (ItemInterface $item) use (
-                $selectedCharacter, $search, $page, $length,
-                $sortColumn, $sortDirection, $csrfTokenManager, $lotGroupRepository
-            ) {
-                $item->expiresAfter(30); // Cache pendant 30 secondes
+            $pagedLots = $result['lots'];
+            $totalRecords = $result['totalRecords'];
 
-                // Créer une instance du formateur
-                $kamasFormatter = new KamasFormatterService();
-
-                // Utiliser la nouvelle méthode optimisée avec tri et pagination SQL
-                $result = $lotGroupRepository->findPaginatedAndSorted(
-                    $selectedCharacter,
-                    $search,
-                    $page,
-                    $length,
-                    $sortColumn,
-                    $sortDirection
-                );
-
-                $pagedLots = $result['lots'];
-                $totalRecords = $result['totalRecords'];
-
-                error_log('📄 Lots trouvés avec tri SQL: ' . count($pagedLots) . '/' . $totalRecords);
-
-                // Formater les données avec HTML
-                $formattedData = array_map(function($lot) use ($csrfTokenManager, $kamasFormatter) {
-                    $profit = ($lot->getSellPricePerLot() ?? 0) - ($lot->getBuyPricePerLot() ?? 0);
-                    $profitPerUnit = $lot->getLotSize() > 0 ? $profit / $lot->getLotSize() : 0;
-
-                    return [
-                        sprintf('<div class="flex items-center gap-2">
-                            <img src="%s" alt="%s" class="w-8 h-8 rounded">
-                            <span>%s</span>
-                        </div>',
-                            $lot->getItem()->getImgUrl() ?? '/images/items/default.png',
-                            htmlspecialchars($lot->getItem()->getName()),
-                            htmlspecialchars($lot->getItem()->getName())
-                        ),
-                        sprintf('<div class="text-center">
-                            <div class="text-white font-medium">%dx</div>
-                            <div class="text-gray-400 text-xs">%s</div>
-                        </div>',
-                            $lot->getLotSize(),
-                            $lot->getItem()->getItemType() ? $lot->getItem()->getItemType()->value : 'N/A'
-                        ),
-                        sprintf('<span class="text-red-400">%s</span>',
-                            $kamasFormatter->formatWithHtml($lot->getBuyPricePerLot())
-                        ),
-                        sprintf('<span class="text-green-400">%s</span>',
-                            $kamasFormatter->formatWithHtml($lot->getSellPricePerLot())
-                        ),
-                        sprintf('<div class="text-center">
-                            <div class="%s font-medium">%s</div>
-                            <div class="text-gray-400 text-xs">Par unité: %s</div>
-                        </div>',
-                            $profit >= 0 ? 'text-green-400' : 'text-red-400',
-                            $kamasFormatter->formatWithHtml($profit),
-                            $kamasFormatter->formatWithHtml((int)$profitPerUnit)
-                        ),
-                        sprintf('<span class="px-2 py-1 rounded-full text-xs %s">%s</span>',
-                            $lot->getStatus()->value === 'available' ? 'bg-green-800 text-green-200' : 'bg-gray-800 text-gray-200',
-                            $lot->getStatus()->value === 'available' ? 'Disponible' : ucfirst($lot->getStatus()->value)
-                        ),
-                        sprintf('<div class="flex gap-2">
-                            <a href="%s" class="text-blue-400 hover:text-blue-300 text-xs px-2 py-1 border border-blue-400 rounded">Modifier</a>
-                            <a href="%s" class="text-green-400 hover:text-green-300 text-xs px-2 py-1 border border-green-400 rounded">Vendre</a>
-                            <form method="POST" action="%s" style="display:inline;" onsubmit="return confirm(\'Supprimer ce lot ?\')">
-                                <input type="hidden" name="_token" value="%s">
-                                <button type="submit" class="text-red-400 hover:text-red-300 text-xs px-2 py-1 border border-red-400 rounded">Supprimer</button>
-                            </form>
-                        </div>',
-                            $this->generateUrl('app_lot_edit', ['id' => $lot->getId()]),
-                            $this->generateUrl('app_lot_sell', ['id' => $lot->getId()]),
-                            $this->generateUrl('app_lot_delete', ['id' => $lot->getId()]),
-                            $csrfTokenManager->getToken('delete' . $lot->getId())->getValue()
-                        )
-                    ];
-                }, $pagedLots);
-
-                // Générer les cartes mobiles HTML en batch pour améliorer les performances
-                $mobileCards = $this->renderView('lot/_mobile_cards_batch.html.twig', ['items' => $pagedLots]);
+            // Formater les données avec HTML
+            $formattedData = array_map(function($lot) use ($csrfTokenManager, $kamasFormatter) {
+                $profit = ($lot->getSellPricePerLot() ?? 0) - ($lot->getBuyPricePerLot() ?? 0);
+                $profitPerUnit = $lot->getLotSize() > 0 ? $profit / $lot->getLotSize() : 0;
 
                 return [
-                    'draw' => $page,
-                    'recordsTotal' => $totalRecords,
-                    'recordsFiltered' => $totalRecords,
-                    'data' => $formattedData,
-                    'mobile_cards' => $mobileCards
+                    sprintf('<div class="flex items-center gap-2">
+                        <img src="%s" alt="%s" class="w-8 h-8 rounded">
+                        <span>%s</span>
+                    </div>',
+                        $lot->getItem()->getImgUrl() ?? '/images/items/default.png',
+                        htmlspecialchars($lot->getItem()->getName()),
+                        htmlspecialchars($lot->getItem()->getName())
+                    ),
+                    sprintf('<div class="text-center">
+                        <div class="text-white font-medium">%dx</div>
+                        <div class="text-gray-400 text-xs">%s</div>
+                    </div>',
+                        $lot->getLotSize(),
+                        $lot->getItem()->getItemType() ? $lot->getItem()->getItemType()->value : 'N/A'
+                    ),
+                    sprintf('<span class="text-red-400">%s</span>',
+                        $kamasFormatter->formatWithHtml($lot->getBuyPricePerLot())
+                    ),
+                    sprintf('<span class="text-green-400">%s</span>',
+                        $kamasFormatter->formatWithHtml($lot->getSellPricePerLot())
+                    ),
+                    sprintf('<div class="text-center">
+                        <div class="%s font-medium">%s</div>
+                        <div class="text-gray-400 text-xs">Par unité: %s</div>
+                    </div>',
+                        $profit >= 0 ? 'text-green-400' : 'text-red-400',
+                        $kamasFormatter->formatWithHtml($profit),
+                        $kamasFormatter->formatWithHtml((int)$profitPerUnit)
+                    ),
+                    sprintf('<span class="px-2 py-1 rounded-full text-xs %s">%s</span>',
+                        $lot->getStatus()->value === 'available' ? 'bg-green-800 text-green-200' : 'bg-gray-800 text-gray-200',
+                        $lot->getStatus()->value === 'available' ? 'Disponible' : ucfirst($lot->getStatus()->value)
+                    ),
+                    sprintf('<div class="flex gap-2">
+                        <a href="%s" class="text-blue-400 hover:text-blue-300 text-xs px-2 py-1 border border-blue-400 rounded">Modifier</a>
+                        <a href="%s" class="text-green-400 hover:text-green-300 text-xs px-2 py-1 border border-green-400 rounded">Vendre</a>
+                        <form method="POST" action="%s" style="display:inline;" onsubmit="return confirm(\'Supprimer ce lot ?\')">
+                            <input type="hidden" name="_token" value="%s">
+                            <button type="submit" class="text-red-400 hover:text-red-300 text-xs px-2 py-1 border border-red-400 rounded">Supprimer</button>
+                        </form>
+                    </div>',
+                        $this->generateUrl('app_lot_edit', ['id' => $lot->getId()]),
+                        $this->generateUrl('app_lot_sell', ['id' => $lot->getId()]),
+                        $this->generateUrl('app_lot_delete', ['id' => $lot->getId()]),
+                        $csrfTokenManager->getToken('delete' . $lot->getId())->getValue()
+                    )
                 ];
-            });
+            }, $pagedLots);
 
-            return new JsonResponse($cachedResult);
+            // Générer les cartes mobiles HTML en batch
+            $mobileCards = $this->renderView('lot/_mobile_cards_batch.html.twig', ['items' => $pagedLots]);
+
+            return new JsonResponse([
+                'draw' => $page,
+                'recordsTotal' => $totalRecords,
+                'recordsFiltered' => $totalRecords,
+                'data' => $formattedData,
+                'mobile_cards' => $mobileCards
+            ]);
 
         } catch (\Exception $e) {
             error_log('💥 Erreur Lot DataTable: ' . $e->getMessage());
@@ -322,7 +289,7 @@ class LotController extends AbstractController
         ProfileCharacterService $profileCharacterService,
         CacheInvalidationService $cacheInvalidation
     ): Response {
-        if ($this->isCsrfTokenValid('delete'.$lotGroup->getId(), $request->getPayload()->getString('_token'))) {
+        if ($this->isCsrfTokenValid('delete'.$lotGroup->getId(), $request->request->get('_token'))) {
             $em->remove($lotGroup);
             $em->flush();
 

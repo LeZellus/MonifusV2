@@ -4,6 +4,7 @@ namespace App\Service;
 
 use App\Entity\User;
 use Symfony\Contracts\Cache\CacheInterface;
+use Symfony\Contracts\Cache\ItemInterface;
 
 class CacheInvalidationService
 {
@@ -19,10 +20,13 @@ class CacheInvalidationService
 
     public function markUserActivity(User $user): void
     {
-        $cacheItem = $this->cache->getItem("user_last_activity_{$user->getId()}");
-        $cacheItem->set(time());
-        $cacheItem->expiresAfter(300); // 5 minutes
-        $this->cache->save($cacheItem);
+        $this->cache->get(
+            "user_last_activity_{$user->getId()}",
+            function (ItemInterface $item) {
+                $item->expiresAfter(300); // 5 minutes
+                return time();
+            }
+        );
     }
 
     public function invalidateUserStatsAndMarkActivity(User $user): void

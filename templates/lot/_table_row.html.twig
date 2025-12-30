@@ -74,10 +74,9 @@
                         </form>
                     {% endif %}
                     
-                    <form action="{{ path('app_lot_delete', {id: item.id}) }}" method="post" 
-                        onsubmit="return confirm('Supprimer ce lot définitivement ?')" 
+                    <form action="{{ path('app_lot_delete', {id: item.id}) }}" method="post"
+                        onsubmit="return confirm('Supprimer ce lot définitivement ?')"
                         class="block">
-                        <input type="hidden" name="_method" value="DELETE">
                         <input type="hidden" name="_token" value="{{ csrf_token('delete' ~ item.id) }}">
                         <button type="submit" class="w-full text-left px-3 py-2 text-red-400 hover:bg-gray-700 text-sm">
                             🗑️ Supprimer
