@@ -18,6 +18,7 @@ class Comment
     private ?string $content = null;
 
     #[ORM\ManyToOne(inversedBy: 'comments')]
+    #[ORM\JoinColumn(onDelete: 'CASCADE')]
     private ?LotUnit $lotUnit = null;
 
     #[ORM\Column]

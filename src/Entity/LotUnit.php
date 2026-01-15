@@ -29,7 +29,7 @@ class LotUnit
     private ?string $notes = null;
 
     #[ORM\ManyToOne(inversedBy: 'lotUnits')]
-    #[ORM\JoinColumn(nullable: false)]
+    #[ORM\JoinColumn(nullable: false, onDelete: 'CASCADE')]
     private ?LotGroup $lotGroup = null;
 
     /**

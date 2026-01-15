@@ -31,7 +31,7 @@ class LotGroup
     private ?LotStatus $status = null;
 
     #[ORM\ManyToOne(inversedBy: 'lotGroups')]
-    #[ORM\JoinColumn(nullable: false)]
+    #[ORM\JoinColumn(nullable: false, onDelete: 'CASCADE')]
     private ?DofusCharacter $dofusCharacter = null;
 
     #[ORM\ManyToOne(inversedBy: 'lotGroups')]

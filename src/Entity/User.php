@@ -104,7 +104,7 @@ class User implements UserInterface, PasswordAuthenticatedUserInterface
     /**
      * @var Collection<int, TradingProfile>
      */
-    #[ORM\OneToMany(targetEntity: TradingProfile::class, mappedBy: 'user', fetch: 'EXTRA_LAZY')]
+    #[ORM\OneToMany(targetEntity: TradingProfile::class, mappedBy: 'user', cascade: ['remove'], fetch: 'EXTRA_LAZY')]
     private Collection $tradingProfiles;
 
     public function __construct()

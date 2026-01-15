@@ -24,7 +24,7 @@ class TradingProfile
     private ?string $description = null;
 
     #[ORM\ManyToOne(inversedBy: 'tradingProfiles')]
-    #[ORM\JoinColumn(nullable: false)]
+    #[ORM\JoinColumn(nullable: false, onDelete: 'CASCADE')]
     private ?User $user = null;
 
     #[ORM\Column]
