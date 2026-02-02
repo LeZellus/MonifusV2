@@ -19,6 +19,11 @@ use Symfony\Component\Security\Csrf\CsrfTokenManagerInterface;
 class SalesHistoryController extends AbstractController
 {
     use CharacterSelectionTrait;
+
+    public function __construct(
+        private readonly CsrfTokenManagerInterface $csrfTokenManager
+    ) {}
+
     #[Route('/', name: 'app_sales_history_index')]
     public function index(
         Request $request,
@@ -86,8 +91,7 @@ class SalesHistoryController extends AbstractController
     public function datatable(
         Request $request,
         LotUnitRepository $lotUnitRepository,
-        ProfileCharacterService $profileCharacterService,
-        CsrfTokenManagerInterface $csrfTokenManager
+        ProfileCharacterService $profileCharacterService
     ): JsonResponse {
         error_log('🔍 DataTable endpoint appelé avec: ' . json_encode($request->query->all()));
 
@@ -137,7 +141,7 @@ class SalesHistoryController extends AbstractController
         );
 
         // Formater les données avec HTML pour notre table personnalisée
-        $csrfToken = $csrfTokenManager->getToken('cancel_sale')->getValue();
+        $csrfToken = $this->csrfTokenManager->getToken('cancel_sale')->getValue();
         $formattedData = array_map(function($sale) use ($csrfToken) {
             // Handle nullable price fields
             $actualSellPrice = $sale['actualSellPrice'] ?? 0;
