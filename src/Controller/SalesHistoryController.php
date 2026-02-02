@@ -139,20 +139,26 @@ class SalesHistoryController extends AbstractController
         // Formater les données avec HTML pour notre table personnalisée
         $csrfToken = $csrfTokenManager->getToken('cancel_sale')->getValue();
         $formattedData = array_map(function($sale) use ($csrfToken) {
-            $realizedProfit = ($sale['actualSellPrice'] - $sale['buyPricePerLot']) * $sale['quantitySold'];
-            $expectedProfit = ($sale['sellPricePerLot'] - $sale['buyPricePerLot']) * $sale['quantitySold'];
-            $performance = $sale['sellPricePerLot'] > 0 ? ($sale['actualSellPrice'] / $sale['sellPricePerLot'] * 100) : 0;
+            // Handle nullable price fields
+            $actualSellPrice = $sale['actualSellPrice'] ?? 0;
+            $buyPricePerLot = $sale['buyPricePerLot'] ?? 0;
+            $sellPricePerLot = $sale['sellPricePerLot'] ?? $actualSellPrice; // Fallback to actual price if not set
+            $quantitySold = $sale['quantitySold'] ?? 0;
+
+            $realizedProfit = ($actualSellPrice - $buyPricePerLot) * $quantitySold;
+            $expectedProfit = ($sellPricePerLot - $buyPricePerLot) * $quantitySold;
+            $performance = $sellPricePerLot > 0 ? ($actualSellPrice / $sellPricePerLot * 100) : 100;
 
             return [
                 $sale['soldAt']->format('d/m/Y H:i'),
                 sprintf('<div class="flex items-center gap-2"><img src="%s" alt="%s" class="w-8 h-8 rounded"><span>%s</span></div>',
                     $sale['itemImage'] ?? '/images/items/default.png',
-                    htmlspecialchars($sale['itemName']),
-                    htmlspecialchars($sale['itemName'])
+                    htmlspecialchars($sale['itemName'] ?? 'Item inconnu'),
+                    htmlspecialchars($sale['itemName'] ?? 'Item inconnu')
                 ),
-                number_format($sale['quantitySold'], 0, ',', ' '),
-                sprintf('<span class="text-blue-400">%s K</span>', number_format($sale['sellPricePerLot'] / 1000, 0, ',', ' ')),
-                sprintf('<span class="text-green-400">%s K</span>', number_format($sale['actualSellPrice'] / 1000, 0, ',', ' ')),
+                number_format($quantitySold, 0, ',', ' '),
+                sprintf('<span class="text-blue-400">%s K</span>', number_format($sellPricePerLot / 1000, 0, ',', ' ')),
+                sprintf('<span class="text-green-400">%s K</span>', number_format($actualSellPrice / 1000, 0, ',', ' ')),
                 sprintf('<span class="%s">%s%s K</span>',
                     $realizedProfit >= 0 ? 'text-green-400' : 'text-red-400',
                     $realizedProfit >= 0 ? '+' : '',

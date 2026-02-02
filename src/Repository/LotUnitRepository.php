@@ -51,11 +51,16 @@ class LotUnitRepository extends ServiceEntityRepository
     {
         $totalRealizedProfit = 0;
         $totalExpectedProfit = 0;
-        
+
         foreach ($sales as $sale) {
-            $realizedProfit = ($sale->getActualSellPrice() - $sale->getLotGroup()->getBuyPricePerLot()) * $sale->getQuantitySold();
-            $expectedProfit = ($sale->getLotGroup()->getSellPricePerLot() - $sale->getLotGroup()->getBuyPricePerLot()) * $sale->getQuantitySold();
-            
+            $actualSellPrice = $sale->getActualSellPrice() ?? 0;
+            $buyPricePerLot = $sale->getLotGroup()?->getBuyPricePerLot() ?? 0;
+            $sellPricePerLot = $sale->getLotGroup()?->getSellPricePerLot() ?? $actualSellPrice;
+            $quantitySold = $sale->getQuantitySold() ?? 0;
+
+            $realizedProfit = ($actualSellPrice - $buyPricePerLot) * $quantitySold;
+            $expectedProfit = ($sellPricePerLot - $buyPricePerLot) * $quantitySold;
+
             $totalRealizedProfit += $realizedProfit;
             $totalExpectedProfit += $expectedProfit;
         }
