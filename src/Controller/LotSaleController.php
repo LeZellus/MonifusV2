@@ -116,29 +116,41 @@ class LotSaleController extends AbstractController
     #[Route('/{id}/cancel', name: 'app_lot_unit_cancel', methods: ['POST'])]
     public function cancelSale(
         int $id,
+        Request $request,
         EntityManagerInterface $em,
         ProfileCharacterService $profileCharacterService,
         CacheInvalidationService $cacheInvalidation
     ): Response {
+        // Validate CSRF token
+        if (!$this->isCsrfTokenValid('cancel_sale', $request->request->get('_token'))) {
+            throw $this->createAccessDeniedException('Token CSRF invalide.');
+        }
+
         $result = $this->getSelectedCharacterOrRedirect($profileCharacterService);
         if ($result instanceof Response) {
             return $result;
         }
         $selectedCharacter = $result;
-        
+
         if (!$selectedCharacter) {
             throw $this->createAccessDeniedException();
         }
 
         // Récupérer le LotUnit à annuler
         $lotUnit = $em->getRepository(LotUnit::class)->find($id);
-        
+
         if (!$lotUnit) {
             throw $this->createNotFoundException('Vente non trouvée.');
         }
 
         $lotGroup = $lotUnit->getLotGroup();
-        
+
+        // Vérification que le lot existe et a un personnage associé
+        if (!$lotGroup || !$lotGroup->getDofusCharacter()) {
+            $this->addFlash('error', 'Cette vente ne peut pas être annulée : lot ou personnage introuvable.');
+            return $this->redirectToRoute('app_sales_history_index');
+        }
+
         // Vérification de sécurité
         if ($lotGroup->getDofusCharacter()->getId() !== $selectedCharacter->getId()) {
             throw $this->createAccessDeniedException();
@@ -164,6 +176,6 @@ class LotSaleController extends AbstractController
         $cacheInvalidation->invalidateUserStatsAndMarkActivity($this->getUser());
 
         $this->addFlash('success', "Vente annulée ! {$quantityToRestore} lots restaurés.");
-        return $this->redirectToRoute('app_lot_index');
+        return $this->redirectToRoute('app_sales_history_index');
     }
 }
