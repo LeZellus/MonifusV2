@@ -9,4 +9,3 @@ framework:
             - submit
             - authenticate
             - logout
-            - cancel_sale

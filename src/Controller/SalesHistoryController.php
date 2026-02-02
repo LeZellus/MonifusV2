@@ -174,7 +174,7 @@ class SalesHistoryController extends AbstractController
                     number_format($performance - 100, 1)
                 ),
                 htmlspecialchars($sale['notes'] ?? ''),
-                sprintf('<form method="POST" action="/lot-sale/%d/cancel" style="display:inline;" onsubmit="return confirm(\'Êtes-vous sûr de vouloir annuler cette vente ?\')"><input type="hidden" name="_token" value="%s"><button type="submit" class="text-red-400 hover:text-red-300 text-xs px-2 py-1 border border-red-400 rounded hover:bg-red-400 hover:text-white transition-colors">Annuler</button></form>', $sale['id'], $csrfToken)
+                sprintf('<form method="POST" action="/lot-sale/%d/cancel" style="display:inline;" data-turbo="false" onsubmit="return confirm(\'Annuler cette vente ?\')"><input type="hidden" name="_token" value="%s"><button type="submit" class="text-red-400 hover:text-red-300 text-xs px-2 py-1 border border-red-400 rounded hover:bg-red-400 hover:text-white transition-colors">Annuler</button></form>', $sale['id'], $csrfToken)
             ];
         }, $result['data']);
 

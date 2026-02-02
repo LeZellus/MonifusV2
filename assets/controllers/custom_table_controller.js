@@ -172,7 +172,8 @@ export default class extends Controller {
             tr.innerHTML = row.map(cell => `<td class="px-6 py-4 whitespace-nowrap text-sm text-gray-300">${cell}</td>`).join('')
             this.tbodyTarget.appendChild(tr)
         })
-    }
+
+        }
 
     updateInfo(data) {
         if (this.hasInfoTarget) {
