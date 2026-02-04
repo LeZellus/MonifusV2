@@ -26,24 +26,32 @@ class MarketWatchController extends AbstractController
     use CharacterSelectionTrait;
     #[Route('/', name: 'app_market_watch_index')]
     public function index(
+        Request $request,
         MarketWatchService $marketWatchService,
         ProfileCharacterService $profileCharacterService
     ): Response {
         [$selectedCharacter, $characters] = $this->getCharacterData($profileCharacterService);
 
+        // Récupérer le filtre de période (défaut: 30 jours)
+        $period = $request->query->get('period', '30');
+        if ($period !== 'all') {
+            $period = preg_replace('/[^0-9]/', '', $period) ?: '30';
+        }
+
         // Mode admin : données de tous les joueurs
         $isAdmin = $this->isGranted('ROLE_ADMIN');
 
         if ($isAdmin) {
-            $stats = $marketWatchService->calculateGlobalMarketWatchStats();
+            $stats = $marketWatchService->calculateGlobalMarketWatchStats($period);
         } else {
-            $stats = $marketWatchService->calculateMarketWatchStats($selectedCharacter);
+            $stats = $marketWatchService->calculateMarketWatchStats($selectedCharacter, $period);
         }
 
         return $this->render('market_watch/index_custom.html.twig', [
             'character' => $selectedCharacter,
             'characters' => $characters,
             'is_admin_view' => $isAdmin,
+            'current_period' => $period,
             ...$stats,
         ]);
     }
@@ -85,14 +93,20 @@ class MarketWatchController extends AbstractController
             $sortColumn = (int) $request->query->get('sortColumn', 0);
             $sortDirection = $request->query->get('sortDirection', 'desc');
 
-            error_log('📊 Paramètres: page=' . $page . ', length=' . $length . ', search=' . $search);
+            // Récupérer le filtre de période
+            $period = $request->query->get('period', '30');
+            if ($period !== 'all') {
+                $period = preg_replace('/[^0-9]/', '', $period) ?: '30';
+            }
+
+            error_log('📊 Paramètres: page=' . $page . ', length=' . $length . ', search=' . $search . ', period=' . $period);
 
             // Mode admin : données de tous les joueurs, sinon données du personnage
             if ($isAdmin) {
-                $allItemsData = $marketWatchService->getGlobalItemsData($search);
+                $allItemsData = $marketWatchService->getGlobalItemsData($search, $period);
                 error_log('👑 Mode ADMIN: récupération des données globales');
             } else {
-                $allItemsData = $marketWatchService->getItemsDataForCharacter($selectedCharacter, $search);
+                $allItemsData = $marketWatchService->getItemsDataForCharacter($selectedCharacter, $search, $period);
             }
 
             error_log('📋 Nombre total d\'items trouvés: ' . count($allItemsData));
@@ -353,38 +367,48 @@ class MarketWatchController extends AbstractController
 
     #[Route('/item/{itemId}/history', name: 'app_market_watch_history')]
     public function itemHistory(
+        Request $request,
         int $itemId,
         MarketWatchService $marketWatchService,
         ProfileCharacterService $profileCharacterService,
-        ChartDataService $chartDataService
+        ChartDataService $chartDataService,
+        ItemRepository $itemRepository
     ): Response {
         $isAdmin = $this->isGranted('ROLE_ADMIN');
         $selectedCharacter = null;
 
+        // Récupérer le filtre de période (défaut: all pour voir tout l'historique)
+        $period = $request->query->get('period', 'all');
+        if ($period !== 'all') {
+            $period = preg_replace('/[^0-9]/', '', $period) ?: 'all';
+        }
+
         // Mode admin : récupérer l'historique global
         if ($isAdmin) {
-            $priceHistory = $marketWatchService->getGlobalPriceHistoryForItem($itemId);
+            $priceHistory = $marketWatchService->getGlobalPriceHistoryForItem($itemId, $period);
         } else {
             $result = $this->getSelectedCharacterOrRedirect($profileCharacterService, 'Aucun personnage sélectionné.');
             if ($result instanceof Response) {
                 return $result;
             }
             $selectedCharacter = $result;
-            $priceHistory = $marketWatchService->getPriceHistoryForItem($selectedCharacter, $itemId);
+            $priceHistory = $marketWatchService->getPriceHistoryForItem($selectedCharacter, $itemId, $period);
         }
 
-        if (empty($priceHistory)) {
-            $this->addFlash('warning', 'Aucun historique de prix pour cet item.');
+        // Récupérer l'item même si pas d'historique (pour afficher le nom)
+        $item = !empty($priceHistory) ? $priceHistory[0]->getItem() : $itemRepository->find($itemId);
+
+        if (!$item) {
+            $this->addFlash('warning', 'Item introuvable.');
             return $this->redirectToRoute('app_market_watch_index');
         }
 
-        $item = $priceHistory[0]->getItem();
         $averages = $marketWatchService->calculatePriceAverages($priceHistory);
         $chartData = $chartDataService->prepareMarketWatchChartData($priceHistory, 'all');
 
         // En mode admin, compter le nombre de joueurs uniques
         $playersCount = 0;
-        if ($isAdmin) {
+        if ($isAdmin && !empty($priceHistory)) {
             $uniquePlayers = [];
             foreach ($priceHistory as $obs) {
                 $uniquePlayers[$obs->getDofusCharacter()->getId()] = true;
@@ -400,6 +424,7 @@ class MarketWatchController extends AbstractController
             'chart_data' => $chartData,
             'is_admin_view' => $isAdmin,
             'players_count' => $playersCount,
+            'current_period' => $period,
         ]);
     }
 

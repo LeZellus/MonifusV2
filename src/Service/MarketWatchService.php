@@ -23,27 +23,27 @@ class MarketWatchService
     ) {
     }
 
-    public function getItemsDataForCharacter(?DofusCharacter $character, ?string $searchQuery = null): array
+    public function getItemsDataForCharacter(?DofusCharacter $character, ?string $searchQuery = null, ?string $period = null): array
     {
         return $character
-            ? $this->marketWatchRepository->getItemsDataWithStats($character, $searchQuery ?? '')
+            ? $this->marketWatchRepository->getItemsDataWithStats($character, $searchQuery ?? '', $period)
             : [];
     }
 
     /**
      * Récupère les données de TOUS les joueurs agrégées par item (mode admin)
      */
-    public function getGlobalItemsData(?string $searchQuery = null): array
+    public function getGlobalItemsData(?string $searchQuery = null, ?string $period = null): array
     {
-        return $this->marketWatchRepository->getGlobalItemsDataWithStats($searchQuery ?? '');
+        return $this->marketWatchRepository->getGlobalItemsDataWithStats($searchQuery ?? '', $period);
     }
 
     /**
      * Calcule les stats globales pour le mode admin
      */
-    public function calculateGlobalMarketWatchStats(): array
+    public function calculateGlobalMarketWatchStats(?string $period = null): array
     {
-        $itemsData = $this->getGlobalItemsData();
+        $itemsData = $this->getGlobalItemsData(null, $period);
 
         $totalItems = count($itemsData);
         $totalObservations = 0;
@@ -144,17 +144,17 @@ class MarketWatchService
         return count($observations);
     }
 
-    public function getPriceHistoryForItem(DofusCharacter $character, int $itemId): array
+    public function getPriceHistoryForItem(DofusCharacter $character, int $itemId, ?string $period = null): array
     {
-        return $this->marketWatchRepository->findPriceHistoryForItem($character, $itemId);
+        return $this->marketWatchRepository->findPriceHistoryForItem($character, $itemId, $period);
     }
 
     /**
      * Récupère l'historique GLOBAL des prix pour un item (tous les joueurs) - mode admin
      */
-    public function getGlobalPriceHistoryForItem(int $itemId): array
+    public function getGlobalPriceHistoryForItem(int $itemId, ?string $period = null): array
     {
-        return $this->marketWatchRepository->findGlobalPriceHistoryForItem($itemId);
+        return $this->marketWatchRepository->findGlobalPriceHistoryForItem($itemId, $period);
     }
 
     public function calculatePriceAverages(array $priceHistory): array
@@ -167,7 +167,7 @@ class MarketWatchService
         return $marketWatch->getDofusCharacter()->getId() === $userCharacter->getId();
     }
 
-    public function calculateMarketWatchStats(?DofusCharacter $character): array
+    public function calculateMarketWatchStats(?DofusCharacter $character, ?string $period = null): array
     {
         if (!$character) {
             return [
@@ -178,7 +178,7 @@ class MarketWatchService
             ];
         }
 
-        $itemsData = $this->getItemsDataForCharacter($character);
+        $itemsData = $this->getItemsDataForCharacter($character, null, $period);
 
         $totalItems = count($itemsData);
         $totalObservations = 0;

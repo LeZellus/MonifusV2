@@ -5,7 +5,7 @@
 {% block body %}
     <div class="wrapper-container">
         <!-- En-tête -->
-        <div class="flex justify-between items-center mb-6">
+        <div class="flex flex-col md:flex-row justify-between items-start md:items-center gap-4 mb-6">
             <div>
                 <h1 class="text-white text-3xl font-bold flex items-center">
                     <span class="{% if is_admin_view is defined and is_admin_view %}text-yellow-400{% else %}text-orange-400{% endif %} mr-3">{% if is_admin_view is defined and is_admin_view %}👑{% else %}📈{% endif %}</span>
@@ -15,17 +15,49 @@
                     {% endif %}
                 </h1>
                 <p class="text-gray-400 mt-2">
-                    {{ price_history|length }} observation{{ price_history|length > 1 ? 's' : '' }} enregistrée{{ price_history|length > 1 ? 's' : '' }}
-                    {% if is_admin_view is defined and is_admin_view and players_count is defined %}
+                    {{ price_history|length }} observation{{ price_history|length > 1 ? 's' : '' }}
+                    {% if current_period is defined and current_period != 'all' %}
+                        sur les {{ current_period }} derniers jours
+                    {% endif %}
+                    {% if is_admin_view is defined and is_admin_view and players_count is defined and players_count > 0 %}
                         <span class="text-yellow-400 ml-2">par {{ players_count }} joueur{{ players_count > 1 ? 's' : '' }}</span>
                     {% endif %}
                 </p>
             </div>
-            <a href="{{ path('app_market_watch_index') }}"
-               class="bg-gray-600 hover:bg-gray-700 text-white px-4 py-2 rounded-lg transition-colors">
-                ← Retour à la liste
-            </a>
+            <div class="flex items-center gap-3">
+                <!-- Sélecteur de période -->
+                <form method="GET" action="{{ path('app_market_watch_history', {itemId: item.id}) }}" class="flex items-center gap-2">
+                    <label class="text-sm text-gray-400">Période :</label>
+                    <select name="period" onchange="this.form.submit()" class="bg-gray-700 border border-gray-600 text-white text-sm rounded-lg px-3 py-2 focus:border-blue-500 focus:outline-none">
+                        <option value="7" {{ current_period == '7' ? 'selected' : '' }}>7 jours</option>
+                        <option value="30" {{ current_period == '30' ? 'selected' : '' }}>30 jours</option>
+                        <option value="90" {{ current_period == '90' ? 'selected' : '' }}>3 mois</option>
+                        <option value="365" {{ current_period == '365' ? 'selected' : '' }}>1 an</option>
+                        <option value="all" {{ current_period == 'all' ? 'selected' : '' }}>Tout</option>
+                    </select>
+                </form>
+
+                <a href="{{ path('app_market_watch_index') }}"
+                   class="bg-gray-600 hover:bg-gray-700 text-white px-4 py-2 rounded-lg transition-colors">
+                    ← Retour
+                </a>
+            </div>
         </div>
+
+        {% if price_history|length == 0 %}
+        <!-- Message si aucune observation pour la période -->
+        <div class="bg-yellow-600/20 border border-yellow-600 rounded-lg p-6 mb-6 text-center">
+            <div class="text-yellow-400 text-4xl mb-3">📭</div>
+            <h3 class="text-white text-lg font-semibold mb-2">Aucune observation pour cette période</h3>
+            <p class="text-gray-400">
+                Il n'y a pas d'observations enregistrées pour "{{ item.name }}"
+                {% if current_period is defined and current_period != 'all' %}
+                    sur les {{ current_period }} derniers jours.
+                {% endif %}
+            </p>
+            <p class="text-gray-400 mt-2">Essayez de sélectionner une période plus longue ou "Tout".</p>
+        </div>
+        {% else %}
 
         <!-- Statistiques rapides - MODIFIÉ : Grille 2x2 pour inclure x1000 -->
         <div class="grid grid-cols-2 md:grid-cols-5 gap-4 mb-6">
@@ -300,5 +332,6 @@
                 </div>
             {% endfor %}
         </div>
+        {% endif %}
     </div>
 {% endblock %}

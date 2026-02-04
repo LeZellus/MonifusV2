@@ -30,15 +30,27 @@
                 </div>
             </div>
 
-            {% if not (is_admin_view is defined and is_admin_view) %}
-            <div class="flex gap-3">
+            <div class="flex items-center gap-3">
+                <!-- Sélecteur de période -->
+                <form method="GET" action="{{ path('app_market_watch_index') }}" class="flex items-center gap-2">
+                    <label class="text-sm text-gray-400">Période :</label>
+                    <select name="period" onchange="this.form.submit()" class="bg-gray-700 border border-gray-600 text-white text-sm rounded-lg px-3 py-2 focus:border-blue-500 focus:outline-none">
+                        <option value="7" {{ current_period == '7' ? 'selected' : '' }}>7 jours</option>
+                        <option value="30" {{ current_period == '30' ? 'selected' : '' }}>30 jours</option>
+                        <option value="90" {{ current_period == '90' ? 'selected' : '' }}>3 mois</option>
+                        <option value="365" {{ current_period == '365' ? 'selected' : '' }}>1 an</option>
+                        <option value="all" {{ current_period == 'all' ? 'selected' : '' }}>Tout</option>
+                    </select>
+                </form>
+
+                {% if not (is_admin_view is defined and is_admin_view) %}
                 <a href="{{ path('app_market_watch_new') }}"
                    class="btn btn-warning flex items-center gap-2 px-4 py-2 rounded-lg font-medium transition-all hover:scale-105">
                     <span>📝</span>
                     <span>Nouvelle observation</span>
                 </a>
+                {% endif %}
             </div>
-            {% endif %}
         </div>
     </div>
 
@@ -93,7 +105,7 @@
     <!-- Desktop Table -->
     <div class="hidden md:block bg-gray-800 rounded-lg overflow-hidden">
         <div data-controller="custom-table"
-             data-custom-table-ajax-url-value="{{ path('app_market_watch_datatable') }}"
+             data-custom-table-ajax-url-value="{{ path('app_market_watch_datatable', {period: current_period}) }}"
              data-custom-table-page-length-value="25">
 
             <!-- Contrôles supérieurs -->
@@ -183,7 +195,7 @@
     <!-- Vue mobile avec les cartes personnalisées -->
     <div class="md:hidden">
         <div data-controller="market-watch-mobile"
-             data-market-watch-mobile-ajax-url-value="{{ path('app_market_watch_datatable') }}"
+             data-market-watch-mobile-ajax-url-value="{{ path('app_market_watch_datatable', {period: current_period}) }}"
              data-market-watch-mobile-page-length-value="10">
 
             <!-- Contrôles mobiles -->

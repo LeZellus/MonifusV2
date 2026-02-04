@@ -20,7 +20,7 @@ class MarketWatchRepository extends ServiceEntityRepository
     /**
      * Récupère toutes les observations pour un personnage
      */
-    public function findByCharacterWithItems(DofusCharacter $character, string $searchQuery = ''): array
+    public function findByCharacterWithItems(DofusCharacter $character, string $searchQuery = '', ?string $period = null): array
     {
         $qb = $this->createQueryBuilder('mw')
             ->leftJoin('mw.item', 'i')
@@ -36,38 +36,60 @@ class MarketWatchRepository extends ServiceEntityRepository
             ->setParameter('search', '%' . $searchQuery . '%');
         }
 
+        // Filtre par période
+        if ($period && $period !== 'all') {
+            $date = new \DateTime();
+            $date->modify("-{$period} days");
+            $qb->andWhere('mw.observedAt >= :date')
+               ->setParameter('date', $date);
+        }
+
         return $qb->getQuery()->getResult();
     }
 
     /**
      * Récupère l'historique des prix pour un item spécifique
      */
-    public function findPriceHistoryForItem(DofusCharacter $character, int $itemId): array
+    public function findPriceHistoryForItem(DofusCharacter $character, int $itemId, ?string $period = null): array
     {
-        return $this->createQueryBuilder('mw')
+        $qb = $this->createQueryBuilder('mw')
             ->where('mw.dofusCharacter = :character')
             ->andWhere('mw.item = :itemId')
             ->setParameter('character', $character)
             ->setParameter('itemId', $itemId)
-            ->orderBy('mw.observedAt', 'DESC')
-            ->getQuery()
-            ->getResult();
+            ->orderBy('mw.observedAt', 'DESC');
+
+        if ($period && $period !== 'all') {
+            $date = new \DateTime();
+            $date->modify("-{$period} days");
+            $qb->andWhere('mw.observedAt >= :date')
+               ->setParameter('date', $date);
+        }
+
+        return $qb->getQuery()->getResult();
     }
 
     /**
      * Récupère l'historique GLOBAL des prix pour un item (tous les joueurs) - mode admin
      */
-    public function findGlobalPriceHistoryForItem(int $itemId): array
+    public function findGlobalPriceHistoryForItem(int $itemId, ?string $period = null): array
     {
-        return $this->createQueryBuilder('mw')
+        $qb = $this->createQueryBuilder('mw')
             ->leftJoin('mw.item', 'i')
             ->leftJoin('mw.dofusCharacter', 'c')
             ->addSelect('i', 'c')
             ->where('mw.item = :itemId')
             ->setParameter('itemId', $itemId)
-            ->orderBy('mw.observedAt', 'DESC')
-            ->getQuery()
-            ->getResult();
+            ->orderBy('mw.observedAt', 'DESC');
+
+        if ($period && $period !== 'all') {
+            $date = new \DateTime();
+            $date->modify("-{$period} days");
+            $qb->andWhere('mw.observedAt >= :date')
+               ->setParameter('date', $date);
+        }
+
+        return $qb->getQuery()->getResult();
     }
 
     /**
@@ -110,12 +132,12 @@ class MarketWatchRepository extends ServiceEntityRepository
     /**
      * Groupe les observations par item et calcule les statistiques
      */
-    public function getItemsDataWithStats(DofusCharacter $character, string $searchQuery = ''): array
+    public function getItemsDataWithStats(DofusCharacter $character, string $searchQuery = '', ?string $period = null): array
     {
-        // 1. Votre méthode actuelle utilise findByCharacterWithItems() 
+        // 1. Votre méthode actuelle utilise findByCharacterWithItems()
         // 2. On va juste ajouter le filtre de recherche dans cette logique
-        
-        $observations = $this->findByCharacterWithItems($character, $searchQuery);
+
+        $observations = $this->findByCharacterWithItems($character, $searchQuery, $period);
         
         // Le reste de votre code existant ne change pas du tout !
         // Grouper par item
@@ -169,7 +191,7 @@ class MarketWatchRepository extends ServiceEntityRepository
     /**
      * Récupère TOUTES les observations de TOUS les joueurs (mode admin)
      */
-    public function findAllWithItems(string $searchQuery = ''): array
+    public function findAllWithItems(string $searchQuery = '', ?string $period = null): array
     {
         $qb = $this->createQueryBuilder('mw')
             ->leftJoin('mw.item', 'i')
@@ -184,6 +206,13 @@ class MarketWatchRepository extends ServiceEntityRepository
                ->setParameter('search', '%' . $searchQuery . '%');
         }
 
+        if ($period && $period !== 'all') {
+            $date = new \DateTime();
+            $date->modify("-{$period} days");
+            $qb->andWhere('mw.observedAt >= :date')
+               ->setParameter('date', $date);
+        }
+
         return $qb->getQuery()->getResult();
     }
 
@@ -191,9 +220,9 @@ class MarketWatchRepository extends ServiceEntityRepository
      * Groupe TOUTES les observations par item (mode admin) - sans duplication
      * Agrège les données de tous les joueurs
      */
-    public function getGlobalItemsDataWithStats(string $searchQuery = ''): array
+    public function getGlobalItemsDataWithStats(string $searchQuery = '', ?string $period = null): array
     {
-        $observations = $this->findAllWithItems($searchQuery);
+        $observations = $this->findAllWithItems($searchQuery, $period);
 
         // Grouper par item (pas par character)
         $itemsGrouped = [];
