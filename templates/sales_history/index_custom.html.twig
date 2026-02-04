@@ -21,7 +21,19 @@
                         </div>
                     </div>
 
-                    <div class="flex gap-3">
+                    <div class="flex items-center gap-3">
+                        <!-- Sélecteur de période -->
+                        <form method="GET" action="{{ path('app_sales_history_index') }}" class="flex items-center gap-2">
+                            <label class="text-sm text-gray-400">Période :</label>
+                            <select name="period" onchange="this.form.submit()" class="bg-gray-700 border border-gray-600 text-white text-sm rounded-lg px-3 py-2 focus:border-blue-500 focus:outline-none">
+                                <option value="7" {{ current_filters.period == '7' ? 'selected' : '' }}>7 jours</option>
+                                <option value="30" {{ current_filters.period == '30' ? 'selected' : '' }}>30 jours</option>
+                                <option value="90" {{ current_filters.period == '90' ? 'selected' : '' }}>3 mois</option>
+                                <option value="365" {{ current_filters.period == '365' ? 'selected' : '' }}>1 an</option>
+                                <option value="all" {{ current_filters.period == 'all' ? 'selected' : '' }}>Tout</option>
+                            </select>
+                        </form>
+
                         <a href="{{ path('app_sales_history_export', current_filters) }}"
                            class="btn btn-success flex items-center gap-2 px-4 py-2 rounded-lg font-medium transition-all hover:scale-105">
                             <span>📊</span>
@@ -67,7 +79,7 @@
                     } %}
                     {% include 'components/stats_card.html.twig' with {
                         title: 'Période Active',
-                        value: current_filters.period ~ ' jours',
+                        value: current_filters.period == 'all' ? 'Tout' : current_filters.period ~ ' jours',
                         icon: '📅',
                         color: 'purple'
                     } %}

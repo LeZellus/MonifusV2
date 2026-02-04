@@ -127,7 +127,9 @@ export default class extends Controller {
             sortDirection: this.currentSort.direction
         })
 
-        const url = `${this.ajaxUrlValue}?${params}`
+        // Vérifier si l'URL contient déjà des paramètres (?)
+        const separator = this.ajaxUrlValue.includes('?') ? '&' : '?'
+        const url = `${this.ajaxUrlValue}${separator}${params}`
         console.log('🔍 Chargement des données depuis:', url)
 
         try {

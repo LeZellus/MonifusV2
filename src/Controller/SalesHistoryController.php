@@ -128,8 +128,10 @@ class SalesHistoryController extends AbstractController
 
         // Récupérer les filtres personnalisés - nettoyer la valeur de period
         $period = $request->query->get('period', '30');
-        // S'assurer que period ne contient que des chiffres
-        $period = preg_replace('/[^0-9]/', '', $period) ?: '30';
+        // Accepter "all" ou un nombre de jours valide
+        if ($period !== 'all') {
+            $period = preg_replace('/[^0-9]/', '', $period) ?: '30';
+        }
         error_log('🕒 Période nettoyée: ' . $period);
 
         // Appeler la nouvelle méthode optimisée
