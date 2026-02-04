@@ -30,6 +30,46 @@ class MarketWatchService
             : [];
     }
 
+    /**
+     * Récupère les données de TOUS les joueurs agrégées par item (mode admin)
+     */
+    public function getGlobalItemsData(?string $searchQuery = null): array
+    {
+        return $this->marketWatchRepository->getGlobalItemsDataWithStats($searchQuery ?? '');
+    }
+
+    /**
+     * Calcule les stats globales pour le mode admin
+     */
+    public function calculateGlobalMarketWatchStats(): array
+    {
+        $itemsData = $this->getGlobalItemsData();
+
+        $totalItems = count($itemsData);
+        $totalObservations = 0;
+        $totalPlayers = [];
+        $prices = [];
+
+        foreach ($itemsData as $itemData) {
+            $totalObservations += $itemData['observation_count'] ?? 0;
+
+            // Collecter les prix moyens pour calculer la moyenne globale
+            if (isset($itemData['avg_price_unit']) && $itemData['avg_price_unit'] > 0) {
+                $prices[] = $itemData['avg_price_unit'];
+            }
+        }
+
+        $averagePrice = !empty($prices) ? array_sum($prices) / count($prices) : 0;
+        $priceRange = !empty($prices) ? max($prices) - min($prices) : 0;
+
+        return [
+            'total_items_watched' => $totalItems,
+            'total_observations' => $totalObservations,
+            'average_price' => $averagePrice,
+            'price_range' => $priceRange
+        ];
+    }
+
     public function createMarketWatch(
         DofusCharacter $character,
         MarketWatch $marketWatch,
@@ -107,6 +147,14 @@ class MarketWatchService
     public function getPriceHistoryForItem(DofusCharacter $character, int $itemId): array
     {
         return $this->marketWatchRepository->findPriceHistoryForItem($character, $itemId);
+    }
+
+    /**
+     * Récupère l'historique GLOBAL des prix pour un item (tous les joueurs) - mode admin
+     */
+    public function getGlobalPriceHistoryForItem(int $itemId): array
+    {
+        return $this->marketWatchRepository->findGlobalPriceHistoryForItem($itemId);
     }
 
     public function calculatePriceAverages(array $priceHistory): array

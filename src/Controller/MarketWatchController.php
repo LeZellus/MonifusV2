@@ -30,12 +30,20 @@ class MarketWatchController extends AbstractController
         ProfileCharacterService $profileCharacterService
     ): Response {
         [$selectedCharacter, $characters] = $this->getCharacterData($profileCharacterService);
-        $itemsData = $marketWatchService->getItemsDataForCharacter($selectedCharacter);
-        $stats = $marketWatchService->calculateMarketWatchStats($selectedCharacter);
+
+        // Mode admin : données de tous les joueurs
+        $isAdmin = $this->isGranted('ROLE_ADMIN');
+
+        if ($isAdmin) {
+            $stats = $marketWatchService->calculateGlobalMarketWatchStats();
+        } else {
+            $stats = $marketWatchService->calculateMarketWatchStats($selectedCharacter);
+        }
 
         return $this->render('market_watch/index_custom.html.twig', [
             'character' => $selectedCharacter,
             'characters' => $characters,
+            'is_admin_view' => $isAdmin,
             ...$stats,
         ]);
     }
@@ -52,12 +60,14 @@ class MarketWatchController extends AbstractController
 
         try {
             $user = $this->getUser();
-            error_log('🔐 Utilisateur connecté: ' . ($user ? $user->getUserIdentifier() : 'aucun'));
+            $isAdmin = $this->isGranted('ROLE_ADMIN');
+            error_log('🔐 Utilisateur connecté: ' . ($user ? $user->getUserIdentifier() : 'aucun') . ' (Admin: ' . ($isAdmin ? 'oui' : 'non') . ')');
 
             $selectedCharacter = $profileCharacterService->getSelectedCharacter($user);
             error_log('👤 Personnage sélectionné: ' . ($selectedCharacter ? $selectedCharacter->getName() . ' (ID: ' . $selectedCharacter->getId() . ')' : 'aucun'));
 
-            if (!$selectedCharacter) {
+            // Mode admin : pas besoin de personnage sélectionné
+            if (!$isAdmin && !$selectedCharacter) {
                 return new JsonResponse([
                     'draw' => (int) $request->query->get('page', 1),
                     'recordsTotal' => 0,
@@ -77,8 +87,13 @@ class MarketWatchController extends AbstractController
 
             error_log('📊 Paramètres: page=' . $page . ', length=' . $length . ', search=' . $search);
 
-            // Récupérer les données agrégées (une entrée par ressource avec moyennes)
-            $allItemsData = $marketWatchService->getItemsDataForCharacter($selectedCharacter, $search);
+            // Mode admin : données de tous les joueurs, sinon données du personnage
+            if ($isAdmin) {
+                $allItemsData = $marketWatchService->getGlobalItemsData($search);
+                error_log('👑 Mode ADMIN: récupération des données globales');
+            } else {
+                $allItemsData = $marketWatchService->getItemsDataForCharacter($selectedCharacter, $search);
+            }
 
             error_log('📋 Nombre total d\'items trouvés: ' . count($allItemsData));
 
@@ -107,18 +122,31 @@ class MarketWatchController extends AbstractController
             error_log('📄 Items paginés: ' . count($pagedItemsData));
 
             // Formater les données avec HTML et liens vers l'historique
-            $formattedData = array_map(function($itemData) use ($kamasFormatter) {
+            $formattedData = array_map(function($itemData) use ($kamasFormatter, $isAdmin) {
                 $historyUrl = $this->generateUrl('app_market_watch_history', ['itemId' => $itemData['item']->getId()]);
 
-                return [
+                // En mode admin, afficher le nombre de joueurs dans le nom de l'item
+                $playersInfo = '';
+                if ($isAdmin && isset($itemData['players_count'])) {
+                    $playersInfo = sprintf('<div class="text-xs text-yellow-400">%d joueur%s</div>',
+                        $itemData['players_count'],
+                        $itemData['players_count'] > 1 ? 's' : ''
+                    );
+                }
+
+                $row = [
                     sprintf('<div class="flex items-center gap-2">
                         <img src="%s" alt="%s" class="w-8 h-8 rounded">
-                        <a href="%s" class="text-white hover:text-blue-400 transition-colors">%s</a>
+                        <div>
+                            <a href="%s" class="text-white hover:text-blue-400 transition-colors">%s</a>
+                            %s
+                        </div>
                     </div>',
                         $itemData['item']->getImgUrl() ?? '/images/items/default.png',
                         htmlspecialchars($itemData['item']->getName()),
                         $historyUrl,
-                        htmlspecialchars($itemData['item']->getName())
+                        htmlspecialchars($itemData['item']->getName()),
+                        $playersInfo
                     ),
                     sprintf('<span class="text-green-400">%s</span><div class="text-gray-500 text-xs">%d obs</div>',
                         $itemData['avg_price_unit'] ? $kamasFormatter->formatWithHtml((int)$itemData['avg_price_unit']) : '-',
@@ -137,7 +165,13 @@ class MarketWatchController extends AbstractController
                         $itemData['price_1000_count'] ?? 0
                     ),
                     $itemData['latest_date']->format('d/m/Y H:i'),
-                    sprintf('<div class="flex gap-2">
+                ];
+
+                // En mode admin, pas de boutons d'action (lecture seule)
+                if ($isAdmin) {
+                    $row[] = sprintf('<a href="%s" class="text-blue-400 hover:text-blue-300 text-xs px-2 py-1 border border-blue-400 rounded">Voir détails</a>', $historyUrl);
+                } else {
+                    $row[] = sprintf('<div class="flex gap-2">
                         <a href="%s" class="text-blue-400 hover:text-blue-300 text-xs px-2 py-1 border border-blue-400 rounded">Historique</a>
                         <a href="%s" class="text-green-400 hover:text-green-300 text-xs px-2 py-1 border border-green-400 rounded">Ajouter</a>
                         <form method="POST" action="%s" style="display:inline;" onsubmit="return confirm(\'Supprimer toutes les observations pour cette ressource ?\')">
@@ -147,8 +181,10 @@ class MarketWatchController extends AbstractController
                         $historyUrl,
                         $this->generateUrl('app_market_watch_new', ['itemId' => $itemData['item']->getId()]),
                         $this->generateUrl('app_market_watch_delete_all_for_item', ['itemId' => $itemData['item']->getId()])
-                    )
-                ];
+                    );
+                }
+
+                return $row;
             }, $pagedItemsData);
 
             // Générer les cartes mobiles HTML (utiliser la carte mobile existante)
@@ -322,13 +358,20 @@ class MarketWatchController extends AbstractController
         ProfileCharacterService $profileCharacterService,
         ChartDataService $chartDataService
     ): Response {
-        $result = $this->getSelectedCharacterOrRedirect($profileCharacterService, 'Aucun personnage sélectionné.');
-        if ($result instanceof Response) {
-            return $result;
-        }
-        $selectedCharacter = $result;
+        $isAdmin = $this->isGranted('ROLE_ADMIN');
+        $selectedCharacter = null;
 
-        $priceHistory = $marketWatchService->getPriceHistoryForItem($selectedCharacter, $itemId);
+        // Mode admin : récupérer l'historique global
+        if ($isAdmin) {
+            $priceHistory = $marketWatchService->getGlobalPriceHistoryForItem($itemId);
+        } else {
+            $result = $this->getSelectedCharacterOrRedirect($profileCharacterService, 'Aucun personnage sélectionné.');
+            if ($result instanceof Response) {
+                return $result;
+            }
+            $selectedCharacter = $result;
+            $priceHistory = $marketWatchService->getPriceHistoryForItem($selectedCharacter, $itemId);
+        }
 
         if (empty($priceHistory)) {
             $this->addFlash('warning', 'Aucun historique de prix pour cet item.');
@@ -339,12 +382,24 @@ class MarketWatchController extends AbstractController
         $averages = $marketWatchService->calculatePriceAverages($priceHistory);
         $chartData = $chartDataService->prepareMarketWatchChartData($priceHistory, 'all');
 
+        // En mode admin, compter le nombre de joueurs uniques
+        $playersCount = 0;
+        if ($isAdmin) {
+            $uniquePlayers = [];
+            foreach ($priceHistory as $obs) {
+                $uniquePlayers[$obs->getDofusCharacter()->getId()] = true;
+            }
+            $playersCount = count($uniquePlayers);
+        }
+
         return $this->render('market_watch/history.html.twig', [
             'item' => $item,
             'price_history' => $priceHistory,
             'character' => $selectedCharacter,
             'averages' => $averages,
             'chart_data' => $chartData,
+            'is_admin_view' => $isAdmin,
+            'players_count' => $playersCount,
         ]);
     }
 

@@ -1,6 +1,6 @@
 {% extends 'base.html.twig' %}
 
-{% block title %}Market Watch - {{ character.name }}{% endblock %}
+{% block title %}Market Watch{% if is_admin_view is defined and is_admin_view %} - Vue Admin{% else %} - {{ character.name }}{% endif %}{% endblock %}
 
 {% block body %}
 {% include 'components/compact_profile_header.html.twig' %}
@@ -10,15 +10,27 @@
     <div class="bg-gray-800/50 border border-gray-600/50 rounded-lg p-6 mb-6">
         <div class="flex flex-col md:flex-row justify-between items-start md:items-center gap-4">
             <div class="flex items-center space-x-3">
-                <div class="w-10 h-10 bg-gradient-to-br from-orange-500 to-orange-600 rounded-lg flex items-center justify-center">
-                    <span class="text-xl">📊</span>
+                <div class="w-10 h-10 bg-gradient-to-br {% if is_admin_view is defined and is_admin_view %}from-yellow-500 to-yellow-600{% else %}from-orange-500 to-orange-600{% endif %} rounded-lg flex items-center justify-center">
+                    <span class="text-xl">{% if is_admin_view is defined and is_admin_view %}👑{% else %}📊{% endif %}</span>
                 </div>
                 <div>
-                    <h2 class="text-white font-medium text-lg">Market Watch</h2>
-                    <p class="text-gray-400 text-sm">Surveillance des prix du marché</p>
+                    <h2 class="text-white font-medium text-lg flex items-center gap-2">
+                        Market Watch
+                        {% if is_admin_view is defined and is_admin_view %}
+                            <span class="bg-yellow-500 text-black text-xs px-2 py-0.5 rounded font-bold">ADMIN</span>
+                        {% endif %}
+                    </h2>
+                    <p class="text-gray-400 text-sm">
+                        {% if is_admin_view is defined and is_admin_view %}
+                            Vue globale - Données de tous les joueurs agrégées
+                        {% else %}
+                            Surveillance des prix du marché
+                        {% endif %}
+                    </p>
                 </div>
             </div>
 
+            {% if not (is_admin_view is defined and is_admin_view) %}
             <div class="flex gap-3">
                 <a href="{{ path('app_market_watch_new') }}"
                    class="btn btn-warning flex items-center gap-2 px-4 py-2 rounded-lg font-medium transition-all hover:scale-105">
@@ -26,6 +38,7 @@
                     <span>Nouvelle observation</span>
                 </a>
             </div>
+            {% endif %}
         </div>
     </div>
 
@@ -37,7 +50,13 @@
             </div>
             <div>
                 <h2 class="text-white font-medium text-lg">Statistiques de surveillance</h2>
-                <p class="text-gray-400 text-sm">Aperçu de vos observations et analyses de marché</p>
+                <p class="text-gray-400 text-sm">
+                    {% if is_admin_view is defined and is_admin_view %}
+                        Statistiques globales de tous les joueurs
+                    {% else %}
+                        Aperçu de vos observations et analyses de marché
+                    {% endif %}
+                </p>
             </div>
         </div>
 

@@ -8,14 +8,20 @@
         <div class="flex justify-between items-center mb-6">
             <div>
                 <h1 class="text-white text-3xl font-bold flex items-center">
-                    <span class="text-orange-400 mr-3">📈</span>
+                    <span class="{% if is_admin_view is defined and is_admin_view %}text-yellow-400{% else %}text-orange-400{% endif %} mr-3">{% if is_admin_view is defined and is_admin_view %}👑{% else %}📈{% endif %}</span>
                     Historique des prix - {{ item.name }}
+                    {% if is_admin_view is defined and is_admin_view %}
+                        <span class="bg-yellow-500 text-black text-sm px-2 py-0.5 rounded font-bold ml-3">ADMIN</span>
+                    {% endif %}
                 </h1>
                 <p class="text-gray-400 mt-2">
                     {{ price_history|length }} observation{{ price_history|length > 1 ? 's' : '' }} enregistrée{{ price_history|length > 1 ? 's' : '' }}
+                    {% if is_admin_view is defined and is_admin_view and players_count is defined %}
+                        <span class="text-yellow-400 ml-2">par {{ players_count }} joueur{{ players_count > 1 ? 's' : '' }}</span>
+                    {% endif %}
                 </p>
             </div>
-            <a href="{{ path('app_market_watch_index') }}" 
+            <a href="{{ path('app_market_watch_index') }}"
                class="bg-gray-600 hover:bg-gray-700 text-white px-4 py-2 rounded-lg transition-colors">
                 ← Retour à la liste
             </a>
@@ -187,10 +193,12 @@
         <!-- Actions -->
         <div class="flex justify-between items-center">
             <h3 class="text-white text-xl font-bold">Évolution des prix</h3>
-            <a href="{{ path('app_market_watch_new') }}" 
+            {% if not (is_admin_view is defined and is_admin_view) %}
+            <a href="{{ path('app_market_watch_new') }}"
                class="bg-orange-600 hover:bg-orange-700 text-white px-4 py-2 rounded-lg transition-colors">
                 + Nouvelle observation
             </a>
+            {% endif %}
         </div>
 
         <!-- Timeline des prix -->
@@ -220,27 +228,34 @@
                                         <span class="text-gray-400 text-sm ml-2">(Première)</span>
                                     {% endif %}
                                 </div>
+                                {% if is_admin_view is defined and is_admin_view %}
+                                    <div class="text-yellow-400 text-sm mt-1">
+                                        👤 {{ observation.dofusCharacter.name }}
+                                    </div>
+                                {% endif %}
                                 {% if observation.notes %}
                                     <div class="text-gray-400 text-sm mt-1">{{ observation.notes }}</div>
                                 {% endif %}
                             </div>
                         </div>
-                        
-                        <!-- Actions -->
+
+                        <!-- Actions (masquées en mode admin) -->
+                        {% if not (is_admin_view is defined and is_admin_view) %}
                         <div class="flex space-x-2">
-                            <a href="{{ path('app_market_watch_edit', {id: observation.id}) }}" 
+                            <a href="{{ path('app_market_watch_edit', {id: observation.id}) }}"
                                class="text-blue-400 hover:text-blue-300 text-sm transition-colors">
                                 ✏️ Modifier
                             </a>
-                            <form method="post" action="{{ path('app_market_watch_delete', {id: observation.id}) }}" 
-                                  class="inline" 
+                            <form method="post" action="{{ path('app_market_watch_delete', {id: observation.id}) }}"
+                                  class="inline"
                                   onsubmit="return confirm('Supprimer cette observation ?')">
-                                <button type="submit" 
+                                <button type="submit"
                                         class="text-red-400 hover:text-red-300 text-sm transition-colors">
                                     🗑️ Supprimer
                                 </button>
                             </form>
                         </div>
+                        {% endif %}
                     </div>
 
                     <!-- Prix observés - MODIFIÉ : Grille 2x2 pour inclure x1000 -->

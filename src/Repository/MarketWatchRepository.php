@@ -55,6 +55,22 @@ class MarketWatchRepository extends ServiceEntityRepository
     }
 
     /**
+     * Récupère l'historique GLOBAL des prix pour un item (tous les joueurs) - mode admin
+     */
+    public function findGlobalPriceHistoryForItem(int $itemId): array
+    {
+        return $this->createQueryBuilder('mw')
+            ->leftJoin('mw.item', 'i')
+            ->leftJoin('mw.dofusCharacter', 'c')
+            ->addSelect('i', 'c')
+            ->where('mw.item = :itemId')
+            ->setParameter('itemId', $itemId)
+            ->orderBy('mw.observedAt', 'DESC')
+            ->getQuery()
+            ->getResult();
+    }
+
+    /**
      * Calcule les moyennes de prix à partir d'observations
      */
     public function calculatePriceAverages(array $observations): array
@@ -136,6 +152,87 @@ class MarketWatchRepository extends ServiceEntityRepository
             $itemsData[] = [
                 'item' => $data['item'],
                 'observation_count' => count($data['observations']),
+                'latest_date' => $data['latest_date'],
+                'tracking_period_days' => $trackingPeriod,
+                ...$averages
+            ];
+        }
+
+        // Trier par date de dernière observation (plus récent en premier)
+        usort($itemsData, function($a, $b) {
+            return $b['latest_date'] <=> $a['latest_date'];
+        });
+
+        return $itemsData;
+    }
+
+    /**
+     * Récupère TOUTES les observations de TOUS les joueurs (mode admin)
+     */
+    public function findAllWithItems(string $searchQuery = ''): array
+    {
+        $qb = $this->createQueryBuilder('mw')
+            ->leftJoin('mw.item', 'i')
+            ->leftJoin('mw.dofusCharacter', 'c')
+            ->leftJoin('c.tradingProfile', 'tp')
+            ->leftJoin('tp.user', 'u')
+            ->addSelect('i', 'c')
+            ->orderBy('mw.observedAt', 'DESC');
+
+        if (!empty($searchQuery)) {
+            $qb->andWhere('LOWER(i.name) LIKE LOWER(:search)')
+               ->setParameter('search', '%' . $searchQuery . '%');
+        }
+
+        return $qb->getQuery()->getResult();
+    }
+
+    /**
+     * Groupe TOUTES les observations par item (mode admin) - sans duplication
+     * Agrège les données de tous les joueurs
+     */
+    public function getGlobalItemsDataWithStats(string $searchQuery = ''): array
+    {
+        $observations = $this->findAllWithItems($searchQuery);
+
+        // Grouper par item (pas par character)
+        $itemsGrouped = [];
+        foreach ($observations as $observation) {
+            $itemId = $observation->getItem()->getId();
+            $characterId = $observation->getDofusCharacter()->getId();
+
+            if (!isset($itemsGrouped[$itemId])) {
+                $itemsGrouped[$itemId] = [
+                    'item' => $observation->getItem(),
+                    'observations' => [],
+                    'characters' => [], // Pour compter les joueurs uniques
+                    'latest_date' => $observation->getObservedAt(),
+                    'oldest_date' => $observation->getObservedAt()
+                ];
+            }
+
+            $itemsGrouped[$itemId]['observations'][] = $observation;
+            $itemsGrouped[$itemId]['characters'][$characterId] = true; // Set pour unicité
+
+            // Mettre à jour les dates
+            if ($observation->getObservedAt() > $itemsGrouped[$itemId]['latest_date']) {
+                $itemsGrouped[$itemId]['latest_date'] = $observation->getObservedAt();
+            }
+            if ($observation->getObservedAt() < $itemsGrouped[$itemId]['oldest_date']) {
+                $itemsGrouped[$itemId]['oldest_date'] = $observation->getObservedAt();
+            }
+        }
+
+        // Calculer les statistiques pour chaque item
+        $itemsData = [];
+        foreach ($itemsGrouped as $itemId => $data) {
+            $averages = $this->calculatePriceAverages($data['observations']);
+            $trackingPeriod = $data['latest_date']->diff($data['oldest_date'])->days;
+
+            $itemsData[] = [
+                'item' => $data['item'],
+                'observation_count' => count($data['observations']),
+                'players_count' => count($data['characters']), // Nombre de joueurs uniques
                 'latest_date' => $data['latest_date'],
                 'tracking_period_days' => $trackingPeriod,
                 ...$averages
