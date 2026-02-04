@@ -3,8 +3,8 @@
         {% include 'components/item_display.html.twig' with {item: item.item} %}
     </td>
     <td class="table-cell">
-        <div class="text-white font-medium">{{ item.lotSize }} lots</div>
-        <div class="text-gray-400 text-sm">Vente par {{ item.saleUnit.value }}</div>
+        <div class="text-white font-medium">{{ item.totalItems|number_format(0, ',', ' ') }} items</div>
+        <div class="text-gray-400 text-sm">{{ item.lotSize }}×{{ item.buyUnit.value }} → {{ item.sellLotCount }}×{{ item.saleUnit.value }}</div>
     </td>
     <td class="table-cell">
         {{ price(item.buyPricePerLot, 'white') }}

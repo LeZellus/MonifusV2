@@ -32,10 +32,12 @@ class MarketAnalysisService
 
     public function getTopItems(User $user, int $limit = 5): array
     {
+        // Profit = (actualSellPrice - costPerSaleLot) * quantitySold
+        // costPerSaleLot = (buyPricePerLot / buyUnit) * saleUnit
         return $this->lotGroupRepository->createQueryBuilder('lg')
             ->select('
                 i.name,
-                SUM(lu.actualSellPrice * lu.quantitySold - lg.buyPricePerLot * lu.quantitySold) as totalProfit,
+                SUM((lu.actualSellPrice - (lg.buyPricePerLot / lg.buyUnit * lg.saleUnit)) * lu.quantitySold) as totalProfit,
                 COUNT(lu.id) as transactions,
                 AVG(lu.actualSellPrice) as avgSellPrice
             ')

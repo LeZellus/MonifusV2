@@ -37,8 +37,10 @@ class LotGroupRepository extends ServiceEntityRepository
             ->getArrayResult();
 
         // Profit potentiel (lots disponibles uniquement)
+        // Formule: (sellLotCount * sellPricePerLot) - (lotSize * buyPricePerLot)
+        // Où sellLotCount = FLOOR((lotSize * buyUnit) / saleUnit)
         $potentialProfitResult = $this->createQueryBuilder('lg')
-            ->select('SUM((lg.sellPricePerLot - lg.buyPricePerLot) * lg.lotSize) as potentialProfit')
+            ->select('SUM((FLOOR((lg.lotSize * lg.buyUnit) / lg.saleUnit) * lg.sellPricePerLot) - (lg.lotSize * lg.buyPricePerLot)) as potentialProfit')
             ->leftJoin('lg.dofusCharacter', 'c')
             ->leftJoin('c.tradingProfile', 'tp')
             ->where('tp.user = :user')
@@ -49,9 +51,11 @@ class LotGroupRepository extends ServiceEntityRepository
             ->getSingleScalarResult();
 
         // Profit réalisé (via LotUnit)
+        // Formule: (actualSellPrice - costPerSaleLot) * quantitySold
+        // costPerSaleLot = (buyPricePerLot / buyUnit) * saleUnit
         $realizedProfitResult = $this->getEntityManager()
             ->createQueryBuilder()
-            ->select('SUM((lu.actualSellPrice - lg.buyPricePerLot) * lu.quantitySold) as realizedProfit')
+            ->select('SUM((lu.actualSellPrice - (lg.buyPricePerLot / lg.buyUnit * lg.saleUnit)) * lu.quantitySold) as realizedProfit')
             ->from('App\Entity\LotUnit', 'lu')
             ->join('lu.lotGroup', 'lg')
             ->leftJoin('lg.dofusCharacter', 'c')
@@ -62,9 +66,10 @@ class LotGroupRepository extends ServiceEntityRepository
             ->getSingleScalarResult();
 
         // NOUVEAU : Investi total historique (lots vendus)
+        // costPerSaleLot = (buyPricePerLot / buyUnit) * saleUnit
         $soldInvestmentResult = $this->getEntityManager()
             ->createQueryBuilder()
-            ->select('SUM(lg.buyPricePerLot * lu.quantitySold) as soldInvestment')
+            ->select('SUM((lg.buyPricePerLot / lg.buyUnit * lg.saleUnit) * lu.quantitySold) as soldInvestment')
             ->from('App\Entity\LotUnit', 'lu')
             ->join('lu.lotGroup', 'lg')
             ->leftJoin('lg.dofusCharacter', 'c')
@@ -191,8 +196,7 @@ class LotGroupRepository extends ServiceEntityRepository
             ->select([
                 'i.name as itemName',
                 'COUNT(lg.id) as lotsCount',
-                'SUM((lg.sellPricePerLot - lg.buyPricePerLot) * lg.lotSize) as totalProfit',
-                'AVG((lg.sellPricePerLot - lg.buyPricePerLot) / lg.buyPricePerLot * 100) as roi',
+                'SUM((FLOOR((lg.lotSize * lg.buyUnit) / lg.saleUnit) * lg.sellPricePerLot) - (lg.lotSize * lg.buyPricePerLot)) as totalProfit',
                 'SUM(lg.buyPricePerLot * lg.lotSize) as totalInvested'
             ])
             ->join('lg.item', 'i')
@@ -252,12 +256,12 @@ class LotGroupRepository extends ServiceEntityRepository
         }
 
         // Tri SQL
-        $columns = ['i.name', 'lg.lotSize', 'lg.buyPricePerLot', 'lg.sellPricePerLot', 'lg.sellPricePerLot - lg.buyPricePerLot', 'lg.status'];
+        $columns = ['i.name', 'lg.lotSize', 'lg.buyPricePerLot', 'lg.sellPricePerLot', 'profit', 'lg.status'];
         if (isset($columns[$sortColumn])) {
             $orderBy = $columns[$sortColumn];
-            // Pour le tri par profit, nous devons utiliser une expression
+            // Pour le tri par profit, nous devons utiliser une expression avec la formule correcte
             if ($sortColumn === 4) {
-                $qb->addSelect('(lg.sellPricePerLot - lg.buyPricePerLot) as HIDDEN profit');
+                $qb->addSelect('((FLOOR((lg.lotSize * lg.buyUnit) / lg.saleUnit) * lg.sellPricePerLot) - (lg.lotSize * lg.buyPricePerLot)) as HIDDEN profit');
                 $orderBy = 'profit';
             }
             $qb->orderBy($orderBy, $sortDirection);
@@ -333,8 +337,9 @@ class LotGroupRepository extends ServiceEntityRepository
         $baseStats['soldLots'] = $soldLotsFromStatus;
 
         // Profit potentiel (lots disponibles uniquement)
+        // Formule: (sellLotCount * sellPricePerLot) - (lotSize * buyPricePerLot)
         $potentialProfitResult = $this->createQueryBuilder('lg')
-            ->select('SUM((lg.sellPricePerLot - lg.buyPricePerLot) * lg.lotSize) as potentialProfit')
+            ->select('SUM((FLOOR((lg.lotSize * lg.buyUnit) / lg.saleUnit) * lg.sellPricePerLot) - (lg.lotSize * lg.buyPricePerLot)) as potentialProfit')
             ->where('lg.dofusCharacter = :character')
             ->andWhere('lg.status = :available')
             ->setParameter('character', $character)
@@ -343,8 +348,9 @@ class LotGroupRepository extends ServiceEntityRepository
             ->getSingleScalarResult();
 
         // Profit réalisé (sur les lots vendus via LotUnit)
+        // Formule: (actualSellPrice - costPerSaleLot) * quantitySold
         $realizedProfitResult = $this->createQueryBuilder('lg')
-            ->select('SUM((lu.actualSellPrice - lg.buyPricePerLot) * lu.quantitySold) as realizedProfit')
+            ->select('SUM((lu.actualSellPrice - (lg.buyPricePerLot / lg.buyUnit * lg.saleUnit)) * lu.quantitySold) as realizedProfit')
             ->leftJoin('lg.lotUnits', 'lu')
             ->where('lg.dofusCharacter = :character')
             ->andWhere('lg.status = :sold')

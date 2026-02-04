@@ -2,16 +2,17 @@ import { Controller } from '@hotwired/stimulus';
 
 /**
  * Contrôleur centralisé pour tous les calculs de profit
- * Remplace profit_calculator_controller.js et sale_calculator_controller.js
+ * Gère les calculs avec buyUnit (achat) et saleUnit (revente) séparés
  */
 export default class extends Controller {
     static targets = [
-        "lotSize", "buyPrice", "sellPrice", "quantityInput", "priceInput",
-        "investment", "profitPerLot", "totalProfit", "roi",
+        "lotSize", "buyPrice", "sellPrice", "buyUnit", "saleUnit",
+        "quantityInput", "priceInput",
+        "investment", "totalProfit", "totalQuantity", "sellLotCount", "totalRevenue", "roi",
         "profitPreview", "quantityDisplay", "remainingStock"
     ]
-    
-    static values = { 
+
+    static values = {
         buyPrice: Number,
         totalStock: Number,
         mode: String // 'lot' | 'sale'
@@ -26,7 +27,7 @@ export default class extends Controller {
      */
     updateCalculations() {
         const mode = this.modeValue || 'lot';
-        
+
         if (mode === 'sale') {
             this.updateSaleCalculations();
         } else {
@@ -39,9 +40,9 @@ export default class extends Controller {
      */
     updateLotCalculations() {
         const data = this.extractLotData();
-        const metrics = this.calculateMetrics(data);
-        
-        this.updateDisplay(metrics);
+        const metrics = this.calculateLotMetrics(data);
+
+        this.updateLotDisplay(metrics);
     }
 
     /**
@@ -50,7 +51,7 @@ export default class extends Controller {
     updateSaleCalculations() {
         const data = this.extractSaleData();
         const metrics = this.calculateSaleMetrics(data);
-        
+
         this.updateSaleDisplay(metrics);
     }
 
@@ -58,52 +59,85 @@ export default class extends Controller {
 
     extractLotData() {
         return {
-            quantity: this.getInputValue('lotSize', 'input[name*="lotSize"]'),
-            buyPrice: this.getInputValue('buyPrice', 'input[name*="buyPricePerLot"]'),
-            sellPrice: this.getInputValue('sellPrice', 'input[name*="sellPricePerLot"]')
+            lotSize: this.getFieldValue('lotSize'),
+            buyPrice: this.getFieldValue('buyPrice'),
+            sellPrice: this.getFieldValue('sellPrice'),
+            buyUnit: this.getFieldValue('buyUnit', 1),
+            saleUnit: this.getFieldValue('saleUnit', 1)
         };
     }
 
     extractSaleData() {
         return {
-            quantity: this.getInputValue('quantityInput'),
-            sellPrice: this.getInputValue('priceInput'),
+            quantity: this.getFieldValue('quantityInput'),
+            sellPrice: this.getFieldValue('priceInput'),
             buyPrice: this.buyPriceValue || 0,
             totalStock: this.totalStockValue || 0
         };
     }
 
-    getInputValue(targetName, fallbackSelector = null) {
-        // Essaie d'abord le target Stimulus
-        if (this.hasTarget(targetName)) {
-            return parseInt(this.getTarget(targetName).value) || 0;
+    getFieldValue(targetName, defaultValue = 0) {
+        // Utilise directement les targets Stimulus
+        const targetProperty = `${targetName}Target`;
+        const hasTargetProperty = `has${targetName.charAt(0).toUpperCase() + targetName.slice(1)}Target`;
+
+        if (this[hasTargetProperty] && this[targetProperty]) {
+            return parseInt(this[targetProperty].value) || defaultValue;
         }
-        
-        // Sinon, essaie le sélecteur de fallback
-        if (fallbackSelector) {
-            const element = document.querySelector(fallbackSelector);
-            return element ? parseInt(element.value) || 0 : 0;
-        }
-        
-        return 0;
+
+        return defaultValue;
     }
 
     // ===== CALCULS CENTRALISÉS =====
 
-    calculateMetrics({ quantity, buyPrice, sellPrice }) {
-        const investment = quantity * buyPrice;
-        const profitPerLot = sellPrice - buyPrice;
-        const totalProfit = quantity * profitPerLot;
-        const roi = buyPrice > 0 ? (profitPerLot / buyPrice) * 100 : 0;
+    /**
+     * Calcule les métriques pour un lot avec buyUnit et saleUnit séparés
+     *
+     * Exemple:
+     * - buyUnit = 1000 (j'achète par 1000)
+     * - lotSize = 3 (j'achète 3 lots)
+     * - buyPrice = 9000 (9000k par lot de 1000)
+     * - saleUnit = 100 (je revends par 100)
+     * - sellPrice = 1600 (1600k par lot de 100)
+     *
+     * Résultat:
+     * - totalItems = 3 × 1000 = 3000 items
+     * - investment = 3 × 9000 = 27 000k
+     * - sellLotCount = 3000 / 100 = 30 lots à revendre
+     * - totalRevenue = 30 × 1600 = 48 000k
+     * - totalProfit = 48 000 - 27 000 = 21 000k
+     */
+    calculateLotMetrics({ lotSize, buyPrice, sellPrice, buyUnit, saleUnit }) {
+        // Quantité totale d'items = nombre de lots achetés × taille lot achat
+        const totalItems = lotSize * buyUnit;
+
+        // Investissement total = nombre de lots achetés × prix par lot
+        const investment = lotSize * buyPrice;
+
+        // Nombre de lots à revendre = total items / taille lot revente
+        const sellLotCount = saleUnit > 0 ? Math.floor(totalItems / saleUnit) : 0;
+
+        // Revenu total = nombre de lots revente × prix par lot revente
+        const totalRevenue = sellLotCount * sellPrice;
+
+        // Profit total = revenu - investissement
+        const totalProfit = totalRevenue - investment;
+
+        // ROI = profit / investissement × 100
+        const roi = investment > 0 ? (totalProfit / investment) * 100 : 0;
 
         return {
+            totalItems,
             investment,
-            profitPerLot,
+            sellLotCount,
+            totalRevenue,
             totalProfit,
             roi,
-            formattedInvestment: this.formatKamas(investment),
-            formattedProfitPerLot: this.formatKamas(profitPerLot),
-            formattedTotalProfit: this.formatKamas(totalProfit),
+            formattedTotalItems: totalItems.toLocaleString('fr-FR'),
+            formattedInvestment: this.formatKamas(investment, true),
+            formattedSellLotCount: sellLotCount.toLocaleString('fr-FR'),
+            formattedTotalRevenue: this.formatKamas(totalRevenue, true),
+            formattedTotalProfit: this.formatKamas(totalProfit, true),
             profitClass: this.getProfitClass(totalProfit)
         };
     }
@@ -112,7 +146,7 @@ export default class extends Controller {
         const investment = quantity * buyPrice;
         const totalProfit = quantity * (sellPrice - buyPrice);
         const remainingStock = Math.max(0, totalStock - quantity);
-        
+
         return {
             investment,
             totalProfit,
@@ -125,26 +159,38 @@ export default class extends Controller {
 
     // ===== MISE À JOUR DE L'AFFICHAGE =====
 
-    updateDisplay(metrics) {
-        this.updateTarget('investment', metrics.formattedInvestment);
-        this.updateTarget('profitPerLot', metrics.formattedProfitPerLot);
-        this.updateTarget('totalProfit', metrics.formattedTotalProfit, metrics.profitClass);
-        
-        // ROI si disponible
-        if (this.hasTarget('roi')) {
-            this.updateTarget('roi', `${metrics.roi.toFixed(1)}%`);
+    updateLotDisplay(metrics) {
+        // Mise à jour directe des targets
+        if (this.hasTotalQuantityTarget) {
+            this.totalQuantityTarget.textContent = metrics.formattedTotalItems;
+        }
+        if (this.hasInvestmentTarget) {
+            this.investmentTarget.textContent = metrics.formattedInvestment;
+        }
+        if (this.hasSellLotCountTarget) {
+            this.sellLotCountTarget.textContent = metrics.formattedSellLotCount;
+        }
+        if (this.hasTotalRevenueTarget) {
+            this.totalRevenueTarget.textContent = metrics.formattedTotalRevenue;
+        }
+        if (this.hasTotalProfitTarget) {
+            this.totalProfitTarget.textContent = metrics.formattedTotalProfit;
+            this.totalProfitTarget.className = `text-3xl font-bold ${metrics.profitClass}`;
+        }
+        if (this.hasRoiTarget) {
+            this.roiTarget.textContent = `${metrics.roi.toFixed(1)}%`;
         }
     }
 
     updateSaleDisplay(metrics) {
         if (metrics.quantity > 0 && metrics.totalProfit !== 0) {
             this.showPreview();
-            
+
             this.updateTarget('quantityDisplay', `${metrics.quantity} lots`);
             this.updateTarget('totalProfit', metrics.formattedTotalProfit, metrics.profitClass);
-            
-            if (this.hasTarget('remainingStock')) {
-                const message = metrics.remainingStock > 0 
+
+            if (this.hasRemainingStockTarget) {
+                const message = metrics.remainingStock > 0
                     ? `Il restera ${metrics.remainingStock} lots en stock`
                     : 'Lot entièrement vendu';
                 this.updateTarget('remainingStock', message);
@@ -155,10 +201,13 @@ export default class extends Controller {
     }
 
     updateTarget(targetName, value, className = null) {
-        if (this.hasTarget(targetName)) {
-            const element = this.getTarget(targetName);
-            element.textContent = value || '-';
-            
+        const targetProperty = `${targetName}Target`;
+        const hasTargetProperty = `has${targetName.charAt(0).toUpperCase() + targetName.slice(1)}Target`;
+
+        if (this[hasTargetProperty] && this[targetProperty]) {
+            const element = this[targetProperty];
+            element.textContent = value || '0';
+
             if (className) {
                 element.className = `font-bold ${className}`;
             }
@@ -167,19 +216,18 @@ export default class extends Controller {
 
     // ===== UTILITAIRES =====
 
-    formatKamas(amount) {
-        if (amount === 0 || amount === null || amount === undefined) return '-';
+    formatKamas(amount, showZero = false) {
+        if (amount === null || amount === undefined) return '-';
+        if (amount === 0) return showZero ? '0' : '-';
 
         const abs = Math.abs(amount);
         const sign = amount < 0 ? '-' : '';
 
-        // Format Dofus: 700 000 000k = 700kk (millions de milliers)
         if (abs >= 1000000000) {
             const kk = Math.floor(abs / 1000000);
             return `${sign}${kk}kk`;
         }
 
-        // Format Dofus: 1 500 000k = 1m5k (millions + milliers)
         if (abs >= 1000000) {
             const millions = Math.floor(abs / 1000000);
             const remainder = abs % 1000000;
@@ -192,7 +240,6 @@ export default class extends Controller {
             }
         }
 
-        // Format standard: pas de "k" pour les milliers simples
         if (abs >= 1000) {
             return `${sign}${abs.toLocaleString('fr-FR')}`;
         }
@@ -205,39 +252,23 @@ export default class extends Controller {
     }
 
     showPreview() {
-        if (this.hasTarget('profitPreview')) {
+        if (this.hasProfitPreviewTarget) {
             this.profitPreviewTarget.style.display = 'block';
         }
     }
 
     hidePreview() {
-        if (this.hasTarget('profitPreview')) {
+        if (this.hasProfitPreviewTarget) {
             this.profitPreviewTarget.style.display = 'none';
         }
     }
 
-    // ===== HELPERS POUR LA COMPATIBILITÉ =====
-
-    getTarget(name) {
-        return this[`${name}Target`];
-    }
-
-    hasTarget(name) {
-        return this[`has${name.charAt(0).toUpperCase() + name.slice(1)}Target`];
-    }
-
     // ===== MÉTHODES PUBLIQUES POUR API =====
 
-    /**
-     * Méthode pour calculer via JavaScript externe
-     */
-    calculate(quantity, buyPrice, sellPrice) {
-        return this.calculateMetrics({ quantity, buyPrice, sellPrice });
+    calculate(lotSize, buyPrice, sellPrice, buyUnit = 1, saleUnit = 1) {
+        return this.calculateLotMetrics({ lotSize, buyPrice, sellPrice, buyUnit, saleUnit });
     }
 
-    /**
-     * Met à jour manuellement les calculs (pour usage externe)
-     */
     refresh() {
         this.updateCalculations();
     }

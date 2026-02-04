@@ -16,8 +16,8 @@
                     </div>
                     <div>
                         <div class="text-gray-400 text-sm">Stock disponible</div>
-                        <div class="text-orange-400 font-bold text-lg">{{ lot_group.lotSize }} lots</div>
-                        <div class="text-gray-400 text-sm">Vente par {{ lot_group.saleUnit.value }}</div>
+                        <div class="text-orange-400 font-bold text-lg">{{ lot_group.totalItems|number_format(0, ',', ' ') }} items</div>
+                        <div class="text-gray-400 text-sm">{{ lot_group.sellLotCount }} lots de {{ lot_group.saleUnit.value }} à vendre</div>
                     </div>
                     <div>
                         <div class="text-gray-400 text-sm">Personnage</div>
@@ -37,10 +37,11 @@
             </div>
 
             <!-- Formulaire de vente -->
-            <div class="wrapper-background" 
+            {% set costPerSaleLot = (lot_group.costPerItem * lot_group.saleUnit.value)|round %}
+            <div class="wrapper-background"
                  data-controller="centralized-calculator" data-centralized-calculator-mode-value="sale"
-                 data-centralized-calculator-buy-price-value="{{ lot_group.buyPricePerLot }}"
-                 data-centralized-calculator-total-stock-value="{{ lot_group.lotSize }}">
+                 data-centralized-calculator-buy-price-value="{{ costPerSaleLot }}"
+                 data-centralized-calculator-total-stock-value="{{ lot_group.sellLotCount }}">
                 <h2 class="text-white text-xl font-semibold mb-4">💸 Enregistrer la vente</h2>
                 {{ form_start(form) }}
                 
@@ -55,7 +56,7 @@
                     }) }}
                     {{ form_errors(form.quantitySold) }}
                     <div class="form-help">
-                        Stock disponible : {{ lot_group.lotSize }} lots
+                        Stock disponible : {{ lot_group.sellLotCount }} lots de {{ lot_group.saleUnit.value }}
                     </div>
                 </div>
 

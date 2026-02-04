@@ -26,6 +26,9 @@ doctrine:
                 alias: App
         controller_resolver:
             auto_mapping: false
+        dql:
+            numeric_functions:
+                FLOOR: App\Doctrine\FloorFunction
 
 when@test:
     doctrine:

@@ -1,191 +1,181 @@
 <!-- templates/lot/_form.html.twig -->
-<div class="max-w-2xl mx-auto grid gap-4">
+<div class="max-w-3xl mx-auto" data-controller="centralized-calculator" data-centralized-calculator-mode-value="lot">
 
-    {% if is_edit %}
-        <!-- Informations actuelles du lot -->
-        <div class="wrapper-background">
-            {% include 'components/section_header.html.twig' with {
-                type: 'simple',
-                title: 'Informations actuelles',
-                icon: '📊',
-                color: 'blue',
-                wrapper_class: ''
+    {{ form_start(form) }}
+
+    <!-- En-tête avec Item -->
+    <div class="wrapper-background mb-6">
+        <div class="flex items-center gap-3 mb-4">
+            <span class="text-2xl">📦</span>
+            <h2 class="text-xl font-semibold text-white">{{ is_edit ? 'Modifier le lot' : 'Nouveau lot' }}</h2>
+        </div>
+
+        {% if is_edit %}
+            {% include 'components/autocomplete_field.html.twig' with {
+                form: form,
+                search_field: 'itemSearch',
+                hidden_field: 'item',
+                is_readonly: true,
+                current_item: lot.item,
+                label: 'Item',
+                readonly_help: 'Non modifiable'
             } %}
-            
-            <div class="stats-grid">
-                <div class="price-card">
-                    <div class="price-label">Quantité</div>
-                    <div class="stats-value text-white">{{ lot.lotSize }}</div>
-                    <div class="price-label">lots</div>
-                </div>
-                <div class="price-card">
-                    <div class="price-label">Prix achat</div>
-                    <div class="stats-value">{{ price(lot.buyPricePerLot, 'orange') }}</div>
-                    <div class="price-label">par lot</div>
-                </div>
-                <div class="price-card">
-                    <div class="price-label">Prix vente</div>
-                    <div class="stats-value">{{ price(lot.sellPricePerLot, 'orange') }}</div>
-                    <div class="price-label">par lot</div>
-                </div>
-                {{ financial_card('Profit total', lot, 'success') }}
-            </div>
-        </div>
-    {% endif %}
-
-    <!-- Formulaire principal -->
-    <div class="wrapper-background" data-controller="centralized-calculator" data-centralized-calculator-mode-value="lot">
-        {% include 'components/section_header.html.twig' with {
-            type: 'form',
-            title: is_edit ? 'Modifier les informations' : 'Informations du lot',
-            icon: is_edit ? '🔄' : '📝',
-            color: 'blue',
-            wrapper_class: ''
-        } %}
-
-        {{ form_start(form) }}
-        
-        <div class="form-grid">
-            <!-- Item avec autocomplétion ou lecture seule -->
-            {% if is_edit %}
-                {% include 'components/autocomplete_field.html.twig' with {
-                    form: form,
-                    search_field: 'itemSearch',
-                    hidden_field: 'item',
-                    is_readonly: true,
-                    current_item: lot.item,
-                    label: 'Item sélectionné',
-                    readonly_help: '💡 L\'item ne peut pas être modifié après création'
-                } %}
-            {% else %}
-                {% include 'components/autocomplete_field.html.twig' with {
-                    form: form,
-                    search_field: 'itemSearch', 
-                    hidden_field: 'item',
-                    api_url: path('api_items_search'),
-                    label: 'Rechercher un item',
-                    placeholder: 'Tapez pour rechercher un item...',
-                    help_text: '🔍 Tapez pour rechercher et sélectionner un item'
-                } %}
-            {% endif %}
-
-            <!-- Configuration du lot -->
-            <div>
-                {{ form_label(form.lotSize, null, {'label_attr': {'class': 'form-label'}}) }}
-                <div class="relative">
-                    {{ form_widget(form.lotSize, {'attr': {
-                        'class': 'form-input-lg', 
-                        'placeholder': 'ex: 100',
-                        'data-centralized-calculator-target': 'lotSize',
-                        'data-action': 'input->centralized-calculator#updateCalculations'
-                    }}) }}
-                    <div class="absolute inset-y-0 right-0 pr-3 flex items-center">
-                        <span class="text-gray-400 text-sm">lots</span>
-                    </div>
-                </div>
-                {{ form_errors(form.lotSize) }}
-                <div class="form-help">📊 Quantité totale à trader</div>
-            </div>
-
-            <div>
-                {{ form_label(form.saleUnit, null, {'label_attr': {'class': 'form-label'}}) }}
-                {{ form_widget(form.saleUnit, {'attr': {'class': 'form-input-lg'}}) }}
-                {{ form_errors(form.saleUnit) }}
-                <div class="form-help">🎯 Comment vous vendez sur Dofus</div>
-            </div>
-
-            <!-- Prix -->
-            <div>
-                {{ form_label(form.buyPricePerLot, null, {'label_attr': {'class': 'form-label'}}) }}
-                <div class="relative">
-                    {{ form_widget(form.buyPricePerLot, {'attr': {
-                        'class': 'form-input-lg form-input-danger', 
-                        'placeholder': '1000',
-                        'data-centralized-calculator-target': 'buyPrice',
-                        'data-action': 'input->centralized-calculator#updateCalculations'
-                    }}) }}
-                    <div class="absolute inset-y-0 right-0 pr-3 flex items-center">
-                        <span class="text-gray-400 text-sm">kamas</span>
-                    </div>
-                </div>
-                {{ form_errors(form.buyPricePerLot) }}
-                <div class="form-help">💸 Prix payé pour acheter</div>
-            </div>
-
-            <div>
-                {{ form_label(form.sellPricePerLot, null, {'label_attr': {'class': 'form-label'}}) }}
-                <div class="relative">
-                    {{ form_widget(form.sellPricePerLot, {'attr': {
-                        'class': 'form-input-lg form-input-success', 
-                        'placeholder': '1200',
-                        'data-centralized-calculator-target': 'sellPrice',
-                        'data-action': 'input->centralized-calculator#updateCalculations'
-                    }}) }}
-                    <div class="absolute inset-y-0 right-0 pr-3 flex items-center">
-                        <span class="text-gray-400 text-sm">kamas</span>
-                    </div>
-                    
-                </div>
-                {{ form_errors(form.sellPricePerLot) }}
-                <div class="form-help">💡 Laisser vide si inconnu</div>
-            </div>
-
-            <!-- Statut -->
-            <div class="md:col-span-2">
-                {% include 'components/toggle_field.html.twig' with {
-                    form_field: form.status,
-                    label: 'Statut du lot',
-                    on_label: 'Vendu',
-                    off_label: 'Disponible', 
-                    on_value: 'sold',
-                    off_value: 'available',
-                    help_text: is_edit ? 'Changez le statut si nécessaire' : 'Statut initial du lot'
-                } %}
-            </div>
-
-            <div class="text-white text-xs">
-                Valeur actuelle du statut : {{ form.status.vars.value }}
-            </div>
-        </div>
-
-        <!-- Aperçu du profit -->
-        {% set profit_content %}
-            <div class="stats-grid-3 text-center">
-                <div>
-                    <div class="text-white font-medium">Investissement</div>
-                    <div data-centralized-calculator-target="investment" class="text-red-400 font-bold">-</div>
-                </div>
-                <div>
-                    <div class="text-white font-medium">Profit par lot</div>
-                    <div data-centralized-calculator-target="profitPerLot" class="text-green-400 font-bold">-</div>
-                </div>
-                <div>
-                    <div class="text-white font-medium">Profit total</div>
-                    <div data-centralized-calculator-target="totalProfit" class="text-green-400 font-bold">-</div>
-                </div>
-            </div>
-        {% endset %}
-
-        <div class="mt-6">
-            {% include 'components/info_box.html.twig' with {
-                title: is_edit ? 'Nouveau calcul de profit' : 'Aperçu du profit',
-                icon: '💡',
-                color: 'blue',
-                content: profit_content
+        {% else %}
+            {% include 'components/autocomplete_field.html.twig' with {
+                form: form,
+                search_field: 'itemSearch',
+                hidden_field: 'item',
+                api_url: path('api_items_search'),
+                label: 'Item',
+                placeholder: 'Rechercher un item...',
+                help_text: ''
             } %}
-        </div>
-
-        <!-- Actions -->
-        <div class="mt-8">
-            {% include 'components/action_buttons.html.twig' with {
-                submit_text: is_edit ? 'Sauvegarder les modifications' : 'Créer le lot',
-                submit_icon: is_edit ? '💾' : '✅',
-                submit_color: is_edit ? 'primary' : 'success',
-                cancel_url: path('app_lot_index'),
-                cancel_icon: '❌'
-            } %}
-        </div>
-
-        {{ form_end(form) }}
+        {% endif %}
     </div>
+
+    <!-- Configuration Achat / Vente côte à côte -->
+    <div class="grid grid-cols-1 lg:grid-cols-2 gap-4 mb-6">
+
+        <!-- ACHAT -->
+        <div class="wrapper-background">
+            <div class="flex items-center gap-2 mb-4 pb-3 border-b border-gray-700">
+                <span class="w-8 h-8 rounded-full bg-red-500/20 flex items-center justify-center text-red-400">↓</span>
+                <h3 class="text-white font-medium">Achat</h3>
+            </div>
+
+            <div class="space-y-4">
+                <div class="grid grid-cols-2 gap-3">
+                    <div>
+                        <label class="form-label text-gray-400 text-xs">Lot HDV</label>
+                        {{ form_widget(form.buyUnit, {'attr': {
+                            'class': 'form-input-lg h-12 text-sm',
+                            'data-centralized-calculator-target': 'buyUnit',
+                            'data-action': 'change->centralized-calculator#updateCalculations'
+                        }}) }}
+                    </div>
+                    <div>
+                        <label class="form-label text-gray-400 text-xs">Quantité</label>
+                        {{ form_widget(form.lotSize, {'attr': {
+                            'class': 'form-input-lg h-12 text-sm',
+                            'placeholder': '3',
+                            'data-centralized-calculator-target': 'lotSize',
+                            'data-action': 'input->centralized-calculator#updateCalculations'
+                        }}) }}
+                    </div>
+                </div>
+
+                <div>
+                    <label class="form-label text-gray-400 text-xs">Prix par lot</label>
+                    <div class="relative">
+                        {{ form_widget(form.buyPricePerLot, {'attr': {
+                            'class': 'form-input-lg h-12 pr-16',
+                            'placeholder': '9000',
+                            'data-centralized-calculator-target': 'buyPrice',
+                            'data-action': 'input->centralized-calculator#updateCalculations'
+                        }}) }}
+                        <span class="absolute right-3 top-1/2 -translate-y-1/2 text-gray-500 text-sm">kamas</span>
+                    </div>
+                </div>
+
+                <!-- Résumé achat -->
+                <div class="bg-gray-800/50 rounded-lg p-3 mt-2">
+                    <div class="flex justify-between items-center">
+                        <span class="text-gray-400 text-sm">Total items</span>
+                        <span data-centralized-calculator-target="totalQuantity" class="text-white font-medium">0</span>
+                    </div>
+                    <div class="flex justify-between items-center mt-1">
+                        <span class="text-gray-400 text-sm">Investissement</span>
+                        <span data-centralized-calculator-target="investment" class="text-red-400 font-bold">0</span>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- VENTE -->
+        <div class="wrapper-background">
+            <div class="flex items-center gap-2 mb-4 pb-3 border-b border-gray-700">
+                <span class="w-8 h-8 rounded-full bg-green-500/20 flex items-center justify-center text-green-400">↑</span>
+                <h3 class="text-white font-medium">Revente</h3>
+            </div>
+
+            <div class="space-y-4">
+                <div>
+                    <label class="form-label text-gray-400 text-xs">Lot HDV</label>
+                    {{ form_widget(form.saleUnit, {'attr': {
+                        'class': 'form-input-lg h-12 text-sm',
+                        'data-centralized-calculator-target': 'saleUnit',
+                        'data-action': 'change->centralized-calculator#updateCalculations'
+                    }}) }}
+                </div>
+
+                <div>
+                    <label class="form-label text-gray-400 text-xs">Prix par lot</label>
+                    <div class="relative">
+                        {{ form_widget(form.sellPricePerLot, {'attr': {
+                            'class': 'form-input-lg h-12 pr-16',
+                            'placeholder': '1600',
+                            'data-centralized-calculator-target': 'sellPrice',
+                            'data-action': 'input->centralized-calculator#updateCalculations'
+                        }}) }}
+                        <span class="absolute right-3 top-1/2 -translate-y-1/2 text-gray-500 text-sm">kamas</span>
+                    </div>
+                </div>
+
+                <!-- Résumé vente -->
+                <div class="bg-gray-800/50 rounded-lg p-3 mt-2">
+                    <div class="flex justify-between items-center">
+                        <span class="text-gray-400 text-sm">Lots à vendre</span>
+                        <span data-centralized-calculator-target="sellLotCount" class="text-white font-medium">0</span>
+                    </div>
+                    <div class="flex justify-between items-center mt-1">
+                        <span class="text-gray-400 text-sm">Revenu total</span>
+                        <span data-centralized-calculator-target="totalRevenue" class="text-green-400 font-bold">0</span>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Résumé & Profit -->
+    <div class="wrapper-background mb-6">
+        <div style="display: flex; align-items: center; justify-content: space-between; flex-wrap: wrap; gap: 1rem;">
+            <!-- Statut -->
+            <div style="margin-bottom: 0;">
+                <label class="form-label">Statut</label>
+                <div class="mt-2">
+                    <div class="relative inline-flex items-center"
+                         data-controller="toggle"
+                         data-toggle-on-value-value="sold"
+                         data-toggle-off-value-value="available">
+                        {{ form_widget(form.status, {'attr': {'class': 'sr-only', 'data-toggle-target': 'input'}}) }}
+                        <button type="button" class="toggle-switch" data-action="click->toggle#switch">
+                            <span class="toggle-slider"></span>
+                        </button>
+                        <div class="ml-4 flex items-center space-x-4">
+                            <span class="toggle-label toggle-label-off">Disponible</span>
+                            <span class="toggle-label toggle-label-on">Vendu</span>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Profit -->
+            <div style="text-align: right;">
+                <div class="text-gray-400 text-sm mb-1">Profit total estimé</div>
+                <div data-centralized-calculator-target="totalProfit" class="text-3xl font-bold text-green-400">0</div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Actions -->
+    <div class="flex gap-3">
+        <a href="{{ path('app_lot_index') }}" class="btn btn-secondary flex-1 justify-center">
+            Annuler
+        </a>
+        <button type="submit" class="btn btn-success flex-1 justify-center">
+            {{ is_edit ? 'Enregistrer' : 'Créer le lot' }}
+        </button>
+    </div>
+
+    {{ form_end(form) }}
 </div>

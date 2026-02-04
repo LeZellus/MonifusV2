@@ -34,26 +34,67 @@ class PriceCalculationService
     ];
     /**
      * Calcule les métriques de profit pour un lot
+     * Utilise buyUnit et saleUnit pour des calculs précis
      */
     public function calculateLotMetrics(LotGroup $lotGroup): array
     {
-        $buyPrice = $lotGroup->getBuyPricePerLot();
-        $sellPrice = $lotGroup->getSellPricePerLot();
-        $quantity = $lotGroup->getLotSize();
+        $lotSize = $lotGroup->getLotSize();
+        $buyPrice = $lotGroup->getBuyPricePerLot() ?? 0;
+        $sellPrice = $lotGroup->getSellPricePerLot() ?? 0;
+        $buyUnit = $lotGroup->getBuyUnit()?->value ?? 1;
+        $saleUnit = $lotGroup->getSaleUnit()?->value ?? 1;
 
-        return $this->calculateMetrics($buyPrice, $sellPrice, $quantity);
+        // Quantité totale d'items = nombre de lots achetés × taille lot achat
+        $totalItems = $lotSize * $buyUnit;
+
+        // Investissement total = nombre de lots achetés × prix par lot
+        $totalInvestment = $lotSize * $buyPrice;
+
+        // Nombre de lots à revendre = total items / taille lot revente
+        $sellLotCount = $saleUnit > 0 ? (int) floor($totalItems / $saleUnit) : 0;
+
+        // Revenu total = nombre de lots revente × prix par lot revente
+        $totalRevenue = $sellLotCount * $sellPrice;
+
+        // Profit total = revenu - investissement
+        $totalProfit = $totalRevenue - $totalInvestment;
+
+        // ROI = profit / investissement × 100
+        $roi = $totalInvestment > 0 ? ($totalProfit / $totalInvestment) * 100 : 0;
+
+        return [
+            'buyPrice' => $buyPrice,
+            'sellPrice' => $sellPrice,
+            'quantity' => $lotSize,
+            'buyUnit' => $buyUnit,
+            'saleUnit' => $saleUnit,
+            'totalItems' => $totalItems,
+            'sellLotCount' => $sellLotCount,
+            'totalInvestment' => $totalInvestment,
+            'totalRevenue' => $totalRevenue,
+            'totalProfit' => $totalProfit,
+            'profitPerUnit' => $totalProfit, // Pour compatibilité
+            'roi' => $roi,
+            'profitClass' => $this->getProfitClass($totalProfit),
+            'isPositive' => $totalProfit > 0,
+            'isNegative' => $totalProfit < 0,
+            'isNeutral' => $totalProfit === 0,
+        ];
     }
 
     /**
      * Calcule les métriques de profit pour une vente réalisée
+     * Le coût par lot de vente = (buyPricePerLot / buyUnit) * saleUnit
      */
     public function calculateSaleMetrics(LotUnit $lotUnit): array
     {
-        $buyPrice = $lotUnit->getLotGroup()->getBuyPricePerLot();
+        $lotGroup = $lotUnit->getLotGroup();
+        // Coût par lot de vente (saleUnit) = costPerItem * saleUnit
+        $costPerSaleLot = (int) round($lotGroup->getCostPerItem() * ($lotGroup->getSaleUnit()?->value ?? 1));
         $sellPrice = $lotUnit->getActualSellPrice();
         $quantity = $lotUnit->getQuantitySold();
 
-        $metrics = $this->calculateMetrics($buyPrice, $sellPrice, $quantity);
+        $metrics = $this->calculateMetrics($costPerSaleLot, $sellPrice, $quantity);
         $metrics['isRealized'] = true;
         $metrics['saleDate'] = $lotUnit->getSoldAt();
 

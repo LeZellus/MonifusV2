@@ -1,7 +1,10 @@
 {% set lotGroup = item.lotGroup %}
 {% set quantitySold = item.quantitySold %}
-{% set expectedProfitPerLot = lotGroup.sellPricePerLot - lotGroup.buyPricePerLot %}
+{% set costPerSaleLot = (lotGroup.costPerItem * lotGroup.saleUnit.value)|round %}
+{% set expectedProfitPerLot = lotGroup.sellPricePerLot - costPerSaleLot %}
 {% set expectedProfitTotal = expectedProfitPerLot * quantitySold %}
+{% set actualProfitPerLot = item.actualSellPrice - costPerSaleLot %}
+{% set actualProfitTotal = actualProfitPerLot * quantitySold %}
 {% set performancePerLot = item.actualSellPrice - lotGroup.sellPricePerLot %}
 {% set performanceTotal = performancePerLot * quantitySold %}
 

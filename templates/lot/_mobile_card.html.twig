@@ -1,6 +1,7 @@
 {# templates/lot/_mobile_card.html.twig #}
-{% set profit = item.sellPricePerLot - item.buyPricePerLot %}
-{% set profitPercent = item.buyPricePerLot > 0 ? (profit / item.buyPricePerLot * 100) : 0 %}
+{% set totalProfit = item.totalProfit %}
+{% set investment = item.totalInvestment %}
+{% set profitPercent = investment > 0 ? (totalProfit / investment * 100) : 0 %}
 
 <div class="wrapper-background">
     <div class="flex justify-between items-start mb-3">
@@ -15,16 +16,16 @@
 
     <div class="grid grid-cols-2 gap-4 mb-3">
         <div>
-            <p class="text-gray-400 text-xs">Configuration</p>
-            <p class="text-white text-sm">{{ item.lotSize }} lots</p>
-            <p class="text-gray-400 text-xs">par {{ item.saleUnit.value }}</p>
+            <p class="text-gray-400 text-xs">Quantité</p>
+            <p class="text-white text-sm">{{ item.totalItems|number_format(0, ',', ' ') }} items</p>
+            <p class="text-gray-400 text-xs">{{ item.lotSize }}×{{ item.buyUnit.value }} → {{ item.sellLotCount }}×{{ item.saleUnit.value }}</p>
         </div>
         <div>
             <p class="text-gray-400 text-xs">Profit</p>
-            <p class="profit-{{ profit >= 0 ? 'positive' : 'negative' }} text-sm font-medium">
-                {{ (profit / 1000)|number_format(0, ',', ' ') }}k
+            <p class="profit-{{ totalProfit >= 0 ? 'positive' : 'negative' }} text-sm font-medium">
+                {{ totalProfit|format_kamas }}
             </p>
-            <p class="profit-{{ profit >= 0 ? 'positive' : 'negative' }} text-xs">
+            <p class="profit-{{ totalProfit >= 0 ? 'positive' : 'negative' }} text-xs">
                 ({{ profitPercent|number_format(1) }}%)
             </p>
         </div>

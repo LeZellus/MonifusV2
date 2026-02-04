@@ -89,8 +89,9 @@ class LotController extends AbstractController
 
             // Formater les données avec HTML
             $formattedData = array_map(function($lot) use ($csrfTokenManager, $kamasFormatter) {
-                $profit = ($lot->getSellPricePerLot() ?? 0) - ($lot->getBuyPricePerLot() ?? 0);
-                $profitPerUnit = $lot->getLotSize() > 0 ? $profit / $lot->getLotSize() : 0;
+                $totalItems = $lot->getTotalItems();
+                $totalProfit = $lot->getTotalProfit();
+                $sellLotCount = $lot->getSellLotCount();
 
                 return [
                     sprintf('<div class="flex items-center gap-2">
@@ -102,11 +103,14 @@ class LotController extends AbstractController
                         htmlspecialchars($lot->getItem()->getName())
                     ),
                     sprintf('<div class="text-center">
-                        <div class="text-white font-medium">%dx</div>
-                        <div class="text-gray-400 text-xs">%s</div>
+                        <div class="text-white font-medium">%s items</div>
+                        <div class="text-gray-400 text-xs">%d×%d → %d×%d</div>
                     </div>',
+                        number_format($totalItems, 0, ',', ' '),
                         $lot->getLotSize(),
-                        $lot->getItem()->getItemType() ? $lot->getItem()->getItemType()->value : 'N/A'
+                        $lot->getBuyUnit()->value,
+                        $sellLotCount,
+                        $lot->getSaleUnit()->value
                     ),
                     sprintf('<span class="text-red-400">%s</span>',
                         $kamasFormatter->formatWithHtml($lot->getBuyPricePerLot())
@@ -116,11 +120,11 @@ class LotController extends AbstractController
                     ),
                     sprintf('<div class="text-center">
                         <div class="%s font-medium">%s</div>
-                        <div class="text-gray-400 text-xs">Par unité: %s</div>
+                        <div class="text-gray-400 text-xs">%d lots à vendre</div>
                     </div>',
-                        $profit >= 0 ? 'text-green-400' : 'text-red-400',
-                        $kamasFormatter->formatWithHtml($profit),
-                        $kamasFormatter->formatWithHtml((int)$profitPerUnit)
+                        $totalProfit >= 0 ? 'text-green-400' : 'text-red-400',
+                        $kamasFormatter->formatWithHtml($totalProfit),
+                        $sellLotCount
                     ),
                     sprintf('<span class="px-2 py-1 rounded-full text-xs %s">%s</span>',
                         $lot->getStatus()->value === 'available' ? 'bg-green-800 text-green-200' : 'bg-gray-800 text-gray-200',

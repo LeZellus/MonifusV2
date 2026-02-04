@@ -48,21 +48,27 @@ class ProfitCalculatorService
     
     /**
      * Calcule tous les métriques d'un LotGroup
+     * Utilise les méthodes de l'entité qui tiennent compte de buyUnit et saleUnit
      */
     public function calculateLotGroupMetrics(LotGroup $lotGroup): array
     {
-        $buyPrice = $lotGroup->getBuyPricePerLot();
-        $sellPrice = $lotGroup->getSellPricePerLot() ?? 0;
-        $quantity = $lotGroup->getLotSize();
-        
+        $investment = $lotGroup->getTotalInvestment();
+        $totalProfit = $lotGroup->getTotalProfit();
+        $totalRevenue = $lotGroup->getTotalRevenue();
+        $roi = $investment > 0 ? ($totalProfit / $investment) * 100 : 0;
+
         return [
-            'investment' => $this->calculateInvestment($quantity, $buyPrice),
-            'profitPerLot' => $this->calculateProfitPerLot($sellPrice, $buyPrice),
-            'totalProfit' => $this->calculateTotalProfit($quantity, $sellPrice, $buyPrice),
-            'roi' => $this->calculateROI($buyPrice, $sellPrice),
-            'quantity' => $quantity,
-            'buyPrice' => $buyPrice,
-            'sellPrice' => $sellPrice
+            'investment' => $investment,
+            'totalProfit' => $totalProfit,
+            'totalRevenue' => $totalRevenue,
+            'roi' => $roi,
+            'totalItems' => $lotGroup->getTotalItems(),
+            'sellLotCount' => $lotGroup->getSellLotCount(),
+            'lotSize' => $lotGroup->getLotSize(),
+            'buyPrice' => $lotGroup->getBuyPricePerLot(),
+            'sellPrice' => $lotGroup->getSellPricePerLot() ?? 0,
+            'buyUnit' => $lotGroup->getBuyUnit()?->value ?? 1,
+            'saleUnit' => $lotGroup->getSaleUnit()?->value ?? 1
         ];
     }
     

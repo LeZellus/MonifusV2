@@ -47,23 +47,31 @@ class LotGroupType extends AbstractType
         }
         
         $builder
-            ->add('saleUnit', EnumType::class, [
+            // Configuration d'achat
+            ->add('buyUnit', EnumType::class, [
                 'class' => SaleUnit::class,
                 'choice_label' => fn(SaleUnit $choice) => $choice->getLabel(),
-                'label' => 'Unité de vente Dofus',
+                'label' => 'Taille lot HDV (achat)',
                 'attr' => ['class' => 'form-input']
             ])
             ->add('lotSize', IntegerType::class, [
-                'label' => 'Taille du lot',
+                'label' => 'Nombre de lots achetés',
                 'attr' => ['class' => 'form-input']
             ])
             ->add('buyPricePerLot', IntegerType::class, [
-                'label' => 'Prix d\'achat par lot (kamas)',
+                'label' => 'Prix d\'achat par lot',
+                'attr' => ['class' => 'form-input']
+            ])
+            // Configuration de vente
+            ->add('saleUnit', EnumType::class, [
+                'class' => SaleUnit::class,
+                'choice_label' => fn(SaleUnit $choice) => $choice->getLabel(),
+                'label' => 'Taille lot HDV (revente)',
                 'attr' => ['class' => 'form-input']
             ])
             ->add('sellPricePerLot', IntegerType::class, [
                 'required' => false,
-                'label' => 'Prix de vente par lot (optionnel)',
+                'label' => 'Prix de vente par lot',
                 'attr' => ['class' => 'form-input', 'placeholder' => 'À définir lors de la vente']
             ]);
 

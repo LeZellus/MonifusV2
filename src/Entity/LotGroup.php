@@ -39,6 +39,9 @@ class LotGroup
     private ?Item $item = null;
 
     #[ORM\Column(enumType: SaleUnit::class)]
+    private ?SaleUnit $buyUnit = null;
+
+    #[ORM\Column(enumType: SaleUnit::class)]
     private ?SaleUnit $saleUnit = null;
 
     #[ORM\Column]
@@ -148,6 +151,17 @@ class LotGroup
         return $this;
     }
 
+    public function getBuyUnit(): ?SaleUnit
+    {
+        return $this->buyUnit;
+    }
+
+    public function setBuyUnit(SaleUnit $buyUnit): static
+    {
+        $this->buyUnit = $buyUnit;
+        return $this;
+    }
+
     public function getSaleUnit(): ?SaleUnit
     {
         return $this->saleUnit;
@@ -157,6 +171,72 @@ class LotGroup
     {
         $this->saleUnit = $saleUnit;
         return $this;
+    }
+
+    /**
+     * Calcule la quantité totale d'items
+     * = nombre de lots achetés × taille du lot d'achat
+     */
+    public function getTotalItems(): int
+    {
+        return $this->lotSize * ($this->buyUnit?->value ?? 1);
+    }
+
+    /**
+     * Calcule le nombre de lots de revente
+     * = quantité totale d'items / taille du lot de revente
+     */
+    public function getSellLotCount(): int
+    {
+        $saleUnitValue = $this->saleUnit?->value ?? 1;
+        return $saleUnitValue > 0 ? (int) ($this->getTotalItems() / $saleUnitValue) : 0;
+    }
+
+    /**
+     * Calcule l'investissement total
+     * = nombre de lots achetés × prix d'achat par lot
+     */
+    public function getTotalInvestment(): int
+    {
+        return $this->lotSize * ($this->buyPricePerLot ?? 0);
+    }
+
+    /**
+     * Calcule le revenu total potentiel
+     * = nombre de lots de revente × prix de vente par lot
+     */
+    public function getTotalRevenue(): int
+    {
+        return $this->getSellLotCount() * ($this->sellPricePerLot ?? 0);
+    }
+
+    /**
+     * Calcule le profit total potentiel
+     * = revenu total - investissement total
+     */
+    public function getTotalProfit(): int
+    {
+        return $this->getTotalRevenue() - $this->getTotalInvestment();
+    }
+
+    /**
+     * Calcule le coût par item
+     * = prix d'achat par lot / taille du lot d'achat
+     */
+    public function getCostPerItem(): float
+    {
+        $buyUnitValue = $this->buyUnit?->value ?? 1;
+        return $buyUnitValue > 0 ? ($this->buyPricePerLot ?? 0) / $buyUnitValue : 0;
+    }
+
+    /**
+     * Calcule le prix de vente par item
+     * = prix de vente par lot / taille du lot de vente
+     */
+    public function getSellPricePerItem(): float
+    {
+        $saleUnitValue = $this->saleUnit?->value ?? 1;
+        return $saleUnitValue > 0 ? ($this->sellPricePerLot ?? 0) / $saleUnitValue : 0;
     }
 
     /**

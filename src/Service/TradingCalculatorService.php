@@ -131,13 +131,13 @@ class TradingCalculatorService
 
             foreach ($character->getLotGroups() as $lot) {
                 $totalLots++;
-                $lotInvestment = $lot->getBuyPricePerLot() * $lot->getLotSize();
+                $lotInvestment = $lot->getTotalInvestment();
                 $totalInvestment += $lotInvestment;
-                
+
                 if ($lot->getStatus() === LotStatus::AVAILABLE) {
                     $activeLots++;
                     $currentInvestment += $lotInvestment;
-                    $totalProfit += ($lot->getSellPricePerLot() - $lot->getBuyPricePerLot()) * $lot->getLotSize();
+                    $totalProfit += $lot->getTotalProfit();
                 }
             }
 
@@ -167,11 +167,13 @@ class TradingCalculatorService
     private function getWeeklyPerformance(User $user): array
     {
         $weekAgo = new \DateTime('-7 days');
-        
+
+        // Profit = (actualSellPrice - costPerSaleLot) * quantitySold
+        // costPerSaleLot = (buyPricePerLot / buyUnit) * saleUnit
         $result = $this->lotUnitRepository->createQueryBuilder('lu')
             ->select([
                 'COUNT(lu.id) as sales',
-                'SUM((lu.actualSellPrice - lg.buyPricePerLot) * lu.quantitySold) as profit'
+                'SUM((lu.actualSellPrice - (lg.buyPricePerLot / lg.buyUnit * lg.saleUnit)) * lu.quantitySold) as profit'
             ])
             ->join('lu.lotGroup', 'lg')
             ->join('lg.dofusCharacter', 'c')
@@ -189,11 +191,12 @@ class TradingCalculatorService
     private function getMonthlyPerformance(User $user): array
     {
         $monthAgo = new \DateTime('-30 days');
-        
+
+        // Profit = (actualSellPrice - costPerSaleLot) * quantitySold
         $result = $this->lotUnitRepository->createQueryBuilder('lu')
             ->select([
                 'COUNT(lu.id) as sales',
-                'SUM((lu.actualSellPrice - lg.buyPricePerLot) * lu.quantitySold) as profit'
+                'SUM((lu.actualSellPrice - (lg.buyPricePerLot / lg.buyUnit * lg.saleUnit)) * lu.quantitySold) as profit'
             ])
             ->join('lu.lotGroup', 'lg')
             ->join('lg.dofusCharacter', 'c')
@@ -257,7 +260,7 @@ class TradingCalculatorService
         $oneWeekAgo = new \DateTime('-7 days');
         
         $lastWeekProfit = $this->lotUnitRepository->createQueryBuilder('lu')
-            ->select('SUM((lu.actualSellPrice - lg.buyPricePerLot) * lu.quantitySold) as profit')
+            ->select('SUM((lu.actualSellPrice - (lg.buyPricePerLot / lg.buyUnit * lg.saleUnit)) * lu.quantitySold) as profit')
             ->join('lu.lotGroup', 'lg')
             ->join('lg.dofusCharacter', 'c')
             ->join('c.tradingProfile', 'tp')
