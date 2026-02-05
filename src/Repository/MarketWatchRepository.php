@@ -191,11 +191,12 @@ class MarketWatchRepository extends ServiceEntityRepository
     /**
      * Récupère TOUTES les observations de TOUS les joueurs (mode admin)
      */
-    public function findAllWithItems(string $searchQuery = '', ?string $period = null): array
+    public function findAllWithItems(string $searchQuery = '', ?string $period = null, ?int $serverId = null): array
     {
         $qb = $this->createQueryBuilder('mw')
             ->leftJoin('mw.item', 'i')
             ->leftJoin('mw.dofusCharacter', 'c')
+            ->leftJoin('c.server', 's')
             ->leftJoin('c.tradingProfile', 'tp')
             ->leftJoin('tp.user', 'u')
             ->addSelect('i', 'c')
@@ -213,6 +214,11 @@ class MarketWatchRepository extends ServiceEntityRepository
                ->setParameter('date', $date);
         }
 
+        if ($serverId) {
+            $qb->andWhere('s.id = :serverId')
+               ->setParameter('serverId', $serverId);
+        }
+
         return $qb->getQuery()->getResult();
     }
 
@@ -220,9 +226,9 @@ class MarketWatchRepository extends ServiceEntityRepository
      * Groupe TOUTES les observations par item (mode admin) - sans duplication
      * Agrège les données de tous les joueurs
      */
-    public function getGlobalItemsDataWithStats(string $searchQuery = '', ?string $period = null): array
+    public function getGlobalItemsDataWithStats(string $searchQuery = '', ?string $period = null, ?int $serverId = null): array
     {
-        $observations = $this->findAllWithItems($searchQuery, $period);
+        $observations = $this->findAllWithItems($searchQuery, $period, $serverId);
 
         // Grouper par item (pas par character)
         $itemsGrouped = [];
@@ -274,5 +280,19 @@ class MarketWatchRepository extends ServiceEntityRepository
         });
 
         return $itemsData;
+    }
+
+    /**
+     * Récupère la liste des serveurs ayant des observations (mode admin)
+     */
+    public function getServersWithObservations(): array
+    {
+        return $this->createQueryBuilder('mw')
+            ->select('DISTINCT s.id, s.name')
+            ->leftJoin('mw.dofusCharacter', 'c')
+            ->leftJoin('c.server', 's')
+            ->orderBy('s.name', 'ASC')
+            ->getQuery()
+            ->getResult();
     }
 }

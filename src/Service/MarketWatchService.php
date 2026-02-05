@@ -33,17 +33,25 @@ class MarketWatchService
     /**
      * Récupère les données de TOUS les joueurs agrégées par item (mode admin)
      */
-    public function getGlobalItemsData(?string $searchQuery = null, ?string $period = null): array
+    public function getGlobalItemsData(?string $searchQuery = null, ?string $period = null, ?int $serverId = null): array
     {
-        return $this->marketWatchRepository->getGlobalItemsDataWithStats($searchQuery ?? '', $period);
+        return $this->marketWatchRepository->getGlobalItemsDataWithStats($searchQuery ?? '', $period, $serverId);
+    }
+
+    /**
+     * Récupère la liste des serveurs ayant des observations (mode admin)
+     */
+    public function getServersWithObservations(): array
+    {
+        return $this->marketWatchRepository->getServersWithObservations();
     }
 
     /**
      * Calcule les stats globales pour le mode admin
      */
-    public function calculateGlobalMarketWatchStats(?string $period = null): array
+    public function calculateGlobalMarketWatchStats(?string $period = null, ?int $serverId = null): array
     {
-        $itemsData = $this->getGlobalItemsData(null, $period);
+        $itemsData = $this->getGlobalItemsData(null, $period, $serverId);
 
         $totalItems = count($itemsData);
         $totalObservations = 0;

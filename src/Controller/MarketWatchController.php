@@ -38,11 +38,17 @@ class MarketWatchController extends AbstractController
             $period = preg_replace('/[^0-9]/', '', $period) ?: '30';
         }
 
+        // Récupérer le filtre de serveur (mode admin uniquement)
+        $serverId = $request->query->get('server');
+        $serverId = $serverId ? (int) $serverId : null;
+
         // Mode admin : données de tous les joueurs
         $isAdmin = $this->isGranted('ROLE_ADMIN');
 
+        $servers = [];
         if ($isAdmin) {
-            $stats = $marketWatchService->calculateGlobalMarketWatchStats($period);
+            $stats = $marketWatchService->calculateGlobalMarketWatchStats($period, $serverId);
+            $servers = $marketWatchService->getServersWithObservations();
         } else {
             $stats = $marketWatchService->calculateMarketWatchStats($selectedCharacter, $period);
         }
@@ -52,6 +58,8 @@ class MarketWatchController extends AbstractController
             'characters' => $characters,
             'is_admin_view' => $isAdmin,
             'current_period' => $period,
+            'current_server' => $serverId,
+            'servers' => $servers,
             ...$stats,
         ]);
     }
@@ -99,11 +107,15 @@ class MarketWatchController extends AbstractController
                 $period = preg_replace('/[^0-9]/', '', $period) ?: '30';
             }
 
-            error_log('📊 Paramètres: page=' . $page . ', length=' . $length . ', search=' . $search . ', period=' . $period);
+            // Récupérer le filtre de serveur (mode admin uniquement)
+            $serverId = $request->query->get('server');
+            $serverId = $serverId ? (int) $serverId : null;
+
+            error_log('📊 Paramètres: page=' . $page . ', length=' . $length . ', search=' . $search . ', period=' . $period . ', server=' . ($serverId ?? 'all'));
 
             // Mode admin : données de tous les joueurs, sinon données du personnage
             if ($isAdmin) {
-                $allItemsData = $marketWatchService->getGlobalItemsData($search, $period);
+                $allItemsData = $marketWatchService->getGlobalItemsData($search, $period, $serverId);
                 error_log('👑 Mode ADMIN: récupération des données globales');
             } else {
                 $allItemsData = $marketWatchService->getItemsDataForCharacter($selectedCharacter, $search, $period);

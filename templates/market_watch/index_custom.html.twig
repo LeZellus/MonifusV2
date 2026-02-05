@@ -30,9 +30,12 @@
                 </div>
             </div>
 
-            <div class="flex items-center gap-3">
+            <div class="flex items-center gap-3 flex-wrap">
                 <!-- Sélecteur de période -->
                 <form method="GET" action="{{ path('app_market_watch_index') }}" class="flex items-center gap-2">
+                    {% if is_admin_view is defined and is_admin_view and current_server is defined and current_server %}
+                        <input type="hidden" name="server" value="{{ current_server }}">
+                    {% endif %}
                     <label class="text-sm text-gray-400">Période :</label>
                     <select name="period" onchange="this.form.submit()" class="bg-gray-700 border border-gray-600 text-white text-sm rounded-lg px-3 py-2 focus:border-blue-500 focus:outline-none">
                         <option value="7" {{ current_period == '7' ? 'selected' : '' }}>7 jours</option>
@@ -42,6 +45,20 @@
                         <option value="all" {{ current_period == 'all' ? 'selected' : '' }}>Tout</option>
                     </select>
                 </form>
+
+                {% if is_admin_view is defined and is_admin_view and servers is defined and servers|length > 0 %}
+                <!-- Sélecteur de serveur (mode admin) -->
+                <form method="GET" action="{{ path('app_market_watch_index') }}" class="flex items-center gap-2">
+                    <input type="hidden" name="period" value="{{ current_period }}">
+                    <label class="text-sm text-gray-400">Serveur :</label>
+                    <select name="server" onchange="this.form.submit()" class="bg-gray-700 border border-gray-600 text-white text-sm rounded-lg px-3 py-2 focus:border-blue-500 focus:outline-none">
+                        <option value="">Tous les serveurs</option>
+                        {% for server in servers %}
+                            <option value="{{ server.id }}" {{ current_server == server.id ? 'selected' : '' }}>{{ server.name }}</option>
+                        {% endfor %}
+                    </select>
+                </form>
+                {% endif %}
 
                 {% if not (is_admin_view is defined and is_admin_view) %}
                 <a href="{{ path('app_market_watch_new') }}"
@@ -105,7 +122,7 @@
     <!-- Desktop Table -->
     <div class="hidden md:block bg-gray-800 rounded-lg overflow-hidden">
         <div data-controller="custom-table"
-             data-custom-table-ajax-url-value="{{ path('app_market_watch_datatable', {period: current_period}) }}"
+             data-custom-table-ajax-url-value="{{ path('app_market_watch_datatable', {period: current_period, server: current_server|default('')}) }}"
              data-custom-table-page-length-value="25">
 
             <!-- Contrôles supérieurs -->
@@ -195,7 +212,7 @@
     <!-- Vue mobile avec les cartes personnalisées -->
     <div class="md:hidden">
         <div data-controller="market-watch-mobile"
-             data-market-watch-mobile-ajax-url-value="{{ path('app_market_watch_datatable', {period: current_period}) }}"
+             data-market-watch-mobile-ajax-url-value="{{ path('app_market_watch_datatable', {period: current_period, server: current_server|default('')}) }}"
              data-market-watch-mobile-page-length-value="10">
 
             <!-- Contrôles mobiles -->
